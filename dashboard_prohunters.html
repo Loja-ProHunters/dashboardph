@@ -233,9 +233,9 @@ tbody td strong{color:var(--black)}
   <div class="topbar">
     <div class="topbar-left"><h1 id="tb-title">Início</h1><p id="tb-sub">Visão geral do portal</p></div>
     <div style="display:flex;align-items:center;gap:10px">
-      <span class="topbar-pill">COMERCIAL</span>
-      <a href="/logout" style="font-size:11px;color:#717571;text-decoration:none;border:1px solid #e2e4e2;border-radius:6px;padding:5px 12px;background:#fff;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='#d94f4f';this.style.color='#d94f4f'" onmouseout="this.style.borderColor='#e2e4e2';this.style.color='#717571'">Sair</a>
-    </div>
+          <span class="topbar-pill">COMERCIAL</span>
+          <a href="/logout" style="font-size:11px;color:#717571;text-decoration:none;border:1px solid #e2e4e2;border-radius:6px;padding:5px 12px;background:#fff;cursor:pointer">Sair</a>
+        </div>
   </div>
   <div class="content">
 
@@ -547,7 +547,7 @@ function md(t){return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(
 function addMsg(role,text){const box=document.getElementById('chatBox'),d=document.createElement('div');d.className='msg '+role;d.innerHTML=`<div class="msg-av">${role==='bot'?'PH':'EU'}</div><div class="msg-bbl"><p>${md(text)}</p></div>`;box.appendChild(d);box.scrollTop=box.scrollHeight}
 function addTyping(){const box=document.getElementById('chatBox'),d=document.createElement('div');d.className='msg bot';d.id='typing';d.innerHTML='<div class="msg-av">PH</div><div class="msg-bbl"><div class="typing-bbl"><span></span><span></span><span></span></div></div>';box.appendChild(d);box.scrollTop=box.scrollHeight}
 function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
-async function sendMessage(){const inp=document.getElementById('chatInput'),txt=inp.value.trim();if(!txt)return;const key='proxy';// autenticação gerenciada pelo servidorinp.value='';document.getElementById('btnSend').disabled=true;addMsg('user',txt);history.push({role:'user',content:txt});addTyping();try{const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:SYS,messages:history})});const data=await res.json();removeTyping();if(data.error){addMsg('bot','⚠ Erro: '+data.error.message)}else{const reply=data.content.find(b=>b.type==='text')?.text||'';addMsg('bot',reply);history.push({role:'assistant',content:reply})}}catch(e){removeTyping();addMsg('bot','⚠ Falha de conexão. Verifique a chave API e tente novamente.')}document.getElementById('btnSend').disabled=false;inp.focus()}
+async function sendMessage(){const inp=document.getElementById('chatInput'),txt=inp.value.trim();if(!txt)return;// autenticação via servidorinp.value='';document.getElementById('btnSend').disabled=true;addMsg('user',txt);history.push({role:'user',content:txt});addTyping();try{const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:SYS,messages:history})});const data=await res.json();removeTyping();if(data.error){addMsg('bot','⚠ Erro: '+data.error.message)}else{const reply=data.content.find(b=>b.type==='text')?.text||'';addMsg('bot',reply);history.push({role:'assistant',content:reply})}}catch(e){removeTyping();addMsg('bot','⚠ Falha de conexão. Verifique a chave API e tente novamente.')}document.getElementById('btnSend').disabled=false;inp.focus()}
 function sendQuick(t){document.getElementById('chatInput').value=t;sendMessage()}
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}}
 </script>
