@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pro Hunters</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#5aaa66;--gd:#3d8a49;--gl:#eaf6ec;--gm:#c2e6c8;--k:#111412;--dk:#444846;--gy:#717571;--gl2:#b0b4b0;--bg:#f4f5f4;--bd:#e2e4e2;--wh:#ffffff;--r:#d94f4f;--rl:#fdf1f1}
+html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--k);font-size:14px}
+.app{display:flex;height:100vh;overflow:hidden}
+.sb{width:230px;min-width:230px;background:var(--wh);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto;z-index:100;transition:transform .25s}
+.sb-logo{padding:20px 18px 16px;border-bottom:1px solid var(--bd)}
+.sb-mark{display:flex;align-items:center;gap:9px;margin-bottom:3px}
+.sb-icon{width:30px;height:30px;background:var(--g);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-icon svg{width:17px;height:17px;fill:none;stroke:#fff;stroke-width:2}
+.sb-name{font-size:14px;font-weight:800}
+.sb-sub{font-size:11px;color:var(--gy);margin-left:39px}
+.sb-grp{padding:12px 10px 4px}
+.sb-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gl2);padding:0 8px 6px}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--dk);border:none;background:none;width:100%;text-align:left;transition:background .15s,color .15s}
+.ni:hover{background:var(--bg);color:var(--k)}
+.ni.on{background:var(--gl);color:var(--gd);font-weight:700}
+.ni-ic{width:26px;height:26px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ni.on .ni-ic{background:var(--gm)}
+.badge{margin-left:auto;background:var(--g);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px}
+.badge-admin{margin-left:auto;background:#8b5cf6;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px}
+.sb-foot{margin-top:auto;padding:14px 18px;border-top:1px solid var(--bd);font-size:11px;color:var(--gl2)}
+.hbg{display:none;position:fixed;top:12px;left:12px;z-index:200;background:var(--wh);border:1px solid var(--bd);border-radius:7px;padding:7px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.hbg span{display:block;width:18px;height:2px;background:var(--k);margin:3px 0;border-radius:2px}
+.ovl{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:90}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{background:var(--wh);border-bottom:1px solid var(--bd);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
+.tb-l h1{font-size:17px;font-weight:800}
+.tb-l p{font-size:12px;color:var(--gy);margin-top:1px}
+.tb-r{display:flex;align-items:center;gap:10px}
+.pill{background:var(--gl);color:var(--gd);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid var(--gm)}
+.user-pill{font-size:11px;color:var(--gy);font-weight:600}
+.btn-sair{font-size:11px;color:var(--gy);text-decoration:none;border:1px solid var(--bd);border-radius:6px;padding:4px 12px;background:var(--wh);cursor:pointer;transition:all .15s}
+.btn-sair:hover{border-color:var(--r);color:var(--r)}
+.content{flex:1;overflow-y:auto;padding:24px}
+.tab{display:none}.tab.on{display:block}
+.sec-title{font-size:14px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--gm)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.kpi{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.kpi-lbl{font-size:10px;color:var(--gy);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.kpi-val{font-size:26px;font-weight:800;color:var(--gd);line-height:1}
+.kpi-sub{font-size:11px;color:var(--gy);margin-top:3px}
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.co{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.co-tag{display:inline-block;font-size:10px;font-weight:700;background:var(--gl);color:var(--gd);border-radius:5px;padding:2px 7px;margin-bottom:7px}
+.co-name{font-size:13px;font-weight:700;margin-bottom:3px}
+.co-desc{font-size:12px;color:var(--gy);line-height:1.5}
+.cl{border-radius:9px;padding:12px 15px;margin-bottom:12px;border:1px solid var(--gm);background:var(--gl)}
+.cl.red{border-color:#f5c0c0;background:var(--rl)}
+.cl.gray{border-color:var(--bd);background:var(--bg)}
+.cl-t{font-size:12px;font-weight:700;color:var(--gd);margin-bottom:5px}
+.cl.red .cl-t{color:var(--r)}
+.cl.gray .cl-t{color:var(--dk)}
+.cl ul{padding-left:15px}
+.cl li{font-size:12px;color:var(--dk);margin-bottom:3px;line-height:1.5}
+.taco-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:18px}
+.taco{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.05);position:relative;overflow:hidden}
+.taco::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--g)}
+.taco-l{font-size:34px;font-weight:900;color:var(--gm);line-height:1;margin-bottom:7px}
+.taco-n{font-size:14px;font-weight:700;margin-bottom:7px}
+.taco-b{font-size:12px;color:var(--dk);line-height:1.6}
+.taco-q{margin-top:9px;padding:7px 10px;background:var(--gl);border-left:3px solid var(--g);border-radius:0 5px 5px 0;font-size:11px;color:var(--gd);font-style:italic}
+.meta-strip{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.meta-p{flex:1;min-width:110px;background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.meta-n{font-size:22px;font-weight:800;color:var(--gd)}
+.meta-l{font-size:11px;color:var(--gy);margin-top:2px}
+.acc-list{display:flex;flex-direction:column;gap:7px}
+.acc-item{background:var(--wh);border:1px solid var(--bd);border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.acc-hd{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;transition:background .15s}
+.acc-hd:hover{background:var(--bg)}
+.acc-num{width:24px;height:24px;background:var(--g);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.acc-title{font-size:13px;font-weight:600;flex:1}
+.acc-tag{font-size:10px;font-weight:600;color:var(--gd);background:var(--gl);border:1px solid var(--gm);padding:2px 8px;border-radius:20px}
+.acc-chv{color:var(--gl2);font-size:10px;transition:transform .2s}
+.acc-bd{display:none;padding:4px 16px 14px 50px;border-top:1px solid var(--bd)}
+.acc-bd.on{display:block}
+.acc-step{display:flex;gap:7px;margin-top:7px;font-size:12px;color:var(--dk);line-height:1.5}
+.acc-dot{width:5px;height:5px;background:var(--g);border-radius:50%;margin-top:6px;flex-shrink:0}
+.vid-sec{margin-top:28px}
+.vid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.vid-card{background:var(--wh);border:1px solid var(--bd);border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.vid-thumb{width:100%;aspect-ratio:16/9;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;border-bottom:1px solid var(--bd);cursor:pointer;position:relative;overflow:hidden}
+.vid-thumb iframe{position:absolute;inset:0;width:100%;height:100%;border:none;display:none}
+.vid-thumb.play iframe{display:block}
+.vid-thumb.play .vui{display:none}
+.vui{display:flex;flex-direction:column;align-items:center;gap:7px}
+.vbtn{width:44px;height:44px;background:var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .15s,background .15s}
+.vbtn:hover{background:var(--gd);transform:scale(1.08)}
+.vbtn svg{width:18px;height:18px;fill:#fff;margin-left:2px}
+.vlbl{font-size:11px;color:var(--gy)}
+.vid-info{padding:12px 14px}
+.vid-num{font-size:10px;font-weight:700;color:var(--gd);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.vid-name{font-size:12px;font-weight:700;margin-bottom:3px}
+.vid-desc{font-size:11px;color:var(--gy);line-height:1.4}
+.vs{display:inline-block;margin-top:7px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.vs.ok{background:var(--gl);color:var(--gd);border:1px solid var(--gm)}
+.proc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:18px}
+.proc{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.proc-n{width:30px;height:30px;background:var(--g);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;margin-bottom:10px}
+.proc-t{font-size:13px;font-weight:700;margin-bottom:5px}
+.proc-d{font-size:12px;color:var(--dk);line-height:1.6}
+.tw{overflow-x:auto;border-radius:9px;border:1px solid var(--bd);box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:18px}
+table{width:100%;border-collapse:collapse;background:var(--wh)}
+thead th{background:var(--g);color:#fff;padding:10px 14px;text-align:left;font-size:12px;font-weight:700;white-space:nowrap}
+tbody td{padding:9px 14px;font-size:12px;color:var(--dk);border-bottom:1px solid var(--bd);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even) td{background:var(--bg)}
+/* IA CHAT */
+.ia-wrap{display:flex;flex-direction:column;height:calc(100vh - 130px)}
+.ia-head{background:var(--wh);border:1px solid var(--bd);border-radius:10px 10px 0 0;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ia-av{width:36px;height:36px;background:var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.ia-name{font-size:13px;font-weight:700}
+.ia-st{font-size:11px;color:var(--gd);font-weight:600;display:flex;align-items:center;gap:3px}
+.ia-st::before{content:'';width:5px;height:5px;background:var(--g);border-radius:50%}
+.ia-note{margin-left:auto;font-size:11px;color:var(--gy);max-width:220px;text-align:right;line-height:1.4}
+.chips{display:flex;flex-wrap:wrap;gap:7px;padding:9px 12px;background:var(--wh);border:1px solid var(--bd);border-top:none;flex-shrink:0}
+.chip{border:1px solid var(--bd);background:var(--bg);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--dk);cursor:pointer;font-weight:500;transition:all .15s}
+.chip:hover{border-color:var(--g);color:var(--gd);background:var(--gl)}
+.chat-box{flex:1;overflow-y:auto;padding:16px;background:var(--bg);border:1px solid var(--bd);border-top:none;display:flex;flex-direction:column;gap:12px}
+.msg{display:flex;gap:8px;max-width:80%}
+.msg.u{align-self:flex-end;flex-direction:row-reverse}
+.msg-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.msg.b .msg-av{background:var(--g);color:#fff}
+.msg.u .msg-av{background:var(--bd);color:var(--dk)}
+.msg-bbl{padding:9px 12px;border-radius:9px;font-size:13px;line-height:1.6;white-space:pre-wrap}
+.msg.b .msg-bbl{background:var(--wh);border:1px solid var(--bd);border-radius:2px 9px 9px 9px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.msg.u .msg-bbl{background:var(--g);color:#fff;border-radius:9px 2px 9px 9px}
+.typing{display:flex;gap:3px;align-items:center;padding:10px 14px}
+.typing span{width:6px;height:6px;background:var(--g);border-radius:50%;animation:bop .8s infinite}
+.typing span:nth-child(2){animation-delay:.15s}
+.typing span:nth-child(3){animation-delay:.3s}
+@keyframes bop{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.chat-form{display:flex;gap:9px;padding:10px 12px;background:var(--wh);border:1px solid var(--bd);border-top:none;border-radius:0 0 10px 10px;flex-shrink:0}
+.chat-ta{flex:1;border:1px solid var(--bd);border-radius:7px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;resize:none;transition:border-color .15s}
+.chat-ta:focus{border-color:var(--g)}
+.chat-ta::placeholder{color:var(--gl2)}
+.btn-send{background:var(--g);color:#fff;border:none;border-radius:7px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
+.btn-send:hover{background:var(--gd)}
+.btn-send:disabled{opacity:.5;cursor:not-allowed}
+.err-msg{color:var(--r);font-size:12px;padding:8px 12px;background:var(--rl);border-radius:7px;border:1px solid #f5c0c0}
+/* ADMIN */
+.admin-card{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:16px}
+.admin-card h3{font-size:14px;font-weight:700;margin-bottom:8px}
+.admin-card p{font-size:12px;color:var(--gy);margin-bottom:14px;line-height:1.5}
+.kb-textarea{width:100%;height:500px;border:1px solid var(--bd);border-radius:8px;padding:14px;font-size:12px;font-family:monospace;line-height:1.6;outline:none;resize:vertical;transition:border-color .15s}
+.kb-textarea:focus{border-color:var(--g)}
+.btn-save{background:var(--g);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;margin-top:12px}
+.btn-save:hover{background:var(--gd)}
+.btn-save:disabled{opacity:.5;cursor:not-allowed}
+.save-status{font-size:12px;margin-top:8px;padding:8px 12px;border-radius:7px;display:none}
+.save-status.ok{background:var(--gl);color:var(--gd);border:1px solid var(--gm);display:block}
+.save-status.err{background:var(--rl);color:var(--r);border:1px solid #f5c0c0;display:block}
+@media(max-width:768px){
+  .sb{position:fixed;left:0;top:0;height:100%;transform:translateX(-100%)}
+  .sb.open{transform:translateX(0)}
+  .ovl.show{display:block}
+  .hbg{display:block}
+  .topbar{padding:12px 12px 12px 50px}
+  .content{padding:14px}
+  .taco-grid,.proc-grid{grid-template-columns:1fr}
+  .ia-note{display:none}
+}
+</style>
+</head>
+<body>
+<div class="hbg" onclick="toggleSB()"><span></span><span></span><span></span></div>
+<div class="ovl" id="ovl" onclick="toggleSB()"></div>
+<div class="app">
+
+<aside class="sb" id="sb">
+  <div class="sb-logo">
+    <div class="sb-mark">
+      <div class="sb-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <div class="sb-name">PRO HUNTERS</div>
+    </div>
+    <div class="sb-sub">Portal Interno</div>
+  </div>
+  <div class="sb-grp">
+    <div class="sb-lbl">Principal</div>
+    <button class="ni on" onclick="goTab('inicio',this)"><span class="ni-ic">🏠</span>Início</button>
+    <button class="ni" onclick="goTab('taco',this)"><span class="ni-ic">🎯</span>Método T.A.C.O</button>
+  </div>
+  <div class="sb-grp">
+    <div class="sb-lbl">Operacional</div>
+    <button class="ni" onclick="goTab('bling',this)"><span class="ni-ic">📋</span>Curso Bling</button>
+    <button class="ni" onclick="goTab('processos',this)"><span class="ni-ic">⚙️</span>Processos</button>
+  </div>
+  <div class="sb-grp">
+    <div class="sb-lbl">Inteligência</div>
+    <button class="ni" onclick="goTab('ia',this)"><span class="ni-ic">✦</span>IA Pro Hunters<span class="badge">NOVO</span></button>
+  </div>
+  <div class="sb-grp" id="grp-admin" style="display:none">
+    <div class="sb-lbl">Administração</div>
+    <button class="ni" onclick="goTab('admin',this)"><span class="ni-ic">⚙</span>Base de Conhecimento<span class="badge-admin">ADMIN</span></button>
+  </div>
+  <div class="sb-foot">v2.2 · Blumenau, SC</div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="tb-l"><h1 id="tb-t">Início</h1><p id="tb-s">Visão geral do portal</p></div>
+    <div class="tb-r">
+      <span class="user-pill" id="user-pill"></span>
+      <span class="pill">COMERCIAL</span>
+      <a href="/logout" class="btn-sair">Sair</a>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- INÍCIO -->
+    <div class="tab on" id="tab-inicio">
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-lbl">Conversão mínima</div><div class="kpi-val">10%</div><div class="kpi-sub">Meta ideal: 15%</div></div>
+        <div class="kpi"><div class="kpi-lbl">Ticket mínimo</div><div class="kpi-val">R$1k</div><div class="kpi-sub">Por atendimento</div></div>
+        <div class="kpi"><div class="kpi-lbl">Empresas do grupo</div><div class="kpi-val">4</div><div class="kpi-sub">PH · CR · Reduto · Reconect</div></div>
+        <div class="kpi"><div class="kpi-lbl">Tipos de pedido</div><div class="kpi-val">4</div><div class="kpi-sub">PF loja · PF online · PJ x2</div></div>
+      </div>
+      <div class="sec-title">Empresas do grupo</div>
+      <div class="co-grid">
+        <div class="co"><div class="co-tag">IMPORTAÇÃO</div><div class="co-name">Pro Hunters</div><div class="co-desc">Importações e maior parte do estoque do grupo.</div></div>
+        <div class="co"><div class="co-tag">MERCADO NACIONAL</div><div class="co-name">Calibre Restrito</div><div class="co-desc">Compra e venda de produtos controlados no mercado nacional.</div></div>
+        <div class="co"><div class="co-tag">SAFARIS</div><div class="co-name">Reduto Safaris</div><div class="co-desc">Safaris internacionais. Opera também como Mobile Connect.</div></div>
+        <div class="co"><div class="co-tag">MÍDIA</div><div class="co-name">Reconect</div><div class="co-desc">Estúdio de podcast do grupo.</div></div>
+      </div>
+      <div class="cl red"><div class="cl-t">Atenção — Chronus</div><ul><li>Empresa encerrada. Não nos associamos de forma alguma.</li><li>Se o cliente perguntar: informar que encerrou e auxiliar sem assumir responsabilidade.</li></ul></div>
+    </div>
+
+    <!-- T.A.C.O -->
+    <div class="tab" id="tab-taco">
+      <div class="taco-grid">
+        <div class="taco"><div class="taco-l">T</div><div class="taco-n">Triagem</div><div class="taco-b">Qualifique o cliente antes de qualquer indicação.<br><br>• Qual a experiência?<br>• Tipo de uso pretendido?<br>• Possui CR (se aplicável)?<br><br>Classifique: Quente / Morno / Frio</div></div>
+        <div class="taco"><div class="taco-l">A</div><div class="taco-n">Abordagem</div><div class="taco-b">Posicione-se como especialista. Demonstre domínio técnico.</div><div class="taco-q">"Deixa eu te indicar algo certo pra tua realidade."</div></div>
+        <div class="taco"><div class="taco-l">C</div><div class="taco-n">Condução</div><div class="taco-b">Indique no máximo 2 produtos. Explique o porquê de cada indicação.</div><div class="taco-q">"Se fosse pra mim, eu iria nesse modelo..."</div></div>
+        <div class="taco"><div class="taco-l">O</div><div class="taco-n">Otimização</div><div class="taco-b">Toda venda deve ter complemento.<br><br>Exemplos: bateria, coldre, acessórios.<br><br>Nunca feche sem upsell.</div></div>
+      </div>
+      <div class="meta-strip">
+        <div class="meta-p"><div class="meta-n">10%</div><div class="meta-l">Conversão mínima</div></div>
+        <div class="meta-p"><div class="meta-n">15%</div><div class="meta-l">Meta ideal</div></div>
+        <div class="meta-p"><div class="meta-n">R$1k+</div><div class="meta-l">Ticket mínimo</div></div>
+      </div>
+      <div class="cl red"><div class="cl-t">Erros não tolerados</div><ul><li>Vender sem triagem</li><li>Não ligar para lead quente</li><li>Fechar sem upsell</li><li>Deixar CRM sem próxima ação definida</li></ul></div>
+    </div>
+
+    <!-- BLING -->
+    <div class="tab" id="tab-bling">
+      <div class="cl"><div class="cl-t">Regra de ouro</div><ul><li>Pedido só após confirmação de entrada ou pagamento total. Para orçamentos: proposta comercial.</li></ul></div>
+      <div class="sec-title" style="margin-top:18px">Tipos de pedido</div>
+      <div class="acc-list">
+        <div class="acc-item"><div class="acc-hd" onclick="toggleAcc(this)"><div class="acc-num">1</div><span class="acc-title">PF — Loja Física</span><span class="acc-tag">Venda Balcão</span><span class="acc-chv">▼</span></div><div class="acc-bd"><div class="acc-step"><div class="acc-dot"></div>Venda › Pedido de venda › Incluir pedido</div><div class="acc-step"><div class="acc-dot"></div>Cliente PF, CPF, Contribuinte: 9 Não Contribuinte</div><div class="acc-step"><div class="acc-dot"></div>Loja: Venda Balcão</div><div class="acc-step"><div class="acc-dot"></div>Categoria: Receita Venda Presencial — Loja</div><div class="acc-step"><div class="acc-dot"></div>Produto: clicar no ícone de folha e inserir nº de série</div><div class="acc-step"><div class="acc-dot"></div>Frete: Sem ocorrência de transporte</div><div class="acc-step"><div class="acc-dot"></div>Cartão: C6 Bank · Pix: Unicred</div><div class="acc-step"><div class="acc-dot"></div>Observações: pagamento, parcelas, pagador se terceiro</div></div></div>
+        <div class="acc-item"><div class="acc-hd" onclick="toggleAcc(this)"><div class="acc-num">2</div><span class="acc-title">PF — Online</span><span class="acc-tag">Telemarketing</span><span class="acc-chv">▼</span></div><div class="acc-bd"><div class="acc-step"><div class="acc-dot"></div>Venda › Pedido de venda › Incluir pedido</div><div class="acc-step"><div class="acc-dot"></div>Cliente PF, CPF, Contribuinte: 9 Não Contribuinte</div><div class="acc-step"><div class="acc-dot"></div>Loja: Nenhuma</div><div class="acc-step"><div class="acc-dot"></div>Categoria: Receita Telemarketing — Vendedores</div><div class="acc-step"><div class="acc-dot"></div>Produto: clicar no ícone de folha e inserir nº de série</div><div class="acc-step"><div class="acc-dot"></div>Frete: FOB (cliente paga) ou CIF (empresa paga)</div><div class="acc-step"><div class="acc-dot"></div>Cartão: link Pagar.me · Pix: Unicred</div><div class="acc-step"><div class="acc-dot"></div>Não alterar parcela após lançar frete</div></div></div>
+        <div class="acc-item"><div class="acc-hd" onclick="toggleAcc(this)"><div class="acc-num">3</div><span class="acc-title">PJ — Uso e Consumo</span><span class="acc-tag">Contribuinte ICMS</span><span class="acc-chv">▼</span></div><div class="acc-bd"><div class="acc-step"><div class="acc-dot"></div>Venda › Pedido de venda › Incluir pedido</div><div class="acc-step"><div class="acc-dot"></div>PJ, verificar IE, Contribuinte ICMS</div><div class="acc-step"><div class="acc-dot"></div>Loja: Nenhuma</div><div class="acc-step"><div class="acc-dot"></div>Categoria: Receita Telemarketing — Vendedores</div><div class="acc-step"><div class="acc-dot"></div>Observação obrigatória: "Material para uso e consumo"</div><div class="acc-step"><div class="acc-dot"></div>Frete e parcelas conforme negociação</div></div></div>
+        <div class="acc-item"><div class="acc-hd" onclick="toggleAcc(this)"><div class="acc-num">4</div><span class="acc-title">PJ — Revenda</span><span class="acc-tag">IE Obrigatória</span><span class="acc-chv">▼</span></div><div class="acc-bd"><div class="acc-step"><div class="acc-dot"></div>Venda › Pedido de venda › Incluir pedido</div><div class="acc-step"><div class="acc-dot"></div>PJ, IE obrigatória (lápis do cadastro), Contribuinte ICMS</div><div class="acc-step"><div class="acc-dot"></div>Loja: Nenhuma</div><div class="acc-step"><div class="acc-dot"></div>Categoria: Receita Telemarketing — Vendedores</div><div class="acc-step"><div class="acc-dot"></div>Observação obrigatória: "Material para revenda"</div><div class="acc-step"><div class="acc-dot"></div>Frete e parcelas conforme negociação</div></div></div>
+        <div class="acc-item"><div class="acc-hd" onclick="toggleAcc(this)"><div class="acc-num">5</div><span class="acc-title">Cadastro — PF</span><span class="acc-tag">Cadastros</span><span class="acc-chv">▼</span></div><div class="acc-bd"><div class="acc-step"><div class="acc-dot"></div>Cadastros › Clientes e Fornecedores › Incluir cadastro</div><div class="acc-step"><div class="acc-dot"></div>Nome, Fantasia, Tipo: Física, CPF, Não contribuinte</div><div class="acc-step"><div class="acc-dot"></div>Endereço completo, telefones com prefixo, e-mail, e-mail NFe, data nascimento</div></div></div>
+        <div class="acc-item"><div class="acc-hd" onclick="toggleAcc(this)"><div class="acc-num">6</div><span class="acc-title">Cadastro — PJ</span><span class="acc-tag">Cadastros</span><span class="acc-chv">▼</span></div><div class="acc-bd"><div class="acc-step"><div class="acc-dot"></div>Cadastros › Clientes e Fornecedores › Incluir cadastro</div><div class="acc-step"><div class="acc-dot"></div>Nome, Fantasia, Tipo: Jurídica, CNPJ, Contribuinte ICMS, IE, IM se houver</div><div class="acc-step"><div class="acc-dot"></div>Endereço completo, telefones com prefixo, e-mail, e-mail NFe</div></div></div>
+      </div>
+      <div class="vid-sec">
+        <div class="sec-title">Video Aulas — Curso Bling</div>
+        <div class="vid-grid">
+          <div class="vid-card"><div class="vid-thumb" id="vt1" onclick="playVid('vt1','1toyZjuuuotvwSrlze0923bef2BYkys3K')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 01</div><div class="vid-name">Pedido PF — Loja Física</div><div class="vid-desc">Pedido presencial, categoria, frete e pagamentos.</div><span class="vs ok">Disponível</span></div></div>
+          <div class="vid-card"><div class="vid-thumb" id="vt2" onclick="playVid('vt2','1r6k4loRBuRo8_C-sBD0wM63axyHnHp3H')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 02</div><div class="vid-name">Pedido PF — Online</div><div class="vid-desc">Telemarketing, frete FOB/CIF e Pagar.me.</div><span class="vs ok">Disponível</span></div></div>
+          <div class="vid-card"><div class="vid-thumb" id="vt3" onclick="playVid('vt3','1TSZmp0vkZ_LihbzfrgklxmbnJVM6l0Nd')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 03</div><div class="vid-name">Pedido PJ — Online</div><div class="vid-desc">IE, revenda vs uso e consumo.</div><span class="vs ok">Disponível</span></div></div>
+          <div class="vid-card"><div class="vid-thumb" id="vt4" onclick="playVid('vt4','1u7cLrkvdbSkkGMJ4gTr4TyPhA8yW2Ty3')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 04</div><div class="vid-name">Pedido PJ — Loja Física</div><div class="vid-desc">Venda balcão, IE e observações obrigatórias.</div><span class="vs ok">Disponível</span></div></div>
+          <div class="vid-card"><div class="vid-thumb" id="vt5" onclick="playVid('vt5','1FqTLffu3xQI5AG0M_hyVDm56XFNscdUC')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 05</div><div class="vid-name">Cadastro — PF</div><div class="vid-desc">Campos obrigatórios e dados fiscais PF.</div><span class="vs ok">Disponível</span></div></div>
+          <div class="vid-card"><div class="vid-thumb" id="vt6" onclick="playVid('vt6','1neRF6_TrWWuxB-j_p80LGolRj5N7gXiN')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 06</div><div class="vid-name">Cadastro — PJ</div><div class="vid-desc">Campos obrigatórios e dados fiscais PJ.</div><span class="vs ok">Disponível</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROCESSOS -->
+    <div class="tab" id="tab-processos">
+      <div class="sec-title">Venda de Armas — 3 etapas</div>
+      <div class="cl gray"><div class="cl-t">Estoque</div><ul><li>Sempre usar planilha de controle de armas — nunca o Bling.</li></ul></div>
+      <div class="proc-grid">
+        <div class="proc"><div class="proc-n">1</div><div class="proc-t">Venda</div><div class="proc-d">Planilha › marcar vendida › nº série e peso › inserir no pedido › imprimir › bunker › Financeiro</div></div>
+        <div class="proc"><div class="proc-n">2</div><div class="proc-t">Autorização</div><div class="proc-d">Imprimir 1ª NF › conferir › assinar › NF com nº série › enviar cliente (CRAF)</div></div>
+        <div class="proc"><div class="proc-n">3</div><div class="proc-t">CRAF recebido</div><div class="proc-d">Última NF › conferir nº série › pesar › Trello › aguardar envio</div></div>
+      </div>
+      <div class="cl red"><div class="cl-t">NUNCA PULAR ETAPAS</div></div>
+      <div class="sec-title" style="margin-top:22px">Guia de Trânsito (GT)</div>
+      <div class="cl"><div class="cl-t">GT — Ezequiel (terrestre)</div><ul><li>Modelo: Dropbox › Comercial › Documentações › Guias e Minutas</li><li>Editar em vermelho: nº guia, nº NF, data, destinatário, SFPC, produto, qtd (unidade), volume (caixa), marca, código de barras, validade 60 dias</li><li>NUNCA salvar. Imprimir › carimbar › assinar (João ou Luis) › digitalizar</li><li>Salvar em: Dropbox › Expediente › Pro Hunters › EXÉRCITO › GT para Clientes › 2026</li><li>Nome: GT-2026-06-02 - Selo nº 11.542.630 - Nome do Cliente - Produto</li></ul></div>
+      <div class="cl"><div class="cl-t">GT — Cliente retira pessoalmente</div><ul><li>Transportador = dados do próprio cliente. Mesmo processo.</li></ul></div>
+      <div class="cl"><div class="cl-t">GT — Gollog (aéreo)</div><ul><li>Usar somente quando vendedor avisar. Preencher Verso GT + Minuta eletrônica. Gollog cobra cliente direto.</li></ul></div>
+      <div class="sec-title" style="margin-top:22px">Portal Postal</div>
+      <div class="cl"><div class="cl-t">Etiqueta — Envio</div><ul><li>portalpostal.com.br › Etiqueta › Gerar etiqueta › PAC</li><li>NF no Bling: Vendas › NF de Saída › cliente › Imprimir NF simplificada</li><li>Nome/empresa/aos cuidados = cliente · Chave NF = nº abaixo do código de barras · Conteúdo = descrição do produto · Valor = preço un. da NF</li></ul></div>
+      <div class="cl"><div class="cl-t">Logística Reversa</div><ul><li>portalpostal.com.br › Logística Reversa › Gerar Autorização de Postagem (Reversa) · PAC · Válida 10 dias</li></ul></div>
+      <div class="sec-title" style="margin-top:22px">Documentação por produto</div>
+      <div class="tw"><table><thead><tr><th>Produto</th><th>Documentação</th></tr></thead><tbody>
+        <tr><td>Armas de fogo</td><td>Sem prévia — simples faturamento (entrega futura)</td></tr>
+        <tr><td>Munições</td><td>CRAF válido no mesmo calibre</td></tr>
+        <tr><td>Prensas de recarga</td><td>CR + autorização de compra</td></tr>
+        <tr><td>DIES e matrizes</td><td>CR + autorização (exceções → Gerência)</td></tr>
+        <tr><td>Insumos — espoletas</td><td>Prensa apostilada no CR</td></tr>
+        <tr><td>Insumos — estojos/projéteis/cartuchos</td><td>Prensa apostilada + CRAF do calibre</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <!-- IA -->
+    <div class="tab" id="tab-ia">
+      <div class="ia-wrap">
+        <div class="ia-head">
+          <div class="ia-av">PH</div>
+          <div><div class="ia-name">Assistente Pro Hunters</div><div class="ia-st">Online</div></div>
+          <div class="ia-note">Dúvidas não cobertas: consultar Luis ou a gerência.</div>
+        </div>
+        <div class="chips">
+          <span class="chip" onclick="sq('Como faco um pedido PF online no Bling?')">Pedido PF online</span>
+          <span class="chip" onclick="sq('Quais documentos o cliente precisa para comprar municao?')">Docs municao</span>
+          <span class="chip" onclick="sq('Explique as 3 etapas da venda de arma')">Venda de arma</span>
+          <span class="chip" onclick="sq('Como preencher uma Guia de Transito?')">Guia de Transito</span>
+          <span class="chip" onclick="sq('Como fazer etiqueta no Portal Postal?')">Portal Postal</span>
+          <span class="chip" onclick="sq('Qual a diferenca entre Pro Hunters e Calibre Restrito?')">PH vs CR</span>
+          <span class="chip" onclick="sq('Resuma o Metodo T.A.C.O')">T.A.C.O</span>
+        </div>
+        <div class="chat-box" id="chatBox">
+          <div class="msg b"><div class="msg-av">PH</div><div class="msg-bbl">Ola. Sou o assistente interno da Pro Hunters. Posso responder duvidas sobre processos operacionais, Bling, T.A.C.O, Guias de Transito e documentacao de produtos controlados. Como posso ajudar?</div></div>
+        </div>
+        <div class="chat-form">
+          <textarea class="chat-ta" id="chatIn" rows="2" placeholder="Digite sua duvida operacional..." onkeydown="handleKey(event)"></textarea>
+          <button class="btn-send" id="btnSend" onclick="sendMsg()">Enviar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="tab" id="tab-admin">
+      <div class="admin-card">
+        <h3>Base de Conhecimento da IA</h3>
+        <p>Edite o texto abaixo para atualizar o que a IA sabe sobre a Pro Hunters. Cada regra nova, processo ou instrucao adicionada aqui passa a valer imediatamente na proxima conversa. Clique em Salvar apos editar.</p>
+        <textarea class="kb-textarea" id="kbText" placeholder="Carregando..."></textarea>
+        <br>
+        <button class="btn-save" id="btnSave" onclick="saveKB()">Salvar base de conhecimento</button>
+        <div class="save-status" id="saveStatus"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+<script>
+/* %%INJECT%% */
+
+var tabMeta = {
+  inicio:    ['Inicio','Visao geral do portal'],
+  taco:      ['Metodo T.A.C.O','Processo comercial oficial'],
+  bling:     ['Curso Bling','Tipos de pedido, cadastros e video aulas'],
+  processos: ['Processos','Armas, GT, Portal Postal, Documentacao'],
+  ia:        ['IA Pro Hunters','Assistente de conhecimento interno'],
+  admin:     ['Base de Conhecimento','Gerenciar o que a IA sabe']
+};
+
+// Mostrar aba admin e nome do usuario
+window.onload = function() {
+  if (typeof IS_ADMIN !== 'undefined' && IS_ADMIN) {
+    document.getElementById('grp-admin').style.display = 'block';
+  }
+  if (typeof USER_NOME !== 'undefined' && USER_NOME) {
+    document.getElementById('user-pill').textContent = USER_NOME;
+  }
+};
+
+function goTab(id, el) {
+  var tabs = document.querySelectorAll('.tab');
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
+  var nis = document.querySelectorAll('.ni');
+  for (var i = 0; i < nis.length; i++) nis[i].classList.remove('on');
+  document.getElementById('tab-' + id).classList.add('on');
+  el.classList.add('on');
+  document.getElementById('tb-t').textContent = tabMeta[id][0];
+  document.getElementById('tb-s').textContent = tabMeta[id][1];
+  closeSB();
+  if (id === 'admin') loadKB();
+}
+
+function toggleSB() {
+  document.getElementById('sb').classList.toggle('open');
+  document.getElementById('ovl').classList.toggle('show');
+}
+function closeSB() {
+  document.getElementById('sb').classList.remove('open');
+  document.getElementById('ovl').classList.remove('show');
+}
+
+function toggleAcc(h) {
+  var b = h.nextElementSibling;
+  var c = h.querySelector('.acc-chv');
+  var isOpen = b.classList.contains('on');
+  var bodies = document.querySelectorAll('.acc-bd');
+  var chevs  = document.querySelectorAll('.acc-chv');
+  for (var i = 0; i < bodies.length; i++) bodies[i].classList.remove('on');
+  for (var i = 0; i < chevs.length; i++)  chevs[i].style.transform = '';
+  if (!isOpen) { b.classList.add('on'); c.style.transform = 'rotate(180deg)'; }
+}
+
+function playVid(thumbId, fileId) {
+  var th = document.getElementById(thumbId);
+  var fr = th.querySelector('iframe');
+  fr.src = 'https://drive.google.com/file/d/' + fileId + '/preview';
+  th.classList.add('play');
+}
+
+// CHAT
+var history = [];
+
+function addMsg(role, text) {
+  var box = document.getElementById('chatBox');
+  var d   = document.createElement('div');
+  d.className = 'msg ' + role;
+  var av  = document.createElement('div');
+  av.className = 'msg-av';
+  av.textContent = (role === 'b') ? 'PH' : 'EU';
+  var bl  = document.createElement('div');
+  bl.className = 'msg-bbl';
+  bl.textContent = text;
+  d.appendChild(av);
+  d.appendChild(bl);
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+
+function addTyping() {
+  var box = document.getElementById('chatBox');
+  var d   = document.createElement('div');
+  d.className = 'msg b';
+  d.id = 'typing';
+  var av = document.createElement('div');
+  av.className = 'msg-av';
+  av.textContent = 'PH';
+  var bl = document.createElement('div');
+  bl.className = 'msg-bbl';
+  var t  = document.createElement('div');
+  t.className = 'typing';
+  t.innerHTML = '<span></span><span></span><span></span>';
+  bl.appendChild(t);
+  d.appendChild(av);
+  d.appendChild(bl);
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+
+function removeTyping() {
+  var t = document.getElementById('typing');
+  if (t) t.remove();
+}
+
+function sendMsg() {
+  var inp = document.getElementById('chatIn');
+  var btn = document.getElementById('btnSend');
+  var txt = inp.value.trim();
+  if (!txt || btn.disabled) return;
+  inp.value = '';
+  btn.disabled = true;
+  addMsg('u', txt);
+  history.push({ role: 'user', content: txt });
+  addTyping();
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/api/chat', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.timeout = 30000;
+  xhr.onload = function() {
+    removeTyping();
+    try {
+      var data = JSON.parse(xhr.responseText);
+      if (data.error) {
+        addMsg('b', 'Erro: ' + data.error.message);
+      } else {
+        var reply = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : 'Sem resposta.';
+        addMsg('b', reply);
+        history.push({ role: 'assistant', content: reply });
+      }
+    } catch(e) {
+      addMsg('b', 'Erro ao processar resposta. Tente novamente.');
+    }
+    btn.disabled = false;
+    inp.focus();
+  };
+  xhr.onerror = function() {
+    removeTyping();
+    addMsg('b', 'Falha de conexao. Verifique sua internet e tente novamente.');
+    btn.disabled = false;
+  };
+  xhr.ontimeout = function() {
+    removeTyping();
+    addMsg('b', 'Tempo esgotado. Tente novamente.');
+    btn.disabled = false;
+  };
+  xhr.send(JSON.stringify({ messages: history }));
+}
+
+function sq(t) { document.getElementById('chatIn').value = t; sendMsg(); }
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
+
+// ADMIN — carregar e salvar base de conhecimento
+function loadKB() {
+  var ta = document.getElementById('kbText');
+  ta.value = 'Carregando...';
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', '/api/knowledge', true);
+  xhr.onload = function() {
+    try {
+      var data = JSON.parse(xhr.responseText);
+      ta.value = data.knowledge || '';
+    } catch(e) {
+      ta.value = 'Erro ao carregar.';
+    }
+  };
+  xhr.onerror = function() { ta.value = 'Erro de conexao.'; };
+  xhr.send();
+}
+
+function saveKB() {
+  var ta  = document.getElementById('kbText');
+  var btn = document.getElementById('btnSave');
+  var st  = document.getElementById('saveStatus');
+  btn.disabled = true;
+  st.className = 'save-status';
+  st.textContent = '';
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/api/knowledge', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onload = function() {
+    btn.disabled = false;
+    try {
+      var data = JSON.parse(xhr.responseText);
+      if (data.ok) {
+        st.className = 'save-status ok';
+        st.textContent = 'Base de conhecimento salva com sucesso! A IA ja usa o novo conteudo.';
+      } else {
+        st.className = 'save-status err';
+        st.textContent = 'Erro ao salvar: ' + (data.error || 'desconhecido');
+      }
+    } catch(e) {
+      st.className = 'save-status err';
+      st.textContent = 'Erro ao processar resposta.';
+    }
+  };
+  xhr.onerror = function() {
+    btn.disabled = false;
+    st.className = 'save-status err';
+    st.textContent = 'Falha de conexao.';
+  };
+  xhr.send(JSON.stringify({ knowledge: ta.value }));
+}
+</script>
+</body>
+</html>
