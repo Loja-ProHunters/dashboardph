@@ -156,6 +156,23 @@ tbody tr:nth-child(even) td{background:var(--bg)}
 .save-status{font-size:12px;margin-top:8px;padding:8px 12px;border-radius:7px;display:none}
 .save-status.ok{background:var(--gl);color:var(--gd);border:1px solid var(--gm);display:block}
 .save-status.err{background:var(--rl);color:var(--r);border:1px solid #f5c0c0;display:block}
+.ct-card{background:var(--wh);border:1px solid var(--bd);border-radius:12px;padding:22px;max-width:760px}
+.ct-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.ct-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.ct-field label{font-size:12px;font-weight:700;color:var(--dk)}
+.ct-field input,.ct-field select,.ct-field textarea{border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+.ct-field input:focus,.ct-field select:focus,.ct-field textarea:focus{border-color:var(--g)}
+.ct-toggle{display:flex;align-items:center;gap:8px;margin:16px 0;padding:12px;background:var(--bg);border-radius:8px;cursor:pointer}
+.ct-toggle input{width:16px;height:16px}
+.ct-toggle span{font-size:13px;font-weight:600}
+.ct-parcela{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center}
+.ct-parcela input{border:1px solid var(--bd);border-radius:7px;padding:8px 9px;font-size:12px;font-family:inherit}
+.ct-rm{background:var(--rl);color:var(--r);border:1px solid #f5c0c0;border-radius:7px;width:30px;height:32px;cursor:pointer;font-size:15px;line-height:1}
+.ct-add{background:var(--gl);color:var(--gd);border:1px solid var(--gm);border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:14px}
+.ct-add:hover{background:var(--gm)}
+.ct-hint{font-size:11px;color:var(--gy);margin-top:-6px;margin-bottom:14px}
+.ct-sec{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--gy);margin:20px 0 10px;padding-top:16px;border-top:1px solid var(--bd)}
+.ct-sec:first-of-type{border-top:none;padding-top:0;margin-top:0}
 @media(max-width:768px){
   .sb{position:fixed;left:0;top:0;height:100%;transform:translateX(-100%)}
   .sb.open{transform:translateX(0)}
@@ -190,6 +207,7 @@ tbody tr:nth-child(even) td{background:var(--bg)}
     <div class="sb-lbl">Operacional</div>
     <button class="ni" onclick="goTab('bling',this)"><span class="ni-ic">📋</span>Curso Bling</button>
     <button class="ni" onclick="goTab('processos',this)"><span class="ni-ic">⚙️</span>Processos</button>
+    <button class="ni" onclick="goTab('contratos',this)"><span class="ni-ic">📄</span>Contratos</button>
   </div>
   <div class="sb-grp">
     <div class="sb-lbl">Inteligência</div>
@@ -300,6 +318,72 @@ tbody tr:nth-child(even) td{background:var(--bg)}
       </tbody></table></div>
     </div>
 
+    <!-- CONTRATOS -->
+    <div class="tab" id="tab-contratos">
+      <div class="ct-card">
+        <div class="ct-sec">Empresa e modelo</div>
+        <div class="ct-row">
+          <div class="ct-field">
+            <label>Empresa</label>
+            <select id="ctEmpresa" onchange="ctOnEmpresaChange()">
+              <option value="ph">Pro Hunters</option>
+              <option value="cr">Calibre Restrito</option>
+            </select>
+          </div>
+          <div class="ct-field">
+            <label>Tipo de contrato</label>
+            <select id="ctTipo" onchange="ctOnTipoChange()">
+              <option value="avista">Venda à Vista</option>
+              <option value="parcelado">Venda Parcelada</option>
+              <option value="combinado">Pagamento Combinado Programado (só Pro Hunters)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ct-sec">Cliente</div>
+        <div class="ct-row">
+          <div class="ct-field"><label>Nome completo</label><input id="ctClienteNome" placeholder="Nome do cliente"></div>
+          <div class="ct-field"><label>CPF / CNPJ</label><input id="ctClienteDoc" placeholder="000.000.000-00"></div>
+        </div>
+        <div class="ct-field"><label>Endereço completo</label><input id="ctClienteEndereco" placeholder="Rua, número, bairro, cidade/UF, CEP"></div>
+
+        <div class="ct-sec">Produto</div>
+        <div class="ct-field"><label>Descrição do produto</label><input id="ctProduto" placeholder="Ex: Rifle Ruger American Rifle Standard, Calibre 308 win"></div>
+
+        <div class="ct-sec">Pagamento</div>
+        <label class="ct-toggle">
+          <input type="checkbox" id="ctPersonalizado" onchange="ctOnPersonalizadoChange()">
+          <span>Negociação personalizada — usar texto livre em vez dos campos estruturados</span>
+        </label>
+
+        <div id="ctPersonalizadoBox" style="display:none">
+          <div class="ct-field"><label>Condições de pagamento (texto livre)</label><textarea id="ctTextoPersonalizado" rows="4" placeholder="Descreva exatamente as condições acertadas com o cliente..."></textarea></div>
+        </div>
+
+        <div id="ctCamposAvista">
+          <div class="ct-row">
+            <div class="ct-field"><label>Valor (R$)</label><input id="ctAvValor" type="number" step="0.01" placeholder="0,00"></div>
+            <div class="ct-field"><label>Data do pagamento</label><input id="ctAvData" type="date"></div>
+          </div>
+          <div class="ct-field"><label>Forma de pagamento</label><input id="ctAvForma" placeholder="Ex: Pix ou Cartão de crédito"></div>
+        </div>
+
+        <div id="ctCamposParcelado" style="display:none">
+          <div class="ct-field"><label>Valor total (R$)</label><input id="ctPcValorTotal" type="number" step="0.01" placeholder="0,00"></div>
+          <div id="ctParcelasList"></div>
+          <button type="button" class="ct-add" onclick="ctAddParcela()">+ Adicionar parcela</button>
+        </div>
+
+        <div id="ctCamposCombinado" style="display:none">
+          <div class="ct-hint">Entrada de 20% e parcelas mensais mínimas de 5% já estão fixas no texto do contrato.</div>
+          <div class="ct-field"><label>Forma de pagamento</label><input id="ctCbForma" placeholder="Ex: PIX ou boleto bancário"></div>
+        </div>
+
+        <button class="btn-save" id="ctBtnGerar" onclick="ctGerar()" style="margin-top:8px">Gerar Contrato (PDF)</button>
+        <div class="save-status" id="ctStatus"></div>
+      </div>
+    </div>
+
     <!-- IA -->
     <div class="tab" id="tab-ia">
       <div class="ia-wrap">
@@ -350,6 +434,7 @@ var tabMeta = {
   taco:      ['Metodo T.A.C.O','Processo comercial oficial'],
   bling:     ['Curso Bling','Tipos de pedido, cadastros e video aulas'],
   processos: ['Processos','Armas, GT, Portal Postal, Documentacao'],
+  contratos: ['Contratos','Gerador de contratos em PDF'],
   ia:        ['IA Pro Hunters','Assistente de conhecimento interno'],
   admin:     ['Base de Conhecimento','Gerenciar o que a IA sabe']
 };
@@ -511,6 +596,160 @@ function loadKB() {
   };
   xhr.onerror = function() { ta.value = 'Erro de conexao.'; };
   xhr.send();
+}
+
+// CONTRATOS
+var ctParcelaSeq = 0;
+
+function ctOnTipoChange() {
+  var tipo = document.getElementById('ctTipo').value;
+  document.getElementById('ctCamposAvista').style.display = (tipo === 'avista') ? 'block' : 'none';
+  document.getElementById('ctCamposParcelado').style.display = (tipo === 'parcelado') ? 'block' : 'none';
+  document.getElementById('ctCamposCombinado').style.display = (tipo === 'combinado') ? 'block' : 'none';
+  if (tipo === 'combinado') {
+    document.getElementById('ctEmpresa').value = 'ph';
+    document.getElementById('ctEmpresa').disabled = true;
+  } else {
+    document.getElementById('ctEmpresa').disabled = false;
+  }
+  if (tipo === 'parcelado' && document.getElementById('ctParcelasList').children.length === 0) {
+    ctAddParcela();
+  }
+}
+
+function ctOnEmpresaChange() {
+  var empresa = document.getElementById('ctEmpresa').value;
+  var tipoSel = document.getElementById('ctTipo');
+  if (empresa === 'cr' && tipoSel.value === 'combinado') {
+    tipoSel.value = 'avista';
+    ctOnTipoChange();
+  }
+}
+
+function ctOnPersonalizadoChange() {
+  var on = document.getElementById('ctPersonalizado').checked;
+  document.getElementById('ctPersonalizadoBox').style.display = on ? 'block' : 'none';
+  var tipo = document.getElementById('ctTipo').value;
+  if (tipo === 'avista') document.getElementById('ctCamposAvista').style.display = on ? 'none' : 'block';
+  if (tipo === 'parcelado') document.getElementById('ctCamposParcelado').style.display = on ? 'none' : 'block';
+  if (tipo === 'combinado') document.getElementById('ctCamposCombinado').style.display = on ? 'none' : 'block';
+}
+
+function ctAddParcela() {
+  ctParcelaSeq++;
+  var id = 'ctp' + ctParcelaSeq;
+  var div = document.createElement('div');
+  div.className = 'ct-parcela';
+  div.id = id;
+  div.innerHTML =
+    '<input placeholder="Descricao (Ex: Entrada, 1 Boleto)" id="' + id + '_desc">' +
+    '<input placeholder="Valor R$" type="number" step="0.01" id="' + id + '_valor">' +
+    '<input placeholder="Forma (Pix/Boleto/Cartao)" id="' + id + '_forma">' +
+    '<input placeholder="Data" type="date" id="' + id + '_data">' +
+    '<button type="button" class="ct-rm" onclick="document.getElementById(\'' + id + '\').remove()">×</button>';
+  document.getElementById('ctParcelasList').appendChild(div);
+}
+
+function ctSetStatus(ok, msg) {
+  var st = document.getElementById('ctStatus');
+  st.className = 'save-status ' + (ok ? 'ok' : 'err');
+  st.textContent = msg;
+}
+
+function ctFmtDateBR(iso) {
+  if (!iso) return '';
+  var p = iso.split('-');
+  return p.length === 3 ? (p[2] + '/' + p[1] + '/' + p[0]) : iso;
+}
+
+function ctGerar() {
+  var nome = document.getElementById('ctClienteNome').value.trim();
+  var doc = document.getElementById('ctClienteDoc').value.trim();
+  var endereco = document.getElementById('ctClienteEndereco').value.trim();
+  var produto = document.getElementById('ctProduto').value.trim();
+  var tipo = document.getElementById('ctTipo').value;
+  var empresa = document.getElementById('ctEmpresa').value;
+  var personalizado = document.getElementById('ctPersonalizado').checked;
+
+  if (!nome || !doc || !endereco || !produto) {
+    ctSetStatus(false, 'Preencha nome, documento, endereco do cliente e o produto.');
+    return;
+  }
+
+  var payload = {
+    tipo: tipo, empresa: empresa, personalizado: personalizado,
+    cliente: { nome: nome, doc: doc, endereco: endereco },
+    produto: produto,
+  };
+
+  if (personalizado) {
+    var texto = document.getElementById('ctTextoPersonalizado').value.trim();
+    if (!texto) { ctSetStatus(false, 'Descreva as condicoes de pagamento personalizadas.'); return; }
+    payload.textoPersonalizado = texto;
+  } else if (tipo === 'avista') {
+    var valor = document.getElementById('ctAvValor').value;
+    var data = document.getElementById('ctAvData').value;
+    var forma = document.getElementById('ctAvForma').value.trim();
+    if (!valor || !data || !forma) { ctSetStatus(false, 'Preencha valor, data e forma de pagamento.'); return; }
+    payload.valor = parseFloat(valor);
+    payload.dataPagamento = ctFmtDateBR(data);
+    payload.formaPagamento = forma;
+  } else if (tipo === 'parcelado') {
+    var valorTotal = document.getElementById('ctPcValorTotal').value;
+    if (!valorTotal) { ctSetStatus(false, 'Preencha o valor total.'); return; }
+    var rows = document.querySelectorAll('#ctParcelasList .ct-parcela');
+    if (!rows.length) { ctSetStatus(false, 'Adicione ao menos uma parcela.'); return; }
+    var parcelas = [];
+    for (var i = 0; i < rows.length; i++) {
+      var id = rows[i].id;
+      var d = document.getElementById(id + '_desc').value.trim();
+      var v = document.getElementById(id + '_valor').value;
+      var f = document.getElementById(id + '_forma').value.trim();
+      var dt = document.getElementById(id + '_data').value;
+      if (!d || !v || !f || !dt) { ctSetStatus(false, 'Preencha todos os campos de cada parcela.'); return; }
+      parcelas.push({ descricao: d, valor: parseFloat(v), forma: f, data: ctFmtDateBR(dt) });
+    }
+    payload.valorTotal = parseFloat(valorTotal);
+    payload.parcelas = parcelas;
+  } else if (tipo === 'combinado') {
+    var formaCb = document.getElementById('ctCbForma').value.trim();
+    if (!formaCb) { ctSetStatus(false, 'Preencha a forma de pagamento.'); return; }
+    payload.formaPagamento = formaCb;
+  }
+
+  var btn = document.getElementById('ctBtnGerar');
+  btn.disabled = true;
+  ctSetStatus(true, 'Gerando contrato...');
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/api/contract', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.responseType = 'blob';
+  xhr.onload = function() {
+    btn.disabled = false;
+    if (xhr.status !== 200) {
+      var reader = new FileReader();
+      reader.onload = function() {
+        try {
+          var err = JSON.parse(reader.result);
+          ctSetStatus(false, err.error || 'Erro ao gerar contrato.');
+        } catch (e) { ctSetStatus(false, 'Erro ao gerar contrato.'); }
+      };
+      reader.readAsText(xhr.response);
+      return;
+    }
+    var cd = xhr.getResponseHeader('Content-Disposition') || '';
+    var m = cd.match(/filename="([^"]+)"/);
+    var filename = m ? m[1] : 'contrato.pdf';
+    var blobUrl = URL.createObjectURL(xhr.response);
+    var a = document.createElement('a');
+    a.href = blobUrl; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+    ctSetStatus(true, 'Contrato gerado com sucesso: ' + filename);
+  };
+  xhr.onerror = function() { btn.disabled = false; ctSetStatus(false, 'Falha de conexao.'); };
+  xhr.send(JSON.stringify(payload));
 }
 
 function saveKB() {
