@@ -36,14 +36,84 @@ function readBody(req) {
   });
 }
 
-// ── Knowledge base ───────────────────────────────────────────
-function getKnowledge() {
-  try { return fs.readFileSync(KB_FILE, 'utf-8'); }
-  catch(e) { return require('../system_prompt'); }
+// ── Knowledge base (persistida no GitHub, pois o filesystem da ──
+// ── Vercel é somente-leitura em produção — fs.writeFileSync nunca ──
+// ── vai persistir de verdade rodando lá) ─────────────────────────
+function githubRequest(method, apiPath, body) {
+  return new Promise((resolve, reject) => {
+    if (!config.githubToken || !config.githubRepo) {
+      reject(new Error('GITHUB_TOKEN ou GITHUB_REPO não configurados nas variáveis de ambiente da Vercel.'));
+      return;
+    }
+    const payload = body ? JSON.stringify(body) : null;
+    const opts = {
+      hostname: 'api.github.com',
+      path: apiPath,
+      method,
+      headers: {
+        'User-Agent': 'prohunters-portal',
+        'Accept': 'application/vnd.github+json',
+        'Authorization': 'Bearer ' + config.githubToken,
+        ...(payload ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) } : {}),
+      },
+    };
+    const r = https.request(opts, res => {
+      let d = '';
+      res.on('data', c => d += c);
+      res.on('end', () => {
+        let parsed = null;
+        try { parsed = JSON.parse(d); } catch (e) {}
+        if (res.statusCode >= 200 && res.statusCode < 300) resolve(parsed);
+        else reject(new Error('GitHub API ' + res.statusCode + ': ' + (parsed && parsed.message ? parsed.message : d)));
+      });
+    });
+    r.on('error', reject);
+    if (payload) r.write(payload);
+    r.end();
+  });
 }
 
-function saveKnowledge(text) {
-  fs.writeFileSync(KB_FILE, text, 'utf-8');
+// Cache em memória por invocação fria (evita ficar batendo no GitHub a cada request de chat)
+let kbCache = { text: null, ts: 0 };
+const KB_CACHE_MS = 60 * 1000; // 1 minuto
+
+async function getKnowledge() {
+  const now = Date.now();
+  if (kbCache.text !== null && (now - kbCache.ts) < KB_CACHE_MS) {
+    return kbCache.text;
+  }
+  try {
+    const filePath = 'knowledge.txt';
+    const apiPath = '/repos/' + config.githubRepo + '/contents/' + filePath + '?ref=' + config.githubBranch;
+    const data = await githubRequest('GET', apiPath);
+    const text = Buffer.from(data.content, 'base64').toString('utf-8');
+    kbCache = { text, ts: now };
+    return text;
+  } catch (e) {
+    // Fallback: arquivo local empacotado no deploy (só leitura, pode estar desatualizado)
+    try { return fs.readFileSync(KB_FILE, 'utf-8'); }
+    catch (e2) { return require('../system_prompt'); }
+  }
+}
+
+async function saveKnowledge(text) {
+  const filePath = 'knowledge.txt';
+  const apiPath = '/repos/' + config.githubRepo + '/contents/' + filePath;
+  // Precisa do sha do arquivo atual para o GitHub aceitar o update
+  let sha = null;
+  try {
+    const current = await githubRequest('GET', apiPath + '?ref=' + config.githubBranch);
+    sha = current.sha;
+  } catch (e) {
+    // arquivo pode não existir ainda — segue sem sha (cria novo)
+  }
+  await githubRequest('PUT', apiPath, {
+    message: 'Atualiza base de conhecimento via painel admin',
+    content: Buffer.from(text, 'utf-8').toString('base64'),
+    branch: config.githubBranch,
+    ...(sha ? { sha } : {}),
+  });
+  kbCache = { text, ts: Date.now() }; // invalida cache local imediatamente
 }
 
 // ── Anthropic proxy ──────────────────────────────────────────
@@ -128,7 +198,7 @@ module.exports = async (req, res) => {
     const body = await readBody(req);
     try {
       const { messages } = JSON.parse(body);
-      const knowledge = getKnowledge();
+      const knowledge = await getKnowledge();
       const result = await callAnthropic(messages, knowledge);
       res.writeHead(result.status, { 'Content-Type': 'application/json' });
       res.end(result.body);
@@ -147,8 +217,14 @@ module.exports = async (req, res) => {
       res.end(JSON.stringify({ error: 'Acesso negado.' }));
       return;
     }
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ knowledge: getKnowledge() }));
+    try {
+      const knowledge = await getKnowledge();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ knowledge }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao carregar: ' + e.message }));
+    }
     return;
   }
 
@@ -163,12 +239,12 @@ module.exports = async (req, res) => {
     const body = await readBody(req);
     try {
       const { knowledge } = JSON.parse(body);
-      saveKnowledge(knowledge);
+      await saveKnowledge(knowledge);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
     } catch(e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Erro ao salvar.' }));
+      res.end(JSON.stringify({ error: 'Erro ao salvar: ' + e.message }));
     }
     return;
   }
