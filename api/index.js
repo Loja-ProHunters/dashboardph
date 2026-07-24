@@ -4,21 +4,40 @@ const fs     = require('fs');
 const path   = require('path');
 const config = require('../config');
 const { gerarContrato } = require('../lib/contracts');
+const { gerarGT } = require('../lib/gt');
+const { extrairNF } = require('../lib/nfExtract');
 
 const SESSION_MS = (config.sessionHours || 8) * 60 * 60 * 1000;
-const sessions   = {};
 const ROOT       = path.join(__dirname, '..');
 const KB_FILE    = path.join(ROOT, 'knowledge.txt');
 
-// ── Sessão ──────────────────────────────────────────────────
-function newToken() { return crypto.randomBytes(32).toString('hex'); }
+// ── Sessão (stateless — assinada no próprio cookie, sem depender de ──
+// ── memória do servidor, que não é compartilhada entre instâncias   ──
+// ── serverless da Vercel) ─────────────────────────────────────────
+function sign(payloadB64) {
+  return crypto.createHmac('sha256', config.sessionSecret).update(payloadB64).digest('hex');
+}
+
+function newToken(sessionData) {
+  const payloadB64 = Buffer.from(JSON.stringify(sessionData)).toString('base64url');
+  const sig = sign(payloadB64);
+  return payloadB64 + '.' + sig;
+}
 
 function getSession(req) {
-  const m = (req.headers.cookie || '').match(/ph_session=([a-f0-9]+)/);
+  const m = (req.headers.cookie || '').match(/ph_session=([^;]+)/);
   if (!m) return null;
-  const s = sessions[m[1]];
-  if (!s || Date.now() > s.expiry) { delete sessions[m[1]]; return null; }
-  return s;
+  const token = decodeURIComponent(m[1]);
+  const parts = token.split('.');
+  if (parts.length !== 2) return null;
+  const [payloadB64, sig] = parts;
+  let expectedSig;
+  try { expectedSig = sign(payloadB64); } catch (e) { return null; }
+  if (expectedSig.length !== sig.length || !crypto.timingSafeEqual(Buffer.from(expectedSig), Buffer.from(sig))) return null;
+  let data;
+  try { data = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf-8')); } catch (e) { return null; }
+  if (!data || Date.now() > data.expiry) return null;
+  return data;
 }
 
 function parseForm(body) {
@@ -169,8 +188,7 @@ module.exports = async (req, res) => {
       res.end(loginPage(true));
       return;
     }
-    const token = newToken();
-    sessions[token] = { nome: user.nome, usuario: user.usuario, expiry: Date.now() + SESSION_MS };
+    const token = newToken({ nome: user.nome, usuario: user.usuario, expiry: Date.now() + SESSION_MS });
     res.writeHead(302, {
       'Set-Cookie': 'ph_session=' + token + '; HttpOnly; Path=/; Max-Age=' + Math.floor(SESSION_MS/1000),
       'Location': '/',
@@ -181,8 +199,6 @@ module.exports = async (req, res) => {
 
   // GET /logout
   if (url === '/logout') {
-    const m = (req.headers.cookie || '').match(/ph_session=([a-f0-9]+)/);
-    if (m) delete sessions[m[1]];
     res.writeHead(302, { 'Set-Cookie': 'ph_session=; HttpOnly; Path=/; Max-Age=0', 'Location': '/' });
     res.end();
     return;
@@ -273,6 +289,58 @@ module.exports = async (req, res) => {
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Erro ao gerar contrato: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/nf-extract — extrai dados da NF via IA (qualquer usuário logado)
+  if (req.method === 'POST' && url === '/api/nf-extract') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { pdfBase64 } = JSON.parse(body);
+      if (!pdfBase64) throw new Error('Nenhum arquivo recebido.');
+      const data = await extrairNF(pdfBase64);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(data));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao extrair dados da NF: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/gt — gera o PDF da Guia de Transito (qualquer usuário logado)
+  if (req.method === 'POST' && url === '/api/gt') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      if (!data || !data.destinatarios || !data.destinatarios[0] || !data.destinatarios[0].nome) {
+        throw new Error('Preencha ao menos os dados do destinatário.');
+      }
+      if (!data.produtos || !data.produtos.length) {
+        throw new Error('Adicione ao menos um produto.');
+      }
+      const { bytes, filename } = await gerarGT(data);
+      res.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename="' + filename.replace(/"/g, '') + '"',
+      });
+      res.end(Buffer.from(bytes));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao gerar GT: ' + e.message }));
     }
     return;
   }
