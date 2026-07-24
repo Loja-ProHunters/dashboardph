@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const fs     = require('fs');
 const path   = require('path');
 const config = require('../config');
+const { gerarContrato } = require('../lib/contracts');
 
 const SESSION_MS = (config.sessionHours || 8) * 60 * 60 * 1000;
 const sessions   = {};
@@ -245,6 +246,33 @@ module.exports = async (req, res) => {
     } catch(e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Erro ao salvar: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/contract — gera o PDF do contrato (qualquer usuário logado)
+  if (req.method === 'POST' && url === '/api/contract') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      if (!data || !data.cliente || !data.cliente.nome || !data.cliente.doc || !data.cliente.endereco || !data.produto) {
+        throw new Error('Preencha nome, documento, endereço do cliente e o produto.');
+      }
+      const { bytes, filename } = await gerarContrato(data);
+      res.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename="' + filename.replace(/"/g, '') + '"',
+      });
+      res.end(Buffer.from(bytes));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao gerar contrato: ' + e.message }));
     }
     return;
   }
