@@ -173,6 +173,15 @@ tbody tr:nth-child(even) td{background:var(--bg)}
 .ct-hint{font-size:11px;color:var(--gy);margin-top:-6px;margin-bottom:14px}
 .ct-sec{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--gy);margin:20px 0 10px;padding-top:16px;border-top:1px solid var(--bd)}
 .ct-sec:first-of-type{border-top:none;padding-top:0;margin-top:0}
+.ct-subtabs{display:flex;gap:8px;margin-bottom:16px}
+.ct-subtab{background:var(--wh);border:1px solid var(--bd);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;color:var(--gy)}
+.ct-subtab.on{background:var(--gl);color:var(--gd);border-color:var(--gm)}
+.ct-subpane{display:none}.ct-subpane.on{display:block}
+.gt-prod{border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:10px;background:var(--bg)}
+.gt-prod-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.gt-prod-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.gt-prod input,.gt-prod select{width:100%;border:1px solid var(--bd);border-radius:7px;padding:7px 9px;font-size:12px;font-family:inherit}
+.gt-prod-rm{background:var(--rl);color:var(--r);border:1px solid #f5c0c0;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer}
 @media(max-width:768px){
   .sb{position:fixed;left:0;top:0;height:100%;transform:translateX(-100%)}
   .sb.open{transform:translateX(0)}
@@ -207,7 +216,7 @@ tbody tr:nth-child(even) td{background:var(--bg)}
     <div class="sb-lbl">Operacional</div>
     <button class="ni" onclick="goTab('bling',this)"><span class="ni-ic">📋</span>Curso Bling</button>
     <button class="ni" onclick="goTab('processos',this)"><span class="ni-ic">⚙️</span>Processos</button>
-    <button class="ni" onclick="goTab('contratos',this)"><span class="ni-ic">📄</span>Contratos</button>
+    <button class="ni" onclick="goTab('contratos',this)"><span class="ni-ic">📄</span>Documentos</button>
   </div>
   <div class="sb-grp">
     <div class="sb-lbl">Inteligência</div>
@@ -318,8 +327,14 @@ tbody tr:nth-child(even) td{background:var(--bg)}
       </tbody></table></div>
     </div>
 
-    <!-- CONTRATOS -->
+    <!-- CONTRATOS / GT -->
     <div class="tab" id="tab-contratos">
+      <div class="ct-subtabs">
+        <button class="ct-subtab on" id="ctsub-contratos" onclick="ctSwitchSub('contratos')">Contratos</button>
+        <button class="ct-subtab" id="ctsub-gt" onclick="ctSwitchSub('gt')">Guias de Trânsito</button>
+      </div>
+
+      <div class="ct-subpane on" id="ctpane-contratos">
       <div class="ct-card">
         <div class="ct-sec">Empresa e modelo</div>
         <div class="ct-row">
@@ -382,6 +397,92 @@ tbody tr:nth-child(even) td{background:var(--bg)}
         <button class="btn-save" id="ctBtnGerar" onclick="ctGerar()" style="margin-top:8px">Gerar Contrato (PDF)</button>
         <div class="save-status" id="ctStatus"></div>
       </div>
+      </div>
+
+      <div class="ct-subpane" id="ctpane-gt">
+      <div class="ct-card" style="max-width:900px">
+        <div class="ct-sec">Nota Fiscal (opcional — preenche automaticamente)</div>
+        <div class="ct-row">
+          <div class="ct-field"><label>Upload da NF (PDF)</label><input type="file" id="gtNfFile" accept="application/pdf"></div>
+          <div class="ct-field" style="justify-content:flex-end"><label>&nbsp;</label><button type="button" class="ct-add" id="gtBtnExtrair" onclick="gtExtrairNF()">Extrair dados da NF</button></div>
+        </div>
+        <div class="save-status" id="gtNfStatus"></div>
+
+        <div class="ct-sec">Empresa e variante</div>
+        <div class="ct-row">
+          <div class="ct-field">
+            <label>Empresa</label>
+            <select id="gtEmpresa"><option value="ph">Pro Hunters</option><option value="cr">Calibre Restrito</option></select>
+          </div>
+          <div class="ct-field">
+            <label>Variante da GT</label>
+            <select id="gtVariante" onchange="gtOnVarianteChange()">
+              <option value="pessoa_fisica">Pessoa Física Transportando (cliente retira)</option>
+              <option value="ezequiel">Ezequiel Transportadora Express</option>
+              <option value="ezequiel_gollog">Ezequiel Express — Redespacho Gollog (aéreo)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ct-sec">Nota Fiscal / Envio</div>
+        <div class="ct-row">
+          <div class="ct-field"><label>Nota Fiscal nº</label><input id="gtNotaFiscal"></div>
+          <div class="ct-field"><label>Data de envio</label><input type="date" id="gtDataEnvio"></div>
+        </div>
+        <div class="ct-field"><label>Número de volumes</label><input type="number" id="gtNumVolumes" value="1"></div>
+
+        <div class="ct-sec">Destinatário (cliente)</div>
+        <div class="ct-row">
+          <div class="ct-field"><label>Nome completo</label><input id="gtDestNome"></div>
+          <div class="ct-field"><label>CPF / CNPJ</label><input id="gtDestDoc"></div>
+        </div>
+        <div class="ct-field"><label>Endereço completo</label><input id="gtDestEndereco"></div>
+        <div class="ct-row">
+          <div class="ct-field"><label>Telefone</label><input id="gtDestTelefone"></div>
+          <div class="ct-field"><label>UF (estado)</label><input id="gtDestUf" maxlength="2" placeholder="Ex: SC" onchange="gtUpdateSfpc()" oninput="gtUpdateSfpc()"></div>
+        </div>
+        <div class="ct-hint" id="gtSfpcHint">SFPC: —</div>
+
+        <div class="ct-sec">Produtos controlados</div>
+        <div id="gtProdutosList"></div>
+        <button type="button" class="ct-add" onclick="gtAddProduto()">+ Adicionar produto</button>
+
+        <div class="ct-sec">Selo de autenticidade</div>
+        <div class="ct-field"><label>Número do selo (impresso no selo físico)</label><input id="gtSeloNumero" placeholder="Ex: 11542630"></div>
+
+        <div id="gtGollogBox" style="display:none">
+          <div class="ct-sec">Verso GT + Minuta Gollog</div>
+          <div class="ct-row">
+            <div class="ct-field"><label>Aeroporto de retirada</label><input id="gtGAeroporto"></div>
+            <div class="ct-field"><label>Trecho (origem - destino)</label><input id="gtGTrecho"></div>
+          </div>
+          <div class="ct-row">
+            <div class="ct-field"><label>Forma de pagamento</label><input id="gtGFormaPagamento" placeholder="Ex: A vista"></div>
+            <div class="ct-field"><label>Tipo de entrega</label><input id="gtGTipoEntrega" placeholder="Ex: Proprio"></div>
+          </div>
+          <div class="ct-row">
+            <div class="ct-field"><label>Tomador do frete</label><input id="gtGTomadorFrete"></div>
+            <div class="ct-field"><label>CNPJ do tomador</label><input id="gtGCnpjTomador"></div>
+          </div>
+          <div class="ct-row">
+            <div class="ct-field"><label>Nº conta Gollog</label><input id="gtGContaGollog"></div>
+            <div class="ct-field"><label>Peso total</label><input id="gtGPesoTotal" placeholder="Ex: 8kg"></div>
+          </div>
+          <div class="ct-row">
+            <div class="ct-field"><label>Tipo de embalagem</label><input id="gtGTipoEmbalagem"></div>
+            <div class="ct-field"><label>Produto predominante</label><input id="gtGProdutoPredominante"></div>
+          </div>
+          <div class="ct-row">
+            <div class="ct-field"><label>Medidas da embalagem</label><input id="gtGMedidas" placeholder="Ex: 40x30x20cm"></div>
+            <div class="ct-field"><label>Tipo de seguro</label><input id="gtGTipoSeguro"></div>
+          </div>
+          <div class="ct-field"><label>Valor da mercadoria</label><input id="gtGValorMercadoria" placeholder="R$ 0,00"></div>
+        </div>
+
+        <button class="btn-save" id="gtBtnGerar" onclick="gtGerar()" style="margin-top:8px">Gerar GT (PDF)</button>
+        <div class="save-status" id="gtStatus"></div>
+      </div>
+      </div>
     </div>
 
     <!-- IA -->
@@ -434,7 +535,7 @@ var tabMeta = {
   taco:      ['Metodo T.A.C.O','Processo comercial oficial'],
   bling:     ['Curso Bling','Tipos de pedido, cadastros e video aulas'],
   processos: ['Processos','Armas, GT, Portal Postal, Documentacao'],
-  contratos: ['Contratos','Gerador de contratos em PDF'],
+  contratos: ['Documentos','Contratos e Guias de Transito'],
   ia:        ['IA Pro Hunters','Assistente de conhecimento interno'],
   admin:     ['Base de Conhecimento','Gerenciar o que a IA sabe']
 };
@@ -751,6 +852,232 @@ function ctGerar() {
   xhr.onerror = function() { btn.disabled = false; ctSetStatus(false, 'Falha de conexao.'); };
   xhr.send(JSON.stringify(payload));
 }
+
+// SUB-ABAS DOCUMENTOS
+function ctSwitchSub(which) {
+  document.getElementById('ctsub-contratos').classList.toggle('on', which === 'contratos');
+  document.getElementById('ctsub-gt').classList.toggle('on', which === 'gt');
+  document.getElementById('ctpane-contratos').classList.toggle('on', which === 'contratos');
+  document.getElementById('ctpane-gt').classList.toggle('on', which === 'gt');
+}
+
+// GT — SFPC por UF
+var SFPC_POR_UF = {
+  RJ:1,ES:1, SP:2, RS:3, MG:4, PR:5,SC:5, BA:6,SE:6, AL:7,PE:7,PB:7,RN:7,
+  PA:8,AP:8,MA:8, MS:9,MT:9, CE:10,PI:10, DF:11,GO:11,TO:11, AM:12,AC:12,RR:12,RO:12
+};
+function gtUpdateSfpc() {
+  var uf = document.getElementById('gtDestUf').value.trim().toUpperCase();
+  var n = SFPC_POR_UF[uf];
+  document.getElementById('gtSfpcHint').textContent = n ? ('SFPC: SFPC/' + String(n).padStart(2,'0')) : 'SFPC: UF nao reconhecida';
+}
+
+function gtOnVarianteChange() {
+  var v = document.getElementById('gtVariante').value;
+  document.getElementById('gtGollogBox').style.display = (v === 'ezequiel_gollog') ? 'block' : 'none';
+}
+
+var gtProdSeq = 0;
+function gtAddProduto(preset) {
+  gtProdSeq++;
+  var id = 'gtp' + gtProdSeq;
+  var div = document.createElement('div');
+  div.className = 'gt-prod';
+  div.id = id;
+  div.innerHTML =
+    '<div class="gt-prod-row">' +
+      '<input placeholder="Produto (Ex: Municao, Arma de Fogo de Repeticao de Calibre Restrito)" id="' + id + '_produto">' +
+      '<input placeholder="Complemento (descricao completa)" id="' + id + '_complemento">' +
+    '</div>' +
+    '<div class="gt-prod-row3">' +
+      '<input placeholder="Unidade" id="' + id + '_unidade" value="Unidade">' +
+      '<input placeholder="Qtd" type="number" id="' + id + '_qtd" value="1">' +
+      '<input placeholder="Volume" type="number" id="' + id + '_volume" value="1">' +
+    '</div>' +
+    '<div class="gt-prod-row">' +
+      '<input placeholder="Marca" id="' + id + '_marca">' +
+      '<input placeholder="Numero de serie (ou Nao Contem)" id="' + id + '_serie">' +
+    '</div>' +
+    '<button type="button" class="gt-prod-rm" onclick="document.getElementById(\'' + id + '\').remove()">Remover produto</button>';
+  document.getElementById('gtProdutosList').appendChild(div);
+  if (preset) {
+    document.getElementById(id + '_produto').value = preset.produto || '';
+    document.getElementById(id + '_complemento').value = preset.complemento || '';
+    document.getElementById(id + '_unidade').value = preset.unidade || 'Unidade';
+    document.getElementById(id + '_qtd').value = preset.qtd || 1;
+    document.getElementById(id + '_marca').value = preset.marca || '';
+    document.getElementById(id + '_serie').value = preset.serie || '';
+  }
+}
+
+function gtClearProdutos() {
+  document.getElementById('gtProdutosList').innerHTML = '';
+}
+
+function gtSetStatus(elId, ok, msg) {
+  var st = document.getElementById(elId);
+  st.className = 'save-status ' + (ok ? 'ok' : 'err');
+  st.textContent = msg;
+}
+
+function gtFmtDateBR(iso) {
+  if (!iso) return '';
+  var p = iso.split('-');
+  return p.length === 3 ? (p[2] + '/' + p[1] + '/' + p[0]) : iso;
+}
+function gtIsoFromBR(br) {
+  if (!br) return '';
+  var p = br.split('/');
+  return p.length === 3 ? (p[2] + '-' + p[1] + '-' + p[0]) : br;
+}
+
+function gtExtrairNF() {
+  var fileInput = document.getElementById('gtNfFile');
+  if (!fileInput.files || !fileInput.files[0]) {
+    gtSetStatus('gtNfStatus', false, 'Selecione o PDF da NF primeiro.');
+    return;
+  }
+  var file = fileInput.files[0];
+  var btn = document.getElementById('gtBtnExtrair');
+  btn.disabled = true;
+  gtSetStatus('gtNfStatus', true, 'Lendo a NF e extraindo os dados...');
+
+  var reader = new FileReader();
+  reader.onload = function() {
+    var base64 = reader.result.split(',')[1];
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/nf-extract', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = function() {
+      btn.disabled = false;
+      try {
+        var data = JSON.parse(xhr.responseText);
+        if (xhr.status !== 200 || data.error) {
+          gtSetStatus('gtNfStatus', false, data.error || 'Erro ao extrair dados.');
+          return;
+        }
+        if (data.empresaSugerida) document.getElementById('gtEmpresa').value = data.empresaSugerida;
+        if (data.notaFiscal) document.getElementById('gtNotaFiscal').value = data.notaFiscal;
+        if (data.cliente) {
+          document.getElementById('gtDestNome').value = data.cliente.nome || '';
+          document.getElementById('gtDestDoc').value = data.cliente.doc || '';
+          document.getElementById('gtDestEndereco').value = data.cliente.endereco || '';
+          document.getElementById('gtDestTelefone').value = data.cliente.telefone || '';
+          document.getElementById('gtDestUf').value = data.cliente.uf || '';
+          gtUpdateSfpc();
+        }
+        gtClearProdutos();
+        (data.produtosControlados || []).forEach(function(p) { gtAddProduto(p); });
+        if (!data.produtosControlados || !data.produtosControlados.length) gtAddProduto();
+        var avisos = (data.avisos || []).join(' | ');
+        gtSetStatus('gtNfStatus', true, 'Dados extraidos! Revise TODOS os campos antes de gerar.' + (avisos ? ' Avisos: ' + avisos : ''));
+      } catch (e) {
+        gtSetStatus('gtNfStatus', false, 'Erro ao processar resposta da IA.');
+      }
+    };
+    xhr.onerror = function() { btn.disabled = false; gtSetStatus('gtNfStatus', false, 'Falha de conexao.'); };
+    xhr.send(JSON.stringify({ pdfBase64: base64 }));
+  };
+  reader.readAsDataURL(file);
+}
+
+function gtGerar() {
+  var empresa = document.getElementById('gtEmpresa').value;
+  var variante = document.getElementById('gtVariante').value;
+  var notaFiscal = document.getElementById('gtNotaFiscal').value.trim();
+  var dataEnvioIso = document.getElementById('gtDataEnvio').value;
+  var numVolumes = document.getElementById('gtNumVolumes').value || 1;
+  var nome = document.getElementById('gtDestNome').value.trim();
+  var doc = document.getElementById('gtDestDoc').value.trim();
+  var endereco = document.getElementById('gtDestEndereco').value.trim();
+  var telefone = document.getElementById('gtDestTelefone').value.trim();
+  var uf = document.getElementById('gtDestUf').value.trim().toUpperCase();
+  var seloNumero = document.getElementById('gtSeloNumero').value.trim();
+
+  if (!notaFiscal || !dataEnvioIso || !nome || !doc || !endereco || !uf || !seloNumero) {
+    gtSetStatus('gtStatus', false, 'Preencha NF, data, destinatario completo (incl. UF) e numero do selo.');
+    return;
+  }
+  var sfpcN = SFPC_POR_UF[uf];
+  if (!sfpcN) { gtSetStatus('gtStatus', false, 'UF nao reconhecida para calculo do SFPC.'); return; }
+
+  var rows = document.querySelectorAll('#gtProdutosList .gt-prod');
+  if (!rows.length) { gtSetStatus('gtStatus', false, 'Adicione ao menos um produto.'); return; }
+  var produtos = [];
+  for (var i = 0; i < rows.length; i++) {
+    var id = rows[i].id;
+    var produto = document.getElementById(id + '_produto').value.trim();
+    var complemento = document.getElementById(id + '_complemento').value.trim();
+    if (!produto || !complemento) { gtSetStatus('gtStatus', false, 'Preencha produto e complemento de todos os itens.'); return; }
+    produtos.push({
+      produto: produto, complemento: complemento,
+      unidade: document.getElementById(id + '_unidade').value.trim() || 'Unidade',
+      qtd: parseInt(document.getElementById(id + '_qtd').value) || 1,
+      volume: parseInt(document.getElementById(id + '_volume').value) || 1,
+      marca: document.getElementById(id + '_marca').value.trim(),
+      serie: document.getElementById(id + '_serie').value.trim() || 'Nao Contem',
+    });
+  }
+
+  var payload = {
+    empresa: empresa, variante: variante, notaFiscal: notaFiscal,
+    dataEnvio: gtFmtDateBR(dataEnvioIso), numeroVolumes: parseInt(numVolumes) || 1,
+    destinatarios: [{ nome: nome, doc: doc, endereco: endereco, telefone: telefone, sfpc: 'SFPC/' + String(sfpcN).padStart(2,'0') }],
+    produtos: produtos, seloNumero: seloNumero,
+  };
+
+  if (variante === 'ezequiel_gollog') {
+    payload.gollog = {
+      aeroporto: document.getElementById('gtGAeroporto').value.trim(),
+      trecho: document.getElementById('gtGTrecho').value.trim(),
+      formaPagamento: document.getElementById('gtGFormaPagamento').value.trim(),
+      tipoEntrega: document.getElementById('gtGTipoEntrega').value.trim(),
+      tomadorFrete: document.getElementById('gtGTomadorFrete').value.trim(),
+      cnpjTomador: document.getElementById('gtGCnpjTomador').value.trim(),
+      nContaGollog: document.getElementById('gtGContaGollog').value.trim(),
+      pesoTotal: document.getElementById('gtGPesoTotal').value.trim(),
+      tipoEmbalagem: document.getElementById('gtGTipoEmbalagem').value.trim(),
+      produtoPredominante: document.getElementById('gtGProdutoPredominante').value.trim(),
+      medidasEmbalagens: document.getElementById('gtGMedidas').value.trim(),
+      tipoSeguro: document.getElementById('gtGTipoSeguro').value.trim(),
+      valorMercadoria: document.getElementById('gtGValorMercadoria').value.trim(),
+      nVolumes: String(numVolumes),
+    };
+  }
+
+  var btn = document.getElementById('gtBtnGerar');
+  btn.disabled = true;
+  gtSetStatus('gtStatus', true, 'Gerando GT...');
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/api/gt', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.responseType = 'blob';
+  xhr.onload = function() {
+    btn.disabled = false;
+    if (xhr.status !== 200) {
+      var reader = new FileReader();
+      reader.onload = function() {
+        try { var err = JSON.parse(reader.result); gtSetStatus('gtStatus', false, err.error || 'Erro ao gerar GT.'); }
+        catch (e) { gtSetStatus('gtStatus', false, 'Erro ao gerar GT.'); }
+      };
+      reader.readAsText(xhr.response);
+      return;
+    }
+    var cd = xhr.getResponseHeader('Content-Disposition') || '';
+    var m = cd.match(/filename="([^"]+)"/);
+    var filename = m ? m[1] : 'gt.pdf';
+    var blobUrl = URL.createObjectURL(xhr.response);
+    var a = document.createElement('a');
+    a.href = blobUrl; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+    gtSetStatus('gtStatus', true, 'GT gerada com sucesso: ' + filename + '. Lembre-se: ainda precisa carimbar e assinar fisicamente antes de escanear.');
+  };
+  xhr.onerror = function() { btn.disabled = false; gtSetStatus('gtStatus', false, 'Falha de conexao.'); };
+  xhr.send(JSON.stringify(payload));
+}
+gtAddProduto();
 
 function saveKB() {
   var ta  = document.getElementById('kbText');
