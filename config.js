@@ -10,11 +10,21 @@
 //   GITHUB_REPO          → ex: "Loja-ProHunters/dashboardph"
 //   GITHUB_BRANCH        → ex: "main" (opcional, padrão "main")
 //   SESSION_HOURS         → ex: "8" (opcional, padrão 8)
+//   SESSION_SECRET         → opcional, texto aleatório longo pra assinar o cookie de sessão (recomendado)
 //   USERS_JSON            → lista de usuários em JSON (veja exemplo abaixo)
 //
 // Exemplo de valor para USERS_JSON (copie e cole em uma linha só na Vercel):
 // [{"usuario":"luis","senha":"SUA_SENHA_AQUI","nome":"Luis"},{"usuario":"vendas","senha":"SUA_SENHA_AQUI","nome":"Vendedor"},{"usuario":"admin","senha":"SUA_SENHA_AQUI","nome":"Admin"}]
 // ─────────────────────────────────────────────────────────────
+
+const crypto = require('crypto');
+
+function loadSessionSecret() {
+  if (process.env.SESSION_SECRET) return process.env.SESSION_SECRET;
+  return crypto.createHash('sha256')
+    .update('prohunters-session-fallback|' + (process.env.ANTHROPIC_API_KEY || '') + '|' + (process.env.GITHUB_TOKEN || ''))
+    .digest('hex');
+}
 
 function loadUsers() {
   if (process.env.USERS_JSON) {
@@ -37,5 +47,6 @@ module.exports = {
   model:        process.env.MODEL || 'claude-sonnet-4-6',
   maxTokens:    parseInt(process.env.MAX_TOKENS || '1000', 10),
   sessionHours: parseInt(process.env.SESSION_HOURS || '8', 10),
+  sessionSecret: loadSessionSecret(),
   users:        loadUsers(),
 };
