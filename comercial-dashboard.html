@@ -509,6 +509,97 @@ tbody td {
 .forecast-text .sub { font-size: 12px; color: var(--gray4); }
 
 /* ─── CONSULTANT OF MONTH ─── */
+/* ═══════════════════════════════════════
+   PÓDIO — COMPETIÇÃO AO VIVO
+═══════════════════════════════════════ */
+.podium-stage{
+  min-height:calc(100vh - 140px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 24px;position:relative;overflow:hidden;
+}
+.podium-stage::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 50% 30%, rgba(45,106,79,.14), transparent 60%);
+}
+.podium-title-wrap{text-align:center;margin-bottom:48px;position:relative;z-index:2}
+.podium-live-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--green);margin:0 auto 12px;
+  box-shadow:0 0 0 0 rgba(29,185,84,.6);animation:podiumPulse 1.8s infinite;
+}
+@keyframes podiumPulse{
+  0%{box-shadow:0 0 0 0 rgba(29,185,84,.55)}
+  70%{box-shadow:0 0 0 10px rgba(29,185,84,0)}
+  100%{box-shadow:0 0 0 0 rgba(29,185,84,0)}
+}
+.podium-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:2px;color:var(--white)}
+.podium-sub{font-size:12px;color:var(--gray4);margin-top:4px;letter-spacing:.5px}
+
+.podium-stand{
+  display:flex;align-items:flex-end;justify-content:center;gap:28px;
+  position:relative;z-index:2;width:100%;max-width:820px;margin-bottom:44px;
+}
+.podium-block{
+  display:flex;flex-direction:column;align-items:center;
+  opacity:0;transform:translateY(40px);
+  animation:podiumRise .7s cubic-bezier(.2,.8,.3,1) forwards;
+}
+.podium-block.pos-1{ order:2; animation-delay:.15s }
+.podium-block.pos-2{ order:1; animation-delay:.32s }
+.podium-block.pos-3{ order:3; animation-delay:.32s }
+@keyframes podiumRise{ to{ opacity:1; transform:translateY(0) } }
+
+.podium-crown{
+  width:34px;height:34px;margin-bottom:6px;color:#f0c96b;
+  filter:drop-shadow(0 0 8px rgba(240,201,107,.7));
+  animation:crownFloat 2.4s ease-in-out infinite;
+}
+@keyframes crownFloat{ 0%,100%{ transform:translateY(0) rotate(-2deg) } 50%{ transform:translateY(-6px) rotate(2deg) } }
+.podium-crown-spacer{ height:40px }
+
+.podium-photo-wrap{position:relative;margin-bottom:14px}
+.podium-photo{
+  border-radius:50%;object-fit:cover;display:block;background:var(--gray1);
+}
+.podium-block.pos-1 .podium-photo{ width:128px;height:128px;border:4px solid #f0c96b;box-shadow:0 0 0 6px rgba(240,201,107,.15),0 0 30px rgba(240,201,107,.35) }
+.podium-block.pos-2 .podium-photo{ width:100px;height:100px;border:4px solid #c8ccd0;box-shadow:0 0 0 6px rgba(200,204,208,.12) }
+.podium-block.pos-3 .podium-photo{ width:100px;height:100px;border:4px solid #cd8a4c;box-shadow:0 0 0 6px rgba(205,138,76,.12) }
+
+.podium-name{font-weight:700;font-size:15px;color:var(--white);margin-bottom:2px;text-align:center}
+.podium-score{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px}
+.podium-block.pos-1 .podium-score{ color:#f0c96b }
+.podium-block.pos-2 .podium-score{ color:#c8ccd0 }
+.podium-block.pos-3 .podium-score{ color:#cd8a4c }
+.podium-score-label{font-size:10px;color:var(--gray4);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+
+.podium-riser{
+  width:150px;border-radius:10px 10px 0 0;
+  display:flex;align-items:flex-start;justify-content:center;padding-top:10px;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;color:rgba(255,255,255,.55);
+}
+.podium-block.pos-1 .podium-riser{ height:120px;background:linear-gradient(180deg,rgba(240,201,107,.22),rgba(240,201,107,.05)); border-top:2px solid #f0c96b }
+.podium-block.pos-2 .podium-riser{ height:80px;background:linear-gradient(180deg,rgba(200,204,208,.18),rgba(200,204,208,.04)); border-top:2px solid #c8ccd0 }
+.podium-block.pos-3 .podium-riser{ height:56px;background:linear-gradient(180deg,rgba(205,138,76,.18),rgba(205,138,76,.04)); border-top:2px solid #cd8a4c }
+
+.podium-race{width:100%;max-width:640px;position:relative;z-index:2}
+.podium-race-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.podium-race-photo{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border2)}
+.podium-race-track{flex:1;height:14px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;position:relative}
+.podium-race-fill{
+  height:100%;border-radius:99px;
+  transition:width 1s cubic-bezier(.2,.8,.2,1);
+  background:linear-gradient(90deg,var(--brand3),var(--brand2));
+  position:relative;
+}
+.podium-race-fill.leader{ background:linear-gradient(90deg,#a07830,#f0c96b) }
+.podium-race-fill::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+  width:40%;animation:raceShine 2.2s infinite;
+}
+@keyframes raceShine{ 0%{ transform:translateX(-120%) } 100%{ transform:translateX(340%) } }
+.podium-race-name{width:120px;font-size:12px;font-weight:700;color:var(--white2);flex-shrink:0}
+.podium-race-val{width:74px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gray4);flex-shrink:0}
+
 .com-card {
  background: linear-gradient(135deg, rgba(45,106,79,.08), rgba(45,106,79,.03));
  border: 1px solid rgba(45,106,79,.3);
@@ -789,7 +880,8 @@ tbody td {
 
 <!-- ═══ TABS ═══ -->
 <div class="tabs-bar">
- <button class="tab-btn active" onclick="showTab('visao')"> Visão Executiva</button>
+ <button class="tab-btn active" onclick="showTab('podio')">Pódio</button>
+ <button class="tab-btn" onclick="showTab('visao')"> Visão Executiva</button>
  <button class="tab-btn" onclick="showTab('vendedores')"> Vendedores</button>
  <button class="tab-btn" onclick="showTab('score')"> Score & Ranking</button>
  <button class="tab-btn" onclick="showTab('ipc')"> IPC & Disciplina</button>
@@ -802,9 +894,24 @@ tbody td {
 <main>
 
 <!-- ═══════════════════════════════════════════
+ TAB 0 — PÓDIO (COMPETIÇÃO AO VIVO)
+═══════════════════════════════════════════ -->
+<div class="tab-panel active" id="tab-podio">
+ <div class="podium-stage">
+ <div class="podium-title-wrap">
+ <div class="podium-live-dot"></div>
+ <h2 class="podium-title">Corrida do Consultor do Mês</h2>
+ <p class="podium-sub">Ranking em tempo real por Score</p>
+ </div>
+ <div class="podium-stand" id="podium-stand"></div>
+ <div class="podium-race" id="podium-race"></div>
+ </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
  TAB 1 — VISÃO EXECUTIVA
 ═══════════════════════════════════════════ -->
-<div class="tab-panel active" id="tab-visao">
+<div class="tab-panel" id="tab-visao">
 
  <div class="section-title">KPIs Executivos</div>
 
@@ -973,7 +1080,7 @@ tbody td {
 
  <div class="section-title"> IPC — Índice de Procedimento e Conduta</div>
 
- <div class="kpi-grid kpi-grid-4">
+ <div class="kpi-grid kpi-grid-3">
  <div class="card">
  <div class="kpi-label">Base IPC</div>
  <div class="kpi-value gold">100</div>
@@ -987,11 +1094,6 @@ tbody td {
  <div class="card">
  <div class="kpi-label">Falta</div>
  <div class="kpi-value red">−3,0</div>
- <div class="kpi-sub">por ocorrência</div>
- </div>
- <div class="card">
- <div class="kpi-label">Pausa / Advertência</div>
- <div class="kpi-value red">−0,5 / −1,0</div>
  <div class="kpi-sub">por ocorrência</div>
  </div>
  </div>
@@ -1131,32 +1233,26 @@ let sellers = [
  {
  id: 1,
  name: 'Pedro',
+ foto: 'consultor_pedro.jpg',
  fat: 0,
- // Score factors
- crm: 0, ligacoes: 0, frequencia: 0, procedimentos: 0, execucao: 0, etiqueta: 0,
- // IPC
- atrasos: 0, faltas: 0, pausas: 0, advertencias: 0
+ etiqueta: 0, tarefas: 0,
+ atrasos: 0, faltas: 0
  },
  {
  id: 2,
- name: 'Jonatas',
+ name: 'Enzo',
+ foto: 'consultor_enzo.jpg',
  fat: 0,
- crm: 0, ligacoes: 0, frequencia: 0, procedimentos: 0, execucao: 0, etiqueta: 0,
- atrasos: 0, faltas: 0, pausas: 0, advertencias: 0
+ etiqueta: 0, tarefas: 0,
+ atrasos: 0, faltas: 0
  },
  {
  id: 3,
- name: 'Enzo',
+ name: 'Wesley Mathias',
+ foto: 'consultor_wesley.jpg',
  fat: 0,
- crm: 0, ligacoes: 0, frequencia: 0, procedimentos: 0, execucao: 0, etiqueta: 0,
- atrasos: 0, faltas: 0, pausas: 0, advertencias: 0
- },
- {
- id: 4,
- name: 'Vendedor 4',
- fat: 0,
- crm: 0, ligacoes: 0, frequencia: 0, procedimentos: 0, execucao: 0, etiqueta: 0,
- atrasos: 0, faltas: 0, pausas: 0, advertencias: 0
+ etiqueta: 0, tarefas: 0,
+ atrasos: 0, faltas: 0
  }
 ];
 
@@ -1164,7 +1260,7 @@ let sellers = [
 // CALCULATIONS
 // ═══════════════════════════════════════
 function calcIPC(s) {
- let ipc = 100 - (s.atrasos * 0.5) - (s.faltas * 3) - (s.pausas * 0.5) - (s.advertencias * 1);
+ let ipc = 100 - (s.atrasos * 0.5) - (s.faltas * 3);
  return Math.max(0, Math.round(ipc * 10) / 10);
 }
 
@@ -1184,17 +1280,13 @@ function calcBonus(fat) {
 }
 
 function calcScore(s) {
- // Normalizar faturamento 0–100 baseado em META_IND * 2 como 100%
+ // Normalizar faturamento 0-100 baseado em META_IND * 2 como 100%
  const fatNorm = Math.min(100, (s.fat / (META_IND * 2)) * 100);
  const score =
  (fatNorm * 3) +
- (Math.min(100, s.crm) * 2) +
- (Math.min(100, s.ligacoes) * 2) +
- (Math.min(100, s.frequencia) * 1) +
- (Math.min(100, s.procedimentos) * 1) +
- (Math.min(100, s.execucao) * 1) +
- (Math.min(100, s.etiqueta) * 0.5);
- const maxScore = 100 * (3 + 2 + 2 + 1 + 1 + 1 + 0.5);
+ (Math.min(100, s.etiqueta) * 1) +
+ (Math.min(100, s.tarefas) * 1);
+ const maxScore = 100 * (3 + 1 + 1);
  return Math.round((score / maxScore) * 100);
 }
 
@@ -1241,16 +1333,10 @@ function readInputs() {
  return el ? parseFloat(el.value) || 0 : 0;
  };
  s.fat = v('fat');
- s.crm = v('crm');
- s.ligacoes = v('lig');
- s.frequencia = v('freq');
- s.procedimentos = v('proc');
- s.execucao = v('exec');
  s.etiqueta = v('etiq');
+ s.tarefas = v('tarefas');
  s.atrasos = v('atr');
  s.faltas = v('falt');
- s.pausas = v('paus');
- s.advertencias = v('adv');
  // editable name
  const nEl = document.getElementById(`inp-${s.id}-name`);
  if (nEl) s.name = nEl.value || s.name;
@@ -1329,6 +1415,7 @@ function renderAll() {
 
  // ── Rankings ──
  renderRankings();
+ renderPodium();
 
  // ── IPC Detail ──
  renderIPCDetail();
@@ -1423,18 +1510,66 @@ function renderRankings() {
  document.getElementById('ranking-ipc-list').innerHTML = rankHTML(byIPC, s => s.ipc, s => `IPC: ${s.ipc}`, i => ['var(--green)','var(--gold)','#e07030','var(--gray3)'][i]);
 }
 
+// ═══════════════════════════════════════
+// PÓDIO — competição ao vivo, top 3 no pódio + barra de corrida
+// ═══════════════════════════════════════
+const CROWN_SVG = '<svg class="podium-crown" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18l-1.5-9L7 12l5-8 5 8 5.5-3L21 18H3zm0 2h18v2H3v-2z"/></svg>';
+
+function renderPodium() {
+ const standEl = document.getElementById('podium-stand');
+ const raceEl = document.getElementById('podium-race');
+ if (!standEl || !raceEl) return;
+
+ const ranked = [...sellers]
+ .map(s => ({ ...s, score: calcScore(s) }))
+ .sort((a, b) => b.score - a.score);
+
+ // ── Pódio (top 3) ──
+ const order = [1, 0, 2]; // 2o lugar, 1o lugar, 3o lugar (visual classico)
+ standEl.innerHTML = order
+ .filter(i => ranked[i])
+ .map(i => {
+ const s = ranked[i];
+ const pos = i + 1;
+ const photoUrl = s.foto ? `/assets/${s.foto}` : '';
+ return `
+ <div class="podium-block pos-${pos}">
+ ${pos === 1 ? CROWN_SVG : '<div class="podium-crown-spacer"></div>'}
+ <div class="podium-photo-wrap">
+ <img class="podium-photo" src="${photoUrl}" alt="${s.name}" onerror="this.style.display='none'">
+ </div>
+ <div class="podium-name">${s.name}</div>
+ <div class="podium-score">${s.score}</div>
+ <div class="podium-score-label">pontos de score</div>
+ <div class="podium-riser">${pos}º</div>
+ </div>`;
+ }).join('');
+
+ // ── Barra de competição em tempo real ──
+ const maxScore = Math.max(...ranked.map(s => s.score), 1);
+ raceEl.innerHTML = ranked.map((s, i) => {
+ const pct = Math.max(4, Math.round((s.score / maxScore) * 100));
+ const photoUrl = s.foto ? `/assets/${s.foto}` : '';
+ return `
+ <div class="podium-race-row">
+ <img class="podium-race-photo" src="${photoUrl}" alt="${s.name}" onerror="this.style.display='none'">
+ <div class="podium-race-name">${s.name}</div>
+ <div class="podium-race-track">
+ <div class="podium-race-fill ${i === 0 ? 'leader' : ''}" style="width:${pct}%"></div>
+ </div>
+ <div class="podium-race-val">${s.score} pts</div>
+ </div>`;
+ }).join('');
+}
+
 function renderScoreBreakdown() {
  const container = document.getElementById('score-breakdown-cards');
  container.innerHTML = sellers.map(s => {
  const score = calcScore(s);
  const factors = [
  { name: 'Faturamento', peso: 3, val: Math.min(100, Math.round((s.fat / (META_IND * 2)) * 100)) },
- { name: 'CRM', peso: 2, val: Math.min(100, s.crm) },
- { name: 'Ligações', peso: 2, val: Math.min(100, s.ligacoes) },
- { name: 'Frequência', peso: 1, val: Math.min(100, s.frequencia) },
- { name: 'Procedimentos', peso: 1, val: Math.min(100, s.procedimentos) },
- { name: 'Execução', peso: 1, val: Math.min(100, s.execucao) },
- { name: 'Etiqueta', peso: 0.5, val: Math.min(100, s.etiqueta) },
+ { name: 'Etiqueta', peso: 1, val: Math.min(100, s.etiqueta) },
+ { name: 'Tarefas Operacionais', peso: 1, val: Math.min(100, s.tarefas) },
  ];
  const scoreColor = score >= 70 ? 'var(--green)' : score >= 45 ? 'var(--yellow)' : 'var(--red)';
  return `<div class="card" style="margin-bottom:16px">
@@ -1470,7 +1605,7 @@ function renderIPCDetail() {
  Multiplicador: <span style="color:${ipcColor};font-weight:700;font-family:'JetBrains Mono',monospace">${multPct}%</span>
  </div>
  <div style="margin-top:6px;font-size:11px;color:var(--gray3)">
- Atrasos: ${s.atrasos} · Faltas: ${s.faltas} · Pausas: ${s.pausas} · Adv: ${s.advertencias}
+ Atrasos: ${s.atrasos} · Faltas: ${s.faltas}
  </div>
  </div>`;
  }).join('');
@@ -1586,15 +1721,15 @@ function renderAlertas(corridos, mes) {
  alerts.push({ type: 'yellow', icon: '', title: `${s.name} — IPC em atenção (${ipc})`, sub: `IPC abaixo de 90. Monitorar disciplina para evitar redução no pagamento.` });
  }
 
- if (s.crm < 50 && s.crm > 0) {
- alerts.push({ type: 'yellow', icon: '', title: `${s.name} — Baixa atividade no CRM`, sub: `Score CRM: ${s.crm}/100. Requer atenção imediata.` });
+ if (s.etiqueta < 50 && s.etiqueta > 0) {
+ alerts.push({ type: 'yellow', icon: '', title: `${s.name} — Etiqueta abaixo do esperado`, sub: `Score Etiqueta: ${s.etiqueta}/100. Requer atenção imediata.` });
  }
 
- if (s.ligacoes < 50 && s.ligacoes > 0) {
- alerts.push({ type: 'yellow', icon: '', title: `${s.name} — Ligações abaixo do esperado`, sub: `Score Ligações: ${s.ligacoes}/100. Volume de atividade insuficiente.` });
+ if (s.tarefas < 50 && s.tarefas > 0) {
+ alerts.push({ type: 'yellow', icon: '', title: `${s.name} — Tarefas operacionais em atraso`, sub: `Score Tarefas: ${s.tarefas}/100. Volume de execução insuficiente.` });
  }
 
- if (score < 40 && (s.fat + s.crm + s.ligacoes) > 0) {
+ if (score < 40 && (s.fat + s.etiqueta + s.tarefas) > 0) {
  alerts.push({ type: 'red', icon: '', title: `${s.name} — Queda de performance`, sub: `Score geral: ${score}/100. Intervenção gerencial recomendada.` });
  }
  });
@@ -1636,17 +1771,11 @@ function buildDataInputs() {
  placeholder="Nome">
  </div>
  <div class="input-grid">
- <div class="input-group"><label> Faturamento (R$)</label><input id="inp-${s.id}-fat" type="number" value="${s.fat}" min="0"></div>
- <div class="input-group"><label> CRM (0-100)</label><input id="inp-${s.id}-crm" type="number" value="${s.crm}" min="0" max="100"></div>
- <div class="input-group"><label> Ligações (0-100)</label><input id="inp-${s.id}-lig" type="number" value="${s.ligacoes}" min="0" max="100"></div>
- <div class="input-group"><label> Frequência (0-100)</label><input id="inp-${s.id}-freq" type="number" value="${s.frequencia}" min="0" max="100"></div>
- <div class="input-group"><label> Procedimentos (0-100)</label><input id="inp-${s.id}-proc" type="number" value="${s.procedimentos}" min="0" max="100"></div>
- <div class="input-group"><label> Execução (0-100)</label><input id="inp-${s.id}-exec" type="number" value="${s.execucao}" min="0" max="100"></div>
- <div class="input-group"><label> Etiqueta (0-100)</label><input id="inp-${s.id}-etiq" type="number" value="${s.etiqueta}" min="0" max="100"></div>
- <div class="input-group"><label>⏰ Atrasos</label><input id="inp-${s.id}-atr" type="number" value="${s.atrasos}" min="0"></div>
- <div class="input-group"><label> Faltas</label><input id="inp-${s.id}-falt" type="number" value="${s.faltas}" min="0"></div>
- <div class="input-group"><label>⏸ Pausas</label><input id="inp-${s.id}-paus" type="number" value="${s.pausas}" min="0"></div>
- <div class="input-group"><label> Advertências</label><input id="inp-${s.id}-adv" type="number" value="${s.advertencias}" min="0"></div>
+ <div class="input-group"><label>Faturamento (R$)</label><input id="inp-${s.id}-fat" type="number" value="${s.fat}" min="0"></div>
+ <div class="input-group"><label>Etiqueta (0-100)</label><input id="inp-${s.id}-etiq" type="number" value="${s.etiqueta}" min="0" max="100"></div>
+ <div class="input-group"><label>Tarefas Operacionais (0-100)</label><input id="inp-${s.id}-tarefas" type="number" value="${s.tarefas}" min="0" max="100"></div>
+ <div class="input-group"><label>Faltas</label><input id="inp-${s.id}-falt" type="number" value="${s.faltas}" min="0"></div>
+ <div class="input-group"><label>Atrasos</label><input id="inp-${s.id}-atr" type="number" value="${s.atrasos}" min="0"></div>
  </div>
  </div>
  `).join('');
@@ -1657,17 +1786,16 @@ function buildDataInputs() {
 // ═══════════════════════════════════════
 function loadDemo() {
  const demo = [
- { fat: 187000, crm: 88, ligacoes: 92, frequencia: 95, procedimentos: 85, execucao: 90, etiqueta: 88, atrasos: 1, faltas: 0, pausas: 2, advertencias: 0 },
- { fat: 143000, crm: 72, ligacoes: 78, frequencia: 80, procedimentos: 70, execucao: 75, etiqueta: 80, atrasos: 3, faltas: 1, pausas: 4, advertencias: 1 },
- { fat: 98000, crm: 55, ligacoes: 60, frequencia: 70, procedimentos: 60, execucao: 58, etiqueta: 65, atrasos: 5, faltas: 2, pausas: 6, advertencias: 2 },
- { fat: 115000, crm: 65, ligacoes: 68, frequencia: 75, procedimentos: 72, execucao: 70, etiqueta: 74, atrasos: 2, faltas: 0, pausas: 3, advertencias: 0 },
+ { fat: 187000, etiqueta: 88, tarefas: 90, atrasos: 1, faltas: 0 },
+ { fat: 143000, etiqueta: 80, tarefas: 75, atrasos: 3, faltas: 1 },
+ { fat: 98000,  etiqueta: 65, tarefas: 58, atrasos: 5, faltas: 2 },
  ];
  demo.forEach((d, i) => {
  const s = sellers[i];
  Object.assign(s, d);
  // Update inputs
- const fields = ['fat','crm','lig','freq','proc','exec','etiq','atr','falt','paus','adv'];
- const vals = [d.fat, d.crm, d.ligacoes, d.frequencia, d.procedimentos, d.execucao, d.etiqueta, d.atrasos, d.faltas, d.pausas, d.advertencias];
+ const fields = ['fat','etiq','tarefas','falt','atr'];
+ const vals = [d.fat, d.etiqueta, d.tarefas, d.faltas, d.atrasos];
  fields.forEach((f, fi) => {
  const el = document.getElementById(`inp-${s.id}-${f}`);
  if (el) el.value = vals[fi];
@@ -1681,9 +1809,9 @@ function loadDemo() {
 function resetData() {
  if (!window.CAN_EDIT_COMERCIAL) return;
  sellers.forEach(s => {
- s.fat = s.crm = s.ligacoes = s.frequencia = s.procedimentos = s.execucao = s.etiqueta = 0;
- s.atrasos = s.faltas = s.pausas = s.advertencias = 0;
- const fields = ['fat','crm','lig','freq','proc','exec','etiq','atr','falt','paus','adv'];
+ s.fat = s.etiqueta = s.tarefas = 0;
+ s.atrasos = s.faltas = 0;
+ const fields = ['fat','etiq','tarefas','falt','atr'];
  fields.forEach(f => {
  const el = document.getElementById(`inp-${s.id}-${f}`);
  if (el) el.value = 0;
@@ -1849,16 +1977,10 @@ document.addEventListener('DOMContentLoaded', async () => {
  if (el) el.value = val;
  };
  setInp('fat', s.fat);
- setInp('crm', s.crm);
- setInp('lig', s.ligacoes);
- setInp('freq', s.frequencia);
- setInp('proc', s.procedimentos);
- setInp('exec', s.execucao);
  setInp('etiq', s.etiqueta);
+ setInp('tarefas', s.tarefas);
  setInp('atr', s.atrasos);
  setInp('falt', s.faltas);
- setInp('paus', s.pausas);
- setInp('adv', s.advertencias);
  const nEl = document.getElementById(`inp-${s.id}-name`);
  if (nEl) nEl.value = s.name;
  });
