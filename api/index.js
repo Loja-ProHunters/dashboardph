@@ -6,6 +6,7 @@ const config = require('../config');
 const { gerarContrato } = require('../lib/contracts');
 const { gerarGT } = require('../lib/gt');
 const { extrairNF } = require('../lib/nfExtract');
+const { extrairPedido } = require('../lib/pedidoExtract');
 
 const SESSION_MS = (config.sessionHours || 8) * 60 * 60 * 1000;
 const ROOT       = path.join(__dirname, '..');
@@ -289,6 +290,28 @@ module.exports = async (req, res) => {
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Erro ao gerar contrato: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/pedido-extract — extrai dados do Pedido de Venda via IA (qualquer usuário logado)
+  if (req.method === 'POST' && url === '/api/pedido-extract') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { pdfBase64 } = JSON.parse(body);
+      if (!pdfBase64) throw new Error('Nenhum arquivo recebido.');
+      const data = await extrairPedido(pdfBase64);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(data));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao extrair dados do pedido: ' + e.message }));
     }
     return;
   }
