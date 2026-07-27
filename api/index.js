@@ -7,6 +7,15 @@ const { gerarContrato } = require('../lib/contracts');
 const { gerarGT } = require('../lib/gt');
 const { extrairNF } = require('../lib/nfExtract');
 const { extrairPedido } = require('../lib/pedidoExtract');
+const { getComercialData, saveComercialData, resetMonth } = require('../lib/comercialStore');
+
+function getRole(usuario) {
+  if (usuario === 'luis') return 'admin';       // acesso total
+  if (usuario === 'auxiliar') return 'auxiliar'; // sem KB, sem dashboard comercial
+  return 'vendas';                                // padrão: ve tudo, exceto KB; ve comercial mas nao edita
+}
+function canEditComercial(sess) { return sess && getRole(sess.usuario) === 'admin'; }
+function canViewComercial(sess) { return sess && getRole(sess.usuario) !== 'auxiliar'; }
 
 const SESSION_MS = (config.sessionHours || 8) * 60 * 60 * 1000;
 const ROOT       = path.join(__dirname, '..');
@@ -170,14 +179,122 @@ function callAnthropic(messages, system) {
 
 // ── Login page ───────────────────────────────────────────────
 function loginPage(erro) {
-  return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pro Hunters</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Segoe UI,system-ui,sans-serif;background:#f4f5f4;display:flex;align-items:center;justify-content:center;min-height:100vh}.card{background:#fff;border:1px solid #e2e4e2;border-radius:12px;padding:40px 36px;width:100%;max-width:380px;box-shadow:0 4px 24px rgba(0,0,0,.07)}.logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;justify-content:center}.logo-box{width:36px;height:36px;background:#5aaa66;border-radius:9px;display:flex;align-items:center;justify-content:center}.logo-box svg{width:20px;height:20px;fill:none;stroke:white;stroke-width:2}.logo-name{font-size:17px;font-weight:800}h2{font-size:16px;font-weight:700;text-align:center;margin-bottom:6px}.sub{font-size:12px;color:#717571;text-align:center;margin-bottom:24px}label{font-size:12px;font-weight:600;color:#444;display:block;margin-bottom:5px}input{width:100%;border:1px solid #e2e4e2;border-radius:8px;padding:10px 12px;font-size:14px;outline:none;margin-bottom:14px;font-family:inherit}input:focus{border-color:#5aaa66}button{width:100%;background:#5aaa66;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}button:hover{background:#3d8a49}.err{background:#fdf1f1;border:1px solid #f5c0c0;border-radius:8px;padding:10px 14px;font-size:12px;color:#d94f4f;margin-bottom:16px;text-align:center}.foot{font-size:11px;color:#b0b4b0;text-align:center;margin-top:20px}</style></head><body><div class="card"><div class="logo"><div class="logo-box"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div><div class="logo-name">PRO HUNTERS</div></div><h2>Acesso ao Portal</h2><p class="sub">Digite suas credenciais para entrar</p>'
-    + (erro ? '<div class="err">Usuário ou senha incorretos.</div>' : '')
-    + '<form method="POST" action="/login"><label>Usuário</label><input type="text" name="usuario" autocomplete="username" autofocus required><label>Senha</label><input type="password" name="senha" autocomplete="current-password" required><button type="submit">Entrar</button></form><div class="foot">Portal Interno · Comercial</div></div></body></html>';
+  return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pro Hunters</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Segoe UI',system-ui,sans-serif;
+  background:radial-gradient(circle at 50% 20%, #12241c 0%, #0a1410 45%, #060a08 100%);
+  display:flex;align-items:center;justify-content:center;min-height:100vh;
+  overflow:hidden;position:relative;
+}
+/* textura de ruido sutil */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.35;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+}
+/* trilhas de projeteis passando em alta velocidade */
+.tracer{
+  position:fixed;left:-20%;width:46%;height:2px;z-index:2;pointer-events:none;
+  background:linear-gradient(90deg, transparent, rgba(120,220,150,.85) 60%, #eaffef 100%);
+  box-shadow:0 0 10px 1px rgba(120,220,150,.65);
+  border-radius:2px;
+  animation-name:tracerFly;
+  animation-timing-function:cubic-bezier(.3,0,.15,1);
+  animation-iteration-count:infinite;
+}
+.tracer::after{
+  content:'';position:absolute;right:-3px;top:50%;transform:translateY(-50%);
+  width:6px;height:6px;border-radius:50%;background:#eaffef;box-shadow:0 0 8px 3px rgba(160,255,190,.9);
+}
+@keyframes tracerFly{ from{ transform:translateX(0); opacity:0 } 4%{opacity:1} 92%{opacity:1} to{ transform:translateX(260vw); opacity:0 } }
+.tracer.t1{ top:14%; animation-duration:1.9s; animation-delay:.2s }
+.tracer.t2{ top:34%; animation-duration:2.6s; animation-delay:1.4s; opacity:.7 }
+.tracer.t3{ top:58%; animation-duration:1.6s; animation-delay:2.5s }
+.tracer.t4{ top:76%; animation-duration:2.2s; animation-delay:.9s; opacity:.6 }
+.tracer.t5{ top:90%; animation-duration:2.9s; animation-delay:3.4s; opacity:.5 }
+
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;box-shadow:inset 0 0 220px 40px rgba(0,0,0,.75)}
+
+.wrap{position:relative;z-index:5;width:100%;max-width:400px;padding:20px}
+.card{
+  background:rgba(15,26,20,.72);
+  border:1px solid rgba(120,200,150,.22);
+  border-radius:16px;padding:38px 34px;width:100%;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 20px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.03) inset;
+}
+.logo-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:22px}
+.logo-wrap img{height:46px;width:auto}
+h2{font-size:16px;font-weight:700;text-align:center;margin-bottom:4px;color:#f2f5f2;letter-spacing:.3px}
+.sub{font-size:12px;color:#9db3a4;text-align:center;margin-bottom:26px}
+label{font-size:11px;font-weight:700;color:#bcd4c4;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px}
+input{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(120,200,150,.25);
+  border-radius:8px;padding:11px 13px;font-size:14px;outline:none;margin-bottom:16px;
+  font-family:inherit;color:#f2f5f2;transition:border-color .15s,background .15s;
+}
+input::placeholder{color:#5c6e63}
+input:focus{border-color:#4caf7a;background:rgba(255,255,255,.07)}
+button{
+  width:100%;background:linear-gradient(135deg,#2d6a4f,#1b4332);color:#fff;border:none;
+  border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;
+  letter-spacing:.3px;transition:filter .15s,transform .1s;
+}
+button:hover{filter:brightness(1.15)}
+button:active{transform:scale(.98)}
+.err{background:rgba(224,48,48,.15);border:1px solid rgba(224,48,48,.4);border-radius:8px;padding:10px 14px;font-size:12px;color:#ff9d9d;margin-bottom:16px;text-align:center}
+.foot{font-size:11px;color:#5c6e63;text-align:center;margin-top:22px;letter-spacing:.4px}
+</style></head>
+<body>
+<div class="vignette"></div>
+<div class="tracer t1"></div>
+<div class="tracer t2"></div>
+<div class="tracer t3"></div>
+<div class="tracer t4"></div>
+<div class="tracer t5"></div>
+<div class="wrap">
+  <div class="card">
+    <div class="logo-wrap"><img src="/assets/ph_logo_header.png" alt="Pro Hunters"></div>
+    <h2>Acesso ao Portal</h2>
+    <p class="sub">Digite suas credenciais para entrar</p>
+    ${erro ? '<div class="err">Usuário ou senha incorretos.</div>' : ''}
+    <form method="POST" action="/login">
+      <label>Usuário</label>
+      <input type="text" name="usuario" autocomplete="username" autofocus required>
+      <label>Senha</label>
+      <input type="password" name="senha" autocomplete="current-password" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <div class="foot">PORTAL INTERNO · COMERCIAL</div>
+  </div>
+</div>
+</body></html>`;
 }
 
 // ── Handler principal ────────────────────────────────────────
 module.exports = async (req, res) => {
   const url = (req.url || '/').split('?')[0];
+
+  // GET /assets/* — arquivos estaticos publicos (logos, imagens)
+  if (req.method === 'GET' && url.startsWith('/assets/')) {
+    const fileName = url.replace('/assets/', '');
+    if (fileName.includes('..') || fileName.includes('/')) {
+      res.writeHead(400); res.end('Nome de arquivo invalido.'); return;
+    }
+    const filePath = path.join(ROOT, 'assets', fileName);
+    try {
+      const buf = fs.readFileSync(filePath);
+      const ext = path.extname(fileName).toLowerCase();
+      const mime = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream';
+      res.writeHead(200, { 'Content-Type': mime, 'Cache-Control': 'public, max-age=86400' });
+      res.end(buf);
+    } catch (e) {
+      res.writeHead(404); res.end('Arquivo nao encontrado.');
+    }
+    return;
+  }
 
   // POST /login
   if (req.method === 'POST' && url === '/login') {
@@ -368,6 +485,95 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // GET /api/comercial — le os dados (luis e vendas podem ver; auxiliar nao)
+  if (req.method === 'GET' && url === '/api/comercial') {
+    const sess = getSession(req);
+    if (!sess || !canViewComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para ver o Dashboard Comercial.' }));
+      return;
+    }
+    try {
+      const data = await getComercialData();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ...data, canEdit: canEditComercial(sess) }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao carregar dados: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/comercial — salva os dados (somente luis/admin)
+  if (req.method === 'POST' && url === '/api/comercial') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para editar o Dashboard Comercial.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const incoming = JSON.parse(body);
+      await saveComercialData(incoming);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao salvar: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/comercial/reset-month — fecha o mes, arquiva no historico e zera (somente luis/admin)
+  if (req.method === 'POST' && url === '/api/comercial/reset-month') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para fechar o mes.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { vencedor } = JSON.parse(body || '{}');
+      const data = await resetMonth(vencedor);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(data));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao fechar o mes: ' + e.message }));
+    }
+    return;
+  }
+
+  // GET /comercial — dashboard comercial (luis e vendas podem ver; auxiliar nao)
+  if (req.method === 'GET' && url === '/comercial') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(loginPage(false));
+      return;
+    }
+    if (!canViewComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end('<!DOCTYPE html><html><body style="font-family:sans-serif;padding:40px;text-align:center;color:#444"><h2>Acesso restrito</h2><p>Seu usuario nao tem permissao para ver o Dashboard Comercial.</p><a href="/">Voltar</a></body></html>');
+      return;
+    }
+    try {
+      let html = fs.readFileSync(path.join(ROOT, 'comercial-dashboard.html'), 'utf-8');
+      const canEditCom = canEditComercial(sess) ? 'true' : 'false';
+      html = html.replace('/* %%INJECT_COMERCIAL%% */',
+        'window.CAN_EDIT_COMERCIAL=' + canEditCom + '; window.USER_NOME="' + sess.nome + '";'
+      );
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(html);
+    } catch (e) {
+      res.writeHead(500);
+      res.end('Erro ao carregar dashboard comercial: ' + e.message);
+    }
+    return;
+  }
+
   // Proteger tudo
   const sess = getSession(req);
   if (!sess) {
@@ -376,12 +582,16 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // Servir dashboard com flag de admin injetada
+  // Servir dashboard com flags de permissao injetadas
   try {
     let html = fs.readFileSync(path.join(ROOT, 'dashboard.html'), 'utf-8');
-    // Injeta variável JS indicando se é admin e o nome do usuário
-    const isAdmin = sess.usuario === 'luis' ? 'true' : 'false';
-    html = html.replace('/* %%INJECT%% */', 'var IS_ADMIN=' + isAdmin + '; var USER_NOME="' + sess.nome + '";');
+    const isAdmin = canEditComercial(sess) ? 'true' : 'false';
+    const canViewCom = canViewComercial(sess) ? 'true' : 'false';
+    const canEditCom = canEditComercial(sess) ? 'true' : 'false';
+    html = html.replace('/* %%INJECT%% */',
+      'var IS_ADMIN=' + isAdmin + '; var USER_NOME="' + sess.nome + '"; ' +
+      'var CAN_VIEW_COMERCIAL=' + canViewCom + '; var CAN_EDIT_COMERCIAL=' + canEditCom + ';'
+    );
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(html);
   } catch(e) {
