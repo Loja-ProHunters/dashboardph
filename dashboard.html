@@ -336,6 +336,13 @@ tbody tr:nth-child(even) td{background:var(--bg)}
 
       <div class="ct-subpane on" id="ctpane-contratos">
       <div class="ct-card">
+        <div class="ct-sec">Pedido de Venda (opcional — preenche automaticamente)</div>
+        <div class="ct-row">
+          <div class="ct-field"><label>Upload do Pedido (PDF do Bling)</label><input type="file" id="ctPedidoFile" accept="application/pdf"></div>
+          <div class="ct-field" style="justify-content:flex-end"><label>&nbsp;</label><button type="button" class="ct-add" id="ctBtnExtrairPedido" onclick="ctExtrairPedido()">Extrair dados do pedido</button></div>
+        </div>
+        <div class="save-status" id="ctPedidoStatus"></div>
+
         <div class="ct-sec">Empresa e modelo</div>
         <div class="ct-row">
           <div class="ct-field">
@@ -736,7 +743,7 @@ function ctOnPersonalizadoChange() {
   if (tipo === 'combinado') document.getElementById('ctCamposCombinado').style.display = on ? 'none' : 'block';
 }
 
-function ctAddParcela() {
+function ctAddParcela(preset) {
   ctParcelaSeq++;
   var id = 'ctp' + ctParcelaSeq;
   var div = document.createElement('div');
@@ -749,6 +756,92 @@ function ctAddParcela() {
     '<input placeholder="Data" type="date" id="' + id + '_data">' +
     '<button type="button" class="ct-rm" onclick="document.getElementById(\'' + id + '\').remove()">×</button>';
   document.getElementById('ctParcelasList').appendChild(div);
+  if (preset) {
+    document.getElementById(id + '_desc').value = preset.descricao || '';
+    document.getElementById(id + '_valor').value = preset.valor || '';
+    document.getElementById(id + '_forma').value = preset.forma || '';
+    document.getElementById(id + '_data').value = ctIsoFromBR(preset.data || '');
+  }
+}
+
+function ctIsoFromBR(br) {
+  if (!br) return '';
+  var p = br.split('/');
+  return p.length === 3 ? (p[2] + '-' + p[1] + '-' + p[0]) : '';
+}
+
+function ctClearParcelas() {
+  document.getElementById('ctParcelasList').innerHTML = '';
+}
+
+function ctExtrairPedido() {
+  var fileInput = document.getElementById('ctPedidoFile');
+  if (!fileInput.files || !fileInput.files[0]) {
+    ctSetStatus(false, 'Selecione o PDF do pedido primeiro.');
+    return;
+  }
+  var file = fileInput.files[0];
+  var btn = document.getElementById('ctBtnExtrairPedido');
+  btn.disabled = true;
+  document.getElementById('ctPedidoStatus').className = 'save-status ok';
+  document.getElementById('ctPedidoStatus').textContent = 'Lendo o pedido e extraindo os dados...';
+
+  var reader = new FileReader();
+  reader.onload = function() {
+    var base64 = reader.result.split(',')[1];
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/pedido-extract', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = function() {
+      btn.disabled = false;
+      var st = document.getElementById('ctPedidoStatus');
+      try {
+        var data = JSON.parse(xhr.responseText);
+        if (xhr.status !== 200 || data.error) {
+          st.className = 'save-status err';
+          st.textContent = data.error || 'Erro ao extrair dados.';
+          return;
+        }
+        if (data.empresaSugerida) document.getElementById('ctEmpresa').value = data.empresaSugerida;
+        if (data.cliente) {
+          document.getElementById('ctClienteNome').value = data.cliente.nome || '';
+          document.getElementById('ctClienteDoc').value = data.cliente.doc || '';
+          document.getElementById('ctClienteEndereco').value = data.cliente.endereco || '';
+        }
+        if (data.produto) document.getElementById('ctProduto').value = data.produto;
+
+        var tipo = data.tipoSugerido === 'parcelado' ? 'parcelado' : 'avista';
+        document.getElementById('ctTipo').value = tipo;
+        ctOnTipoChange();
+
+        var parcelas = data.parcelas || [];
+        if (tipo === 'avista' && parcelas.length) {
+          document.getElementById('ctAvValor').value = parcelas[0].valor || data.valorTotal || '';
+          document.getElementById('ctAvData').value = ctIsoFromBR(parcelas[0].data || '');
+          document.getElementById('ctAvForma').value = parcelas[0].forma || '';
+        } else if (tipo === 'parcelado') {
+          document.getElementById('ctPcValorTotal').value = data.valorTotal || '';
+          ctClearParcelas();
+          parcelas.forEach(function(p) { ctAddParcela(p); });
+          if (!parcelas.length) ctAddParcela();
+        }
+
+        var avisos = (data.avisos || []).join(' | ');
+        st.className = 'save-status ok';
+        st.textContent = 'Dados extraidos! Revise TODOS os campos antes de gerar.' + (avisos ? ' Avisos: ' + avisos : '');
+      } catch (e) {
+        st.className = 'save-status err';
+        st.textContent = 'Erro ao processar resposta da IA.';
+      }
+    };
+    xhr.onerror = function() {
+      btn.disabled = false;
+      var st = document.getElementById('ctPedidoStatus');
+      st.className = 'save-status err'; st.textContent = 'Falha de conexao.';
+    };
+    xhr.send(JSON.stringify({ pdfBase64: base64 }));
+  };
+  reader.readAsDataURL(file);
 }
 
 function ctSetStatus(ok, msg) {
