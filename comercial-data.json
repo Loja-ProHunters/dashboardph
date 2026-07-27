@@ -1,12 +1,39 @@
 {
   "sellers": [
-    { "id": 1, "name": "Pedro", "foto": "consultor_pedro.jpg", "fat": 0, "etiqueta": 0, "tarefas": 0, "faltas": 0, "atrasos": 0 },
-    { "id": 2, "name": "Enzo", "foto": "consultor_enzo.jpg", "fat": 0, "etiqueta": 0, "tarefas": 0, "faltas": 0, "atrasos": 0 },
-    { "id": 3, "name": "Wesley Mathias", "foto": "consultor_wesley.jpg", "fat": 0, "etiqueta": 0, "tarefas": 0, "faltas": 0, "atrasos": 0 }
+    {
+      "id": 1,
+      "name": "Pedro",
+      "foto": "consultor_pedro.jpg",
+      "fat": 0,
+      "etiqueta": 0,
+      "tarefas": 0,
+      "atrasos": 0,
+      "faltas": 0
+    },
+    {
+      "id": 2,
+      "name": "Enzo",
+      "foto": "consultor_enzo.jpg",
+      "fat": 0,
+      "etiqueta": 0,
+      "tarefas": 0,
+      "atrasos": 0,
+      "faltas": 0
+    },
+    {
+      "id": 3,
+      "name": "Wesley Mathias",
+      "foto": "consultor_wesley.jpg",
+      "fat": 0,
+      "etiqueta": 0,
+      "tarefas": 0,
+      "atrasos": 0,
+      "faltas": 0
+    }
   ],
   "diasCorridos": 1,
   "diasMes": 30,
   "mesReferencia": "2026-07",
   "history": [],
-  "savedAt": null
+  "savedAt": "2026-07-27T21:08:43.415Z"
 }
