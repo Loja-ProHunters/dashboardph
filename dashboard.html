@@ -12,15 +12,18 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 .sb{width:230px;min-width:230px;background:var(--wh);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto;z-index:100;transition:transform .25s}
 .sb-logo{padding:20px 18px 16px;border-bottom:1px solid var(--bd)}
 .sb-mark{display:flex;align-items:center;gap:9px;margin-bottom:3px}
+.sb-logo-img{height:34px;width:auto;display:block}
 .sb-icon{width:30px;height:30px;background:var(--g);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sb-icon svg{width:17px;height:17px;fill:none;stroke:#fff;stroke-width:2}
 .sb-name{font-size:14px;font-weight:800}
 .sb-sub{font-size:11px;color:var(--gy);margin-left:39px}
 .sb-grp{padding:12px 10px 4px}
 .sb-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gl2);padding:0 8px 6px}
-.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--dk);border:none;background:none;width:100%;text-align:left;transition:background .15s,color .15s}
+.ni{position:relative;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--dk);border:none;background:none;width:100%;text-align:left;transition:background .18s,color .18s,padding-left .18s;overflow:hidden}
+.ni::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:0;background:var(--g);border-radius:0 3px 3px 0;transition:height .2s ease}
 .ni:hover{background:var(--bg);color:var(--k)}
-.ni.on{background:var(--gl);color:var(--gd);font-weight:700}
+.ni.on{background:var(--gl);color:var(--gd);font-weight:700;padding-left:14px}
+.ni.on::before{height:60%}
 .ni-ic{width:26px;height:26px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
 .ni.on .ni-ic{background:var(--gm)}
 .badge{margin-left:auto;background:var(--g);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px}
@@ -39,6 +42,9 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 .btn-sair{font-size:11px;color:var(--gy);text-decoration:none;border:1px solid var(--bd);border-radius:6px;padding:4px 12px;background:var(--wh);cursor:pointer;transition:all .15s}
 .btn-sair:hover{border-color:var(--r);color:var(--r)}
 .content{flex:1;overflow-y:auto;padding:24px}
+.comercial-frame{width:100%;height:100%;border:none;display:block;background:#0a0a0a}
+#tab-comercial.tab{height:100%}
+#tab-comercial.tab.on{display:flex;flex-direction:column}
 .tab{display:none}.tab.on{display:block}
 .sec-title{font-size:14px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--gm)}
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
@@ -213,29 +219,32 @@ tbody tr:nth-child(even) td{background:var(--bg)}
 <aside class="sb" id="sb">
   <div class="sb-logo">
     <div class="sb-mark">
-      <div class="sb-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-      <div class="sb-name">PRO HUNTERS</div>
+      <img src="/assets/ph_logo_header_dark.png" alt="Pro Hunters" class="sb-logo-img">
     </div>
     <div class="sb-sub">Portal Interno</div>
   </div>
   <div class="sb-grp">
     <div class="sb-lbl">Principal</div>
-    <button class="ni on" onclick="goTab('inicio',this)"><span class="ni-ic">🏠</span>Início</button>
-    <button class="ni" onclick="goTab('taco',this)"><span class="ni-ic">🎯</span>Método T.A.C.O</button>
+    <button class="ni on" onclick="goTab('inicio',this)">Início</button>
+    <button class="ni" onclick="goTab('taco',this)">Método T.A.C.O</button>
   </div>
   <div class="sb-grp">
     <div class="sb-lbl">Operacional</div>
-    <button class="ni" onclick="goTab('bling',this)"><span class="ni-ic">📋</span>Curso Bling</button>
-    <button class="ni" onclick="goTab('processos',this)"><span class="ni-ic">⚙️</span>Processos</button>
-    <button class="ni" onclick="goTab('contratos',this)"><span class="ni-ic">📄</span>Documentos</button>
+    <button class="ni" onclick="goTab('bling',this)">Curso Bling</button>
+    <button class="ni" onclick="goTab('processos',this)">Processos</button>
+    <button class="ni" onclick="goTab('contratos',this)">Documentos</button>
+  </div>
+  <div class="sb-grp" id="grp-comercial" style="display:none">
+    <div class="sb-lbl">Comercial</div>
+    <button class="ni" onclick="goTab('comercial',this)">Dashboard Comercial</button>
   </div>
   <div class="sb-grp">
     <div class="sb-lbl">Inteligência</div>
-    <button class="ni" onclick="goTab('ia',this)"><span class="ni-ic">✦</span>IA Pro Hunters<span class="badge">NOVO</span></button>
+    <button class="ni" onclick="goTab('ia',this)">IA Pro Hunters<span class="badge">NOVO</span></button>
   </div>
   <div class="sb-grp" id="grp-admin" style="display:none">
     <div class="sb-lbl">Administração</div>
-    <button class="ni" onclick="goTab('admin',this)"><span class="ni-ic">⚙</span>Base de Conhecimento<span class="badge-admin">ADMIN</span></button>
+    <button class="ni" onclick="goTab('admin',this)">Base de Conhecimento<span class="badge-admin">ADMIN</span></button>
   </div>
   <div class="sb-foot">v2.2 · Blumenau, SC</div>
 </aside>
@@ -503,6 +512,11 @@ tbody tr:nth-child(even) td{background:var(--bg)}
       </div>
     </div>
 
+    <!-- DASHBOARD COMERCIAL -->
+    <div class="tab" id="tab-comercial">
+      <iframe src="/comercial" class="comercial-frame" title="Dashboard Comercial"></iframe>
+    </div>
+
     <!-- IA -->
     <div class="tab" id="tab-ia">
       <div class="ia-wrap">
@@ -554,14 +568,18 @@ var tabMeta = {
   bling:     ['Curso Bling','Tipos de pedido, cadastros e video aulas'],
   processos: ['Processos','Armas, GT, Portal Postal, Documentacao'],
   contratos: ['Documentos','Contratos e Guias de Transito'],
+  comercial: ['Dashboard Comercial','Ranking, metas e performance da equipe'],
   ia:        ['IA Pro Hunters','Assistente de conhecimento interno'],
   admin:     ['Base de Conhecimento','Gerenciar o que a IA sabe']
 };
 
-// Mostrar aba admin e nome do usuario
+// Mostrar abas condicionais e nome do usuario
 window.onload = function() {
   if (typeof IS_ADMIN !== 'undefined' && IS_ADMIN) {
     document.getElementById('grp-admin').style.display = 'block';
+  }
+  if (typeof CAN_VIEW_COMERCIAL !== 'undefined' && CAN_VIEW_COMERCIAL) {
+    document.getElementById('grp-comercial').style.display = 'block';
   }
   if (typeof USER_NOME !== 'undefined' && USER_NOME) {
     document.getElementById('user-pill').textContent = USER_NOME;

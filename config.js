@@ -14,7 +14,11 @@
 //   USERS_JSON            → lista de usuários em JSON (veja exemplo abaixo)
 //
 // Exemplo de valor para USERS_JSON (copie e cole em uma linha só na Vercel):
-// [{"usuario":"luis","senha":"SUA_SENHA_AQUI","nome":"Luis"},{"usuario":"vendas","senha":"SUA_SENHA_AQUI","nome":"Vendedor"},{"usuario":"admin","senha":"SUA_SENHA_AQUI","nome":"Admin"}]
+// [{"usuario":"luis","senha":"SUA_SENHA","nome":"Luis"},{"usuario":"vendas","senha":"SUA_SENHA","nome":"Vendedor"},{"usuario":"auxiliar","senha":"SUA_SENHA","nome":"Auxiliar"}]
+// Papeis: "luis" = acesso total (Base de Conhecimento + Dashboard Comercial completo, inclusive lançamento).
+//         "vendas" = tudo exceto Base de Conhecimento; ve o Dashboard Comercial mas nao edita o lançamento.
+//         "auxiliar" = tudo exceto Base de Conhecimento e Dashboard Comercial.
+//         Qualquer outro login cadastrado cai automaticamente no papel "vendas".
 // ─────────────────────────────────────────────────────────────
 
 const crypto = require('crypto');
@@ -33,9 +37,9 @@ function loadUsers() {
   }
   // Fallback só para rodar local sem configurar nada (NUNCA usado em produção se USERS_JSON estiver setado)
   return [
-    { usuario: 'luis',   senha: 'phunters2025', nome: 'Luis'     },
-    { usuario: 'vendas', senha: 'vendas2025',   nome: 'Vendedor' },
-    { usuario: 'admin',  senha: 'admin2025',    nome: 'Admin'    },
+    { usuario: 'luis',     senha: 'phunters2025', nome: 'Luis'     },
+    { usuario: 'vendas',   senha: 'vendas2025',   nome: 'Vendedor' },
+    { usuario: 'auxiliar', senha: 'auxiliar2025', nome: 'Auxiliar' },
   ];
 }
 
