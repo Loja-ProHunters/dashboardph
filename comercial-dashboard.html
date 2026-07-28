@@ -607,6 +607,31 @@ tbody td {
 .podium-race-name{width:120px;font-size:12px;font-weight:700;color:var(--white2);flex-shrink:0}
 .podium-race-val{width:74px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gray4);flex-shrink:0}
 
+.registrar-venda-card{
+  margin-top:40px;width:100%;max-width:520px;position:relative;z-index:2;
+  background:rgba(45,106,79,.08);border:1px solid rgba(45,106,79,.3);
+  border-radius:14px;padding:20px 24px;text-align:center;
+}
+.rv-title{font-size:13px;font-weight:700;color:var(--brand2);margin-bottom:14px;letter-spacing:.3px}
+.rv-row{display:flex;gap:10px}
+.rv-row select, .rv-row input{
+  background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;
+  color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;
+}
+.rv-row select{flex:0 0 150px}
+.rv-row input{flex:1;min-width:0}
+.rv-row select:focus, .rv-row input:focus{border-color:var(--brand2)}
+.rv-row button{
+  background:linear-gradient(135deg,var(--brand2),var(--brand3));color:#fff;border:none;
+  border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;
+  transition:filter .15s;
+}
+.rv-row button:hover{filter:brightness(1.15)}
+.rv-status{margin-top:10px;font-size:12px;min-height:16px}
+.rv-status.ok{color:var(--green)}
+.rv-status.err{color:var(--red)}
+@media (max-width:600px){ .rv-row{flex-wrap:wrap} .rv-row select{flex:1 1 100%} }
+
 .com-card {
  background: linear-gradient(135deg, rgba(45,106,79,.08), rgba(45,106,79,.03));
  border: 1px solid rgba(45,106,79,.3);
@@ -905,6 +930,16 @@ tbody td {
  </div>
  <div class="podium-stand" id="podium-stand"></div>
  <div class="podium-race" id="podium-race"></div>
+
+ <div class="registrar-venda-card">
+ <div class="rv-title">Fechou uma venda? Registra aqui</div>
+ <div class="rv-row">
+ <select id="rvSeller"></select>
+ <input type="number" id="rvValor" placeholder="Valor da venda (R$)" min="1" step="0.01">
+ <button onclick="registrarVenda()">Registrar Venda</button>
+ </div>
+ <div class="rv-status" id="rvStatus"></div>
+ </div>
  </div>
 </div>
 
@@ -1205,15 +1240,17 @@ tbody td {
  </div>
 
  <div class="divider"></div>
- <div class="section-title">Dias Corridos no Mês</div>
+ <div class="section-title">Progresso do Mês (automático, baseado na data de hoje)</div>
  <div class="kpi-grid kpi-grid-3">
- <div class="input-group">
- <label>Dias Corridos (hoje)</label>
- <input type="number" id="global-dias" value="15" min="1" max="31" onchange="recalculate()">
+ <div class="card" style="padding:14px 18px">
+ <div class="kpi-label">Dias corridos</div>
+ <div class="kpi-value gold" id="diasCorridosDisplay" style="font-size:26px">-</div>
+ <div class="kpi-sub">calculado automaticamente</div>
  </div>
- <div class="input-group">
- <label>Total de Dias no Mês</label>
- <input type="number" id="global-dias-mes" value="30" min="28" max="31" onchange="recalculate()">
+ <div class="card" style="padding:14px 18px">
+ <div class="kpi-label">Total de dias no mês</div>
+ <div class="kpi-value gold" id="diasMesDisplay" style="font-size:26px">-</div>
+ <div class="kpi-sub">calculado automaticamente</div>
  </div>
  </div>
 
@@ -1302,9 +1339,14 @@ function getStatus(fat) {
 }
 
 function getDias() {
- const corridos = parseInt(document.getElementById('global-dias')?.value || 15);
- const mes = parseInt(document.getElementById('global-dias-mes')?.value || 30);
- return { corridos: Math.min(corridos, mes), mes };
+ const now = new Date();
+ const corridos = now.getDate(); // dia atual do mes (1-31)
+ const mes = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate(); // total de dias no mes atual
+ const dEl = document.getElementById('diasCorridosDisplay');
+ const mEl = document.getElementById('diasMesDisplay');
+ if (dEl) dEl.textContent = corridos;
+ if (mEl) mEl.textContent = mes;
+ return { corridos, mes };
 }
 
 function fmtBRL(v) {
@@ -1519,6 +1561,12 @@ function renderPodium() {
  const standEl = document.getElementById('podium-stand');
  const raceEl = document.getElementById('podium-race');
  if (!standEl || !raceEl) return;
+
+ const sellerSel = document.getElementById('rvSeller');
+ if (sellerSel && !sellerSel.dataset.filled) {
+ sellerSel.innerHTML = sellers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+ sellerSel.dataset.filled = '1';
+ }
 
  const ranked = [...sellers]
  .map(s => ({ ...s, score: calcScore(s) }))
@@ -1801,8 +1849,6 @@ function loadDemo() {
  if (el) el.value = vals[fi];
  });
  });
- document.getElementById('global-dias').value = 18;
- document.getElementById('global-dias-mes').value = 30;
  recalculate();
 }
 
@@ -1818,6 +1864,72 @@ function resetData() {
  });
  });
  recalculate();
+}
+
+// ═══════════════════════════════════════
+// AUTOLANÇAMENTO DE VENDA (pelo próprio vendedor) + atualização em tempo real
+// ═══════════════════════════════════════
+async function registrarVenda() {
+ const sel = document.getElementById('rvSeller');
+ const valEl = document.getElementById('rvValor');
+ const statusEl = document.getElementById('rvStatus');
+ const sellerId = parseInt(sel?.value, 10);
+ const valor = parseFloat(valEl?.value);
+
+ if (!sellerId || !valor || valor <= 0) {
+ statusEl.className = 'rv-status err';
+ statusEl.textContent = 'Escolha seu nome e informe um valor de venda valido.';
+ return;
+ }
+
+ try {
+ const resp = await fetch('/api/comercial/registrar-venda', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ sellerId, valor }),
+ });
+ const data = await resp.json();
+ if (!resp.ok) {
+ statusEl.className = 'rv-status err';
+ statusEl.textContent = data.error || 'Erro ao registrar a venda.';
+ return;
+ }
+ data.sellers.forEach(saved => {
+ const s = sellers.find(x => x.id === saved.id);
+ if (s) s.fat = saved.fat;
+ const fatEl = document.getElementById(`inp-${saved.id}-fat`);
+ if (fatEl) fatEl.value = saved.fat;
+ });
+ const nome = sellers.find(s => s.id === sellerId)?.name || '';
+ valEl.value = '';
+ statusEl.className = 'rv-status ok';
+ statusEl.textContent = `Venda de ${fmtBRL(valor)} registrada para ${nome}!`;
+ renderAll();
+ } catch (e) {
+ statusEl.className = 'rv-status err';
+ statusEl.textContent = 'Falha de conexao.';
+ }
+}
+
+// A cada 30s, busca dados atualizados no servidor (ex: vendas registradas por
+// outra pessoa) e atualiza o placar em tempo real, sem mexer nos campos que o
+// gerente possa estar digitando na aba Dados.
+async function pollComercialData() {
+ try {
+ const resp = await fetch('/api/comercial');
+ if (!resp.ok) return;
+ const payload = await resp.json();
+ (payload.sellers || []).forEach(saved => {
+ const s = sellers.find(x => x.id === saved.id);
+ if (!s) return;
+ if (s.fat !== saved.fat) {
+ s.fat = saved.fat;
+ const fatEl = document.getElementById(`inp-${saved.id}-fat`);
+ if (fatEl && document.activeElement !== fatEl) fatEl.value = saved.fat;
+ }
+ });
+ renderAll();
+ } catch (e) { /* silencioso — tenta de novo no proximo ciclo */ }
 }
 
 async function closeMonth() {
@@ -1836,13 +1948,11 @@ async function closeMonth() {
  });
  if (!resp.ok) { showSaveStatus('Falha ao fechar o mes'); return; }
  const payload = await resp.json();
- currentMesReferencia = payload.mesReferencia;
- historyData = payload.history || [];
+ currentMesReferencia = payload.mesReferencia; historyData = payload.history || [];
  payload.sellers.forEach(saved => {
  const s = sellers.find(x => x.id === saved.id);
  if (s) Object.assign(s, saved);
  });
- document.getElementById('global-dias').value = payload.diasCorridos || 1;
  recalculate();
  showSaveStatus('Mes fechado e arquivado com sucesso');
  } catch (e) {
@@ -1861,10 +1971,11 @@ async function saveData() {
  clearTimeout(saveTimer);
  saveTimer = setTimeout(async () => {
  try {
+ const { corridos, mes } = getDias();
  const payload = {
  sellers,
- diasCorridos: parseInt(document.getElementById('global-dias')?.value || 1, 10),
- diasMes: parseInt(document.getElementById('global-dias-mes')?.value || 30, 10),
+ diasCorridos: corridos,
+ diasMes: mes,
  mesReferencia: currentMesReferencia,
  history: historyData,
  };
@@ -1899,16 +2010,6 @@ async function loadData() {
  const s = sellers.find(x => x.id === saved.id);
  if (s) Object.assign(s, saved);
  });
- }
-
- // Restaurar dias
- if (payload.diasCorridos) {
- const el = document.getElementById('global-dias');
- if (el) el.value = payload.diasCorridos;
- }
- if (payload.diasMes) {
- const el = document.getElementById('global-dias-mes');
- if (el) el.value = payload.diasMes;
  }
 
  return payload.savedAt || true;
@@ -1960,6 +2061,7 @@ function updateDate() {
 document.addEventListener('DOMContentLoaded', async () => {
  updateDate();
  setInterval(updateDate, 30000);
+ setInterval(pollComercialData, 30000);
  buildDataInputs();
 
  // Tentar carregar dados salvos (isso tambem define window.CAN_EDIT_COMERCIAL)
