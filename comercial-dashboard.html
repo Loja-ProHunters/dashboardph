@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pro Hunters — Central de Comando Comercial</title>
+<link rel="icon" href="/assets/favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -572,11 +573,12 @@ tbody td {
 .podium-block.pos-3 .podium-photo{ width:100px;height:100px;border:4px solid #cd8a4c;box-shadow:0 0 0 6px rgba(205,138,76,.12) }
 
 .podium-name{font-weight:700;font-size:15px;color:var(--white);margin-bottom:2px;text-align:center}
-.podium-score{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px}
+.podium-score{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:.5px;white-space:nowrap}
 .podium-block.pos-1 .podium-score{ color:#f0c96b }
 .podium-block.pos-2 .podium-score{ color:#c8ccd0 }
 .podium-block.pos-3 .podium-score{ color:#cd8a4c }
-.podium-score-label{font-size:10px;color:var(--gray4);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.podium-score-label{font-size:10px;color:var(--gray4);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.podium-ipc-label{font-size:11px;font-weight:700;letter-spacing:.3px;margin-bottom:10px}
 
 .podium-riser{
   width:150px;border-radius:10px 10px 0 0;
@@ -1270,7 +1272,7 @@ const META_IND = 150000;
 let sellers = [
  {
  id: 1,
- name: 'Pedro',
+ name: 'Pedro Dickmann',
  foto: 'consultor_pedro.jpg',
  fat: 0,
  etiqueta: 0, tarefas: 0,
@@ -1278,7 +1280,7 @@ let sellers = [
  },
  {
  id: 2,
- name: 'Enzo',
+ name: 'Enzo Boschetto',
  foto: 'consultor_enzo.jpg',
  fat: 0,
  etiqueta: 0, tarefas: 0,
@@ -1564,16 +1566,17 @@ function renderPodium() {
  if (!standEl || !raceEl) return;
 
  const sellerSel = document.getElementById('rvSeller');
- if (sellerSel && !sellerSel.dataset.filled) {
+ if (sellerSel) {
+ const prevVal = sellerSel.value;
  sellerSel.innerHTML = sellers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
- sellerSel.dataset.filled = '1';
+ if (prevVal) sellerSel.value = prevVal;
  }
 
  const ranked = [...sellers]
- .map(s => ({ ...s, score: calcScore(s) }))
+ .map(s => ({ ...s, score: calcScore(s), ipc: calcIPC(s) }))
  .sort((a, b) => b.score - a.score);
 
- // ── Pódio (top 3) ──
+ // ── Pódio (top 3) — faturamento em evidência, IPC embaixo ──
  const order = [1, 0, 2]; // 2o lugar, 1o lugar, 3o lugar (visual classico)
  standEl.innerHTML = order
  .filter(i => ranked[i])
@@ -1581,6 +1584,7 @@ function renderPodium() {
  const s = ranked[i];
  const pos = i + 1;
  const photoUrl = s.foto ? `/assets/${s.foto}` : '';
+ const ipcColor = s.ipc >= 90 ? 'var(--green)' : s.ipc >= 75 ? 'var(--yellow)' : 'var(--red)';
  return `
  <div class="podium-block pos-${pos}">
  ${pos === 1 ? CROWN_SVG : '<div class="podium-crown-spacer"></div>'}
@@ -1588,13 +1592,14 @@ function renderPodium() {
  <img class="podium-photo" src="${photoUrl}" alt="${s.name}" onerror="this.style.display='none'">
  </div>
  <div class="podium-name">${s.name}</div>
- <div class="podium-score">${s.score}</div>
- <div class="podium-score-label">pontos de score</div>
+ <div class="podium-score">${fmtBRL(s.fat)}</div>
+ <div class="podium-score-label">faturamento</div>
+ <div class="podium-ipc-label" style="color:${ipcColor}">IPC ${s.ipc}</div>
  <div class="podium-riser">${pos}º</div>
  </div>`;
  }).join('');
 
- // ── Barra de competição em tempo real ──
+ // ── Barra de competição em tempo real (largura pelo score, texto mostra R$ e IPC) ──
  const maxScore = Math.max(...ranked.map(s => s.score), 1);
  raceEl.innerHTML = ranked.map((s, i) => {
  const pct = Math.max(4, Math.round((s.score / maxScore) * 100));
@@ -1606,7 +1611,7 @@ function renderPodium() {
  <div class="podium-race-track">
  <div class="podium-race-fill ${i === 0 ? 'leader' : ''}" style="width:${pct}%"></div>
  </div>
- <div class="podium-race-val">${s.score} pts</div>
+ <div class="podium-race-val">${fmtBRL(s.fat)} · IPC ${s.ipc}</div>
  </div>`;
  }).join('');
 }
