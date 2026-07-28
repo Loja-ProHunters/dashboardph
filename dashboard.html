@@ -43,8 +43,9 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 .btn-sair:hover{border-color:var(--r);color:var(--r)}
 .content{flex:1;overflow-y:auto;padding:24px}
 .comercial-frame{width:100%;height:100%;border:none;display:block;background:#0a0a0a}
-#tab-comercial.tab{height:100%}
+#tab-comercial.tab{height:calc(100% + 48px);margin:-24px}
 #tab-comercial.tab.on{display:flex;flex-direction:column}
+@media (max-width:768px){ #tab-comercial.tab{height:calc(100% + 28px);margin:-14px} }
 .tab{display:none}.tab.on{display:block}
 .sec-title{font-size:14px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--gm)}
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}

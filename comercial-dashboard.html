@@ -68,6 +68,12 @@ header {
  z-index: 100;
  box-shadow: 0 4px 32px rgba(0,0,0,.6);
 }
+header.header-slim{
+ height:40px;
+ justify-content:flex-end;
+ padding:0 28px;
+ border-bottom:1px solid rgba(45,106,79,.18);
+}
 
 .logo-area {
  display: flex;
@@ -149,12 +155,13 @@ header {
 
 /* ─── TABS ─── */
 .tabs-bar {
- background: var(--black2);
- border-bottom: 1px solid var(--border2);
+ background: linear-gradient(180deg, var(--black3) 0%, var(--black2) 100%);
+ border-bottom: 1px solid var(--border);
  display: flex;
- gap: 0;
- padding: 0 32px;
+ gap: 4px;
+ padding: 10px 32px 0;
  overflow-x: auto;
+ box-shadow: 0 4px 24px rgba(0,0,0,.45);
 }
 
 .tab-btn {
@@ -860,14 +867,7 @@ tbody td {
 <body>
 
 <!-- ═══ HEADER ═══ -->
-<header>
- <div class="logo-area">
- <div class="logo-icon"></div>
- <div class="logo-text">
- <div class="logo-name">PRO HUNTERS</div>
- <div class="logo-sub">Central de Comando Comercial</div>
- </div>
- </div>
+<header class="header-slim">
  <div class="header-right">
  <div class="live-badge">
  <div class="live-dot"></div>
