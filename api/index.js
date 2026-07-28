@@ -7,7 +7,7 @@ const { gerarContrato } = require('../lib/contracts');
 const { gerarGT } = require('../lib/gt');
 const { extrairNF } = require('../lib/nfExtract');
 const { extrairPedido } = require('../lib/pedidoExtract');
-const { getComercialData, saveComercialData, resetMonth } = require('../lib/comercialStore');
+const { getComercialData, saveComercialData, resetMonth, registrarVenda } = require('../lib/comercialStore');
 
 function getRole(usuario) {
   if (usuario === 'luis') return 'admin';       // acesso total
@@ -542,6 +542,32 @@ module.exports = async (req, res) => {
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Erro ao fechar o mes: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/comercial/registrar-venda — autolancamento do proprio vendedor
+  // (qualquer um que pode VER o comercial pode registrar, nao precisa ser admin)
+  if (req.method === 'POST' && url === '/api/comercial/registrar-venda') {
+    const sess = getSession(req);
+    if (!sess || !canViewComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { sellerId, valor } = JSON.parse(body || '{}');
+      const valorNum = Number(valor);
+      if (!sellerId || !valorNum || valorNum <= 0) {
+        throw new Error('Informe o vendedor e um valor de venda maior que zero.');
+      }
+      const data = await registrarVenda(Number(sellerId), valorNum);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, sellers: data.sellers }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao registrar venda: ' + e.message }));
     }
     return;
   }
