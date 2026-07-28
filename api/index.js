@@ -10,7 +10,7 @@ const { extrairPedido } = require('../lib/pedidoExtract');
 const { getComercialData, saveComercialData, resetMonth, registrarVenda } = require('../lib/comercialStore');
 
 function getRole(usuario) {
-  if (usuario === 'luis') return 'admin';       // acesso total
+  if (usuario === 'gerencia') return 'admin';    // acesso total
   if (usuario === 'auxiliar') return 'auxiliar'; // sem KB, sem dashboard comercial
   return 'vendas';                                // padrão: ve tudo, exceto KB; ve comercial mas nao edita
 }
@@ -179,7 +179,7 @@ function callAnthropic(messages, system) {
 
 // ── Login page ───────────────────────────────────────────────
 function loginPage(erro) {
-  return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pro Hunters</title>
+  return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pro Hunters</title><link rel="icon" href="/assets/favicon.ico">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -277,6 +277,18 @@ button:active{transform:scale(.98)}
 module.exports = async (req, res) => {
   const url = (req.url || '/').split('?')[0];
 
+  // GET /favicon.ico — navegadores pedem isso direto na raiz por padrao
+  if (req.method === 'GET' && url === '/favicon.ico') {
+    try {
+      const buf = fs.readFileSync(path.join(ROOT, 'assets', 'favicon.ico'));
+      res.writeHead(200, { 'Content-Type': 'image/x-icon', 'Cache-Control': 'public, max-age=86400' });
+      res.end(buf);
+    } catch (e) {
+      res.writeHead(404); res.end();
+    }
+    return;
+  }
+
   // GET /assets/* — arquivos estaticos publicos (logos, imagens)
   if (req.method === 'GET' && url.startsWith('/assets/')) {
     const fileName = url.replace('/assets/', '');
@@ -347,7 +359,7 @@ module.exports = async (req, res) => {
   // GET /api/knowledge — retorna o conteúdo atual (só admin)
   if (req.method === 'GET' && url === '/api/knowledge') {
     const sess = getSession(req);
-    if (!sess || sess.usuario !== 'luis') {
+    if (!sess || sess.usuario !== 'gerencia') {
       res.writeHead(403, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Acesso negado.' }));
       return;
@@ -366,7 +378,7 @@ module.exports = async (req, res) => {
   // POST /api/knowledge — salva novo conteúdo (só admin)
   if (req.method === 'POST' && url === '/api/knowledge') {
     const sess = getSession(req);
-    if (!sess || sess.usuario !== 'luis') {
+    if (!sess || sess.usuario !== 'gerencia') {
       res.writeHead(403, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Acesso negado.' }));
       return;
