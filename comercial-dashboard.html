@@ -1576,6 +1576,8 @@ function renderPodium() {
  .map(s => ({ ...s, score: calcScore(s), ipc: calcIPC(s) }))
  .sort((a, b) => b.score - a.score);
 
+ checkLeaderChange(ranked[0] ? ranked[0].id : undefined);
+
  // ── Pódio (top 3) — faturamento em evidência, IPC embaixo ──
  const order = [1, 0, 2]; // 2o lugar, 1o lugar, 3o lugar (visual classico)
  standEl.innerHTML = order
@@ -1873,6 +1875,61 @@ function resetData() {
 }
 
 // ═══════════════════════════════════════
+// EFEITOS SONOROS — gerados na hora via Web Audio API (sem arquivos de audio)
+// ═══════════════════════════════════════
+let audioCtx = null;
+function getAudioCtx() {
+ try {
+ if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+ if (audioCtx.state === 'suspended') audioCtx.resume();
+ return audioCtx;
+ } catch (e) { return null; }
+}
+// destrava o audio no primeiro toque/clique do usuario na pagina (politica dos navegadores)
+document.addEventListener('click', () => getAudioCtx(), { once: true });
+
+function playTone(freq, startTime, duration, type, gainPeak) {
+ const ctx = getAudioCtx();
+ if (!ctx) return;
+ const osc = ctx.createOscillator();
+ const gain = ctx.createGain();
+ osc.type = type || 'sine';
+ osc.frequency.value = freq;
+ const t0 = ctx.currentTime + startTime;
+ gain.gain.setValueAtTime(0, t0);
+ gain.gain.linearRampToValueAtTime(gainPeak || 0.2, t0 + 0.02);
+ gain.gain.exponentialRampToValueAtTime(0.001, t0 + duration);
+ osc.connect(gain);
+ gain.connect(ctx.destination);
+ osc.start(t0);
+ osc.stop(t0 + duration + 0.05);
+}
+
+// Som de venda registrada: "cha-ching" curto e satisfatorio
+function playSaleSound() {
+ playTone(880.00, 0, 0.12, 'triangle', 0.22); // A5
+ playTone(1318.51, 0.09, 0.20, 'triangle', 0.24); // E6
+}
+
+// Som de troca de lideranca (coroa mudou de dono): pequena fanfarra, mais longa e festiva
+function playCrownSound() {
+ const notes = [523.25, 659.25, 783.99, 1046.50]; // C5 E5 G5 C6 (arpejo maior subindo)
+ notes.forEach((f, i) => playTone(f, i * 0.11, 0.26, 'square', 0.16));
+ playTone(1318.51, 0.52, 0.55, 'sawtooth', 0.18); // E6 final, sustentada
+ playTone(1567.98, 0.52, 0.55, 'sawtooth', 0.12); // G6 junto, da corpo de "acorde"
+}
+
+// Detecta troca de lider entre uma renderizacao do podio e a proxima, pra tocar
+// o som pra QUALQUER pessoa que esteja com a tela aberta (nao so quem vendeu)
+let lastLeaderId = undefined;
+function checkLeaderChange(newLeaderId) {
+ if (lastLeaderId !== undefined && newLeaderId !== undefined && newLeaderId !== lastLeaderId) {
+ playCrownSound();
+ }
+ lastLeaderId = newLeaderId;
+}
+
+// ═══════════════════════════════════════
 // AUTOLANÇAMENTO DE VENDA (pelo próprio vendedor) + atualização em tempo real
 // ═══════════════════════════════════════
 async function registrarVenda() {
@@ -1910,6 +1967,7 @@ async function registrarVenda() {
  valEl.value = '';
  statusEl.className = 'rv-status ok';
  statusEl.textContent = `Venda de ${fmtBRL(valor)} registrada para ${nome}!`;
+ playSaleSound();
  renderAll();
  } catch (e) {
  statusEl.className = 'rv-status err';
