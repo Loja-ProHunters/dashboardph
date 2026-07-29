@@ -11,11 +11,12 @@ const { getComercialData, saveComercialData, resetMonth, registrarVenda } = requ
 
 function getRole(usuario) {
   if (usuario === 'gerencia') return 'admin';    // acesso total
-  if (usuario === 'auxiliar') return 'auxiliar'; // sem KB, sem dashboard comercial
+  if (usuario === 'auxiliar') return 'auxiliar'; // acesso total à aba Documentos, sem KB, sem dashboard comercial
   return 'vendas';                                // padrão: ve tudo, exceto KB; ve comercial mas nao edita
 }
 function canEditComercial(sess) { return sess && getRole(sess.usuario) === 'admin'; }
 function canViewComercial(sess) { return sess && getRole(sess.usuario) !== 'auxiliar'; }
+function canUseDocumentos(sess) { return sess && sess.usuario; } // Qualquer usuário logado pode usar Documentos (gerencia, vendas, auxiliar)
 
 const SESSION_MS = (config.sessionHours || 8) * 60 * 60 * 1000;
 const ROOT       = path.join(__dirname, '..');
@@ -396,10 +397,10 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // POST /api/contract — gera o PDF do contrato (qualquer usuário logado)
+  // POST /api/contract — gera o PDF do contrato (qualquer usuário logado: gerencia, vendas, auxiliar)
   if (req.method === 'POST' && url === '/api/contract') {
     const sess = getSession(req);
-    if (!sess) {
+    if (!canUseDocumentos(sess)) {
       res.writeHead(401, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Nao autorizado.' }));
       return;
@@ -423,10 +424,10 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // POST /api/pedido-extract — extrai dados do Pedido de Venda via IA (qualquer usuário logado)
+  // POST /api/pedido-extract — extrai dados do Pedido de Venda via IA (qualquer usuário logado: gerencia, vendas, auxiliar)
   if (req.method === 'POST' && url === '/api/pedido-extract') {
     const sess = getSession(req);
-    if (!sess) {
+    if (!canUseDocumentos(sess)) {
       res.writeHead(401, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Nao autorizado.' }));
       return;
@@ -445,10 +446,10 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // POST /api/nf-extract — extrai dados da NF via IA (qualquer usuário logado)
+  // POST /api/nf-extract — extrai dados da NF via IA (qualquer usuário logado: gerencia, vendas, auxiliar)
   if (req.method === 'POST' && url === '/api/nf-extract') {
     const sess = getSession(req);
-    if (!sess) {
+    if (!canUseDocumentos(sess)) {
       res.writeHead(401, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Nao autorizado.' }));
       return;
@@ -467,10 +468,10 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // POST /api/gt — gera o PDF da Guia de Transito (qualquer usuário logado)
+  // POST /api/gt — gera o PDF da Guia de Transito (qualquer usuário logado: gerencia, vendas, auxiliar)
   if (req.method === 'POST' && url === '/api/gt') {
     const sess = getSession(req);
-    if (!sess) {
+    if (!canUseDocumentos(sess)) {
       res.writeHead(401, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Nao autorizado.' }));
       return;
