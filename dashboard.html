@@ -1289,5 +1289,128 @@ function saveKB() {
   xhr.send(JSON.stringify({ knowledge: ta.value }));
 }
 </script>
+<!-- ========== ABA PARCEIRO INFLUENCIADOR ========== -->
+<!-- INSTRUÇÃO: Adicione isto APÓS a aba "Guias de Trânsito" no dashboard.html -->
+
+<div id="abaParceiro" style="display: none; padding: 20px;">
+  <h2>Contrato - Parceiro Influenciador</h2>
+  
+  <div style="margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+    <label style="display: block; margin-bottom: 15px; font-weight: bold;">
+      <input type="radio" name="tipoCarregamento" value="pdf" checked> Extrair dados de PDF de Pedido
+    </label>
+    <label style="display: block; margin-bottom: 15px; font-weight: bold;">
+      <input type="radio" name="tipoCarregamento" value="manual"> Preencher manualmente
+    </label>
+  </div>
+
+  <!-- Seção PDF Upload -->
+  <div id="secaoPdfParceiro" style="padding: 15px; background: #f9f9f9; border-radius: 5px; margin: 15px 0;">
+    <label>Selecione PDF do Pedido:</label>
+    <input type="file" id="pdfParceiro" accept=".pdf" style="margin: 10px 0;">
+    <button onclick="extrairDadosPDF('pdfParceiro')" style="padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">
+      Extrair Dados
+    </button>
+  </div>
+
+  <!-- Seção Manual -->
+  <div id="secaoManualParceiro" style="display: none; padding: 15px; background: #f9f9f9; border-radius: 5px; margin: 15px 0;">
+    <label>Nome do Parceiro:</label>
+    <input type="text" id="nomeParceiro" placeholder="Ex: João da Silva" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px;">
+    
+    <label>CPF/CNPJ:</label>
+    <input type="text" id="cpfCnpjParceiro" placeholder="000.000.000-00 ou 00.000.000/0001-00" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px;">
+    
+    <label>Endereço Completo:</label>
+    <input type="text" id="enderecoParceiro" placeholder="Rua, nº, complemento" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px;">
+    
+    <label>Cidade:</label>
+    <input type="text" id="cidadeParceiro" placeholder="Blumenau" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px;">
+    
+    <label>UF:</label>
+    <input type="text" id="ufParceiro" placeholder="SC" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px;">
+  </div>
+
+  <div style="margin: 20px 0;">
+    <button onclick="gerarContratoParceiro()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+      Gerar Contrato - Parceria Influenciador
+    </button>
+  </div>
+
+  <div id="statusParceiro" style="margin-top: 15px; padding: 10px; display: none; border-radius: 3px;"></div>
+</div>
+
+<!-- ========== SCRIPTS PARCEIRO ========== -->
+<script>
+// Toggle entre PDF e Manual
+document.querySelectorAll('input[name="tipoCarregamento"]').forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    if (e.target.value === 'pdf') {
+      document.getElementById('secaoPdfParceiro').style.display = 'block';
+      document.getElementById('secaoManualParceiro').style.display = 'none';
+    } else {
+      document.getElementById('secaoPdfParceiro').style.display = 'none';
+      document.getElementById('secaoManualParceiro').style.display = 'block';
+    }
+  });
+});
+
+async function gerarContratoParceiro() {
+  const status = document.getElementById('statusParceiro');
+  
+  const dados = {
+    nomeParceiro: document.getElementById('nomeParceiro').value,
+    cpfCnpj: document.getElementById('cpfCnpjParceiro').value,
+    endereco: document.getElementById('enderecoParceiro').value,
+    cidade: document.getElementById('cidadeParceiro').value,
+    uf: document.getElementById('ufParceiro').value
+  };
+
+  if (!dados.nomeParceiro || !dados.cpfCnpj) {
+    status.style.display = 'block';
+    status.style.background = '#f8d7da';
+    status.style.color = '#721c24';
+    status.textContent = '❌ Preencha pelo menos Nome e CPF/CNPJ';
+    return;
+  }
+
+  try {
+    status.style.display = 'block';
+    status.style.background = '#e2e3e5';
+    status.style.color = '#383d41';
+    status.textContent = '⏳ Gerando contrato...';
+
+    const response = await fetch('/api/contrato-influenciador', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados)
+    });
+
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Contrato_Parceria_${dados.nomeParceiro}_ProHunters.docx`;
+      a.click();
+      
+      status.style.background = '#d4edda';
+      status.style.color = '#155724';
+      status.textContent = '✅ Contrato gerado com sucesso!';
+    } else {
+      const error = await response.text();
+      status.style.background = '#f8d7da';
+      status.style.color = '#721c24';
+      status.textContent = `❌ Erro: ${error}`;
+    }
+  } catch (err) {
+    status.style.display = 'block';
+    status.style.background = '#f8d7da';
+    status.style.color = '#721c24';
+    status.textContent = `❌ Erro: ${err.message}`;
+  }
+}
+</script>
+
 </body>
 </html>
