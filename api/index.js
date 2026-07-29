@@ -275,48 +275,6 @@ button:active{transform:scale(.98)}
 }
 
 // ── Handler principal ────────────────────────────────────────
-
-  // POST /api/contrato-influenciador
-  if (req.method === 'POST' && url === '/api/contrato-influenciador') {
-    const sess = getSession(req);
-    if (!canUseDocumentos(sess)) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
-      return;
-    }
-    const body = await readBody(req);
-    try {
-      const data = JSON.parse(body);
-      const { pdfBase64, nomeParceiro, cpfCnpj, endereco, cidade, uf } = data;
-      
-      let dados = { nomeParceiro, cpfCnpj, endereco, cidade, uf };
-      
-      if (pdfBase64) {
-        try {
-          dados = await extrairPedido(pdfBase64);
-        } catch (e) {
-          console.warn('Aviso: extração falhou, usando dados manual');
-        }
-      }
-      
-      const templateResp = await fetch('https://raw.githubusercontent.com/Loja-ProHunters/dashboardph/main/templates/Contrato_Parceria.docx');
-      if (!templateResp.ok) throw new Error('Template nao encontrado');
-      const templateBuf = await templateResp.arrayBuffer();
-      
-      const contratoBuf = await gerarContratoInfluenciador(Buffer.from(templateBuf), dados);
-      
-      res.writeHead(200, {
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'Content-Disposition': 'attachment; filename="Contrato_Parceria_' + (dados.nomeParceiro || 'ProHunters').replace(/[^a-z0-9]/gi, '_') + '.docx"'
-      });
-      res.end(contratoBuf);
-    } catch (e) {
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Erro: ' + e.message }));
-    }
-    return;
-  }
-
 module.exports = async (req, res) => {
   const url = (req.url || '/').split('?')[0];
 
