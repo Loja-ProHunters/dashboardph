@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const fs     = require('fs');
 const path   = require('path');
 const config = require('../config');
-const { gerarContrato, gerarContratoInfluenciador } = require('../lib/contracts');
+const { gerarContrato } = require('../lib/contracts');
 const { gerarGT } = require('../lib/gt');
 const { extrairNF } = require('../lib/nfExtract');
 const { extrairPedido } = require('../lib/pedidoExtract');
@@ -275,51 +275,6 @@ button:active{transform:scale(.98)}
 }
 
 // ── Handler principal ────────────────────────────────────────
-  // POST /api/contrato-influenciador — gera contrato Parceria Influenciador
-  if (req.method === 'POST' && url === '/api/contrato-influenciador') {
-    const sess = getSession(req);
-    if (!canUseDocumentos(sess)) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
-      return;
-    }
-    const body = await readBody(req);
-    try {
-      const data = JSON.parse(body);
-      const { pdfBase64, nomeParceiro, cpfCnpj, endereco, cidade, uf } = data;
-      
-      let dadosExtraidos = { nomeParceiro, cpfCnpj, endereco, cidade, uf };
-      
-      // Se veio PDF, tentar extrair dados
-      if (pdfBase64) {
-        try {
-          dadosExtraidos = await extrairPedido(pdfBase64);
-        } catch (e) {
-          console.warn('Aviso: extração PDF falhou, usando dados do formulário:', e.message);
-        }
-      }
-      
-      // Ler template do repositório
-      const templateResp = await fetch('https://raw.githubusercontent.com/Loja-ProHunters/dashboardph/main/templates/Contrato_Parceria.docx');
-      if (!templateResp.ok) throw new Error('Template não encontrado');
-      const templateBuf = await templateResp.arrayBuffer();
-      
-      // Processar contrato com dados extraídos
-      const contratoBuf = await gerarContratoInfluenciador(Buffer.from(templateBuf), dadosExtraidos);
-      
-      res.writeHead(200, {
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'Content-Disposition': 'attachment; filename="Contrato_Parceria_' + (dadosExtraidos.nomeParceiro || 'ProHunters').replace(/[^a-z0-9]/gi, '_') + '.docx"'
-      });
-      res.end(contratoBuf);
-    } catch (e) {
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Erro ao gerar contrato: ' + e.message }));
-    }
-    return;
-  }
-
-
 module.exports = async (req, res) => {
   const url = (req.url || '/').split('?')[0];
 
