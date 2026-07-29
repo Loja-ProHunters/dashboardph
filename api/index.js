@@ -275,7 +275,6 @@ button:active{transform:scale(.98)}
 }
 
 // ── Handler principal ────────────────────────────────────────
-
   // POST /api/contrato-influenciador — gera contrato Parceria Influenciador
   if (req.method === 'POST' && url === '/api/contrato-influenciador') {
     const sess = getSession(req);
@@ -319,6 +318,7 @@ button:active{transform:scale(.98)}
     }
     return;
   }
+
 
 module.exports = async (req, res) => {
   const url = (req.url || '/').split('?')[0];
