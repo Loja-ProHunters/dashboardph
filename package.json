@@ -1,10 +1,13 @@
 {
   "name": "prohunters-portal",
   "version": "3.0.0",
-  "description": "Portal Interno — Pro Hunters",
-  "engines": { "node": ">=18.0.0" },
+  "description": "Portal Interno \u2014 Pro Hunters",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "pdf-lib": "^1.17.1",
-    "bwip-js": "^4.11.2"
+    "bwip-js": "^4.11.2",
+    "pdfkit": "^0.13.0"
   }
 }
