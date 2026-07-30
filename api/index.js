@@ -162,7 +162,7 @@ function callAnthropic(messages, system) {
       method:   'POST',
       headers: {
         'Content-Type':      'application/json',
-        'x-api-key':         config.anthropicKey,
+        'x-api-key': config.anthropicApiKey,
         'anthropic-version': '2023-06-01',
         'Content-Length':    Buffer.byteLength(payload),
       },
