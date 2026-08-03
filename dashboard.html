@@ -2,1415 +2,2389 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pro Hunters</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Hunters — Central de Comando Comercial</title>
+<link rel="icon" href="/assets/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--g:#5aaa66;--gd:#3d8a49;--gl:#eaf6ec;--gm:#c2e6c8;--k:#111412;--dk:#444846;--gy:#717571;--gl2:#b0b4b0;--bg:#f4f5f4;--bd:#e2e4e2;--wh:#ffffff;--r:#d94f4f;--rl:#fdf1f1}
-html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--k);font-size:14px}
-.app{display:flex;height:100vh;overflow:hidden}
-.sb{width:230px;min-width:230px;background:var(--wh);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto;z-index:100;transition:transform .25s}
-.sb-logo{padding:20px 18px 16px;border-bottom:1px solid var(--bd)}
-.sb-mark{display:flex;align-items:center;gap:9px;margin-bottom:3px}
-.sb-logo-img{height:34px;width:auto;display:block}
-.sb-icon{width:30px;height:30px;background:var(--g);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sb-icon svg{width:17px;height:17px;fill:none;stroke:#fff;stroke-width:2}
-.sb-name{font-size:14px;font-weight:800}
-.sb-sub{font-size:11px;color:var(--gy);margin-left:39px}
-.sb-grp{padding:12px 10px 4px}
-.sb-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gl2);padding:0 8px 6px}
-.ni{position:relative;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--dk);border:none;background:none;width:100%;text-align:left;transition:background .18s,color .18s,padding-left .18s;overflow:hidden}
-.ni::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:0;background:var(--g);border-radius:0 3px 3px 0;transition:height .2s ease}
-.ni:hover{background:var(--bg);color:var(--k)}
-.ni.on{background:var(--gl);color:var(--gd);font-weight:700;padding-left:14px}
-.ni.on::before{height:60%}
-.ni-ic{width:26px;height:26px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.ni.on .ni-ic{background:var(--gm)}
-.badge{margin-left:auto;background:var(--g);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px}
-.badge-admin{margin-left:auto;background:#8b5cf6;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px}
-.sb-foot{margin-top:auto;padding:14px 18px;border-top:1px solid var(--bd);font-size:11px;color:var(--gl2)}
-.hbg{display:none;position:fixed;top:12px;left:12px;z-index:200;background:var(--wh);border:1px solid var(--bd);border-radius:7px;padding:7px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.hbg span{display:block;width:18px;height:2px;background:var(--k);margin:3px 0;border-radius:2px}
-.ovl{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:90}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.topbar{background:var(--wh);border-bottom:1px solid var(--bd);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
-.tb-l h1{font-size:17px;font-weight:800}
-.tb-l p{font-size:12px;color:var(--gy);margin-top:1px}
-.tb-r{display:flex;align-items:center;gap:10px}
-.pill{background:var(--gl);color:var(--gd);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid var(--gm)}
-.user-pill{font-size:11px;color:var(--gy);font-weight:600}
-.btn-sair{font-size:11px;color:var(--gy);text-decoration:none;border:1px solid var(--bd);border-radius:6px;padding:4px 12px;background:var(--wh);cursor:pointer;transition:all .15s}
-.btn-sair:hover{border-color:var(--r);color:var(--r)}
-.content{flex:1;overflow-y:auto;padding:24px}
-.comercial-frame{width:100%;height:100%;border:none;display:block;background:#0a0a0a}
-#tab-comercial.tab{height:calc(100% + 48px);margin:-24px}
-#tab-comercial.tab.on{display:flex;flex-direction:column}
-@media (max-width:768px){ #tab-comercial.tab{height:calc(100% + 28px);margin:-14px} }
-.tab{display:none}.tab.on{display:block}
-.sec-title{font-size:14px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--gm)}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
-.kpi{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.kpi-lbl{font-size:10px;color:var(--gy);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
-.kpi-val{font-size:26px;font-weight:800;color:var(--gd);line-height:1}
-.kpi-sub{font-size:11px;color:var(--gy);margin-top:3px}
-.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px}
-.co{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.co-tag{display:inline-block;font-size:10px;font-weight:700;background:var(--gl);color:var(--gd);border-radius:5px;padding:2px 7px;margin-bottom:7px}
-.co-name{font-size:13px;font-weight:700;margin-bottom:3px}
-.co-desc{font-size:12px;color:var(--gy);line-height:1.5}
-.cl{border-radius:9px;padding:12px 15px;margin-bottom:12px;border:1px solid var(--gm);background:var(--gl)}
-.cl.red{border-color:#f5c0c0;background:var(--rl)}
-.cl.gray{border-color:var(--bd);background:var(--bg)}
-.cl-t{font-size:12px;font-weight:700;color:var(--gd);margin-bottom:5px}
-.cl.red .cl-t{color:var(--r)}
-.cl.gray .cl-t{color:var(--dk)}
-.cl ul{padding-left:15px}
-.cl li{font-size:12px;color:var(--dk);margin-bottom:3px;line-height:1.5}
-.taco-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:18px}
-.taco{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.05);position:relative;overflow:hidden}
-.taco::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--g)}
-.taco-l{font-size:34px;font-weight:900;color:var(--gm);line-height:1;margin-bottom:7px}
-.taco-n{font-size:14px;font-weight:700;margin-bottom:7px}
-.taco-b{font-size:12px;color:var(--dk);line-height:1.6}
-.taco-q{margin-top:9px;padding:7px 10px;background:var(--gl);border-left:3px solid var(--g);border-radius:0 5px 5px 0;font-size:11px;color:var(--gd);font-style:italic}
-.meta-strip{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-.meta-p{flex:1;min-width:110px;background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.meta-n{font-size:22px;font-weight:800;color:var(--gd)}
-.meta-l{font-size:11px;color:var(--gy);margin-top:2px}
-.acc-list{display:flex;flex-direction:column;gap:7px}
-.acc-item{background:var(--wh);border:1px solid var(--bd);border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.acc-hd{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;transition:background .15s}
-.acc-hd:hover{background:var(--bg)}
-.acc-num{width:24px;height:24px;background:var(--g);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
-.acc-title{font-size:13px;font-weight:600;flex:1}
-.acc-tag{font-size:10px;font-weight:600;color:var(--gd);background:var(--gl);border:1px solid var(--gm);padding:2px 8px;border-radius:20px}
-.acc-chv{color:var(--gl2);font-size:10px;transition:transform .2s}
-.acc-bd{display:none;padding:4px 16px 14px 50px;border-top:1px solid var(--bd)}
-.acc-bd.on{display:block}
-.acc-step{display:flex;gap:7px;margin-top:7px;font-size:12px;color:var(--dk);line-height:1.5}
-.acc-dot{width:5px;height:5px;background:var(--g);border-radius:50%;margin-top:6px;flex-shrink:0}
-.vid-sec{margin-top:28px}
-.vid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.vid-card{background:var(--wh);border:1px solid var(--bd);border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.vid-thumb{width:100%;aspect-ratio:16/9;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;border-bottom:1px solid var(--bd);cursor:pointer;position:relative;overflow:hidden}
-.vid-thumb iframe{position:absolute;inset:0;width:100%;height:100%;border:none;display:none}
-.vid-thumb.play iframe{display:block}
-.vid-thumb.play .vui{display:none}
-.vui{display:flex;flex-direction:column;align-items:center;gap:7px}
-.vbtn{width:44px;height:44px;background:var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .15s,background .15s}
-.vbtn:hover{background:var(--gd);transform:scale(1.08)}
-.vbtn svg{width:18px;height:18px;fill:#fff;margin-left:2px}
-.vlbl{font-size:11px;color:var(--gy)}
-.vid-info{padding:12px 14px}
-.vid-num{font-size:10px;font-weight:700;color:var(--gd);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
-.vid-name{font-size:12px;font-weight:700;margin-bottom:3px}
-.vid-desc{font-size:11px;color:var(--gy);line-height:1.4}
-.vs{display:inline-block;margin-top:7px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
-.vs.ok{background:var(--gl);color:var(--gd);border:1px solid var(--gm)}
-.proc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:18px}
-.proc{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.proc-n{width:30px;height:30px;background:var(--g);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;margin-bottom:10px}
-.proc-t{font-size:13px;font-weight:700;margin-bottom:5px}
-.proc-d{font-size:12px;color:var(--dk);line-height:1.6}
-.tw{overflow-x:auto;border-radius:9px;border:1px solid var(--bd);box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:18px}
-table{width:100%;border-collapse:collapse;background:var(--wh)}
-thead th{background:var(--g);color:#fff;padding:10px 14px;text-align:left;font-size:12px;font-weight:700;white-space:nowrap}
-tbody td{padding:9px 14px;font-size:12px;color:var(--dk);border-bottom:1px solid var(--bd);vertical-align:top}
-tbody tr:last-child td{border-bottom:none}
-tbody tr:nth-child(even) td{background:var(--bg)}
-/* IA CHAT */
-.ia-wrap{display:flex;flex-direction:column;height:calc(100vh - 130px)}
-.ia-head{background:var(--wh);border:1px solid var(--bd);border-radius:10px 10px 0 0;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.ia-av{width:36px;height:36px;background:var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
-.ia-name{font-size:13px;font-weight:700}
-.ia-st{font-size:11px;color:var(--gd);font-weight:600;display:flex;align-items:center;gap:3px}
-.ia-st::before{content:'';width:5px;height:5px;background:var(--g);border-radius:50%}
-.ia-note{margin-left:auto;font-size:11px;color:var(--gy);max-width:220px;text-align:right;line-height:1.4}
-.chips{display:flex;flex-wrap:wrap;gap:7px;padding:9px 12px;background:var(--wh);border:1px solid var(--bd);border-top:none;flex-shrink:0}
-.chip{border:1px solid var(--bd);background:var(--bg);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--dk);cursor:pointer;font-weight:500;transition:all .15s}
-.chip:hover{border-color:var(--g);color:var(--gd);background:var(--gl)}
-.chat-box{flex:1;overflow-y:auto;padding:16px;background:var(--bg);border:1px solid var(--bd);border-top:none;display:flex;flex-direction:column;gap:12px}
-.msg{display:flex;gap:8px;max-width:80%}
-.msg.u{align-self:flex-end;flex-direction:row-reverse}
-.msg-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
-.msg.b .msg-av{background:var(--g);color:#fff}
-.msg.u .msg-av{background:var(--bd);color:var(--dk)}
-.msg-bbl{padding:9px 12px;border-radius:9px;font-size:13px;line-height:1.6;white-space:pre-wrap}
-.msg-bbl p{margin:0 0 8px 0;white-space:normal}
-.msg-bbl p:last-child{margin-bottom:0}
-.msg-bbl ul{margin:0 0 8px 18px;padding:0;white-space:normal}
-.msg-bbl li{margin-bottom:3px}
-.msg-bbl hr{border:none;border-top:1px solid var(--bd);margin:10px 0}
-.msg-bbl strong{font-weight:700}
-.msg-bbl h2,.msg-bbl h3,.msg-bbl h4{margin:10px 0 6px 0;font-weight:800;line-height:1.3;white-space:normal}
-.msg-bbl h2:first-child,.msg-bbl h3:first-child,.msg-bbl h4:first-child{margin-top:0}
-.msg-bbl h2{font-size:15px}
-.msg-bbl h3{font-size:14px}
-.msg-bbl h4{font-size:13px}
-.msg.b .msg-bbl{background:var(--wh);border:1px solid var(--bd);border-radius:2px 9px 9px 9px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.msg.u .msg-bbl{background:var(--g);color:#fff;border-radius:9px 2px 9px 9px}
-.typing{display:flex;gap:3px;align-items:center;padding:10px 14px}
-.typing span{width:6px;height:6px;background:var(--g);border-radius:50%;animation:bop .8s infinite}
-.typing span:nth-child(2){animation-delay:.15s}
-.typing span:nth-child(3){animation-delay:.3s}
-@keyframes bop{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
-.chat-form{display:flex;gap:9px;padding:10px 12px;background:var(--wh);border:1px solid var(--bd);border-top:none;border-radius:0 0 10px 10px;flex-shrink:0}
-.chat-ta{flex:1;border:1px solid var(--bd);border-radius:7px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;resize:none;transition:border-color .15s}
-.chat-ta:focus{border-color:var(--g)}
-.chat-ta::placeholder{color:var(--gl2)}
-.btn-send{background:var(--g);color:#fff;border:none;border-radius:7px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
-.btn-send:hover{background:var(--gd)}
-.btn-send:disabled{opacity:.5;cursor:not-allowed}
-.err-msg{color:var(--r);font-size:12px;padding:8px 12px;background:var(--rl);border-radius:7px;border:1px solid #f5c0c0}
-/* ADMIN */
-.admin-card{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:16px}
-.admin-card h3{font-size:14px;font-weight:700;margin-bottom:8px}
-.admin-card p{font-size:12px;color:var(--gy);margin-bottom:14px;line-height:1.5}
-.kb-textarea{width:100%;height:500px;border:1px solid var(--bd);border-radius:8px;padding:14px;font-size:12px;font-family:monospace;line-height:1.6;outline:none;resize:vertical;transition:border-color .15s}
-.kb-textarea:focus{border-color:var(--g)}
-.btn-save{background:var(--g);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;margin-top:12px}
-.btn-save:hover{background:var(--gd)}
-.btn-save:disabled{opacity:.5;cursor:not-allowed}
-.save-status{font-size:12px;margin-top:8px;padding:8px 12px;border-radius:7px;display:none}
-.save-status.ok{background:var(--gl);color:var(--gd);border:1px solid var(--gm);display:block}
-.save-status.err{background:var(--rl);color:var(--r);border:1px solid #f5c0c0;display:block}
-.ct-card{background:var(--wh);border:1px solid var(--bd);border-radius:12px;padding:22px;max-width:760px}
-.ct-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.ct-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
-.ct-field label{font-size:12px;font-weight:700;color:var(--dk)}
-.ct-field input,.ct-field select,.ct-field textarea{border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
-.ct-field input:focus,.ct-field select:focus,.ct-field textarea:focus{border-color:var(--g)}
-.ct-toggle{display:flex;align-items:center;gap:8px;margin:16px 0;padding:12px;background:var(--bg);border-radius:8px;cursor:pointer}
-.ct-toggle input{width:16px;height:16px}
-.ct-toggle span{font-size:13px;font-weight:600}
-.ct-parcela{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center}
-.ct-parcela input{border:1px solid var(--bd);border-radius:7px;padding:8px 9px;font-size:12px;font-family:inherit}
-.ct-rm{background:var(--rl);color:var(--r);border:1px solid #f5c0c0;border-radius:7px;width:30px;height:32px;cursor:pointer;font-size:15px;line-height:1}
-.ct-add{background:var(--gl);color:var(--gd);border:1px solid var(--gm);border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:14px}
-.ct-add:hover{background:var(--gm)}
-.ct-hint{font-size:11px;color:var(--gy);margin-top:-6px;margin-bottom:14px}
-.ct-sec{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--gy);margin:20px 0 10px;padding-top:16px;border-top:1px solid var(--bd)}
-.ct-sec:first-of-type{border-top:none;padding-top:0;margin-top:0}
-.ct-subtabs{display:flex;gap:8px;margin-bottom:16px}
-.ct-subtab{background:var(--wh);border:1px solid var(--bd);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;color:var(--gy)}
-.ct-subtab.on{background:var(--gl);color:var(--gd);border-color:var(--gm)}
-.ct-subpane{display:none}.ct-subpane.on{display:block}
-.gt-prod{border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:10px;background:var(--bg)}
-.gt-prod-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
-.gt-prod-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
-.gt-prod input,.gt-prod select{width:100%;border:1px solid var(--bd);border-radius:7px;padding:7px 9px;font-size:12px;font-family:inherit}
-.gt-prod-rm{background:var(--rl);color:var(--r);border:1px solid #f5c0c0;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer}
-@media(max-width:768px){
-  .sb{position:fixed;left:0;top:0;height:100%;transform:translateX(-100%)}
-  .sb.open{transform:translateX(0)}
-  .ovl.show{display:block}
-  .hbg{display:block}
-  .topbar{padding:12px 12px 12px 50px}
-  .content{padding:14px}
-  .taco-grid,.proc-grid{grid-template-columns:1fr}
-  .ia-note{display:none}
+:root {
+ --black: #0a0a0a;
+ --black2: #111111;
+ --black3: #181818;
+ --black4: #222222;
+ --gray1: #2a2a2a;
+ --gray2: #3a3a3a;
+ --gray3: #555;
+ --gray4: #888;
+ --gray5: #aaa;
+ --white: #f5f5f5;
+ --white2: #e0e0e0;
+ --brand: #1b4332;
+ --brand2: #2d6a4f;
+ --brand3: #143528;
+ --gold: #d4a843;
+ --green: #1db954;
+ --green2: #0f9b42;
+ --green3: #0a6e2e;
+ --yellow: #e5b800;
+ --red: #e03030;
+ --red2: #a01818;
+ --border: rgba(45,106,79,0.28);
+ --border2: rgba(255,255,255,0.07);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+ background: var(--black);
+ color: var(--white);
+ font-family: 'DM Sans', sans-serif;
+ min-height: 100vh;
+ overflow-x: hidden;
+}
+
+/* ─── NOISE TEXTURE ─── */
+body::before {
+ content: '';
+ position: fixed;
+ inset: 0;
+ background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+ pointer-events: none;
+ z-index: 0;
+ opacity: .4;
+}
+
+/* ─── HEADER ─── */
+header {
+ background: linear-gradient(135deg, var(--black2) 0%, var(--black3) 100%);
+ border-bottom: 1px solid var(--border);
+ padding: 0 32px;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ height: 72px;
+ position: sticky;
+ top: 0;
+ z-index: 100;
+ box-shadow: 0 4px 32px rgba(0,0,0,.6);
+}
+header.header-slim{
+ height:40px;
+ justify-content:flex-end;
+ padding:0 28px;
+ border-bottom:1px solid rgba(45,106,79,.18);
+}
+
+.logo-area {
+ display: flex;
+ align-items: center;
+ gap: 16px;
+}
+
+.logo-icon {
+ width: 44px; height: 44px;
+ background: linear-gradient(135deg, var(--brand2), var(--brand3));
+ border-radius: 10px;
+ display: flex; align-items: center; justify-content: center;
+ font-size: 22px;
+ box-shadow: 0 0 18px rgba(45,106,79,.35);
+}
+
+.logo-text {
+ display: flex;
+ flex-direction: column;
+ gap: 1px;
+}
+
+.logo-name {
+ font-family: 'Bebas Neue', sans-serif;
+ font-size: 26px;
+ letter-spacing: 3px;
+ background: linear-gradient(90deg, var(--brand2), var(--brand));
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+ line-height: 1;
+}
+
+.logo-sub {
+ font-size: 10px;
+ letter-spacing: 2.5px;
+ color: var(--gray4);
+ text-transform: uppercase;
+ font-weight: 500;
+}
+
+.header-right {
+ display: flex;
+ align-items: center;
+ gap: 24px;
+}
+
+.live-badge {
+ display: flex;
+ align-items: center;
+ gap: 6px;
+ background: rgba(29,185,84,.12);
+ border: 1px solid rgba(29,185,84,.3);
+ padding: 5px 12px;
+ border-radius: 20px;
+ font-size: 11px;
+ color: var(--green);
+ font-weight: 600;
+ letter-spacing: 1px;
+}
+
+.live-dot {
+ width: 6px; height: 6px;
+ background: var(--green);
+ border-radius: 50%;
+ animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+ 0%,100% { opacity:1; transform: scale(1); }
+ 50% { opacity:.4; transform: scale(1.3); }
+}
+
+.header-date {
+ font-family: 'JetBrains Mono', monospace;
+ font-size: 11px;
+ color: var(--gray4);
+ letter-spacing: 1px;
+}
+
+/* ─── TABS ─── */
+.tabs-bar {
+ background: linear-gradient(180deg, var(--black3) 0%, var(--black2) 100%);
+ border-bottom: 1px solid var(--border);
+ display: flex;
+ gap: 4px;
+ padding: 10px 32px 0;
+ overflow-x: auto;
+ box-shadow: 0 4px 24px rgba(0,0,0,.45);
+}
+
+.tab-btn {
+ background: none;
+ border: none;
+ color: var(--gray4);
+ font-family: 'DM Sans', sans-serif;
+ font-size: 13px;
+ font-weight: 500;
+ padding: 14px 22px;
+ cursor: pointer;
+ border-bottom: 2px solid transparent;
+ border-radius: 6px 6px 0 0;
+ transition: all .2s;
+ white-space: nowrap;
+ letter-spacing: .3px;
+}
+
+.tab-btn:hover { color: var(--white2); background: rgba(45,106,79,.1); }
+.tab-btn.active {
+ color: var(--brand2);
+ border-bottom-color: var(--brand2);
+ font-weight: 600;
+ background: rgba(45,106,79,.14);
+ box-shadow: 0 -2px 12px rgba(45,106,79,.18) inset;
+}
+
+/* ─── MAIN ─── */
+main {
+ padding: 28px 32px;
+ max-width: 1600px;
+ margin: 0 auto;
+ position: relative;
+ z-index: 1;
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ─── SECTION TITLE ─── */
+.section-title {
+ font-family: 'Bebas Neue', sans-serif;
+ font-size: 13px;
+ letter-spacing: 3px;
+ color: var(--brand2);
+ text-transform: uppercase;
+ margin-bottom: 16px;
+ display: flex;
+ align-items: center;
+ gap: 10px;
+}
+
+.section-title::after {
+ content: '';
+ flex: 1;
+ height: 1px;
+ background: linear-gradient(90deg, var(--border), transparent);
+}
+
+/* ─── GRID ─── */
+.kpi-grid { display: grid; gap: 16px; }
+.kpi-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.kpi-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.kpi-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.kpi-grid-52 { grid-template-columns: 5fr 2fr; }
+.kpi-grid-23 { grid-template-columns: 2fr 3fr; }
+
+/* ─── CARD ─── */
+.card {
+ background: var(--black3);
+ border: 1px solid var(--border2);
+ border-radius: 14px;
+ padding: 22px 24px;
+ position: relative;
+ overflow: hidden;
+ transition: border-color .2s, transform .2s;
+}
+
+.card:hover {
+ border-color: rgba(45,106,79,.25);
+ transform: translateY(-1px);
+}
+
+.card::before {
+ content: '';
+ position: absolute;
+ top: 0; left: 0; right: 0;
+ height: 1px;
+ background: linear-gradient(90deg, transparent, rgba(45,106,79,.3), transparent);
+}
+
+.card-accent-green::before { background: linear-gradient(90deg, transparent, rgba(29,185,84,.4), transparent); }
+.card-accent-red::before { background: linear-gradient(90deg, transparent, rgba(224,48,48,.4), transparent); }
+.card-accent-yellow::before { background: linear-gradient(90deg, transparent, rgba(229,184,0,.4), transparent); }
+
+.kpi-label {
+ font-size: 11px;
+ font-weight: 600;
+ letter-spacing: 1.5px;
+ color: var(--gray4);
+ text-transform: uppercase;
+ margin-bottom: 10px;
+}
+
+.kpi-value {
+ font-family: 'Bebas Neue', sans-serif;
+ font-size: 38px;
+ line-height: 1;
+ color: var(--white);
+ letter-spacing: 1px;
+}
+
+.kpi-value.gold { color: var(--brand2); }
+.kpi-value.green { color: var(--green); }
+.kpi-value.red { color: var(--red); }
+.kpi-value.yellow { color: var(--yellow); }
+
+.kpi-sub {
+ font-size: 12px;
+ color: var(--gray4);
+ margin-top: 6px;
+ display: flex;
+ align-items: center;
+ gap: 5px;
+}
+
+.kpi-badge {
+ display: inline-flex;
+ align-items: center;
+ gap: 4px;
+ font-size: 11px;
+ font-weight: 600;
+ padding: 3px 9px;
+ border-radius: 20px;
+}
+
+.badge-green { background: rgba(29,185,84,.15); color: var(--green); border: 1px solid rgba(29,185,84,.3); }
+.badge-red { background: rgba(224,48,48,.15); color: var(--red); border: 1px solid rgba(224,48,48,.3); }
+.badge-yellow { background: rgba(229,184,0,.15); color: var(--yellow); border: 1px solid rgba(229,184,0,.3); }
+.badge-gold { background: rgba(45,106,79,.18); color: var(--brand2); border: 1px solid rgba(45,106,79,.35); }
+.badge-gray { background: rgba(255,255,255,.07); color: var(--gray5); border: 1px solid var(--border2); }
+
+/* ─── PROGRESS BAR ─── */
+.progress-wrap {
+ background: var(--gray1);
+ border-radius: 99px;
+ height: 8px;
+ margin-top: 12px;
+ overflow: hidden;
+}
+
+.progress-bar {
+ height: 100%;
+ border-radius: 99px;
+ background: linear-gradient(90deg, var(--brand3), var(--brand2));
+ transition: width .6s ease;
+ position: relative;
+}
+
+.progress-bar.green { background: linear-gradient(90deg, var(--green3), var(--green)); }
+.progress-bar.red { background: linear-gradient(90deg, var(--red2), var(--red)); }
+.progress-bar.yellow { background: linear-gradient(90deg, #8a6e00, var(--yellow)); }
+
+.progress-bar::after {
+ content: '';
+ position: absolute;
+ right: 0; top: 0; bottom: 0;
+ width: 6px;
+ background: rgba(255,255,255,.5);
+ border-radius: 99px;
+}
+
+/* ─── TABLE ─── */
+.table-wrap {
+ overflow-x: auto;
+ border-radius: 14px;
+ border: 1px solid var(--border2);
+}
+
+table {
+ width: 100%;
+ border-collapse: collapse;
+ font-size: 13px;
+}
+
+thead th {
+ background: var(--black4);
+ padding: 13px 14px;
+ text-align: left;
+ font-size: 10px;
+ font-weight: 700;
+ letter-spacing: 1.5px;
+ color: var(--gray4);
+ text-transform: uppercase;
+ border-bottom: 1px solid var(--border2);
+ white-space: nowrap;
+}
+
+tbody tr {
+ border-bottom: 1px solid rgba(255,255,255,.04);
+ transition: background .15s;
+}
+
+tbody tr:hover { background: rgba(45,106,79,.04); }
+tbody tr:last-child { border-bottom: none; }
+
+tbody td {
+ padding: 13px 14px;
+ color: var(--white2);
+ white-space: nowrap;
+}
+
+.td-name {
+ font-weight: 600;
+ color: var(--white);
+ display: flex;
+ align-items: center;
+ gap: 8px;
+}
+
+.rank-badge {
+ width: 22px; height: 22px;
+ border-radius: 6px;
+ display: flex; align-items: center; justify-content: center;
+ font-size: 11px;
+ font-weight: 700;
+ font-family: 'JetBrains Mono', monospace;
+ flex-shrink: 0;
+}
+
+.rank-1 { background: linear-gradient(135deg,#a07830,#d4a843); color: #fff; }
+.rank-2 { background: rgba(192,192,192,.2); color: #c0c0c0; border: 1px solid rgba(192,192,192,.3); }
+.rank-3 { background: rgba(180,100,50,.2); color: #cd7f32; border: 1px solid rgba(180,100,50,.3); }
+.rank-4 { background: rgba(255,255,255,.06); color: var(--gray4); border: 1px solid var(--border2); }
+
+.status-pill {
+ display: inline-flex;
+ align-items: center;
+ gap: 4px;
+ padding: 3px 10px;
+ border-radius: 20px;
+ font-size: 10px;
+ font-weight: 700;
+ letter-spacing: .8px;
+ text-transform: uppercase;
+}
+
+.status-meta { background: rgba(29,185,84,.15); color: var(--green); border: 1px solid rgba(29,185,84,.3); }
+.status-ok { background: rgba(229,184,0,.12); color: var(--yellow); border: 1px solid rgba(229,184,0,.3); }
+.status-risk { background: rgba(224,48,48,.12); color: var(--red); border: 1px solid rgba(224,48,48,.25); }
+
+/* ─── SCORE BAR ─── */
+.score-bar-wrap {
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ min-width: 120px;
+}
+
+.score-bar-bg {
+ flex: 1;
+ height: 6px;
+ background: var(--gray1);
+ border-radius: 99px;
+ overflow: hidden;
+}
+
+.score-bar-fill {
+ height: 100%;
+ border-radius: 99px;
+}
+
+.score-num {
+ font-family: 'JetBrains Mono', monospace;
+ font-size: 12px;
+ font-weight: 600;
+ min-width: 28px;
+ text-align: right;
+}
+
+/* ─── CHART BARS ─── */
+.chart-area {
+ display: flex;
+ align-items: flex-end;
+ gap: 12px;
+ height: 180px;
+ padding: 0 8px;
+}
+
+.bar-col {
+ flex: 1;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ gap: 6px;
+ height: 100%;
+ justify-content: flex-end;
+}
+
+.bar-value {
+ font-family: 'JetBrains Mono', monospace;
+ font-size: 10px;
+ color: var(--gray4);
+ white-space: nowrap;
+}
+
+.bar-visual {
+ width: 100%;
+ border-radius: 6px 6px 0 0;
+ position: relative;
+ min-height: 4px;
+ transition: height .5s ease;
+}
+
+.bar-label {
+ font-size: 11px;
+ font-weight: 600;
+ color: var(--gray5);
+ text-align: center;
+}
+
+.bar-target-line {
+ position: absolute;
+ left: -4px; right: -4px;
+ height: 2px;
+ background: rgba(45,106,79,.5);
+ border-radius: 1px;
+}
+
+/* ─── FORECAST CARD ─── */
+.forecast-status {
+ display: flex;
+ align-items: center;
+ gap: 12px;
+ padding: 14px 18px;
+ border-radius: 10px;
+ margin-top: 14px;
+}
+
+.forecast-status.ok { background: rgba(29,185,84,.08); border: 1px solid rgba(29,185,84,.2); }
+.forecast-status.warn { background: rgba(229,184,0,.08); border: 1px solid rgba(229,184,0,.2); }
+.forecast-status.danger { background: rgba(224,48,48,.08); border: 1px solid rgba(224,48,48,.2); }
+
+.forecast-icon { font-size: 24px; }
+
+.forecast-text .title {
+ font-size: 14px;
+ font-weight: 700;
+ margin-bottom: 2px;
+}
+
+.forecast-text .sub { font-size: 12px; color: var(--gray4); }
+
+/* ─── CONSULTANT OF MONTH ─── */
+/* ═══════════════════════════════════════
+   PÓDIO — COMPETIÇÃO AO VIVO
+═══════════════════════════════════════ */
+.podium-stage{
+  min-height:calc(100vh - 140px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 24px;position:relative;overflow:hidden;
+}
+.podium-stage::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 50% 30%, rgba(45,106,79,.14), transparent 60%);
+}
+.podium-title-wrap{text-align:center;margin-bottom:48px;position:relative;z-index:2}
+.podium-live-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--green);margin:0 auto 12px;
+  box-shadow:0 0 0 0 rgba(29,185,84,.6);animation:podiumPulse 1.8s infinite;
+}
+@keyframes podiumPulse{
+  0%{box-shadow:0 0 0 0 rgba(29,185,84,.55)}
+  70%{box-shadow:0 0 0 10px rgba(29,185,84,0)}
+  100%{box-shadow:0 0 0 0 rgba(29,185,84,0)}
+}
+.podium-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:2px;color:var(--white)}
+.podium-sub{font-size:12px;color:var(--gray4);margin-top:4px;letter-spacing:.5px}
+
+.podium-stand{
+  display:flex;align-items:flex-end;justify-content:center;gap:28px;
+  position:relative;z-index:2;width:100%;max-width:820px;margin-bottom:44px;
+}
+.podium-block{
+  display:flex;flex-direction:column;align-items:center;
+  opacity:0;transform:translateY(40px);
+  animation:podiumRise .7s cubic-bezier(.2,.8,.3,1) forwards;
+}
+.podium-block.pos-1{ order:2; animation-delay:.15s }
+.podium-block.pos-2{ order:1; animation-delay:.32s }
+.podium-block.pos-3{ order:3; animation-delay:.32s }
+@keyframes podiumRise{ to{ opacity:1; transform:translateY(0) } }
+
+.podium-crown{
+  width:34px;height:34px;margin-bottom:6px;color:#f0c96b;
+  filter:drop-shadow(0 0 8px rgba(240,201,107,.7));
+  animation:crownFloat 2.4s ease-in-out infinite;
+}
+@keyframes crownFloat{ 0%,100%{ transform:translateY(0) rotate(-2deg) } 50%{ transform:translateY(-6px) rotate(2deg) } }
+.podium-crown-spacer{ height:40px }
+
+.podium-photo-wrap{position:relative;margin-bottom:14px}
+.podium-photo{
+  border-radius:50%;object-fit:cover;display:block;background:var(--gray1);
+}
+.podium-block.pos-1 .podium-photo{ width:128px;height:128px;border:4px solid #f0c96b;box-shadow:0 0 0 6px rgba(240,201,107,.15),0 0 30px rgba(240,201,107,.35) }
+.podium-block.pos-2 .podium-photo{ width:100px;height:100px;border:4px solid #c8ccd0;box-shadow:0 0 0 6px rgba(200,204,208,.12) }
+.podium-block.pos-3 .podium-photo{ width:100px;height:100px;border:4px solid #cd8a4c;box-shadow:0 0 0 6px rgba(205,138,76,.12) }
+
+.podium-name{font-weight:700;font-size:15px;color:var(--white);margin-bottom:2px;text-align:center}
+.podium-score{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:.5px;white-space:nowrap}
+.podium-block.pos-1 .podium-score{ color:#f0c96b }
+.podium-block.pos-2 .podium-score{ color:#c8ccd0 }
+.podium-block.pos-3 .podium-score{ color:#cd8a4c }
+.podium-score-label{font-size:10px;color:var(--gray4);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.podium-ipc-label{font-size:11px;font-weight:700;letter-spacing:.3px;margin-bottom:10px}
+
+.podium-riser{
+  width:150px;border-radius:10px 10px 0 0;
+  display:flex;align-items:flex-start;justify-content:center;padding-top:10px;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;color:rgba(255,255,255,.55);
+}
+.podium-block.pos-1 .podium-riser{ height:120px;background:linear-gradient(180deg,rgba(240,201,107,.22),rgba(240,201,107,.05)); border-top:2px solid #f0c96b }
+.podium-block.pos-2 .podium-riser{ height:80px;background:linear-gradient(180deg,rgba(200,204,208,.18),rgba(200,204,208,.04)); border-top:2px solid #c8ccd0 }
+.podium-block.pos-3 .podium-riser{ height:56px;background:linear-gradient(180deg,rgba(205,138,76,.18),rgba(205,138,76,.04)); border-top:2px solid #cd8a4c }
+
+.last-champion-banner{
+  display:flex;align-items:center;gap:16px;justify-content:center;
+  max-width:520px;margin:0 auto 40px;padding:14px 22px;
+  background:linear-gradient(135deg,rgba(240,201,107,.10),rgba(240,201,107,.02));
+  border:1px solid rgba(240,201,107,.35);border-radius:14px;position:relative;z-index:2;
+  animation:fadeUp .5s ease both;
+}
+.last-champion-photo{
+  width:52px;height:52px;border-radius:50%;object-fit:cover;
+  border:3px solid #f0c96b;box-shadow:0 0 0 4px rgba(240,201,107,.15);flex-shrink:0;
+}
+.last-champion-text{text-align:left}
+.last-champion-label{font-size:10px;letter-spacing:1.5px;color:var(--gray4);text-transform:uppercase;font-weight:700}
+.last-champion-name{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#f0c96b;letter-spacing:.5px;line-height:1.2}
+.last-champion-sub{font-size:11px;color:var(--gray4);margin-top:2px}
+
+.hist-trophy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+.hist-trophy-card{
+  background:var(--black3);border:1px solid var(--border2);border-radius:14px;padding:20px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.hist-trophy-card.leader{border-color:rgba(240,201,107,.4);background:linear-gradient(135deg,rgba(240,201,107,.06),rgba(240,201,107,.01))}
+.hist-trophy-photo{width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid var(--border2);margin-bottom:10px}
+.hist-trophy-card.leader .hist-trophy-photo{border-color:#f0c96b}
+.hist-trophy-name{font-weight:700;font-size:14px;color:var(--white);margin-bottom:6px}
+.hist-trophy-count{font-family:'Bebas Neue',sans-serif;font-size:30px;color:#f0c96b;line-height:1}
+.hist-trophy-count-label{font-size:10px;color:var(--gray4);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.hist-trophy-total{font-size:11px;color:var(--gray5);margin-top:10px}
+
+.hist-empty{text-align:center;padding:60px 20px;color:var(--gray4)}
+.hist-empty-icon{font-size:32px;margin-bottom:12px;opacity:.5}
+
+.podium-race{width:100%;max-width:640px;position:relative;z-index:2}
+.podium-race-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.podium-race-photo{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border2)}
+.podium-race-track{flex:1;height:14px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;position:relative}
+.podium-race-fill{
+  height:100%;border-radius:99px;
+  transition:width 1s cubic-bezier(.2,.8,.2,1);
+  background:linear-gradient(90deg,var(--brand3),var(--brand2));
+  position:relative;
+}
+.podium-race-fill.leader{ background:linear-gradient(90deg,#a07830,#f0c96b) }
+.podium-race-fill::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+  width:40%;animation:raceShine 2.2s infinite;
+}
+@keyframes raceShine{ 0%{ transform:translateX(-120%) } 100%{ transform:translateX(340%) } }
+.podium-race-name{width:120px;font-size:12px;font-weight:700;color:var(--white2);flex-shrink:0}
+.podium-race-val{width:74px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gray4);flex-shrink:0}
+
+.registrar-venda-card{
+  margin-top:40px;width:100%;max-width:520px;position:relative;z-index:2;
+  background:rgba(45,106,79,.08);border:1px solid rgba(45,106,79,.3);
+  border-radius:14px;padding:20px 24px;text-align:center;
+}
+.rv-title{font-size:13px;font-weight:700;color:var(--brand2);margin-bottom:14px;letter-spacing:.3px}
+.rv-row{display:flex;gap:10px}
+.rv-row select, .rv-row input{
+  background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;
+  color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;
+}
+.rv-row select{flex:0 0 150px}
+.rv-row select option{background:#12241c;color:#f2f5f2}
+.rv-row input{flex:1;min-width:0}
+.rv-row select:focus, .rv-row input:focus{border-color:var(--brand2)}
+.rv-row button{
+  background:linear-gradient(135deg,var(--brand2),var(--brand3));color:#fff;border:none;
+  border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;
+  transition:filter .15s;
+}
+.rv-row button:hover{filter:brightness(1.15)}
+.rv-status{margin-top:10px;font-size:12px;min-height:16px}
+.rv-status.ok{color:var(--green)}
+.rv-status.err{color:var(--red)}
+@media (max-width:600px){ .rv-row{flex-wrap:wrap} .rv-row select{flex:1 1 100%} }
+
+.com-card {
+ background: linear-gradient(135deg, rgba(45,106,79,.08), rgba(45,106,79,.03));
+ border: 1px solid rgba(45,106,79,.3);
+ border-radius: 14px;
+ padding: 24px;
+ position: relative;
+ overflow: hidden;
+}
+
+.com-card::after {
+ content: '';
+ position: absolute;
+ right: -30px; top: -30px;
+ width: 160px; height: 160px;
+ border-radius: 50%;
+ background: radial-gradient(circle, rgba(45,106,79,.16), transparent 70%);
+}
+
+.com-name {
+ font-family: 'Bebas Neue', sans-serif;
+ font-size: 42px;
+ color: var(--brand2);
+ letter-spacing: 2px;
+ line-height: 1;
+}
+
+/* ─── ALERTS ─── */
+.alert-item {
+ display: flex;
+ align-items: flex-start;
+ gap: 12px;
+ padding: 12px 16px;
+ border-radius: 10px;
+ margin-bottom: 8px;
+ border-left: 3px solid;
+}
+
+.alert-red { background: rgba(224,48,48,.07); border-color: var(--red); }
+.alert-yellow { background: rgba(229,184,0,.07); border-color: var(--yellow); }
+.alert-green { background: rgba(29,185,84,.07); border-color: var(--green); }
+
+.alert-icon { font-size: 16px; margin-top: 1px; }
+
+.alert-content .title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.alert-content .sub { font-size: 11px; color: var(--gray4); }
+
+/* ─── INPUT CONTROLS ─── */
+.input-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+ gap: 12px;
+ margin-top: 12px;
+}
+
+.input-group {
+ display: flex;
+ flex-direction: column;
+ gap: 5px;
+}
+
+.input-group label {
+ font-size: 10px;
+ font-weight: 600;
+ letter-spacing: 1px;
+ color: var(--gray4);
+ text-transform: uppercase;
+}
+
+.input-group input {
+ background: var(--black4);
+ border: 1px solid var(--border2);
+ border-radius: 8px;
+ padding: 8px 12px;
+ color: var(--white);
+ font-family: 'JetBrains Mono', monospace;
+ font-size: 13px;
+ width: 100%;
+ transition: border-color .2s;
+ outline: none;
+}
+
+.input-group input:focus { border-color: rgba(45,106,79,.5); }
+
+.btn-primary {
+ background: linear-gradient(135deg, var(--brand3), var(--brand2));
+ border: none;
+ border-radius: 8px;
+ padding: 10px 20px;
+ color: var(--black);
+ font-family: 'DM Sans', sans-serif;
+ font-size: 13px;
+ font-weight: 700;
+ cursor: pointer;
+ letter-spacing: .5px;
+ transition: opacity .2s, transform .1s;
+}
+
+.btn-primary:hover { opacity: .85; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+/* ─── PACE INDICATOR ─── */
+.pace-item {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ padding: 10px 14px;
+ border-radius: 8px;
+ margin-bottom: 6px;
+ background: rgba(255,255,255,.03);
+ border: 1px solid var(--border2);
+}
+
+.pace-name { font-weight: 600; font-size: 13px; }
+.pace-numbers { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gray4); }
+
+.pace-pill {
+ font-size: 10px;
+ font-weight: 700;
+ padding: 3px 9px;
+ border-radius: 20px;
+ letter-spacing: .8px;
+ text-transform: uppercase;
+}
+
+.pace-above { background: rgba(29,185,84,.15); color: var(--green); border: 1px solid rgba(29,185,84,.3); }
+.pace-on { background: rgba(229,184,0,.12); color: var(--yellow); border: 1px solid rgba(229,184,0,.3); }
+.pace-below { background: rgba(224,48,48,.12); color: var(--red); border: 1px solid rgba(224,48,48,.3); }
+
+/* ─── DONUT ─── */
+.donut-wrap {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ padding: 16px 0;
+}
+
+/* ─── RANKING ─── */
+.rank-item {
+ display: flex;
+ align-items: center;
+ gap: 14px;
+ padding: 14px 0;
+ border-bottom: 1px solid rgba(255,255,255,.04);
+}
+
+.rank-item:last-child { border-bottom: none; }
+
+.rank-pos {
+ font-family: 'Bebas Neue', sans-serif;
+ font-size: 28px;
+ line-height: 1;
+ width: 28px;
+ text-align: center;
+}
+
+.rank-pos.p1 { color: var(--gold); }
+.rank-pos.p2 { color: #c0c0c0; }
+.rank-pos.p3 { color: #cd7f32; }
+.rank-pos.p4 { color: var(--gray3); }
+
+.rank-info { flex: 1; }
+.rank-info .name { font-weight: 600; font-size: 14px; }
+.rank-info .val { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gray4); margin-top: 2px; }
+
+.rank-bar-mini {
+ width: 100px;
+ height: 6px;
+ background: var(--gray1);
+ border-radius: 99px;
+ overflow: hidden;
+}
+
+.rank-bar-fill {
+ height: 100%;
+ border-radius: 99px;
+}
+
+/* ─── SCORE BREAKDOWN ─── */
+.score-factor-item {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 8px;
+ padding: 8px 0;
+ border-bottom: 1px solid rgba(255,255,255,.04);
+}
+
+.score-factor-item:last-child { border-bottom: none; }
+
+.sf-name { font-size: 12px; color: var(--gray5); flex: 1; }
+.sf-weight { font-size: 10px; color: var(--gray3); font-family: 'JetBrains Mono', monospace; width: 32px; text-align: right; }
+
+.sf-bar-wrap { width: 80px; height: 5px; background: var(--gray1); border-radius: 99px; overflow: hidden; }
+.sf-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--brand3), var(--brand2)); }
+
+.sf-val { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; width: 30px; text-align: right; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1100px) {
+ .kpi-grid-4 { grid-template-columns: repeat(2, 1fr); }
+ .kpi-grid-52 { grid-template-columns: 1fr; }
+ .kpi-grid-23 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 700px) {
+ main { padding: 16px; }
+ header { padding: 0 16px; }
+ .kpi-grid-3 { grid-template-columns: 1fr 1fr; }
+ .kpi-grid-4 { grid-template-columns: 1fr 1fr; }
+ .kpi-value { font-size: 28px; }
+}
+
+.mt16 { margin-top: 16px; }
+.mt24 { margin-top: 24px; }
+.flex-gap8 { display: flex; gap: 8px; align-items: center; }
+.text-mono { font-family: 'JetBrains Mono', monospace; }
+
+.divider {
+ height: 1px;
+ background: var(--border2);
+ margin: 24px 0;
+}
+
+/* ─── MINI SPARKLINE ─── */
+.sparkline {
+ display: flex;
+ align-items: flex-end;
+ gap: 2px;
+ height: 28px;
+}
+
+.spark-bar {
+ flex: 1;
+ background: rgba(45,106,79,.25);
+ border-radius: 2px 2px 0 0;
+ min-height: 2px;
+}
+
+.spark-bar.active { background: var(--brand2); }
+
+/* animate on load */
+@keyframes fadeUp {
+ from { opacity: 0; transform: translateY(12px); }
+ to { opacity: 1; transform: translateY(0); }
+}
+
+.card { animation: fadeUp .4s ease both; }
+.card:nth-child(1) { animation-delay: .05s; }
+.card:nth-child(2) { animation-delay: .1s; }
+.card:nth-child(3) { animation-delay: .15s; }
+.card:nth-child(4) { animation-delay: .2s; }
+
+.trophy-glow {
+ text-shadow: 0 0 20px rgba(45,106,79,.8);
 }
 </style>
 </head>
 <body>
-<div class="hbg" onclick="toggleSB()"><span></span><span></span><span></span></div>
-<div class="ovl" id="ovl" onclick="toggleSB()"></div>
-<div class="app">
 
-<aside class="sb" id="sb">
-  <div class="sb-logo">
-    <div class="sb-mark">
-      <img src="/assets/ph_logo_header_dark.png" alt="Pro Hunters" class="sb-logo-img">
-    </div>
-    <div class="sb-sub">Portal Interno</div>
-  </div>
-  <div class="sb-grp">
-    <div class="sb-lbl">Principal</div>
-    <button class="ni on" onclick="goTab('inicio',this)">Início</button>
-    <button class="ni" onclick="goTab('taco',this)">Método T.A.C.O</button>
-  </div>
-  <div class="sb-grp">
-    <div class="sb-lbl">Operacional</div>
-    <button class="ni" onclick="goTab('bling',this)">Curso Bling</button>
-    <button class="ni" onclick="goTab('processos',this)">Processos</button>
-    <button class="ni" onclick="goTab('contratos',this)">Documentos</button>
-  </div>
-  <div class="sb-grp" id="grp-comercial" style="display:none">
-    <div class="sb-lbl">Comercial</div>
-    <button class="ni" onclick="goTab('comercial',this)">Dashboard Comercial</button>
-  </div>
-  <div class="sb-grp">
-    <div class="sb-lbl">Inteligência</div>
-    <button class="ni" onclick="goTab('ia',this)">IA Pro Hunters<span class="badge">NOVO</span></button>
-  </div>
-  <div class="sb-grp" id="grp-admin" style="display:none">
-    <div class="sb-lbl">Administração</div>
-    <button class="ni" onclick="goTab('admin',this)">Base de Conhecimento<span class="badge-admin">ADMIN</span></button>
-  </div>
-  <div class="sb-foot">v2.2 · Blumenau, SC</div>
-</aside>
+<!-- ═══ HEADER ═══ -->
+<header class="header-slim">
+ <div class="header-right">
+ <div class="live-badge">
+ <div class="live-dot"></div>
+ LIVE
+ </div>
+ <div id="save-status" style="font-size:11px;color:var(--green);font-weight:600;letter-spacing:.5px;opacity:0;transition:opacity .4s;font-family:'DM Sans',sans-serif;"></div>
+ <div class="header-date" id="headerDate"></div>
+ </div>
+</header>
 
-<main class="main">
-  <div class="topbar">
-    <div class="tb-l"><h1 id="tb-t">Início</h1><p id="tb-s">Visão geral do portal</p></div>
-    <div class="tb-r">
-      <span class="user-pill" id="user-pill"></span>
-      <span class="pill">COMERCIAL</span>
-      <a href="/logout" class="btn-sair">Sair</a>
-    </div>
-  </div>
-  <div class="content">
+<!-- ═══ TABS ═══ -->
+<div class="tabs-bar">
+ <button class="tab-btn active" onclick="showTab('podio')">Pódio</button>
+ <button class="tab-btn" onclick="showTab('visao')"> Visão Executiva</button>
+ <button class="tab-btn" onclick="showTab('vendedores')"> Vendedores</button>
+ <button class="tab-btn" onclick="showTab('score')"> Score & Ranking</button>
+ <button class="tab-btn" onclick="showTab('ipc')"> IPC & Disciplina</button>
+ <button class="tab-btn" onclick="showTab('graficos')"> Gráficos</button>
+ <button class="tab-btn" onclick="showTab('diario')"> Controle Diário</button>
+ <button class="tab-btn" onclick="showTab('alertas')"> Alertas</button>
+ <button class="tab-btn" onclick="showTab('historico')"> Histórico</button>
+ <button class="tab-btn" id="tabbtn-dados" onclick="showTab('dados')"> Dados</button>
+</div>
 
-    <!-- INÍCIO -->
-    <div class="tab on" id="tab-inicio">
-      <div class="kpi-grid">
-        <div class="kpi"><div class="kpi-lbl">Conversão mínima</div><div class="kpi-val">10%</div><div class="kpi-sub">Meta ideal: 15%</div></div>
-        <div class="kpi"><div class="kpi-lbl">Ticket mínimo</div><div class="kpi-val">R$1k</div><div class="kpi-sub">Por atendimento</div></div>
-        <div class="kpi"><div class="kpi-lbl">Empresas do grupo</div><div class="kpi-val">4</div><div class="kpi-sub">PH · CR · Reduto · Reconect</div></div>
-        <div class="kpi"><div class="kpi-lbl">Tipos de pedido</div><div class="kpi-val">4</div><div class="kpi-sub">PF loja · PF online · PJ x2</div></div>
-      </div>
-      <div class="sec-title">Empresas do grupo</div>
-      <div class="co-grid">
-        <div class="co"><div class="co-tag">IMPORTAÇÃO</div><div class="co-name">Pro Hunters</div><div class="co-desc">Importações e maior parte do estoque do grupo.</div></div>
-        <div class="co"><div class="co-tag">MERCADO NACIONAL</div><div class="co-name">Calibre Restrito</div><div class="co-desc">Compra e venda de produtos controlados no mercado nacional.</div></div>
-        <div class="co"><div class="co-tag">SAFARIS</div><div class="co-name">Reduto Safaris</div><div class="co-desc">Safaris internacionais. Opera também como Mobile Connect.</div></div>
-        <div class="co"><div class="co-tag">MÍDIA</div><div class="co-name">Reconect</div><div class="co-desc">Estúdio de podcast do grupo.</div></div>
-      </div>
-      <div class="cl red"><div class="cl-t">Atenção — Chronus</div><ul><li>Empresa encerrada. Não nos associamos de forma alguma.</li><li>Se o cliente perguntar: informar que encerrou e auxiliar sem assumir responsabilidade.</li></ul></div>
-    </div>
+<main>
 
-    <!-- T.A.C.O -->
-    <div class="tab" id="tab-taco">
-      <div class="taco-grid">
-        <div class="taco"><div class="taco-l">T</div><div class="taco-n">Triagem</div><div class="taco-b">Qualifique o cliente antes de qualquer indicação.<br><br>• Qual a experiência?<br>• Tipo de uso pretendido?<br>• Possui CR (se aplicável)?<br><br>Classifique: Quente / Morno / Frio</div></div>
-        <div class="taco"><div class="taco-l">A</div><div class="taco-n">Abordagem</div><div class="taco-b">Posicione-se como especialista. Demonstre domínio técnico.</div><div class="taco-q">"Deixa eu te indicar algo certo pra tua realidade."</div></div>
-        <div class="taco"><div class="taco-l">C</div><div class="taco-n">Condução</div><div class="taco-b">Indique no máximo 2 produtos. Explique o porquê de cada indicação.</div><div class="taco-q">"Se fosse pra mim, eu iria nesse modelo..."</div></div>
-        <div class="taco"><div class="taco-l">O</div><div class="taco-n">Otimização</div><div class="taco-b">Toda venda deve ter complemento.<br><br>Exemplos: bateria, coldre, acessórios.<br><br>Nunca feche sem upsell.</div></div>
-      </div>
-      <div class="meta-strip">
-        <div class="meta-p"><div class="meta-n">10%</div><div class="meta-l">Conversão mínima</div></div>
-        <div class="meta-p"><div class="meta-n">15%</div><div class="meta-l">Meta ideal</div></div>
-        <div class="meta-p"><div class="meta-n">R$1k+</div><div class="meta-l">Ticket mínimo</div></div>
-      </div>
-      <div class="cl red"><div class="cl-t">Erros não tolerados</div><ul><li>Vender sem triagem</li><li>Não ligar para lead quente</li><li>Fechar sem upsell</li><li>Deixar CRM sem próxima ação definida</li></ul></div>
-    </div>
+<!-- ═══════════════════════════════════════════
+ TAB 0 — PÓDIO (COMPETIÇÃO AO VIVO)
+═══════════════════════════════════════════ -->
+<div class="tab-panel active" id="tab-podio">
+ <div class="podium-stage">
+ <div class="podium-title-wrap">
+ <div class="podium-live-dot"></div>
+ <h2 class="podium-title">Corrida do Consultor do Mês</h2>
+ <p class="podium-sub">Ranking em tempo real por Score</p>
+ </div>
+ <div id="last-champion-banner"></div>
+ <div class="podium-stand" id="podium-stand"></div>
+ <div class="podium-race" id="podium-race"></div>
 
-    <!-- BLING -->
-    <div class="tab" id="tab-bling">
-      <div class="cl"><div class="cl-t">Regra de ouro</div><ul><li>Pedido só após confirmação de entrada ou pagamento total. Para orçamentos: proposta comercial.</li></ul></div>
-      <div class="sec-title" style="margin-top:18px">Tipos de pedido</div>
-      <div class="acc-list">
-        <div class="acc-item"><div class="acc-hd" onclick="toggleAcc(this)"><div class="acc-num">1</div><span class="acc-title">PF — Loja Física</span><span class="acc-tag">Venda Balcão</span><span class="acc-chv">▼</span></div><div class="acc-bd"><div class="acc-step"><div class="acc-dot"></div>Venda › Pedido de venda › Incluir pedido</div><div class="acc-step"><div class="acc-dot"></div>Cliente PF, CPF, Contribuinte: 9 Não Contribuinte</div><div class="acc-step"><div class="acc-dot"></div>Loja: Venda Balcão</div><div class="acc-step"><div class="acc-dot"></div>Categoria: Receita Venda Presencial — Loja</div><div class="acc-step"><div class="acc-dot"></div>Produto: clicar no ícone de folha e inserir nº de série</div><div class="acc-step"><div class="acc-dot"></div>Frete: Sem ocorrência de transporte</div><div class="acc-step"><div class="acc-dot"></div>Cartão: C6 Bank · Pix: Unicred</div><div class="acc-step"><div class="acc-dot"></div>Observações: pagamento, parcelas, pagador se terceiro</div></div></div>
-        <div class="acc-item"><div class="acc-hd" onclick="toggleAcc(this)"><div class="acc-num">2</div><span class="acc-title">PF — Online</span><span class="acc-tag">Telemarketing</span><span class="acc-chv">▼</span></div><div class="acc-bd"><div class="acc-step"><div class="acc-dot"></div>Venda › Pedido de venda › Incluir pedido</div><div class="acc-step"><div class="acc-dot"></div>Cliente PF, CPF, Contribuinte: 9 Não Contribuinte</div><div class="acc-step"><div class="acc-dot"></div>Loja: Nenhuma</div><div class="acc-step"><div class="acc-dot"></div>Categoria: Receita Telemarketing — Vendedores</div><div class="acc-step"><div class="acc-dot"></div>Produto: clicar no ícone de folha e inserir nº de série</div><div class="acc-step"><div class="acc-dot"></div>Frete: FOB (cliente paga) ou CIF (empresa paga)</div><div class="acc-step"><div class="acc-dot"></div>Cartão: link Pagar.me · Pix: Unicred</div><div class="acc-step"><div class="acc-dot"></div>Não alterar parcela após lançar frete</div></div></div>
-        <div class="acc-item"><div class="acc-hd" onclick="toggleAcc(this)"><div class="acc-num">3</div><span class="acc-title">PJ — Uso e Consumo</span><span class="acc-tag">Contribuinte ICMS</span><span class="acc-chv">▼</span></div><div class="acc-bd"><div class="acc-step"><div class="acc-dot"></div>Venda › Pedido de venda › Incluir pedido</div><div class="acc-step"><div class="acc-dot"></div>PJ, verificar IE, Contribuinte ICMS</div><div class="acc-step"><div class="acc-dot"></div>Loja: Nenhuma</div><div class="acc-step"><div class="acc-dot"></div>Categoria: Receita Telemarketing — Vendedores</div><div class="acc-step"><div class="acc-dot"></div>Observação obrigatória: "Material para uso e consumo"</div><div class="acc-step"><div class="acc-dot"></div>Frete e parcelas conforme negociação</div></div></div>
-        <div class="acc-item"><div class="acc-hd" onclick="toggleAcc(this)"><div class="acc-num">4</div><span class="acc-title">PJ — Revenda</span><span class="acc-tag">IE Obrigatória</span><span class="acc-chv">▼</span></div><div class="acc-bd"><div class="acc-step"><div class="acc-dot"></div>Venda › Pedido de venda › Incluir pedido</div><div class="acc-step"><div class="acc-dot"></div>PJ, IE obrigatória (lápis do cadastro), Contribuinte ICMS</div><div class="acc-step"><div class="acc-dot"></div>Loja: Nenhuma</div><div class="acc-step"><div class="acc-dot"></div>Categoria: Receita Telemarketing — Vendedores</div><div class="acc-step"><div class="acc-dot"></div>Observação obrigatória: "Material para revenda"</div><div class="acc-step"><div class="acc-dot"></div>Frete e parcelas conforme negociação</div></div></div>
-        <div class="acc-item"><div class="acc-hd" onclick="toggleAcc(this)"><div class="acc-num">5</div><span class="acc-title">Cadastro — PF</span><span class="acc-tag">Cadastros</span><span class="acc-chv">▼</span></div><div class="acc-bd"><div class="acc-step"><div class="acc-dot"></div>Cadastros › Clientes e Fornecedores › Incluir cadastro</div><div class="acc-step"><div class="acc-dot"></div>Nome, Fantasia, Tipo: Física, CPF, Não contribuinte</div><div class="acc-step"><div class="acc-dot"></div>Endereço completo, telefones com prefixo, e-mail, e-mail NFe, data nascimento</div></div></div>
-        <div class="acc-item"><div class="acc-hd" onclick="toggleAcc(this)"><div class="acc-num">6</div><span class="acc-title">Cadastro — PJ</span><span class="acc-tag">Cadastros</span><span class="acc-chv">▼</span></div><div class="acc-bd"><div class="acc-step"><div class="acc-dot"></div>Cadastros › Clientes e Fornecedores › Incluir cadastro</div><div class="acc-step"><div class="acc-dot"></div>Nome, Fantasia, Tipo: Jurídica, CNPJ, Contribuinte ICMS, IE, IM se houver</div><div class="acc-step"><div class="acc-dot"></div>Endereço completo, telefones com prefixo, e-mail, e-mail NFe</div></div></div>
-      </div>
-      <div class="vid-sec">
-        <div class="sec-title">Video Aulas — Curso Bling</div>
-        <div class="vid-grid">
-          <div class="vid-card"><div class="vid-thumb" id="vt1" onclick="playVid('vt1','1toyZjuuuotvwSrlze0923bef2BYkys3K')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 01</div><div class="vid-name">Pedido PF — Loja Física</div><div class="vid-desc">Pedido presencial, categoria, frete e pagamentos.</div><span class="vs ok">Disponível</span></div></div>
-          <div class="vid-card"><div class="vid-thumb" id="vt2" onclick="playVid('vt2','1r6k4loRBuRo8_C-sBD0wM63axyHnHp3H')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 02</div><div class="vid-name">Pedido PF — Online</div><div class="vid-desc">Telemarketing, frete FOB/CIF e Pagar.me.</div><span class="vs ok">Disponível</span></div></div>
-          <div class="vid-card"><div class="vid-thumb" id="vt3" onclick="playVid('vt3','1TSZmp0vkZ_LihbzfrgklxmbnJVM6l0Nd')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 03</div><div class="vid-name">Pedido PJ — Online</div><div class="vid-desc">IE, revenda vs uso e consumo.</div><span class="vs ok">Disponível</span></div></div>
-          <div class="vid-card"><div class="vid-thumb" id="vt4" onclick="playVid('vt4','1u7cLrkvdbSkkGMJ4gTr4TyPhA8yW2Ty3')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 04</div><div class="vid-name">Pedido PJ — Loja Física</div><div class="vid-desc">Venda balcão, IE e observações obrigatórias.</div><span class="vs ok">Disponível</span></div></div>
-          <div class="vid-card"><div class="vid-thumb" id="vt5" onclick="playVid('vt5','1FqTLffu3xQI5AG0M_hyVDm56XFNscdUC')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 05</div><div class="vid-name">Cadastro — PF</div><div class="vid-desc">Campos obrigatórios e dados fiscais PF.</div><span class="vs ok">Disponível</span></div></div>
-          <div class="vid-card"><div class="vid-thumb" id="vt6" onclick="playVid('vt6','1neRF6_TrWWuxB-j_p80LGolRj5N7gXiN')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 06</div><div class="vid-name">Cadastro — PJ</div><div class="vid-desc">Campos obrigatórios e dados fiscais PJ.</div><span class="vs ok">Disponível</span></div></div>
-        </div>
-      </div>
-    </div>
+ <div class="registrar-venda-card">
+ <div class="rv-title">Fechou uma venda? Registra aqui</div>
+ <div class="rv-row">
+ <select id="rvSeller"></select>
+ <input type="number" id="rvValor" placeholder="Valor da venda (R$)" min="1" step="0.01">
+ <button onclick="registrarVenda()">Registrar Venda</button>
+ </div>
+ <div class="rv-status" id="rvStatus"></div>
+ </div>
+ </div>
+</div>
 
-    <!-- PROCESSOS -->
-    <div class="tab" id="tab-processos">
-      <div class="sec-title">Venda de Armas — 3 etapas</div>
-      <div class="cl gray"><div class="cl-t">Estoque</div><ul><li>Sempre usar planilha de controle de armas — nunca o Bling.</li></ul></div>
-      <div class="proc-grid">
-        <div class="proc"><div class="proc-n">1</div><div class="proc-t">Venda</div><div class="proc-d">Planilha › marcar vendida › nº série e peso › inserir no pedido › imprimir › bunker › Financeiro</div></div>
-        <div class="proc"><div class="proc-n">2</div><div class="proc-t">Autorização</div><div class="proc-d">Imprimir 1ª NF › conferir › assinar › NF com nº série › enviar cliente (CRAF)</div></div>
-        <div class="proc"><div class="proc-n">3</div><div class="proc-t">CRAF recebido</div><div class="proc-d">Última NF › conferir nº série › pesar › Trello › aguardar envio</div></div>
-      </div>
-      <div class="cl red"><div class="cl-t">NUNCA PULAR ETAPAS</div></div>
-      <div class="sec-title" style="margin-top:22px">Guia de Trânsito (GT)</div>
-      <div class="cl"><div class="cl-t">GT — Ezequiel (terrestre)</div><ul><li>Modelo: Dropbox › Comercial › Documentações › Guias e Minutas</li><li>Editar em vermelho: nº guia, nº NF, data, destinatário, SFPC, produto, qtd (unidade), volume (caixa), marca, código de barras, validade 60 dias</li><li>NUNCA salvar. Imprimir › carimbar › assinar (João ou Luis) › digitalizar</li><li>Salvar em: Dropbox › Expediente › Pro Hunters › EXÉRCITO › GT para Clientes › 2026</li><li>Nome: GT-2026-06-02 - Selo nº 11.542.630 - Nome do Cliente - Produto</li></ul></div>
-      <div class="cl"><div class="cl-t">GT — Cliente retira pessoalmente</div><ul><li>Transportador = dados do próprio cliente. Mesmo processo.</li></ul></div>
-      <div class="cl"><div class="cl-t">GT — Gollog (aéreo)</div><ul><li>Usar somente quando vendedor avisar. Preencher Verso GT + Minuta eletrônica. Gollog cobra cliente direto.</li></ul></div>
-      <div class="sec-title" style="margin-top:22px">Portal Postal</div>
-      <div class="cl"><div class="cl-t">Etiqueta — Envio</div><ul><li>portalpostal.com.br › Etiqueta › Gerar etiqueta › PAC</li><li>NF no Bling: Vendas › NF de Saída › cliente › Imprimir NF simplificada</li><li>Nome/empresa/aos cuidados = cliente · Chave NF = nº abaixo do código de barras · Conteúdo = descrição do produto · Valor = preço un. da NF</li></ul></div>
-      <div class="cl"><div class="cl-t">Logística Reversa</div><ul><li>portalpostal.com.br › Logística Reversa › Gerar Autorização de Postagem (Reversa) · PAC · Válida 10 dias</li></ul></div>
-      <div class="sec-title" style="margin-top:22px">Documentação por produto</div>
-      <div class="tw"><table><thead><tr><th>Produto</th><th>Documentação</th></tr></thead><tbody>
-        <tr><td>Armas de fogo</td><td>Sem prévia — simples faturamento (entrega futura)</td></tr>
-        <tr><td>Munições</td><td>CRAF válido no mesmo calibre</td></tr>
-        <tr><td>Prensas de recarga</td><td>CR + autorização de compra</td></tr>
-        <tr><td>DIES e matrizes</td><td>CR + autorização (exceções → Gerência)</td></tr>
-        <tr><td>Insumos — espoletas</td><td>Prensa apostilada no CR</td></tr>
-        <tr><td>Insumos — estojos/projéteis/cartuchos</td><td>Prensa apostilada + CRAF do calibre</td></tr>
-      </tbody></table></div>
-    </div>
+<!-- ═══════════════════════════════════════════
+ TAB 1 — VISÃO EXECUTIVA
+═══════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-visao">
 
-    <!-- CONTRATOS / GT -->
-    <div class="tab" id="tab-contratos">
-      <div class="ct-subtabs">
-        <button class="ct-subtab on" id="ctsub-contratos" onclick="ctSwitchSub('contratos')">Contratos</button>
-        <button class="ct-subtab" id="ctsub-gt" onclick="ctSwitchSub('gt')">Guias de Trânsito</button>
-      </div>
+ <div class="section-title">KPIs Executivos</div>
 
-      <div class="ct-subpane on" id="ctpane-contratos">
-      <div class="ct-card">
-        <div class="ct-sec">Pedido de Venda (opcional — preenche automaticamente)</div>
-        <div class="ct-row">
-          <div class="ct-field"><label>Upload do Pedido (PDF do Bling)</label><input type="file" id="ctPedidoFile" accept="application/pdf"></div>
-          <div class="ct-field" style="justify-content:flex-end"><label>&nbsp;</label><button type="button" class="ct-add" id="ctBtnExtrairPedido" onclick="ctExtrairPedido()">Extrair dados do pedido</button></div>
-        </div>
-        <div class="save-status" id="ctPedidoStatus"></div>
+ <!-- ROW 1: Main KPIs -->
+ <div class="kpi-grid kpi-grid-4">
 
-        <div class="ct-sec">Empresa e modelo</div>
-        <div class="ct-row">
-          <div class="ct-field">
-            <label>Empresa</label>
-            <select id="ctEmpresa" onchange="ctOnEmpresaChange()">
-              <option value="ph">Pro Hunters</option>
-              <option value="cr">Calibre Restrito</option>
-            </select>
-          </div>
-          <div class="ct-field">
-            <label>Tipo de contrato</label>
-            <select id="ctTipo" onchange="ctOnTipoChange()">
-              <option value="avista">Venda à Vista</option>
-              <option value="parcelado">Venda Parcelada</option>
-              <option value="combinado">Pagamento Combinado Programado (só Pro Hunters)</option>
-            </select>
-          </div>
-        </div>
+ <div class="card card-accent-green">
+ <div class="kpi-label"> Faturamento Total</div>
+ <div class="kpi-value green" id="kpi-fat">R$ 0</div>
+ <div class="kpi-sub">mês atual</div>
+ <div class="progress-wrap" style="margin-top:14px">
+ <div class="progress-bar green" id="kpi-fat-bar" style="width:0%"></div>
+ </div>
+ </div>
 
-        <div class="ct-sec">Cliente</div>
-        <div class="ct-row">
-          <div class="ct-field"><label>Nome completo</label><input id="ctClienteNome" placeholder="Nome do cliente"></div>
-          <div class="ct-field"><label>CPF / CNPJ</label><input id="ctClienteDoc" placeholder="000.000.000-00"></div>
-        </div>
-        <div class="ct-field"><label>Endereço completo</label><input id="ctClienteEndereco" placeholder="Rua, número, bairro, cidade/UF, CEP"></div>
+ <div class="card">
+ <div class="kpi-label"> Meta Global</div>
+ <div class="kpi-value gold">R$ 300.000</div>
+ <div class="kpi-sub" id="kpi-pct-label">0% atingido</div>
+ <div class="progress-wrap" style="margin-top:14px">
+ <div class="progress-bar" id="kpi-meta-bar" style="width:0%"></div>
+ </div>
+ </div>
 
-        <div class="ct-sec">Produto</div>
-        <div class="ct-field"><label>Descrição do produto</label><input id="ctProduto" placeholder="Ex: Rifle Ruger American Rifle Standard, Calibre 308 win"></div>
+ <div class="card">
+ <div class="kpi-label"> Projeção Final</div>
+ <div class="kpi-value" id="kpi-proj">R$ 0</div>
+ <div class="kpi-sub" id="kpi-proj-label">dias corridos</div>
+ <div style="margin-top:10px" id="kpi-proj-badge"></div>
+ </div>
 
-        <div class="ct-sec">Pagamento</div>
-        <label class="ct-toggle">
-          <input type="checkbox" id="ctPersonalizado" onchange="ctOnPersonalizadoChange()">
-          <span>Negociação personalizada — usar texto livre em vez dos campos estruturados</span>
-        </label>
+ <div class="card">
+ <div class="kpi-label"> Gap para Meta</div>
+ <div class="kpi-value red" id="kpi-gap">R$ 0</div>
+ <div class="kpi-sub" id="kpi-gap-label">faltando</div>
+ </div>
 
-        <div id="ctPersonalizadoBox" style="display:none">
-          <div class="ct-field"><label>Condições de pagamento (texto livre)</label><textarea id="ctTextoPersonalizado" rows="4" placeholder="Descreva exatamente as condições acertadas com o cliente..."></textarea></div>
-        </div>
+ </div>
 
-        <div id="ctCamposAvista">
-          <div class="ct-row">
-            <div class="ct-field"><label>Valor (R$)</label><input id="ctAvValor" type="number" step="0.01" placeholder="0,00"></div>
-            <div class="ct-field"><label>Data do pagamento</label><input id="ctAvData" type="date"></div>
-          </div>
-          <div class="ct-field"><label>Forma de pagamento</label><input id="ctAvForma" placeholder="Ex: Pix ou Cartão de crédito"></div>
-        </div>
+ <div class="kpi-grid kpi-grid-4 mt16">
 
-        <div id="ctCamposParcelado" style="display:none">
-          <div class="ct-field"><label>Valor total (R$)</label><input id="ctPcValorTotal" type="number" step="0.01" placeholder="0,00"></div>
-          <div id="ctParcelasList"></div>
-          <button type="button" class="ct-add" onclick="ctAddParcela()">+ Adicionar parcela</button>
-        </div>
+ <div class="card">
+ <div class="kpi-label"> Total Comissões</div>
+ <div class="kpi-value" id="kpi-com">R$ 0</div>
+ <div class="kpi-sub">1% do faturamento</div>
+ </div>
 
-        <div id="ctCamposCombinado" style="display:none">
-          <div class="ct-hint">Entrada de 20% e parcelas mensais mínimas de 5% já estão fixas no texto do contrato.</div>
-          <div class="ct-field"><label>Forma de pagamento</label><input id="ctCbForma" placeholder="Ex: PIX ou boleto bancário"></div>
-        </div>
+ <div class="card">
+ <div class="kpi-label"> Total Bônus</div>
+ <div class="kpi-value" id="kpi-bon">R$ 0</div>
+ <div class="kpi-sub">por metas atingidas</div>
+ </div>
 
-        <button class="btn-save" id="ctBtnGerar" onclick="ctGerar()" style="margin-top:8px">Gerar Contrato (PDF)</button>
-        <div class="save-status" id="ctStatus"></div>
-      </div>
-      </div>
+ <div class="card">
+ <div class="kpi-label"> Ticket Médio</div>
+ <div class="kpi-value" id="kpi-ticket">R$ 0</div>
+ <div class="kpi-sub" id="kpi-ticket-sub">por vendedor</div>
+ </div>
 
-      <div class="ct-subpane" id="ctpane-gt">
-      <div class="ct-card" style="max-width:900px">
-        <div class="ct-sec">Nota Fiscal (opcional — preenche automaticamente)</div>
-        <div class="ct-row">
-          <div class="ct-field"><label>Upload da NF (PDF)</label><input type="file" id="gtNfFile" accept="application/pdf"></div>
-          <div class="ct-field" style="justify-content:flex-end"><label>&nbsp;</label><button type="button" class="ct-add" id="gtBtnExtrair" onclick="gtExtrairNF()">Extrair dados da NF</button></div>
-        </div>
-        <div class="save-status" id="gtNfStatus"></div>
+ <div class="com-card">
+ <div class="kpi-label"> Consultor do Mês</div>
+ <div class="com-name" id="kpi-com-mes">—</div>
+ <div class="kpi-sub mt16">Score mais alto</div>
+ </div>
 
-        <div class="ct-sec">Empresa e variante</div>
-        <div class="ct-row">
-          <div class="ct-field">
-            <label>Empresa</label>
-            <select id="gtEmpresa"><option value="ph">Pro Hunters</option><option value="cr">Calibre Restrito</option></select>
-          </div>
-          <div class="ct-field">
-            <label>Variante da GT</label>
-            <select id="gtVariante" onchange="gtOnVarianteChange()">
-              <option value="pessoa_fisica">Pessoa Física Transportando (cliente retira)</option>
-              <option value="ezequiel">Ezequiel Transportadora Express</option>
-              <option value="ezequiel_gollog">Ezequiel Express — Redespacho Gollog (aéreo)</option>
-            </select>
-          </div>
-        </div>
+ </div>
 
-        <div class="ct-sec">Nota Fiscal / Envio</div>
-        <div class="ct-row">
-          <div class="ct-field"><label>Nota Fiscal nº</label><input id="gtNotaFiscal"></div>
-          <div class="ct-field"><label>Data de envio</label><input type="date" id="gtDataEnvio"></div>
-        </div>
-        <div class="ct-field"><label>Número de volumes</label><input type="number" id="gtNumVolumes" value="1"></div>
+ <!-- FORECAST -->
+ <div class="divider"></div>
+ <div class="section-title"> Previsão Inteligente</div>
 
-        <div class="ct-sec">Destinatário (cliente)</div>
-        <div class="ct-row">
-          <div class="ct-field"><label>Nome completo</label><input id="gtDestNome"></div>
-          <div class="ct-field"><label>CPF / CNPJ</label><input id="gtDestDoc"></div>
-        </div>
-        <div class="ct-field"><label>Endereço completo</label><input id="gtDestEndereco"></div>
-        <div class="ct-row">
-          <div class="ct-field"><label>Telefone</label><input id="gtDestTelefone"></div>
-          <div class="ct-field"><label>UF (estado)</label><input id="gtDestUf" maxlength="2" placeholder="Ex: SC" onchange="gtUpdateSfpc()" oninput="gtUpdateSfpc()"></div>
-        </div>
-        <div class="ct-hint" id="gtSfpcHint">SFPC: —</div>
+ <div class="kpi-grid kpi-grid-3">
 
-        <div class="ct-sec">Produtos controlados</div>
-        <div id="gtProdutosList"></div>
-        <button type="button" class="ct-add" onclick="gtAddProduto()">+ Adicionar produto</button>
+ <div class="card" id="forecast-card">
+ <div class="kpi-label"> Previsão de Fechamento</div>
+ <div class="kpi-value" id="fc-value">R$ 0</div>
+ <div id="fc-status-block" style="margin-top:12px"></div>
+ </div>
 
-        <div class="ct-sec">Selo de autenticidade</div>
-        <div class="ct-field"><label>Número do selo (impresso no selo físico)</label><input id="gtSeloNumero" placeholder="Ex: 11542630"></div>
+ <div class="card">
+ <div class="kpi-label"> Progresso do Mês</div>
+ <div class="kpi-value" id="fc-days">0 / 0</div>
+ <div class="kpi-sub">dias corridos / dias úteis</div>
+ <div class="progress-wrap" style="margin-top:14px">
+ <div class="progress-bar yellow" id="fc-days-bar" style="width:0%"></div>
+ </div>
+ </div>
 
-        <div id="gtGollogBox" style="display:none">
-          <div class="ct-sec">Verso GT + Minuta Gollog</div>
-          <div class="ct-row">
-            <div class="ct-field"><label>Aeroporto de retirada</label><input id="gtGAeroporto"></div>
-            <div class="ct-field"><label>Trecho (origem - destino)</label><input id="gtGTrecho"></div>
-          </div>
-          <div class="ct-row">
-            <div class="ct-field"><label>Forma de pagamento</label><input id="gtGFormaPagamento" placeholder="Ex: A vista"></div>
-            <div class="ct-field"><label>Tipo de entrega</label><input id="gtGTipoEntrega" placeholder="Ex: Proprio"></div>
-          </div>
-          <div class="ct-row">
-            <div class="ct-field"><label>Tomador do frete</label><input id="gtGTomadorFrete"></div>
-            <div class="ct-field"><label>CNPJ do tomador</label><input id="gtGCnpjTomador"></div>
-          </div>
-          <div class="ct-row">
-            <div class="ct-field"><label>Nº conta Gollog</label><input id="gtGContaGollog"></div>
-            <div class="ct-field"><label>Peso total</label><input id="gtGPesoTotal" placeholder="Ex: 8kg"></div>
-          </div>
-          <div class="ct-row">
-            <div class="ct-field"><label>Tipo de embalagem</label><input id="gtGTipoEmbalagem"></div>
-            <div class="ct-field"><label>Produto predominante</label><input id="gtGProdutoPredominante"></div>
-          </div>
-          <div class="ct-row">
-            <div class="ct-field"><label>Medidas da embalagem</label><input id="gtGMedidas" placeholder="Ex: 40x30x20cm"></div>
-            <div class="ct-field"><label>Tipo de seguro</label><input id="gtGTipoSeguro"></div>
-          </div>
-          <div class="ct-field"><label>Valor da mercadoria</label><input id="gtGValorMercadoria" placeholder="R$ 0,00"></div>
-        </div>
+ <div class="card">
+ <div class="kpi-label"> Média Diária Necessária</div>
+ <div class="kpi-value" id="fc-daily-need">R$ 0</div>
+ <div class="kpi-sub">para bater a meta</div>
+ <div style="margin-top:8px" id="fc-daily-real">
+ <span class="kpi-sub">Média atual: <span class="text-mono" id="fc-daily-cur">R$ 0</span></span>
+ </div>
+ </div>
 
-        <button class="btn-save" id="gtBtnGerar" onclick="gtGerar()" style="margin-top:8px">Gerar GT (PDF)</button>
-        <div class="save-status" id="gtStatus"></div>
-      </div>
-      </div>
-    </div>
+ </div>
 
-    <!-- DASHBOARD COMERCIAL -->
-    <div class="tab" id="tab-comercial">
-      <iframe src="/comercial" class="comercial-frame" title="Dashboard Comercial"></iframe>
-    </div>
+</div>
 
-    <!-- IA -->
-    <div class="tab" id="tab-ia">
-      <div class="ia-wrap">
-        <div class="ia-head">
-          <div class="ia-av">PH</div>
-          <div><div class="ia-name">Assistente Pro Hunters</div><div class="ia-st">Online</div></div>
-          <div class="ia-note">Dúvidas não cobertas: consultar Luis ou a gerência.</div>
-        </div>
-        <div class="chips">
-          <span class="chip" onclick="sq('Como faco um pedido PF online no Bling?')">Pedido PF online</span>
-          <span class="chip" onclick="sq('Quais documentos o cliente precisa para comprar municao?')">Docs municao</span>
-          <span class="chip" onclick="sq('Explique as 3 etapas da venda de arma')">Venda de arma</span>
-          <span class="chip" onclick="sq('Como preencher uma Guia de Transito?')">Guia de Transito</span>
-          <span class="chip" onclick="sq('Como fazer etiqueta no Portal Postal?')">Portal Postal</span>
-          <span class="chip" onclick="sq('Qual a diferenca entre Pro Hunters e Calibre Restrito?')">PH vs CR</span>
-          <span class="chip" onclick="sq('Resuma o Metodo T.A.C.O')">T.A.C.O</span>
-        </div>
-        <div class="chat-box" id="chatBox">
-          <div class="msg b"><div class="msg-av">PH</div><div class="msg-bbl">Ola. Sou o assistente interno da Pro Hunters. Posso responder duvidas sobre processos operacionais, Bling, T.A.C.O, Guias de Transito e documentacao de produtos controlados. Como posso ajudar?</div></div>
-        </div>
-        <div class="chat-form">
-          <textarea class="chat-ta" id="chatIn" rows="2" placeholder="Digite sua duvida operacional..." onkeydown="handleKey(event)"></textarea>
-          <button class="btn-send" id="btnSend" onclick="sendMsg()">Enviar</button>
-        </div>
-      </div>
-    </div>
+<!-- ═══════════════════════════════════════════
+ TAB 2 — VENDEDORES
+═══════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-vendedores">
 
-    <!-- ADMIN -->
-    <div class="tab" id="tab-admin">
-      <div class="admin-card">
-        <h3>Base de Conhecimento da IA</h3>
-        <p>Edite o texto abaixo para atualizar o que a IA sabe sobre a Pro Hunters. Cada regra nova, processo ou instrucao adicionada aqui passa a valer imediatamente na proxima conversa. Clique em Salvar apos editar.</p>
-        <textarea class="kb-textarea" id="kbText" placeholder="Carregando..."></textarea>
-        <br>
-        <button class="btn-save" id="btnSave" onclick="saveKB()">Salvar base de conhecimento</button>
-        <div class="save-status" id="saveStatus"></div>
-      </div>
-    </div>
+ <div class="section-title">Tabela de Performance — Vendedores</div>
 
-  </div>
+ <div class="table-wrap">
+ <table id="main-table">
+ <thead>
+ <tr>
+ <th>#</th>
+ <th>Vendedor</th>
+ <th>Faturamento</th>
+ <th>Meta Ind.</th>
+ <th>% Meta</th>
+ <th>Projeção</th>
+ <th>Score</th>
+ <th>IPC</th>
+ <th>Comissão</th>
+ <th>Bônus</th>
+ <th>Pagamento Final</th>
+ <th>Status</th>
+ </tr>
+ </thead>
+ <tbody id="main-tbody"></tbody>
+ </table>
+ </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════
+ TAB 3 — SCORE & RANKING
+═══════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-score">
+
+ <div class="kpi-grid kpi-grid-23" style="align-items:start">
+
+ <!-- Rankings -->
+ <div>
+ <div class="section-title"> Ranking Geral (Score)</div>
+ <div class="card" id="ranking-score-list"></div>
+
+ <div class="section-title mt24"> Ranking por Faturamento</div>
+ <div class="card" id="ranking-fat-list"></div>
+
+ <div class="section-title mt24"> Ranking por Disciplina (IPC)</div>
+ <div class="card" id="ranking-ipc-list"></div>
+ </div>
+
+ <!-- Score Breakdown -->
+ <div>
+ <div class="section-title"> Score por Vendedor (Breakdown)</div>
+ <div id="score-breakdown-cards"></div>
+ </div>
+
+ </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════
+ TAB 4 — IPC & DISCIPLINA
+═══════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-ipc">
+
+ <div class="section-title"> IPC — Índice de Procedimento e Conduta</div>
+
+ <div class="kpi-grid kpi-grid-3">
+ <div class="card">
+ <div class="kpi-label">Base IPC</div>
+ <div class="kpi-value gold">100</div>
+ <div class="kpi-sub">pontos iniciais</div>
+ </div>
+ <div class="card">
+ <div class="kpi-label">Atraso</div>
+ <div class="kpi-value red">−0,5</div>
+ <div class="kpi-sub">por ocorrência</div>
+ </div>
+ <div class="card">
+ <div class="kpi-label">Falta</div>
+ <div class="kpi-value red">−3,0</div>
+ <div class="kpi-sub">por ocorrência</div>
+ </div>
+ </div>
+
+ <div class="kpi-grid kpi-grid-4 mt16">
+ <div class="card card-accent-green"><div class="kpi-label">IPC ≥ 90</div><div class="kpi-value green">100%</div><div class="kpi-sub">multiplicador pagamento</div></div>
+ <div class="card"><div class="kpi-label">IPC 80–89</div><div class="kpi-value yellow">80%</div><div class="kpi-sub">multiplicador pagamento</div></div>
+ <div class="card"><div class="kpi-label">IPC 70–79</div><div class="kpi-value" style="color:#e07030">60%</div><div class="kpi-sub">multiplicador pagamento</div></div>
+ <div class="card card-accent-red"><div class="kpi-label">IPC &lt; 70</div><div class="kpi-value red">0–40%</div><div class="kpi-sub">crítico / zerado</div></div>
+ </div>
+
+ <div class="divider"></div>
+ <div class="section-title">Detalhamento IPC por Vendedor</div>
+
+ <div id="ipc-detail-grid" class="kpi-grid kpi-grid-4"></div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════
+ TAB 5 — GRÁFICOS
+═══════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-graficos">
+
+ <div class="kpi-grid kpi-grid-2">
+
+ <div class="card">
+ <div class="kpi-label"> Faturamento por Vendedor</div>
+ <div class="chart-area" id="chart-fat" style="margin-top:16px"></div>
+ </div>
+
+ <div class="card">
+ <div class="kpi-label"> Score por Vendedor</div>
+ <div class="chart-area" id="chart-score" style="margin-top:16px"></div>
+ </div>
+
+ </div>
+
+ <div class="kpi-grid kpi-grid-2 mt16">
+
+ <div class="card">
+ <div class="kpi-label"> Meta vs Realizado</div>
+ <div class="chart-area" id="chart-meta" style="margin-top:16px"></div>
+ </div>
+
+ <div class="card">
+ <div class="kpi-label"> Evolução do Mês (Simulada)</div>
+ <div class="chart-area" id="chart-evolucao" style="margin-top:16px"></div>
+ </div>
+
+ </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════
+ TAB 6 — CONTROLE DIÁRIO
+═══════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-diario">
+
+ <div class="kpi-grid kpi-grid-3">
+ <div class="card">
+ <div class="kpi-label"> Dias Corridos</div>
+ <div class="kpi-value gold" id="daily-elapsed">0</div>
+ <div class="kpi-sub">de <span id="daily-total">0</span> no mês</div>
+ </div>
+ <div class="card">
+ <div class="kpi-label"> Meta Diária Global</div>
+ <div class="kpi-value" id="daily-meta-global">R$ 0</div>
+ <div class="kpi-sub">para bater R$300k</div>
+ </div>
+ <div class="card">
+ <div class="kpi-label"> Realizado Diário (Média)</div>
+ <div class="kpi-value" id="daily-real-global">R$ 0</div>
+ <div class="kpi-sub">média dos dias corridos</div>
+ </div>
+ </div>
+
+ <div class="divider"></div>
+ <div class="section-title">Ritmo por Vendedor</div>
+
+ <div id="pace-list"></div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════
+ TAB 7 — ALERTAS
+═══════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-alertas">
+
+ <div class="section-title"> Central de Alertas Automáticos</div>
+
+ <div id="alerts-container"></div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════
+ TAB — HISTÓRICO (PLACAR ANUAL)
+═══════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-historico">
+
+ <div class="section-title"> Placar Anual — Consultor do Mês</div>
+ <div id="hist-trophy-grid" class="hist-trophy-grid"></div>
+
+ <div class="divider"></div>
+ <div class="section-title"> Histórico de Meses Fechados</div>
+ <div class="table-wrap">
+ <table>
+ <thead>
+ <tr>
+ <th>Mês</th>
+ <th>Consultor do Mês</th>
+ <th>Faturamento do Vencedor</th>
+ <th>Faturamento Total do Mês</th>
+ <th>Fechado em</th>
+ </tr>
+ </thead>
+ <tbody id="hist-table-body"></tbody>
+ </table>
+ </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════
+ TAB 8 — DADOS (INPUT)
+═══════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-dados">
+
+ <div class="section-title"> Configuração de Dados</div>
+
+ <div id="data-inputs-container"></div>
+
+ <div style="margin-top:20px; display:flex; gap:12px; flex-wrap:wrap">
+ <button class="btn-primary" onclick="recalculate()"> Recalcular Dashboard</button>
+ <button class="btn-primary" onclick="loadDemo()" style="background:linear-gradient(135deg,#1a3a2a,#1db954)"> Carregar Dados Demo</button>
+ <button class="btn-primary" onclick="resetData()" style="background:linear-gradient(135deg,#3a1a1a,var(--red))"> Resetar</button>
+ <button class="btn-primary" onclick="closeMonth()" style="background:linear-gradient(135deg,var(--brand3),var(--brand2))"> Fechar Mes e Definir Consultor</button>
+ </div>
+
+ <div class="divider"></div>
+ <div class="section-title">Progresso do Mês (automático, baseado na data de hoje)</div>
+ <div class="kpi-grid kpi-grid-3">
+ <div class="card" style="padding:14px 18px">
+ <div class="kpi-label">Dias corridos</div>
+ <div class="kpi-value gold" id="diasCorridosDisplay" style="font-size:26px">-</div>
+ <div class="kpi-sub">calculado automaticamente</div>
+ </div>
+ <div class="card" style="padding:14px 18px">
+ <div class="kpi-label">Total de dias no mês</div>
+ <div class="kpi-value gold" id="diasMesDisplay" style="font-size:26px">-</div>
+ <div class="kpi-sub">calculado automaticamente</div>
+ </div>
+ </div>
+
+</div>
+
 </main>
-</div>
+
 <script>
-/* %%INJECT%% */
+/* %%INJECT_COMERCIAL%% */
+// ═══════════════════════════════════════
+// DATA MODEL
+// ═══════════════════════════════════════
+const META_GLOBAL = 300000;
+const META_IND = 150000;
 
-var tabMeta = {
-  inicio:    ['Inicio','Visao geral do portal'],
-  taco:      ['Metodo T.A.C.O','Processo comercial oficial'],
-  bling:     ['Curso Bling','Tipos de pedido, cadastros e video aulas'],
-  processos: ['Processos','Armas, GT, Portal Postal, Documentacao'],
-  contratos: ['Documentos','Contratos e Guias de Transito'],
-  comercial: ['Dashboard Comercial','Ranking, metas e performance da equipe'],
-  ia:        ['IA Pro Hunters','Assistente de conhecimento interno'],
-  admin:     ['Base de Conhecimento','Gerenciar o que a IA sabe']
-};
+let sellers = [
+ {
+ id: 1,
+ name: 'Pedro Dickmann',
+ foto: 'consultor_pedro.jpg',
+ fat: 0,
+ etiqueta: 0, tarefas: 0,
+ atrasos: 0, faltas: 0
+ },
+ {
+ id: 2,
+ name: 'Enzo Boschetto',
+ foto: 'consultor_enzo.jpg',
+ fat: 0,
+ etiqueta: 0, tarefas: 0,
+ atrasos: 0, faltas: 0
+ },
+ {
+ id: 3,
+ name: 'Wesley Mathias',
+ foto: 'consultor_wesley.jpg',
+ fat: 0,
+ etiqueta: 0, tarefas: 0,
+ atrasos: 0, faltas: 0
+ }
+];
 
-// Mostrar abas condicionais e nome do usuario
-window.onload = function() {
-  if (typeof IS_ADMIN !== 'undefined' && IS_ADMIN) {
-    document.getElementById('grp-admin').style.display = 'block';
-  }
-  if (typeof CAN_VIEW_COMERCIAL !== 'undefined' && CAN_VIEW_COMERCIAL) {
-    document.getElementById('grp-comercial').style.display = 'block';
-  }
-  if (typeof USER_NOME !== 'undefined' && USER_NOME) {
-    document.getElementById('user-pill').textContent = USER_NOME;
-  }
-};
-
-function goTab(id, el) {
-  var tabs = document.querySelectorAll('.tab');
-  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
-  var nis = document.querySelectorAll('.ni');
-  for (var i = 0; i < nis.length; i++) nis[i].classList.remove('on');
-  document.getElementById('tab-' + id).classList.add('on');
-  el.classList.add('on');
-  document.getElementById('tb-t').textContent = tabMeta[id][0];
-  document.getElementById('tb-s').textContent = tabMeta[id][1];
-  closeSB();
-  if (id === 'admin') loadKB();
+// ═══════════════════════════════════════
+// CALCULATIONS
+// ═══════════════════════════════════════
+function calcIPC(s) {
+ let ipc = 100 - (s.atrasos * 0.5) - (s.faltas * 3);
+ return Math.max(0, Math.round(ipc * 10) / 10);
 }
 
-function toggleSB() {
-  document.getElementById('sb').classList.toggle('open');
-  document.getElementById('ovl').classList.toggle('show');
-}
-function closeSB() {
-  document.getElementById('sb').classList.remove('open');
-  document.getElementById('ovl').classList.remove('show');
-}
-
-function toggleAcc(h) {
-  var b = h.nextElementSibling;
-  var c = h.querySelector('.acc-chv');
-  var isOpen = b.classList.contains('on');
-  var bodies = document.querySelectorAll('.acc-bd');
-  var chevs  = document.querySelectorAll('.acc-chv');
-  for (var i = 0; i < bodies.length; i++) bodies[i].classList.remove('on');
-  for (var i = 0; i < chevs.length; i++)  chevs[i].style.transform = '';
-  if (!isOpen) { b.classList.add('on'); c.style.transform = 'rotate(180deg)'; }
+function ipcMultiplier(ipc) {
+ if (ipc >= 90) return 1.0;
+ if (ipc >= 80) return 0.8;
+ if (ipc >= 70) return 0.6;
+ if (ipc >= 60) return 0.4;
+ return 0;
 }
 
-function playVid(thumbId, fileId) {
-  var th = document.getElementById(thumbId);
-  var fr = th.querySelector('iframe');
-  fr.src = 'https://drive.google.com/file/d/' + fileId + '/preview';
-  th.classList.add('play');
+function calcBonus(fat) {
+ if (fat >= 300000) return 1000;
+ if (fat >= 200000) return 750;
+ if (fat >= 100000) return 500;
+ return 0;
 }
 
-// CHAT
-var chatHistory = [];
-
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+function calcScore(s) {
+ // Normalizar faturamento 0-100 baseado em META_IND * 2 como 100%
+ const fatNorm = Math.min(100, (s.fat / (META_IND * 2)) * 100);
+ const score =
+ (fatNorm * 3) +
+ (Math.min(100, s.etiqueta) * 1) +
+ (Math.min(100, s.tarefas) * 1);
+ const maxScore = 100 * (3 + 1 + 1);
+ return Math.round((score / maxScore) * 100);
 }
 
-function mdToHtml(text) {
-  var escaped = escapeHtml(text);
-  var lines = escaped.split('\n');
-  var html = '';
-  var inList = false;
-
-  function closeList() { if (inList) { html += '</ul>'; inList = false; } }
-
-  lines.forEach(function(line) {
-    var trimmed = line.trim();
-    if (trimmed === '---' || trimmed === '***' || trimmed === '___') {
-      closeList();
-      html += '<hr>';
-      return;
-    }
-    var hMatch = trimmed.match(/^(#{1,4})\s+(.*)$/);
-    if (hMatch) {
-      closeList();
-      var level = Math.min(hMatch[1].length + 1, 4); // # vira h2, ## vira h3, etc (h1 fica reservado pro titulo da pagina)
-      html += '<h' + level + '>' + inlineMd(hMatch[2]) + '</h' + level + '>';
-      return;
-    }
-    var listMatch = trimmed.match(/^[-*]\s+(.*)$/);
-    if (listMatch) {
-      if (!inList) { html += '<ul>'; inList = true; }
-      html += '<li>' + inlineMd(listMatch[1]) + '</li>';
-      return;
-    }
-    closeList();
-    if (trimmed === '') { html += '<br>'; return; }
-    html += '<p>' + inlineMd(trimmed) + '</p>';
-  });
-  closeList();
-  return html;
+function calcProjection(fat, diasCorridos, diasMes) {
+ if (diasCorridos === 0) return 0;
+ return Math.round((fat / diasCorridos) * diasMes);
 }
 
-function inlineMd(s) {
-  return s
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>');
+function getStatus(fat) {
+ if (fat >= 150000) return 'META BATIDA';
+ if (fat >= 100000) return 'ACEITÁVEL';
+ return 'RED FLAG';
 }
 
-function addMsg(role, text) {
-  var box = document.getElementById('chatBox');
-  var d   = document.createElement('div');
-  d.className = 'msg ' + role;
-  var av  = document.createElement('div');
-  av.className = 'msg-av';
-  av.textContent = (role === 'b') ? 'PH' : 'EU';
-  var bl  = document.createElement('div');
-  bl.className = 'msg-bbl';
-  if (role === 'b') {
-    bl.innerHTML = mdToHtml(text);
-  } else {
-    bl.textContent = text;
-  }
-  d.appendChild(av);
-  d.appendChild(bl);
-  box.appendChild(d);
-  box.scrollTop = box.scrollHeight;
+function getDias() {
+ const now = new Date();
+ const corridos = now.getDate(); // dia atual do mes (1-31)
+ const mes = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate(); // total de dias no mes atual
+ const dEl = document.getElementById('diasCorridosDisplay');
+ const mEl = document.getElementById('diasMesDisplay');
+ if (dEl) dEl.textContent = corridos;
+ if (mEl) mEl.textContent = mes;
+ return { corridos, mes };
 }
 
-function addTyping() {
-  var box = document.getElementById('chatBox');
-  var d   = document.createElement('div');
-  d.className = 'msg b';
-  d.id = 'typing';
-  var av = document.createElement('div');
-  av.className = 'msg-av';
-  av.textContent = 'PH';
-  var bl = document.createElement('div');
-  bl.className = 'msg-bbl';
-  var t  = document.createElement('div');
-  t.className = 'typing';
-  t.innerHTML = '<span></span><span></span><span></span>';
-  bl.appendChild(t);
-  d.appendChild(av);
-  d.appendChild(bl);
-  box.appendChild(d);
-  box.scrollTop = box.scrollHeight;
+function fmtBRL(v) {
+ return 'R$ ' + Math.round(v).toLocaleString('pt-BR');
 }
 
-function removeTyping() {
-  var t = document.getElementById('typing');
-  if (t) t.remove();
+function pctColor(pct) {
+ if (pct >= 100) return 'green';
+ if (pct >= 60) return 'yellow';
+ return 'red';
 }
 
-function sendMsg() {
-  var inp = document.getElementById('chatIn');
-  var btn = document.getElementById('btnSend');
-  var txt = inp.value.trim();
-  if (!txt || btn.disabled) return;
-  inp.value = '';
-  btn.disabled = true;
-  addMsg('u', txt);
-  chatHistory.push({ role: 'user', content: txt });
-  addTyping();
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', '/api/chat', true);
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.timeout = 30000;
-  xhr.onload = function() {
-    removeTyping();
-    try {
-      var data = JSON.parse(xhr.responseText);
-      if (data.error) {
-        addMsg('b', 'Erro: ' + data.error.message);
-      } else {
-        var reply = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : 'Sem resposta.';
-        addMsg('b', reply);
-        chatHistory.push({ role: 'assistant', content: reply });
-      }
-    } catch(e) {
-      addMsg('b', 'Erro ao processar resposta. Tente novamente.');
-    }
-    btn.disabled = false;
-    inp.focus();
-  };
-  xhr.onerror = function() {
-    removeTyping();
-    addMsg('b', 'Falha de conexao. Verifique sua internet e tente novamente.');
-    btn.disabled = false;
-  };
-  xhr.ontimeout = function() {
-    removeTyping();
-    addMsg('b', 'Tempo esgotado. Tente novamente.');
-    btn.disabled = false;
-  };
-  xhr.send(JSON.stringify({ messages: chatHistory }));
+// ═══════════════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════════════
+function recalculate() {
+ readInputs();
+ renderAll();
+ saveData();
 }
 
-function sq(t) { document.getElementById('chatIn').value = t; sendMsg(); }
-function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
-
-// ADMIN — carregar e salvar base de conhecimento
-function loadKB() {
-  var ta = document.getElementById('kbText');
-  ta.value = 'Carregando...';
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', '/api/knowledge', true);
-  xhr.onload = function() {
-    try {
-      var data = JSON.parse(xhr.responseText);
-      ta.value = data.knowledge || '';
-    } catch(e) {
-      ta.value = 'Erro ao carregar.';
-    }
-  };
-  xhr.onerror = function() { ta.value = 'Erro de conexao.'; };
-  xhr.send();
+function readInputs() {
+ sellers.forEach(s => {
+ const v = (id) => {
+ const el = document.getElementById(`inp-${s.id}-${id}`);
+ return el ? parseFloat(el.value) || 0 : 0;
+ };
+ s.fat = v('fat');
+ s.etiqueta = v('etiq');
+ s.tarefas = v('tarefas');
+ s.atrasos = v('atr');
+ s.faltas = v('falt');
+ // editable name
+ const nEl = document.getElementById(`inp-${s.id}-name`);
+ if (nEl) s.name = nEl.value || s.name;
+ });
 }
 
-// CONTRATOS
-var ctParcelaSeq = 0;
+function renderAll() {
+ const { corridos, mes } = getDias();
+ const totalFat = sellers.reduce((a, s) => a + s.fat, 0);
+ const totalComissao = sellers.reduce((a, s) => {
+ const ipc = calcIPC(s);
+ const mult = ipcMultiplier(ipc);
+ return a + (s.fat * 0.01 * mult);
+ }, 0);
+ const totalBonus = sellers.reduce((a, s) => {
+ const ipc = calcIPC(s);
+ const mult = ipcMultiplier(ipc);
+ return a + (calcBonus(s.fat) * mult);
+ }, 0);
 
-function ctOnTipoChange() {
-  var tipo = document.getElementById('ctTipo').value;
-  document.getElementById('ctCamposAvista').style.display = (tipo === 'avista') ? 'block' : 'none';
-  document.getElementById('ctCamposParcelado').style.display = (tipo === 'parcelado') ? 'block' : 'none';
-  document.getElementById('ctCamposCombinado').style.display = (tipo === 'combinado') ? 'block' : 'none';
-  if (tipo === 'combinado') {
-    document.getElementById('ctEmpresa').value = 'ph';
-    document.getElementById('ctEmpresa').disabled = true;
-  } else {
-    document.getElementById('ctEmpresa').disabled = false;
-  }
-  if (tipo === 'parcelado' && document.getElementById('ctParcelasList').children.length === 0) {
-    ctAddParcela();
-  }
+ const pct = META_GLOBAL > 0 ? (totalFat / META_GLOBAL) * 100 : 0;
+ const proj = calcProjection(totalFat, corridos, mes);
+ const gap = Math.max(0, META_GLOBAL - totalFat);
+ const ticket = sellers.length > 0 ? totalFat / sellers.length : 0;
+
+ const scores = sellers.map(s => calcScore(s));
+ const maxScore = Math.max(...scores);
+ const tiedIdxs = scores.reduce((acc, sc, i) => { if (sc === maxScore) acc.push(i); return acc; }, []);
+ const lastChampionName = (historyData && historyData[0]) ? historyData[0].vencedor : null;
+ let maxScoreIdx = tiedIdxs[0];
+ if (tiedIdxs.length > 1 && lastChampionName) {
+ const championIdx = tiedIdxs.find(i => sellers[i].name === lastChampionName);
+ if (championIdx !== undefined) maxScoreIdx = championIdx;
+ }
+ const consultorMes = sellers[maxScoreIdx]?.name || '—';
+
+ // ── KPIs Executivos ──
+ setText('kpi-fat', fmtBRL(totalFat));
+ setText('kpi-pct-label', pct.toFixed(1) + '% da meta atingido');
+ setWidth('kpi-fat-bar', Math.min(100, pct));
+ setWidth('kpi-meta-bar', Math.min(100, pct));
+
+ setText('kpi-proj', fmtBRL(proj));
+ setText('kpi-proj-label', `${corridos} de ${mes} dias corridos`);
+ setText('kpi-gap', fmtBRL(gap));
+ setText('kpi-gap-label', gap === 0 ? ' Meta atingida!' : 'para bater a meta');
+ setText('kpi-com', fmtBRL(totalComissao));
+ setText('kpi-bon', fmtBRL(totalBonus));
+ setText('kpi-ticket', fmtBRL(ticket));
+ setText('kpi-com-mes', consultorMes);
+
+ const projBadgeEl = document.getElementById('kpi-proj-badge');
+ if (proj >= META_GLOBAL) {
+ projBadgeEl.innerHTML = '<span class="kpi-badge badge-green"> VAI BATER A META</span>';
+ } else if (proj >= META_GLOBAL * 0.8) {
+ projBadgeEl.innerHTML = '<span class="kpi-badge badge-yellow"> ATENÇÃO</span>';
+ } else {
+ projBadgeEl.innerHTML = '<span class="kpi-badge badge-red"> EM RISCO</span>';
+ }
+
+ // ── Forecast ──
+ setText('fc-value', fmtBRL(proj));
+ setText('fc-days', `${corridos} / ${mes}`);
+ setWidth('fc-days-bar', (corridos / mes) * 100);
+
+ const diasRestantes = mes - corridos;
+ const dailyNeed = diasRestantes > 0 ? gap / diasRestantes : 0;
+ const dailyCur = corridos > 0 ? totalFat / corridos : 0;
+ setText('fc-daily-need', fmtBRL(dailyNeed));
+ setText('fc-daily-cur', fmtBRL(dailyCur));
+
+ const fcBlock = document.getElementById('fc-status-block');
+ if (proj >= META_GLOBAL) {
+ fcBlock.innerHTML = `<div class="forecast-status ok"><div class="forecast-icon"></div><div class="forecast-text"><div class="title" style="color:#1db954">META GARANTIDA</div><div class="sub">Projeção ${fmtBRL(proj)} supera a meta</div></div></div>`;
+ } else if (proj >= META_GLOBAL * 0.8) {
+ fcBlock.innerHTML = `<div class="forecast-status warn"><div class="forecast-icon"></div><div class="forecast-text"><div class="title" style="color:#e5b800">ATENÇÃO — ACELERAÇÃO NECESSÁRIA</div><div class="sub">Faltam ${fmtBRL(META_GLOBAL - proj)} na projeção</div></div></div>`;
+ } else {
+ fcBlock.innerHTML = `<div class="forecast-status danger"><div class="forecast-icon"></div><div class="forecast-text"><div class="title" style="color:#e03030">RISCO CRÍTICO</div><div class="sub">Faltam ${fmtBRL(META_GLOBAL - proj)} — Ação imediata!</div></div></div>`;
+ }
+
+ // ── Main Table ──
+ renderMainTable(corridos, mes);
+
+ // ── Rankings ──
+ renderRankings();
+ renderPodium();
+
+ // ── IPC Detail ──
+ renderIPCDetail();
+
+ // ── Gráficos ──
+ renderCharts(corridos, mes);
+
+ // ── Controle Diário ──
+ renderDiario(corridos, mes, totalFat, dailyCur);
+
+ // ── Alertas ──
+ renderAlertas(corridos, mes);
+
+ // ── Score Breakdown ──
+ renderScoreBreakdown();
+
+ // ── Campeão do mês passado + Histórico ──
+ renderLastChampion();
+ renderHistorico();
 }
 
-function ctOnEmpresaChange() {
-  var empresa = document.getElementById('ctEmpresa').value;
-  var tipoSel = document.getElementById('ctTipo');
-  if (empresa === 'cr' && tipoSel.value === 'combinado') {
-    tipoSel.value = 'avista';
-    ctOnTipoChange();
-  }
+function formatMesReferencia(mesRef) {
+ if (!mesRef) return '—';
+ const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+ const [ano, mes] = mesRef.split('-');
+ const idx = parseInt(mes, 10) - 1;
+ return `${MESES[idx] || mes} de ${ano}`;
 }
 
-function ctOnPersonalizadoChange() {
-  var on = document.getElementById('ctPersonalizado').checked;
-  document.getElementById('ctPersonalizadoBox').style.display = on ? 'block' : 'none';
-  var tipo = document.getElementById('ctTipo').value;
-  if (tipo === 'avista') document.getElementById('ctCamposAvista').style.display = on ? 'none' : 'block';
-  if (tipo === 'parcelado') document.getElementById('ctCamposParcelado').style.display = on ? 'none' : 'block';
-  if (tipo === 'combinado') document.getElementById('ctCamposCombinado').style.display = on ? 'none' : 'block';
+function renderLastChampion() {
+ const el = document.getElementById('last-champion-banner');
+ if (!el) return;
+ if (!historyData || historyData.length === 0) {
+ el.innerHTML = '';
+ return;
+ }
+ const last = historyData[0]; // mais recente primeiro
+ if (!last || !last.vencedor) { el.innerHTML = ''; return; }
+ const vencedorSeller = (last.sellers || []).find(s => s.name === last.vencedor);
+ const foto = vencedorSeller?.foto ? `/assets/${vencedorSeller.foto}` : '';
+ const fat = vencedorSeller ? fmtBRL(vencedorSeller.fat || 0) : '';
+ el.innerHTML = `
+ <img class="last-champion-photo" src="${foto}" alt="${last.vencedor}" onerror="this.style.display='none'">
+ <div class="last-champion-text">
+ <div class="last-champion-label"> Consultor do Mês — ${formatMesReferencia(last.mesReferencia)}</div>
+ <div class="last-champion-name">${last.vencedor}</div>
+ <div class="last-champion-sub">${fat ? fat + ' em faturamento · ' : ''}quem repete a dose esse mês?</div>
+ </div>`;
 }
 
-function ctAddParcela(preset) {
-  ctParcelaSeq++;
-  var id = 'ctp' + ctParcelaSeq;
-  var div = document.createElement('div');
-  div.className = 'ct-parcela';
-  div.id = id;
-  div.innerHTML =
-    '<input placeholder="Descricao (Ex: Entrada, 1 Boleto)" id="' + id + '_desc">' +
-    '<input placeholder="Valor R$" type="number" step="0.01" id="' + id + '_valor">' +
-    '<input placeholder="Forma (Pix/Boleto/Cartao)" id="' + id + '_forma">' +
-    '<input placeholder="Data" type="date" id="' + id + '_data">' +
-    '<button type="button" class="ct-rm" onclick="document.getElementById(\'' + id + '\').remove()">×</button>';
-  document.getElementById('ctParcelasList').appendChild(div);
-  if (preset) {
-    document.getElementById(id + '_desc').value = preset.descricao || '';
-    document.getElementById(id + '_valor').value = preset.valor || '';
-    document.getElementById(id + '_forma').value = preset.forma || '';
-    document.getElementById(id + '_data').value = ctIsoFromBR(preset.data || '');
-  }
+function renderHistorico() {
+ const trophyEl = document.getElementById('hist-trophy-grid');
+ const tableBodyEl = document.getElementById('hist-table-body');
+ if (!trophyEl || !tableBodyEl) return;
+
+ if (!historyData || historyData.length === 0) {
+ trophyEl.innerHTML = `<div class="hist-empty" style="grid-column:1/-1">
+ <div class="hist-empty-icon"></div>
+ <div>Ainda não há meses fechados no histórico.</div>
+ <div style="font-size:12px;margin-top:4px">Quando o mês encerrar (automático ou manual), ele aparece aqui.</div>
+ </div>`;
+ tableBodyEl.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--gray4);padding:24px">Nenhum mês fechado ainda.</td></tr>`;
+ return;
+ }
+
+ // ── Placar de vitórias por consultor (conta quantas vezes cada um venceu) ──
+ const winCount = {};
+ const totalFatBySeller = {};
+ const fotoBySeller = {};
+ sellers.forEach(s => { fotoBySeller[s.name] = s.foto; totalFatBySeller[s.name] = s.fat || 0; });
+ historyData.forEach(h => {
+ if (h.vencedor) winCount[h.vencedor] = (winCount[h.vencedor] || 0) + 1;
+ (h.sellers || []).forEach(s => {
+ fotoBySeller[s.name] = fotoBySeller[s.name] || s.foto;
+ totalFatBySeller[s.name] = (totalFatBySeller[s.name] || 0) + (s.fat || 0);
+ });
+ });
+
+ const allNames = Object.keys(totalFatBySeller);
+ const maxWins = Math.max(...allNames.map(n => winCount[n] || 0), 0);
+ const rankedNames = allNames.sort((a, b) => (winCount[b] || 0) - (winCount[a] || 0));
+
+ trophyEl.innerHTML = rankedNames.map(name => {
+ const wins = winCount[name] || 0;
+ const isLeader = wins > 0 && wins === maxWins;
+ const foto = fotoBySeller[name] ? `/assets/${fotoBySeller[name]}` : '';
+ return `
+ <div class="hist-trophy-card ${isLeader ? 'leader' : ''}">
+ <img class="hist-trophy-photo" src="${foto}" alt="${name}" onerror="this.style.display='none'">
+ <div class="hist-trophy-name">${name}</div>
+ <div class="hist-trophy-count">${wins}</div>
+ <div class="hist-trophy-count-label">${wins === 1 ? 'vez consultor do mês' : 'vezes consultor do mês'}</div>
+ <div class="hist-trophy-total">Total acumulado: ${fmtBRL(totalFatBySeller[name])}</div>
+ </div>`;
+ }).join('');
+
+ // ── Tabela de meses fechados ──
+ tableBodyEl.innerHTML = historyData.map(h => {
+ const vencedorSeller = (h.sellers || []).find(s => s.name === h.vencedor);
+ const fatVencedor = vencedorSeller ? vencedorSeller.fat || 0 : 0;
+ const fatTotalMes = (h.sellers || []).reduce((a, s) => a + (s.fat || 0), 0);
+ const fechadoEm = h.fechadoEm ? new Date(h.fechadoEm).toLocaleDateString('pt-BR') : '—';
+ return `<tr>
+ <td>${formatMesReferencia(h.mesReferencia)}</td>
+ <td class="td-name"> ${h.vencedor || '—'}</td>
+ <td>${fmtBRL(fatVencedor)}</td>
+ <td>${fmtBRL(fatTotalMes)}</td>
+ <td>${fechadoEm}</td>
+ </tr>`;
+ }).join('');
 }
 
-function ctIsoFromBR(br) {
-  if (!br) return '';
-  var p = br.split('/');
-  return p.length === 3 ? (p[2] + '-' + p[1] + '-' + p[0]) : '';
+function renderMainTable(corridos, mes) {
+ const tbody = document.getElementById('main-tbody');
+ // Sort by score for rank
+ const sorted = [...sellers].map(s => ({ ...s, score: calcScore(s), ipc: calcIPC(s) }))
+ .sort((a, b) => b.score - a.score);
+
+ tbody.innerHTML = sorted.map((s, i) => {
+ const rank = i + 1;
+ const pct = (s.fat / META_IND * 100).toFixed(1);
+ const proj = calcProjection(s.fat, corridos, mes);
+ const mult = ipcMultiplier(s.ipc);
+ const comissao = s.fat * 0.01 * mult;
+ const bonus = calcBonus(s.fat) * mult;
+ const pagamento = comissao + bonus;
+ const status = getStatus(s.fat);
+ const statusClass = status === 'META BATIDA' ? 'status-meta' : status === 'ACEITÁVEL' ? 'status-ok' : 'status-risk';
+ const scoreColor = s.score >= 70 ? '#1db954' : s.score >= 45 ? '#e5b800' : '#e03030';
+ const ipcColor = s.ipc >= 90 ? '#1db954' : s.ipc >= 80 ? '#e5b800' : '#e03030';
+
+ return `<tr>
+ <td><div class="rank-badge rank-${rank}">${rank}</div></td>
+ <td><div class="td-name">${s.name}</div></td>
+ <td style="font-family:'JetBrains Mono',monospace;font-weight:600">${fmtBRL(s.fat)}</td>
+ <td style="color:var(--gray4);font-family:'JetBrains Mono',monospace">${fmtBRL(META_IND)}</td>
+ <td>
+ <div style="display:flex;align-items:center;gap:6px">
+ <div style="width:50px;height:5px;background:var(--gray1);border-radius:99px;overflow:hidden">
+ <div style="width:${Math.min(100,pct)}%;height:100%;background:${pct>=100?'var(--green)':pct>=60?'var(--yellow)':'var(--red)'};border-radius:99px"></div>
+ </div>
+ <span style="font-family:'JetBrains Mono',monospace;font-size:12px">${pct}%</span>
+ </div>
+ </td>
+ <td style="font-family:'JetBrains Mono',monospace">${fmtBRL(proj)}</td>
+ <td>
+ <div class="score-bar-wrap">
+ <div class="score-bar-bg"><div class="score-bar-fill" style="width:${s.score}%;background:${scoreColor}"></div></div>
+ <span class="score-num" style="color:${scoreColor}">${s.score}</span>
+ </div>
+ </td>
+ <td style="font-family:'JetBrains Mono',monospace;color:${ipcColor};font-weight:600">${s.ipc}</td>
+ <td style="font-family:'JetBrains Mono',monospace">${fmtBRL(comissao)}</td>
+ <td style="font-family:'JetBrains Mono',monospace;color:var(--gold)">${fmtBRL(calcBonus(s.fat))}</td>
+ <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gold)">${fmtBRL(pagamento)}</td>
+ <td><span class="status-pill ${statusClass}">${status}</span></td>
+ </tr>`;
+ }).join('');
 }
 
-function ctClearParcelas() {
-  document.getElementById('ctParcelasList').innerHTML = '';
+function renderRankings() {
+ const byScore = [...sellers].map(s => ({ ...s, score: calcScore(s), ipc: calcIPC(s) })).sort((a,b) => b.score - a.score);
+ const byFat = [...sellers].sort((a,b) => b.fat - a.fat);
+ const byIPC = [...sellers].map(s => ({ ...s, ipc: calcIPC(s) })).sort((a,b) => b.ipc - a.ipc);
+ const maxFat = Math.max(...sellers.map(s => s.fat), 1);
+
+ function rankHTML(list, valFn, labelFn, colorFn) {
+ return list.map((s, i) => {
+ const val = valFn(s);
+ const pct = (val / (valFn(list[0]) || 1)) * 100;
+ const posClass = `p${i+1}`;
+ return `<div class="rank-item">
+ <div class="rank-pos ${posClass}">${i+1}</div>
+ <div class="rank-info">
+ <div class="name">${s.name}</div>
+ <div class="val">${labelFn(s)}</div>
+ </div>
+ <div class="rank-bar-mini">
+ <div class="rank-bar-fill" style="width:${pct}%;background:${colorFn(i)}"></div>
+ </div>
+ </div>`;
+ }).join('');
+ }
+
+ document.getElementById('ranking-score-list').innerHTML = rankHTML(byScore, s => s.score, s => `Score: ${s.score}`, i => ['var(--gold)','#c0c0c0','#cd7f32','var(--gray3)'][i]);
+ document.getElementById('ranking-fat-list').innerHTML = rankHTML(byFat, s => s.fat, s => fmtBRL(s.fat), i => ['var(--green)','var(--gold)','#e07030','var(--gray3)'][i]);
+ document.getElementById('ranking-ipc-list').innerHTML = rankHTML(byIPC, s => s.ipc, s => `IPC: ${s.ipc}`, i => ['var(--green)','var(--gold)','#e07030','var(--gray3)'][i]);
 }
 
-function ctExtrairPedido() {
-  var fileInput = document.getElementById('ctPedidoFile');
-  if (!fileInput.files || !fileInput.files[0]) {
-    ctSetStatus(false, 'Selecione o PDF do pedido primeiro.');
-    return;
-  }
-  var file = fileInput.files[0];
-  var btn = document.getElementById('ctBtnExtrairPedido');
-  btn.disabled = true;
-  document.getElementById('ctPedidoStatus').className = 'save-status ok';
-  document.getElementById('ctPedidoStatus').textContent = 'Lendo o pedido e extraindo os dados...';
+// ═══════════════════════════════════════
+// PÓDIO — competição ao vivo, top 3 no pódio + barra de corrida
+// ═══════════════════════════════════════
+const CROWN_SVG = '<svg class="podium-crown" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18l-1.5-9L7 12l5-8 5 8 5.5-3L21 18H3zm0 2h18v2H3v-2z"/></svg>';
 
-  var reader = new FileReader();
-  reader.onload = function() {
-    var base64 = reader.result.split(',')[1];
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/pedido-extract', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = function() {
-      btn.disabled = false;
-      var st = document.getElementById('ctPedidoStatus');
-      try {
-        var data = JSON.parse(xhr.responseText);
-        if (xhr.status !== 200 || data.error) {
-          st.className = 'save-status err';
-          st.textContent = data.error || 'Erro ao extrair dados.';
-          return;
-        }
-        if (data.empresaSugerida) document.getElementById('ctEmpresa').value = data.empresaSugerida;
-        if (data.cliente) {
-          document.getElementById('ctClienteNome').value = data.cliente.nome || '';
-          document.getElementById('ctClienteDoc').value = data.cliente.doc || '';
-          document.getElementById('ctClienteEndereco').value = data.cliente.endereco || '';
-        }
-        if (data.produto) document.getElementById('ctProduto').value = data.produto;
+function renderPodium() {
+ const standEl = document.getElementById('podium-stand');
+ const raceEl = document.getElementById('podium-race');
+ if (!standEl || !raceEl) return;
 
-        var tipo = data.tipoSugerido === 'parcelado' ? 'parcelado' : 'avista';
-        document.getElementById('ctTipo').value = tipo;
-        ctOnTipoChange();
+ const sellerSel = document.getElementById('rvSeller');
+ if (sellerSel) {
+ const prevVal = sellerSel.value;
+ sellerSel.innerHTML = sellers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+ if (prevVal) sellerSel.value = prevVal;
+ }
 
-        var parcelas = data.parcelas || [];
-        if (tipo === 'avista' && parcelas.length) {
-          document.getElementById('ctAvValor').value = parcelas[0].valor || data.valorTotal || '';
-          document.getElementById('ctAvData').value = ctIsoFromBR(parcelas[0].data || '');
-          document.getElementById('ctAvForma').value = parcelas[0].forma || '';
-        } else if (tipo === 'parcelado') {
-          document.getElementById('ctPcValorTotal').value = data.valorTotal || '';
-          ctClearParcelas();
-          parcelas.forEach(function(p) { ctAddParcela(p); });
-          if (!parcelas.length) ctAddParcela();
-        }
+ const lastChampion = (historyData && historyData[0]) ? historyData[0].vencedor : null;
 
-        var avisos = (data.avisos || []).join(' | ');
-        st.className = 'save-status ok';
-        st.textContent = 'Dados extraidos! Revise TODOS os campos antes de gerar.' + (avisos ? ' Avisos: ' + avisos : '');
-      } catch (e) {
-        st.className = 'save-status err';
-        st.textContent = 'Erro ao processar resposta da IA.';
-      }
-    };
-    xhr.onerror = function() {
-      btn.disabled = false;
-      var st = document.getElementById('ctPedidoStatus');
-      st.className = 'save-status err'; st.textContent = 'Falha de conexao.';
-    };
-    xhr.send(JSON.stringify({ pdfBase64: base64 }));
-  };
-  reader.readAsDataURL(file);
+ const ranked = [...sellers]
+ .map(s => ({ ...s, score: calcScore(s), ipc: calcIPC(s) }))
+ .sort((a, b) => {
+ if (b.score !== a.score) return b.score - a.score;
+ // Empate: o campeão vigente (vencedor do mês passado) defende a coroa
+ // até alguém realmente ultrapassá-lo com faturamento/score maior.
+ if (lastChampion) {
+ if (a.name === lastChampion) return -1;
+ if (b.name === lastChampion) return 1;
+ }
+ return 0;
+ });
+
+ checkLeaderChange(ranked[0] ? ranked[0].id : undefined);
+
+ // ── Pódio (top 3) — faturamento em evidência, IPC embaixo ──
+ const order = [1, 0, 2]; // 2o lugar, 1o lugar, 3o lugar (visual classico)
+ standEl.innerHTML = order
+ .filter(i => ranked[i])
+ .map(i => {
+ const s = ranked[i];
+ const pos = i + 1;
+ const photoUrl = s.foto ? `/assets/${s.foto}` : '';
+ const ipcColor = s.ipc >= 90 ? 'var(--green)' : s.ipc >= 75 ? 'var(--yellow)' : 'var(--red)';
+ return `
+ <div class="podium-block pos-${pos}">
+ ${pos === 1 ? CROWN_SVG : '<div class="podium-crown-spacer"></div>'}
+ <div class="podium-photo-wrap">
+ <img class="podium-photo" src="${photoUrl}" alt="${s.name}" onerror="this.style.display='none'">
+ </div>
+ <div class="podium-name">${s.name}</div>
+ <div class="podium-score">${fmtBRL(s.fat)}</div>
+ <div class="podium-score-label">faturamento</div>
+ <div class="podium-ipc-label" style="color:${ipcColor}">IPC ${s.ipc}</div>
+ <div class="podium-riser">${pos}º</div>
+ </div>`;
+ }).join('');
+
+ // ── Barra de competição em tempo real (largura pelo score, texto mostra R$ e IPC) ──
+ const maxScore = Math.max(...ranked.map(s => s.score), 1);
+ raceEl.innerHTML = ranked.map((s, i) => {
+ const pct = Math.max(4, Math.round((s.score / maxScore) * 100));
+ const photoUrl = s.foto ? `/assets/${s.foto}` : '';
+ return `
+ <div class="podium-race-row">
+ <img class="podium-race-photo" src="${photoUrl}" alt="${s.name}" onerror="this.style.display='none'">
+ <div class="podium-race-name">${s.name}</div>
+ <div class="podium-race-track">
+ <div class="podium-race-fill ${i === 0 ? 'leader' : ''}" style="width:${pct}%"></div>
+ </div>
+ <div class="podium-race-val">${fmtBRL(s.fat)} · IPC ${s.ipc}</div>
+ </div>`;
+ }).join('');
 }
 
-function ctSetStatus(ok, msg) {
-  var st = document.getElementById('ctStatus');
-  st.className = 'save-status ' + (ok ? 'ok' : 'err');
-  st.textContent = msg;
+function renderScoreBreakdown() {
+ const container = document.getElementById('score-breakdown-cards');
+ container.innerHTML = sellers.map(s => {
+ const score = calcScore(s);
+ const factors = [
+ { name: 'Faturamento', peso: 3, val: Math.min(100, Math.round((s.fat / (META_IND * 2)) * 100)) },
+ { name: 'Etiqueta', peso: 1, val: Math.min(100, s.etiqueta) },
+ { name: 'Tarefas Operacionais', peso: 1, val: Math.min(100, s.tarefas) },
+ ];
+ const scoreColor = score >= 70 ? 'var(--green)' : score >= 45 ? 'var(--yellow)' : 'var(--red)';
+ return `<div class="card" style="margin-bottom:16px">
+ <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+ <div style="font-weight:700;font-size:15px">${s.name}</div>
+ <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:${scoreColor}">${score}</div>
+ </div>
+ ${factors.map(f => `<div class="score-factor-item">
+ <span class="sf-name">${f.name}</span>
+ <span class="sf-weight">×${f.peso}</span>
+ <div class="sf-bar-wrap"><div class="sf-bar-fill" style="width:${f.val}%"></div></div>
+ <span class="sf-val" style="color:${scoreColor}">${f.val}</span>
+ </div>`).join('')}
+ </div>`;
+ }).join('');
 }
 
-function ctFmtDateBR(iso) {
-  if (!iso) return '';
-  var p = iso.split('-');
-  return p.length === 3 ? (p[2] + '/' + p[1] + '/' + p[0]) : iso;
+function renderIPCDetail() {
+ const container = document.getElementById('ipc-detail-grid');
+ container.innerHTML = sellers.map(s => {
+ const ipc = calcIPC(s);
+ const mult = ipcMultiplier(ipc);
+ const ipcColor = ipc >= 90 ? 'var(--green)' : ipc >= 75 ? 'var(--yellow)' : 'var(--red)';
+ const multPct = Math.round(mult * 100);
+ return `<div class="card">
+ <div style="font-weight:700;font-size:14px;margin-bottom:12px">${s.name}</div>
+ <div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:${ipcColor};line-height:1">${ipc}</div>
+ <div style="font-size:11px;color:var(--gray4);margin-bottom:12px">pontos IPC</div>
+ <div class="progress-wrap">
+ <div class="progress-bar ${ipc >= 90 ? 'green' : ipc >= 80 ? 'yellow' : 'red'}" style="width:${ipc}%"></div>
+ </div>
+ <div style="margin-top:10px;font-size:12px;color:var(--gray4)">
+ Multiplicador: <span style="color:${ipcColor};font-weight:700;font-family:'JetBrains Mono',monospace">${multPct}%</span>
+ </div>
+ <div style="margin-top:6px;font-size:11px;color:var(--gray3)">
+ Atrasos: ${s.atrasos} · Faltas: ${s.faltas}
+ </div>
+ </div>`;
+ }).join('');
 }
 
-function ctGerar() {
-  var nome = document.getElementById('ctClienteNome').value.trim();
-  var doc = document.getElementById('ctClienteDoc').value.trim();
-  var endereco = document.getElementById('ctClienteEndereco').value.trim();
-  var produto = document.getElementById('ctProduto').value.trim();
-  var tipo = document.getElementById('ctTipo').value;
-  var empresa = document.getElementById('ctEmpresa').value;
-  var personalizado = document.getElementById('ctPersonalizado').checked;
+function renderCharts(corridos, mes) {
+ const maxFat = Math.max(...sellers.map(s => s.fat), META_IND, 1);
+ const maxScore = 100;
 
-  if (!nome || !doc || !endereco || !produto) {
-    ctSetStatus(false, 'Preencha nome, documento, endereco do cliente e o produto.');
-    return;
-  }
+ // Fat chart
+ renderBarChart('chart-fat', sellers.map(s => ({
+ label: s.name,
+ val: s.fat,
+ max: maxFat,
+ color: s.fat >= META_IND ? 'var(--green)' : s.fat >= 100000 ? 'var(--yellow)' : 'var(--red)',
+ displayVal: fmtBRL(s.fat),
+ target: META_IND / maxFat
+ })));
 
-  var payload = {
-    tipo: tipo, empresa: empresa, personalizado: personalizado,
-    cliente: { nome: nome, doc: doc, endereco: endereco },
-    produto: produto,
-  };
+ // Score chart
+ renderBarChart('chart-score', sellers.map(s => ({
+ label: s.name,
+ val: calcScore(s),
+ max: 100,
+ color: calcScore(s) >= 70 ? 'var(--green)' : calcScore(s) >= 45 ? 'var(--yellow)' : 'var(--red)',
+ displayVal: calcScore(s)
+ })));
 
-  if (personalizado) {
-    var texto = document.getElementById('ctTextoPersonalizado').value.trim();
-    if (!texto) { ctSetStatus(false, 'Descreva as condicoes de pagamento personalizadas.'); return; }
-    payload.textoPersonalizado = texto;
-  } else if (tipo === 'avista') {
-    var valor = document.getElementById('ctAvValor').value;
-    var data = document.getElementById('ctAvData').value;
-    var forma = document.getElementById('ctAvForma').value.trim();
-    if (!valor || !data || !forma) { ctSetStatus(false, 'Preencha valor, data e forma de pagamento.'); return; }
-    payload.valor = parseFloat(valor);
-    payload.dataPagamento = ctFmtDateBR(data);
-    payload.formaPagamento = forma;
-  } else if (tipo === 'parcelado') {
-    var valorTotal = document.getElementById('ctPcValorTotal').value;
-    if (!valorTotal) { ctSetStatus(false, 'Preencha o valor total.'); return; }
-    var rows = document.querySelectorAll('#ctParcelasList .ct-parcela');
-    if (!rows.length) { ctSetStatus(false, 'Adicione ao menos uma parcela.'); return; }
-    var parcelas = [];
-    for (var i = 0; i < rows.length; i++) {
-      var id = rows[i].id;
-      var d = document.getElementById(id + '_desc').value.trim();
-      var v = document.getElementById(id + '_valor').value;
-      var f = document.getElementById(id + '_forma').value.trim();
-      var dt = document.getElementById(id + '_data').value;
-      if (!d || !v || !f || !dt) { ctSetStatus(false, 'Preencha todos os campos de cada parcela.'); return; }
-      parcelas.push({ descricao: d, valor: parseFloat(v), forma: f, data: ctFmtDateBR(dt) });
-    }
-    payload.valorTotal = parseFloat(valorTotal);
-    payload.parcelas = parcelas;
-  } else if (tipo === 'combinado') {
-    var formaCb = document.getElementById('ctCbForma').value.trim();
-    if (!formaCb) { ctSetStatus(false, 'Preencha a forma de pagamento.'); return; }
-    payload.formaPagamento = formaCb;
-  }
+ // Meta vs realizado
+ const totalFat = sellers.reduce((a,s) => a+s.fat, 0);
+ renderBarChart('chart-meta', [
+ { label: 'Meta', val: META_GLOBAL, max: Math.max(META_GLOBAL, totalFat, 1), color: 'rgba(45,106,79,0.5)', displayVal: fmtBRL(META_GLOBAL) },
+ { label: 'Realizado', val: totalFat, max: Math.max(META_GLOBAL, totalFat, 1), color: totalFat >= META_GLOBAL ? 'var(--green)' : 'var(--yellow)', displayVal: fmtBRL(totalFat) }
+ ]);
 
-  var btn = document.getElementById('ctBtnGerar');
-  btn.disabled = true;
-  ctSetStatus(true, 'Gerando contrato...');
-
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', '/api/contract', true);
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.responseType = 'blob';
-  xhr.onload = function() {
-    btn.disabled = false;
-    if (xhr.status !== 200) {
-      var reader = new FileReader();
-      reader.onload = function() {
-        try {
-          var err = JSON.parse(reader.result);
-          ctSetStatus(false, err.error || 'Erro ao gerar contrato.');
-        } catch (e) { ctSetStatus(false, 'Erro ao gerar contrato.'); }
-      };
-      reader.readAsText(xhr.response);
-      return;
-    }
-    var cd = xhr.getResponseHeader('Content-Disposition') || '';
-    var m = cd.match(/filename="([^"]+)"/);
-    var filename = m ? m[1] : 'contrato.pdf';
-    var blobUrl = URL.createObjectURL(xhr.response);
-    var a = document.createElement('a');
-    a.href = blobUrl; a.download = filename;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    URL.revokeObjectURL(blobUrl);
-    ctSetStatus(true, 'Contrato gerado com sucesso: ' + filename);
-  };
-  xhr.onerror = function() { btn.disabled = false; ctSetStatus(false, 'Falha de conexao.'); };
-  xhr.send(JSON.stringify(payload));
+ // Evolução simulada
+ const dailyAvg = corridos > 0 ? totalFat / corridos : 0;
+ const evoData = [];
+ for (let d = 1; d <= Math.min(mes, 10); d++) {
+ evoData.push({
+ label: `D${d*3}`,
+ val: Math.round(dailyAvg * d * 3 * (0.85 + Math.random() * 0.3)),
+ max: META_GLOBAL,
+ color: 'var(--brand2)',
+ displayVal: ''
+ });
+ }
+ renderBarChart('chart-evolucao', evoData);
 }
 
-// SUB-ABAS DOCUMENTOS
-function ctSwitchSub(which) {
-  document.getElementById('ctsub-contratos').classList.toggle('on', which === 'contratos');
-  document.getElementById('ctsub-gt').classList.toggle('on', which === 'gt');
-  document.getElementById('ctpane-contratos').classList.toggle('on', which === 'contratos');
-  document.getElementById('ctpane-gt').classList.toggle('on', which === 'gt');
+function renderBarChart(containerId, data) {
+ const container = document.getElementById(containerId);
+ if (!container) return;
+ container.innerHTML = data.map(d => {
+ const h = Math.min(100, d.max > 0 ? (d.val / d.max) * 100 : 0);
+ const targetH = d.target ? d.target * 100 : null;
+ return `<div class="bar-col">
+ <div class="bar-value">${d.displayVal}</div>
+ <div style="flex:1;display:flex;align-items:flex-end;width:100%;position:relative">
+ ${targetH ? `<div class="bar-target-line" style="bottom:${targetH}%"></div>` : ''}
+ <div class="bar-visual" style="height:${Math.max(2, h)}%;background:${d.color};width:100%"></div>
+ </div>
+ <div class="bar-label">${d.label}</div>
+ </div>`;
+ }).join('');
 }
 
-// GT — SFPC por UF
-var SFPC_POR_UF = {
-  RJ:1,ES:1, SP:2, RS:3, MG:4, PR:5,SC:5, BA:6,SE:6, AL:7,PE:7,PB:7,RN:7,
-  PA:8,AP:8,MA:8, MS:9,MT:9, CE:10,PI:10, DF:11,GO:11,TO:11, AM:12,AC:12,RR:12,RO:12
-};
-function gtUpdateSfpc() {
-  var uf = document.getElementById('gtDestUf').value.trim().toUpperCase();
-  var n = SFPC_POR_UF[uf];
-  document.getElementById('gtSfpcHint').textContent = n ? ('SFPC: SFPC/' + String(n).padStart(2,'0')) : 'SFPC: UF nao reconhecida';
+function renderDiario(corridos, mes, totalFat, dailyCur) {
+ setText('daily-elapsed', corridos);
+ setText('daily-total', mes);
+ const metaDiaria = META_GLOBAL / mes;
+ const metaAcum = metaDiaria * corridos;
+ setText('daily-meta-global', fmtBRL(metaDiaria));
+ setText('daily-real-global', fmtBRL(dailyCur));
+
+ const container = document.getElementById('pace-list');
+ container.innerHTML = sellers.map(s => {
+ const metaIndDiaria = META_IND / mes;
+ const metaAcumInd = metaIndDiaria * corridos;
+ const ratio = metaAcumInd > 0 ? s.fat / metaAcumInd : 0;
+ let pace, paceClass;
+ if (ratio >= 1.05) { pace = ' ACIMA DO RITMO'; paceClass = 'pace-above'; }
+ else if (ratio >= 0.90) { pace = ' NO RITMO'; paceClass = 'pace-on'; }
+ else { pace = ' ABAIXO DO RITMO'; paceClass = 'pace-below'; }
+
+ return `<div class="pace-item">
+ <div class="pace-name">${s.name}</div>
+ <div class="pace-numbers">Atual: ${fmtBRL(s.fat)} · Meta acum.: ${fmtBRL(metaAcumInd)} · Meta diária: ${fmtBRL(metaIndDiaria)}</div>
+ <div class="pace-pill ${paceClass}">${pace}</div>
+ </div>`;
+ }).join('');
 }
 
-function gtOnVarianteChange() {
-  var v = document.getElementById('gtVariante').value;
-  document.getElementById('gtGollogBox').style.display = (v === 'ezequiel_gollog') ? 'block' : 'none';
+function renderAlertas(corridos, mes) {
+ const alerts = [];
+ const metaDiaria = META_IND / mes;
+ const metaAcum = metaDiaria * corridos;
+
+ sellers.forEach(s => {
+ const ipc = calcIPC(s);
+ const score = calcScore(s);
+ const ratio = metaAcum > 0 ? s.fat / metaAcum : 0;
+
+ if (s.fat < 100000) {
+ alerts.push({ type: 'red', icon: '', title: `${s.name} — RED FLAG`, sub: `Faturamento ${fmtBRL(s.fat)} abaixo de R$100k. Risco crítico de resultado.` });
+ } else if (ratio < 0.85) {
+ alerts.push({ type: 'yellow', icon: '', title: `${s.name} — Abaixo do ritmo proporcional`, sub: `Realizado ${fmtBRL(s.fat)} vs. Meta proporcional ${fmtBRL(metaAcum)} (${(ratio*100).toFixed(0)}%).` });
+ }
+
+ if (ipc < 80) {
+ alerts.push({ type: 'red', icon: '', title: `${s.name} — IPC Crítico (${ipc})`, sub: `Índice de disciplina abaixo de 80. Multiplicador de pagamento reduzido para ${Math.round(ipcMultiplier(ipc)*100)}%.` });
+ } else if (ipc < 90) {
+ alerts.push({ type: 'yellow', icon: '', title: `${s.name} — IPC em atenção (${ipc})`, sub: `IPC abaixo de 90. Monitorar disciplina para evitar redução no pagamento.` });
+ }
+
+ if (s.etiqueta < 50 && s.etiqueta > 0) {
+ alerts.push({ type: 'yellow', icon: '', title: `${s.name} — Etiqueta abaixo do esperado`, sub: `Score Etiqueta: ${s.etiqueta}/100. Requer atenção imediata.` });
+ }
+
+ if (s.tarefas < 50 && s.tarefas > 0) {
+ alerts.push({ type: 'yellow', icon: '', title: `${s.name} — Tarefas operacionais em atraso`, sub: `Score Tarefas: ${s.tarefas}/100. Volume de execução insuficiente.` });
+ }
+
+ if (score < 40 && (s.fat + s.etiqueta + s.tarefas) > 0) {
+ alerts.push({ type: 'red', icon: '', title: `${s.name} — Queda de performance`, sub: `Score geral: ${score}/100. Intervenção gerencial recomendada.` });
+ }
+ });
+
+ const totalFat = sellers.reduce((a,s) => a+s.fat, 0);
+ const proj = calcProjection(totalFat, corridos, mes);
+ if (proj < META_GLOBAL * 0.8) {
+ alerts.unshift({ type: 'red', icon: '', title: 'Empresa — RISCO CRÍTICO DE META', sub: `Projeção ${fmtBRL(proj)} muito abaixo da meta ${fmtBRL(META_GLOBAL)}. Ação imediata necessária!` });
+ } else if (proj < META_GLOBAL) {
+ alerts.unshift({ type: 'yellow', icon: '', title: 'Empresa — Meta em risco', sub: `Projeção ${fmtBRL(proj)} abaixo da meta. Acelerar cadência de vendas.` });
+ } else {
+ alerts.unshift({ type: 'green', icon: '', title: 'Empresa — Meta no caminho certo!', sub: `Projeção ${fmtBRL(proj)} supera a meta de ${fmtBRL(META_GLOBAL)}.` });
+ }
+
+ const container = document.getElementById('alerts-container');
+ if (alerts.length === 0) {
+ container.innerHTML = '<div class="alert-item alert-green"><div class="alert-icon"></div><div class="alert-content"><div class="title">Nenhum alerta ativo</div><div class="sub">Todos os indicadores estão dentro do esperado.</div></div></div>';
+ return;
+ }
+ container.innerHTML = alerts.map(a => `
+ <div class="alert-item alert-${a.type}">
+ <div class="alert-icon">${a.icon}</div>
+ <div class="alert-content">
+ <div class="title">${a.title}</div>
+ <div class="sub">${a.sub}</div>
+ </div>
+ </div>
+ `).join('');
 }
 
-var gtProdSeq = 0;
-function gtAddProduto(preset) {
-  gtProdSeq++;
-  var id = 'gtp' + gtProdSeq;
-  var div = document.createElement('div');
-  div.className = 'gt-prod';
-  div.id = id;
-  div.innerHTML =
-    '<div class="gt-prod-row">' +
-      '<input placeholder="Produto (Ex: Municao, Arma de Fogo de Repeticao de Calibre Restrito)" id="' + id + '_produto">' +
-      '<input placeholder="Complemento (descricao completa)" id="' + id + '_complemento">' +
-    '</div>' +
-    '<div class="gt-prod-row3">' +
-      '<input placeholder="Unidade" id="' + id + '_unidade" value="Unidade">' +
-      '<input placeholder="Qtd" type="number" id="' + id + '_qtd" value="1">' +
-      '<input placeholder="Volume" type="number" id="' + id + '_volume" value="1">' +
-    '</div>' +
-    '<div class="gt-prod-row">' +
-      '<input placeholder="Marca" id="' + id + '_marca">' +
-      '<input placeholder="Numero de serie (ou Nao Contem)" id="' + id + '_serie">' +
-    '</div>' +
-    '<button type="button" class="gt-prod-rm" onclick="document.getElementById(\'' + id + '\').remove()">Remover produto</button>';
-  document.getElementById('gtProdutosList').appendChild(div);
-  if (preset) {
-    document.getElementById(id + '_produto').value = preset.produto || '';
-    document.getElementById(id + '_complemento').value = preset.complemento || '';
-    document.getElementById(id + '_unidade').value = preset.unidade || 'Unidade';
-    document.getElementById(id + '_qtd').value = preset.qtd || 1;
-    document.getElementById(id + '_marca').value = preset.marca || '';
-    document.getElementById(id + '_serie').value = preset.serie || '';
-  }
+function buildDataInputs() {
+ const container = document.getElementById('data-inputs-container');
+ container.innerHTML = sellers.map(s => `
+ <div class="card" style="margin-bottom:16px">
+ <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+ <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--brand2)">Vendedor ${s.id}</div>
+ <input id="inp-${s.id}-name" type="text" value="${s.name}"
+ style="background:transparent;border:none;border-bottom:1px solid var(--border2);color:var(--white);font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;padding:2px 4px;outline:none;width:150px"
+ placeholder="Nome">
+ </div>
+ <div class="input-grid">
+ <div class="input-group"><label>Faturamento (R$)</label><input id="inp-${s.id}-fat" type="number" value="${s.fat}" min="0"></div>
+ <div class="input-group"><label>Etiqueta (0-100)</label><input id="inp-${s.id}-etiq" type="number" value="${s.etiqueta}" min="0" max="100"></div>
+ <div class="input-group"><label>Tarefas Operacionais (0-100)</label><input id="inp-${s.id}-tarefas" type="number" value="${s.tarefas}" min="0" max="100"></div>
+ <div class="input-group"><label>Faltas</label><input id="inp-${s.id}-falt" type="number" value="${s.faltas}" min="0"></div>
+ <div class="input-group"><label>Atrasos</label><input id="inp-${s.id}-atr" type="number" value="${s.atrasos}" min="0"></div>
+ </div>
+ </div>
+ `).join('');
 }
 
-function gtClearProdutos() {
-  document.getElementById('gtProdutosList').innerHTML = '';
+// ═══════════════════════════════════════
+// DEMO DATA
+// ═══════════════════════════════════════
+function loadDemo() {
+ const demo = [
+ { fat: 187000, etiqueta: 88, tarefas: 90, atrasos: 1, faltas: 0 },
+ { fat: 143000, etiqueta: 80, tarefas: 75, atrasos: 3, faltas: 1 },
+ { fat: 98000,  etiqueta: 65, tarefas: 58, atrasos: 5, faltas: 2 },
+ ];
+ demo.forEach((d, i) => {
+ const s = sellers[i];
+ Object.assign(s, d);
+ // Update inputs
+ const fields = ['fat','etiq','tarefas','falt','atr'];
+ const vals = [d.fat, d.etiqueta, d.tarefas, d.faltas, d.atrasos];
+ fields.forEach((f, fi) => {
+ const el = document.getElementById(`inp-${s.id}-${f}`);
+ if (el) el.value = vals[fi];
+ });
+ });
+ recalculate();
 }
 
-function gtSetStatus(elId, ok, msg) {
-  var st = document.getElementById(elId);
-  st.className = 'save-status ' + (ok ? 'ok' : 'err');
-  st.textContent = msg;
+function resetData() {
+ if (!window.CAN_EDIT_COMERCIAL) return;
+ sellers.forEach(s => {
+ s.fat = s.etiqueta = s.tarefas = 0;
+ s.atrasos = s.faltas = 0;
+ const fields = ['fat','etiq','tarefas','falt','atr'];
+ fields.forEach(f => {
+ const el = document.getElementById(`inp-${s.id}-${f}`);
+ if (el) el.value = 0;
+ });
+ });
+ recalculate();
 }
 
-function gtFmtDateBR(iso) {
-  if (!iso) return '';
-  var p = iso.split('-');
-  return p.length === 3 ? (p[2] + '/' + p[1] + '/' + p[0]) : iso;
+// ═══════════════════════════════════════
+// EFEITOS SONOROS — gerados na hora via Web Audio API (sem arquivos de audio)
+// ═══════════════════════════════════════
+let audioCtx = null;
+function getAudioCtx() {
+ try {
+ if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+ if (audioCtx.state === 'suspended') audioCtx.resume();
+ return audioCtx;
+ } catch (e) { return null; }
 }
-function gtIsoFromBR(br) {
-  if (!br) return '';
-  var p = br.split('/');
-  return p.length === 3 ? (p[2] + '-' + p[1] + '-' + p[0]) : br;
-}
+// destrava o audio no primeiro toque/clique do usuario na pagina (politica dos navegadores)
+document.addEventListener('click', () => getAudioCtx(), { once: true });
 
-function gtExtrairNF() {
-  var fileInput = document.getElementById('gtNfFile');
-  if (!fileInput.files || !fileInput.files[0]) {
-    gtSetStatus('gtNfStatus', false, 'Selecione o PDF da NF primeiro.');
-    return;
-  }
-  var file = fileInput.files[0];
-  var btn = document.getElementById('gtBtnExtrair');
-  btn.disabled = true;
-  gtSetStatus('gtNfStatus', true, 'Lendo a NF e extraindo os dados...');
-
-  var reader = new FileReader();
-  reader.onload = function() {
-    var base64 = reader.result.split(',')[1];
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/nf-extract', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = function() {
-      btn.disabled = false;
-      try {
-        var data = JSON.parse(xhr.responseText);
-        if (xhr.status !== 200 || data.error) {
-          gtSetStatus('gtNfStatus', false, data.error || 'Erro ao extrair dados.');
-          return;
-        }
-        if (data.empresaSugerida) document.getElementById('gtEmpresa').value = data.empresaSugerida;
-        if (data.notaFiscal) document.getElementById('gtNotaFiscal').value = data.notaFiscal;
-        if (data.cliente) {
-          document.getElementById('gtDestNome').value = data.cliente.nome || '';
-          document.getElementById('gtDestDoc').value = data.cliente.doc || '';
-          document.getElementById('gtDestEndereco').value = data.cliente.endereco || '';
-          document.getElementById('gtDestTelefone').value = data.cliente.telefone || '';
-          document.getElementById('gtDestUf').value = data.cliente.uf || '';
-          gtUpdateSfpc();
-        }
-        gtClearProdutos();
-        (data.produtosControlados || []).forEach(function(p) { gtAddProduto(p); });
-        if (!data.produtosControlados || !data.produtosControlados.length) gtAddProduto();
-        var avisos = (data.avisos || []).join(' | ');
-        gtSetStatus('gtNfStatus', true, 'Dados extraidos! Revise TODOS os campos antes de gerar.' + (avisos ? ' Avisos: ' + avisos : ''));
-      } catch (e) {
-        gtSetStatus('gtNfStatus', false, 'Erro ao processar resposta da IA.');
-      }
-    };
-    xhr.onerror = function() { btn.disabled = false; gtSetStatus('gtNfStatus', false, 'Falha de conexao.'); };
-    xhr.send(JSON.stringify({ pdfBase64: base64 }));
-  };
-  reader.readAsDataURL(file);
+function playTone(freq, startTime, duration, type, gainPeak) {
+ const ctx = getAudioCtx();
+ if (!ctx) return;
+ const osc = ctx.createOscillator();
+ const gain = ctx.createGain();
+ osc.type = type || 'sine';
+ osc.frequency.value = freq;
+ const t0 = ctx.currentTime + startTime;
+ gain.gain.setValueAtTime(0, t0);
+ gain.gain.linearRampToValueAtTime(gainPeak || 0.2, t0 + 0.02);
+ gain.gain.exponentialRampToValueAtTime(0.001, t0 + duration);
+ osc.connect(gain);
+ gain.connect(ctx.destination);
+ osc.start(t0);
+ osc.stop(t0 + duration + 0.05);
 }
 
-function gtGerar() {
-  var empresa = document.getElementById('gtEmpresa').value;
-  var variante = document.getElementById('gtVariante').value;
-  var notaFiscal = document.getElementById('gtNotaFiscal').value.trim();
-  var dataEnvioIso = document.getElementById('gtDataEnvio').value;
-  var numVolumes = document.getElementById('gtNumVolumes').value || 1;
-  var nome = document.getElementById('gtDestNome').value.trim();
-  var doc = document.getElementById('gtDestDoc').value.trim();
-  var endereco = document.getElementById('gtDestEndereco').value.trim();
-  var telefone = document.getElementById('gtDestTelefone').value.trim();
-  var uf = document.getElementById('gtDestUf').value.trim().toUpperCase();
-  var seloNumero = document.getElementById('gtSeloNumero').value.trim();
-
-  if (!notaFiscal || !dataEnvioIso || !nome || !doc || !endereco || !uf || !seloNumero) {
-    gtSetStatus('gtStatus', false, 'Preencha NF, data, destinatario completo (incl. UF) e numero do selo.');
-    return;
-  }
-  var sfpcN = SFPC_POR_UF[uf];
-  if (!sfpcN) { gtSetStatus('gtStatus', false, 'UF nao reconhecida para calculo do SFPC.'); return; }
-
-  var rows = document.querySelectorAll('#gtProdutosList .gt-prod');
-  if (!rows.length) { gtSetStatus('gtStatus', false, 'Adicione ao menos um produto.'); return; }
-  var produtos = [];
-  for (var i = 0; i < rows.length; i++) {
-    var id = rows[i].id;
-    var produto = document.getElementById(id + '_produto').value.trim();
-    var complemento = document.getElementById(id + '_complemento').value.trim();
-    if (!produto || !complemento) { gtSetStatus('gtStatus', false, 'Preencha produto e complemento de todos os itens.'); return; }
-    produtos.push({
-      produto: produto, complemento: complemento,
-      unidade: document.getElementById(id + '_unidade').value.trim() || 'Unidade',
-      qtd: parseInt(document.getElementById(id + '_qtd').value) || 1,
-      volume: parseInt(document.getElementById(id + '_volume').value) || 1,
-      marca: document.getElementById(id + '_marca').value.trim(),
-      serie: document.getElementById(id + '_serie').value.trim() || 'Nao Contem',
-    });
-  }
-
-  var payload = {
-    empresa: empresa, variante: variante, notaFiscal: notaFiscal,
-    dataEnvio: gtFmtDateBR(dataEnvioIso), numeroVolumes: parseInt(numVolumes) || 1,
-    destinatarios: [{ nome: nome, doc: doc, endereco: endereco, telefone: telefone, sfpc: 'SFPC/' + String(sfpcN).padStart(2,'0') }],
-    produtos: produtos, seloNumero: seloNumero,
-  };
-
-  if (variante === 'ezequiel_gollog') {
-    payload.gollog = {
-      aeroporto: document.getElementById('gtGAeroporto').value.trim(),
-      trecho: document.getElementById('gtGTrecho').value.trim(),
-      formaPagamento: document.getElementById('gtGFormaPagamento').value.trim(),
-      tipoEntrega: document.getElementById('gtGTipoEntrega').value.trim(),
-      tomadorFrete: document.getElementById('gtGTomadorFrete').value.trim(),
-      cnpjTomador: document.getElementById('gtGCnpjTomador').value.trim(),
-      nContaGollog: document.getElementById('gtGContaGollog').value.trim(),
-      pesoTotal: document.getElementById('gtGPesoTotal').value.trim(),
-      tipoEmbalagem: document.getElementById('gtGTipoEmbalagem').value.trim(),
-      produtoPredominante: document.getElementById('gtGProdutoPredominante').value.trim(),
-      medidasEmbalagens: document.getElementById('gtGMedidas').value.trim(),
-      tipoSeguro: document.getElementById('gtGTipoSeguro').value.trim(),
-      valorMercadoria: document.getElementById('gtGValorMercadoria').value.trim(),
-      nVolumes: String(numVolumes),
-    };
-  }
-
-  var btn = document.getElementById('gtBtnGerar');
-  btn.disabled = true;
-  gtSetStatus('gtStatus', true, 'Gerando GT...');
-
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', '/api/gt', true);
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.responseType = 'blob';
-  xhr.onload = function() {
-    btn.disabled = false;
-    if (xhr.status !== 200) {
-      var reader = new FileReader();
-      reader.onload = function() {
-        try { var err = JSON.parse(reader.result); gtSetStatus('gtStatus', false, err.error || 'Erro ao gerar GT.'); }
-        catch (e) { gtSetStatus('gtStatus', false, 'Erro ao gerar GT.'); }
-      };
-      reader.readAsText(xhr.response);
-      return;
-    }
-    var cd = xhr.getResponseHeader('Content-Disposition') || '';
-    var m = cd.match(/filename="([^"]+)"/);
-    var filename = m ? m[1] : 'gt.pdf';
-    var blobUrl = URL.createObjectURL(xhr.response);
-    var a = document.createElement('a');
-    a.href = blobUrl; a.download = filename;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    URL.revokeObjectURL(blobUrl);
-    gtSetStatus('gtStatus', true, 'GT gerada com sucesso: ' + filename + '. Lembre-se: ainda precisa carimbar e assinar fisicamente antes de escanear.');
-  };
-  xhr.onerror = function() { btn.disabled = false; gtSetStatus('gtStatus', false, 'Falha de conexao.'); };
-  xhr.send(JSON.stringify(payload));
+// Som de venda registrada: "cha-ching" curto e satisfatorio
+function playSaleSound() {
+ playTone(880.00, 0, 0.12, 'triangle', 0.22); // A5
+ playTone(1318.51, 0.09, 0.20, 'triangle', 0.24); // E6
 }
-gtAddProduto();
 
-function saveKB() {
-  var ta  = document.getElementById('kbText');
-  var btn = document.getElementById('btnSave');
-  var st  = document.getElementById('saveStatus');
-  btn.disabled = true;
-  st.className = 'save-status';
-  st.textContent = '';
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', '/api/knowledge', true);
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.onload = function() {
-    btn.disabled = false;
-    try {
-      var data = JSON.parse(xhr.responseText);
-      if (data.ok) {
-        st.className = 'save-status ok';
-        st.textContent = 'Base de conhecimento salva com sucesso! A IA ja usa o novo conteudo.';
-      } else {
-        st.className = 'save-status err';
-        st.textContent = 'Erro ao salvar: ' + (data.error || 'desconhecido');
-      }
-    } catch(e) {
-      st.className = 'save-status err';
-      st.textContent = 'Erro ao processar resposta.';
-    }
-  };
-  xhr.onerror = function() {
-    btn.disabled = false;
-    st.className = 'save-status err';
-    st.textContent = 'Falha de conexao.';
-  };
-  xhr.send(JSON.stringify({ knowledge: ta.value }));
+// Som de troca de lideranca (coroa mudou de dono): pequena fanfarra, mais longa e festiva
+function playCrownSound() {
+ const notes = [523.25, 659.25, 783.99, 1046.50]; // C5 E5 G5 C6 (arpejo maior subindo)
+ notes.forEach((f, i) => playTone(f, i * 0.11, 0.26, 'square', 0.16));
+ playTone(1318.51, 0.52, 0.55, 'sawtooth', 0.18); // E6 final, sustentada
+ playTone(1567.98, 0.52, 0.55, 'sawtooth', 0.12); // G6 junto, da corpo de "acorde"
 }
-</script>
-<!-- ========== ABA PARCEIRO INFLUENCIADOR ========== -->
-<!-- INSTRUÇÃO: Adicione isto APÓS a aba "Guias de Trânsito" no dashboard.html -->
 
-<div id="abaParceiro" style="display: none; padding: 20px;">
-  <h2>Contrato - Parceiro Influenciador</h2>
-  
-  <div style="margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
-    <label style="display: block; margin-bottom: 15px; font-weight: bold;">
-      <input type="radio" name="tipoCarregamento" value="pdf" checked> Extrair dados de PDF de Pedido
-    </label>
-    <label style="display: block; margin-bottom: 15px; font-weight: bold;">
-      <input type="radio" name="tipoCarregamento" value="manual"> Preencher manualmente
-    </label>
-  </div>
+// Detecta troca de lider entre uma renderizacao do podio e a proxima, pra tocar
+// o som pra QUALQUER pessoa que esteja com a tela aberta (nao so quem vendeu)
+let lastLeaderId = undefined;
+function checkLeaderChange(newLeaderId) {
+ if (lastLeaderId !== undefined && newLeaderId !== undefined && newLeaderId !== lastLeaderId) {
+ playCrownSound();
+ }
+ lastLeaderId = newLeaderId;
+}
 
-  <!-- Seção PDF Upload -->
-  <div id="secaoPdfParceiro" style="padding: 15px; background: #f9f9f9; border-radius: 5px; margin: 15px 0;">
-    <label>Selecione PDF do Pedido:</label>
-    <input type="file" id="pdfParceiro" accept=".pdf" style="margin: 10px 0;">
-    <button onclick="extrairDadosPDF('pdfParceiro')" style="padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">
-      Extrair Dados
-    </button>
-  </div>
+// ═══════════════════════════════════════
+// AUTOLANÇAMENTO DE VENDA (pelo próprio vendedor) + atualização em tempo real
+// ═══════════════════════════════════════
+async function registrarVenda() {
+ const sel = document.getElementById('rvSeller');
+ const valEl = document.getElementById('rvValor');
+ const statusEl = document.getElementById('rvStatus');
+ const sellerId = parseInt(sel?.value, 10);
+ const valor = parseFloat(valEl?.value);
 
-  <!-- Seção Manual -->
-  <div id="secaoManualParceiro" style="display: none; padding: 15px; background: #f9f9f9; border-radius: 5px; margin: 15px 0;">
-    <label>Nome do Parceiro:</label>
-    <input type="text" id="nomeParceiro" placeholder="Ex: João da Silva" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px;">
-    
-    <label>CPF/CNPJ:</label>
-    <input type="text" id="cpfCnpjParceiro" placeholder="000.000.000-00 ou 00.000.000/0001-00" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px;">
-    
-    <label>Endereço Completo:</label>
-    <input type="text" id="enderecoParceiro" placeholder="Rua, nº, complemento" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px;">
-    
-    <label>Cidade:</label>
-    <input type="text" id="cidadeParceiro" placeholder="Blumenau" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px;">
-    
-    <label>UF:</label>
-    <input type="text" id="ufParceiro" placeholder="SC" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px;">
-  </div>
+ if (!sellerId || !valor || valor <= 0) {
+ statusEl.className = 'rv-status err';
+ statusEl.textContent = 'Escolha seu nome e informe um valor de venda valido.';
+ return;
+ }
 
-  <div style="margin: 20px 0;">
-    <button onclick="gerarContratoParceiro()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
-      Gerar Contrato - Parceria Influenciador
-    </button>
-  </div>
+ try {
+ const resp = await fetch('/api/comercial/registrar-venda', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ sellerId, valor }),
+ });
+ const data = await resp.json();
+ if (!resp.ok) {
+ statusEl.className = 'rv-status err';
+ statusEl.textContent = data.error || 'Erro ao registrar a venda.';
+ return;
+ }
+ data.sellers.forEach(saved => {
+ const s = sellers.find(x => x.id === saved.id);
+ if (s) s.fat = saved.fat;
+ const fatEl = document.getElementById(`inp-${saved.id}-fat`);
+ if (fatEl) fatEl.value = saved.fat;
+ });
+ const nome = sellers.find(s => s.id === sellerId)?.name || '';
+ valEl.value = '';
+ statusEl.className = 'rv-status ok';
+ statusEl.textContent = `Venda de ${fmtBRL(valor)} registrada para ${nome}!`;
+ playSaleSound();
+ renderAll();
+ } catch (e) {
+ statusEl.className = 'rv-status err';
+ statusEl.textContent = 'Falha de conexao.';
+ }
+}
 
-  <div id="statusParceiro" style="margin-top: 15px; padding: 10px; display: none; border-radius: 3px;"></div>
-</div>
+// A cada 30s, busca dados atualizados no servidor (ex: vendas registradas por
+// outra pessoa) e atualiza o placar em tempo real, sem mexer nos campos que o
+// gerente possa estar digitando na aba Dados.
+async function pollComercialData() {
+ try {
+ const resp = await fetch('/api/comercial');
+ if (!resp.ok) return;
+ const payload = await resp.json();
+ (payload.sellers || []).forEach(saved => {
+ const s = sellers.find(x => x.id === saved.id);
+ if (!s) return;
+ if (s.fat !== saved.fat) {
+ s.fat = saved.fat;
+ const fatEl = document.getElementById(`inp-${saved.id}-fat`);
+ if (fatEl && document.activeElement !== fatEl) fatEl.value = saved.fat;
+ }
+ });
+ renderAll();
+ } catch (e) { /* silencioso — tenta de novo no proximo ciclo */ }
+}
 
-<!-- ========== SCRIPTS PARCEIRO ========== -->
-<script>
-// Toggle entre PDF e Manual
-document.querySelectorAll('input[name="tipoCarregamento"]').forEach(radio => {
-  radio.addEventListener('change', (e) => {
-    if (e.target.value === 'pdf') {
-      document.getElementById('secaoPdfParceiro').style.display = 'block';
-      document.getElementById('secaoManualParceiro').style.display = 'none';
-    } else {
-      document.getElementById('secaoPdfParceiro').style.display = 'none';
-      document.getElementById('secaoManualParceiro').style.display = 'block';
-    }
-  });
+async function closeMonth() {
+ if (!window.CAN_EDIT_COMERCIAL) return;
+ const ranked = [...sellers].map(s => ({ ...s, score: calcScore(s) })).sort((a,b) => b.score - a.score);
+ const vencedor = ranked[0] ? ranked[0].name : null;
+ const msg = vencedor
+ ? `Fechar o mes agora? O Consultor do Mes sera "${vencedor}" (maior score). Isso arquiva os dados atuais no historico e zera tudo para o novo mes.`
+ : 'Fechar o mes agora? Isso arquiva os dados atuais no historico e zera tudo para o novo mes.';
+ if (!confirm(msg)) return;
+ try {
+ const resp = await fetch('/api/comercial/reset-month', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ vencedor }),
+ });
+ if (!resp.ok) { showSaveStatus('Falha ao fechar o mes'); return; }
+ const payload = await resp.json();
+ currentMesReferencia = payload.mesReferencia; historyData = payload.history || [];
+ payload.sellers.forEach(saved => {
+ const s = sellers.find(x => x.id === saved.id);
+ if (s) Object.assign(s, saved);
+ });
+ recalculate();
+ showSaveStatus('Mes fechado e arquivado com sucesso');
+ } catch (e) {
+ showSaveStatus('Falha ao fechar o mes (conexao)');
+ }
+}
+
+// ═══════════════════════════════════════
+// PERSISTÊNCIA — API real (GitHub via backend), com controle de acesso
+// ═══════════════════════════════════════
+let saveTimer = null;
+let historyData = [];
+
+async function saveData() {
+ if (!window.CAN_EDIT_COMERCIAL) return; // vendas/auxiliar nunca gravam
+ clearTimeout(saveTimer);
+ saveTimer = setTimeout(async () => {
+ try {
+ const { corridos, mes } = getDias();
+ const payload = {
+ sellers,
+ diasCorridos: corridos,
+ diasMes: mes,
+ mesReferencia: currentMesReferencia,
+ history: historyData,
+ };
+ const resp = await fetch('/api/comercial', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify(payload),
+ });
+ if (resp.ok) showSaveStatus('Salvo automaticamente');
+ else showSaveStatus('Falha ao salvar');
+ } catch (e) {
+ showSaveStatus('Falha ao salvar (conexao)');
+ }
+ }, 600); // debounce: agrupa digitacoes rapidas num unico salvamento
+}
+
+let currentMesReferencia = null;
+
+async function loadData() {
+ try {
+ const resp = await fetch('/api/comercial');
+ if (!resp.ok) return false;
+ const payload = await resp.json();
+
+ window.CAN_EDIT_COMERCIAL = !!payload.canEdit;
+ currentMesReferencia = payload.mesReferencia || null;
+ historyData = payload.history || [];
+
+ // Restaurar vendedores
+ if (payload.sellers && Array.isArray(payload.sellers)) {
+ payload.sellers.forEach(saved => {
+ const s = sellers.find(x => x.id === saved.id);
+ if (s) Object.assign(s, saved);
+ });
+ }
+
+ return payload.savedAt || true;
+ } catch (e) {
+ return false;
+ }
+}
+
+function showSaveStatus(msg) {
+ const el = document.getElementById('save-status');
+ if (!el) return;
+ el.textContent = msg;
+ el.style.opacity = '1';
+ clearTimeout(el._timeout);
+ el._timeout = setTimeout(() => { el.style.opacity = '0'; }, 3000);
+}
+
+// ═══════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════
+function setText(id, val) {
+ const el = document.getElementById(id);
+ if (el) el.textContent = val;
+}
+
+function setWidth(id, pct) {
+ const el = document.getElementById(id);
+ if (el) el.style.width = Math.min(100, Math.max(0, pct)) + '%';
+}
+
+function showTab(name) {
+ document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+ document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+ document.getElementById('tab-' + name)?.classList.add('active');
+ event.target.classList.add('active');
+}
+
+// ── Header date ──
+function updateDate() {
+ const now = new Date();
+ const str = now.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase() +
+ ' · ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+ setText('headerDate', str);
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+ updateDate();
+ setInterval(updateDate, 30000);
+ setInterval(pollComercialData, 30000);
+ buildDataInputs();
+
+ // Tentar carregar dados salvos (isso tambem define window.CAN_EDIT_COMERCIAL)
+ const savedAt = await loadData();
+
+ // Esconde a aba de lancamento (Dados) para quem nao pode editar
+ const tabBtnDados = document.getElementById('tabbtn-dados');
+ if (tabBtnDados) tabBtnDados.style.display = window.CAN_EDIT_COMERCIAL ? '' : 'none';
+
+ if (savedAt) {
+ // Atualizar inputs com dados restaurados
+ sellers.forEach(s => {
+ const setInp = (field, val) => {
+ const el = document.getElementById(`inp-${s.id}-${field}`);
+ if (el) el.value = val;
+ };
+ setInp('fat', s.fat);
+ setInp('etiq', s.etiqueta);
+ setInp('tarefas', s.tarefas);
+ setInp('atr', s.atrasos);
+ setInp('falt', s.faltas);
+ const nEl = document.getElementById(`inp-${s.id}-name`);
+ if (nEl) nEl.value = s.name;
+ });
+
+ const dateStr = typeof savedAt === 'string'
+ ? new Date(savedAt).toLocaleString('pt-BR')
+ : '';
+ showSaveStatus(` Dados restaurados${dateStr ? ' · ' + dateStr : ''}`);
+ }
+
+ recalculate();
 });
 
-async function gerarContratoParceiro() {
-  const status = document.getElementById('statusParceiro');
-  
-  const dados = {
-    nomeParceiro: document.getElementById('nomeParceiro').value,
-    cpfCnpj: document.getElementById('cpfCnpjParceiro').value,
-    endereco: document.getElementById('enderecoParceiro').value,
-    cidade: document.getElementById('cidadeParceiro').value,
-    uf: document.getElementById('ufParceiro').value
-  };
 
-  if (!dados.nomeParceiro || !dados.cpfCnpj) {
-    status.style.display = 'block';
-    status.style.background = '#f8d7da';
-    status.style.color = '#721c24';
-    status.textContent = '❌ Preencha pelo menos Nome e CPF/CNPJ';
-    return;
-  }
+// ========== ÁUDIOS INLINE (BASE64) ==========
+// INSTRUÇÃO: Adicione este código na seção <script> do comercial-dashboard.html
 
-  try {
-    status.style.display = 'block';
-    status.style.background = '#e2e3e5';
-    status.style.color = '#383d41';
-    status.textContent = '⏳ Gerando contrato...';
+// Áudio de venda (money sound)
+const AUDIO_MONEY = new Audio('data:audio/mp3;base64,SUQzBAAAAAABClRYWFgAAAASAAADbWFqb3JfYnJhbmQAaXNvbQBUWFhYAAAAEwAAA21pbm9yX3ZlcnNpb24ANTEyAFRYWFgAAAAkAAADY29tcGF0aWJsZV9icmFuZHMAaXNvbWlzbzJhdmMxbXA0MQBUU1NFAAAADwAAA0xhdmY2MC4xNi4xMDAAAAAAAAAAAAAAAP/7UAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFhpbmcAAAAPAAAAcAAAoIkAAgMDBAUFBgcICQkKCwsMDA4ODxAQFhkfJiksMjc9QkZKU1dbYGdtc3Z9gYWKjpKWmqOqrrK1ub3AxM3S1tnd4OTn6Onp6uvr7O3u7+/w8fHy8/P09fb29/j4+fr7/Pz9/v7/AAAAAExhdmM2MC4zMQAAAAAAAAAAAAAAACQFwAAAAAAAAKCJSLOlsAAAAAAAAAAAAAAAAAAAAAD/+xBkAA/wAABpAAAACAAADSAAAAEAAAGkAAAAIAAANIAAAARMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGQiD/AAAGkAAAAIAAANIAAAAQAAAaQAAAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQZEQP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+xBkZg/wAABpAAAACAAADSAAAAEAAAGkAAAAIAAANIAAAARVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGSID/AAAGkAAAAIAAANIAAAAQAAAaQAAAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQZKoP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+xBkzA/wAABpAAAACAAADSAAAAEAAAGkAAAAIAAANIAAAARVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGTdj/AAAGkAAAAIAAANIAAAAQAAAaQAAAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQZN2P8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+xBk3Y/wAABpAAAACAAADSAAAAEAAAGkAAAAIAAANIAAAARVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGTdj/AAAGkAAAAIAAANIAAAAQAAAaQAAAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
+AUDIO_MONEY.volume = 1.0; // 100%
 
-    const response = await fetch('/api/contrato-influenciador', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dados)
-    });
+// Áudio de coroa (sword sound - fanfare)
+const AUDIO_SWORD = new Audio('data:audio/mp3;base64,SUQzBAAAAAABClRYWFgAAAASAAADbWFqb3JfYnJhbmQAaXNvbQBUWFhYAAAAEwAAA21pbm9yX3ZlcnNpb24ANTEyAFRYWFgAAAAkAAADY29tcGF0aWJsZV9icmFuZHMAaXNvbWlzbzJhdmMxbXA0MQBUU1NFAAAADwAAA0xhdmY2MC4xNi4xMDAAAAAAAAAAAAAAAP/7UAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFhpbmcAAAAPAAAAcAAAoIkAAgMDBAUFBgcICQkKCwsMDA4ODxAQFhkfJiksMjc9QkZKU1dbYGdtc3Z9gYWKjpKWmqOqrrK1ub3AxM3S1tnd4OTn6Onp6uvr7O3u7+/w8fHy8/P09fb29/j4+fr7/Pz9/v7/AAAAAExhdmM2MC4zMQAAAAAAAAAAAAAAACQFwAAAAAAAAKCJSLOlsAAAAAAAAAAAAAAAAAAAAAD/+xBkAA/wAABpAAAACAAADSAAAAEAAAGkAAAAIAAANIAAAARMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGQiD/AAAGkAAAAIAAANIAAAAQAAAaQAAAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQZEQP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+xBkZg/wAABpAAAACAAADSAAAAEAAAGkAAAAIAAANIAAAARVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGSID/AAAGkAAAAIAAANIAAAAQAAAaQAAAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQZKoP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+xBkzA/wAABpAAAACAAADSAAAAEAAAGkAAAAIAAANIAAAARVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGTdj/AAAGkAAAAIAAANIAAAAQAAAaQAAAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
+AUDIO_SWORD.volume = 1.0; // 100%
 
-    if (response.ok) {
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Contrato_Parceria_${dados.nomeParceiro}_ProHunters.docx`;
-      a.click();
-      
-      status.style.background = '#d4edda';
-      status.style.color = '#155724';
-      status.textContent = '✅ Contrato gerado com sucesso!';
-    } else {
-      const error = await response.text();
-      status.style.background = '#f8d7da';
-      status.style.color = '#721c24';
-      status.textContent = `❌ Erro: ${error}`;
-    }
-  } catch (err) {
-    status.style.display = 'block';
-    status.style.background = '#f8d7da';
-    status.style.color = '#721c24';
-    status.textContent = `❌ Erro: ${err.message}`;
+// ========== FUNÇÕES DE ÁUDIO ==========
+
+function tocarSomVenda() {
+  AUDIO_MONEY.currentTime = 0;
+  AUDIO_MONEY.play().catch(e => console.log('Erro ao tocar som de venda:', e));
+}
+
+function tocarSomCoroa() {
+  AUDIO_SWORD.currentTime = 0;
+  AUDIO_SWORD.play().catch(e => console.log('Erro ao tocar som de coroa:', e));
+}
+
+// ========== INTEGRAÇÃO COM DASHBOARD COMERCIAL ==========
+// Adicione estas chamadas nos eventos:
+// 
+// 1. Quando um vendedor REGISTRA VENDA:
+//    - Chame: tocarSomVenda();
+//
+// 2. Quando um vendedor MUDA PARA LÍDER (recebe coroa):
+//    - Chame: tocarSomCoroa();
+
+// ========== EXEMPLO DE USO ==========
+/*
+// Na função de registrar venda:
+function registrarVenda() {
+  // ... código existente ...
+  tocarSomVenda(); // ✓ Toca cha-ching
+}
+
+// Na função de atualizar líder:
+function atualizarLider(novoLider) {
+  // ... código existente ...
+  if (liderAnterior !== novoLider) {
+    tocarSomCoroa(); // ✓ Toca fanfare quando novo líder é coroado
   }
 }
-</script>
+*/
 
+
+</script>
 </body>
 </html>
