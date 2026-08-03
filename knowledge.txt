@@ -68,6 +68,18 @@ Financeiro: conciliar NF com SKU padrão interno (formato: Marca-Código, exempl
 Marketing: adicionar no site produtos sem cadastro prévio, referência igual ao SKU do Bling. NINGUÉM muda o SKU.
 Gerência: verificar e aprovar anúncio no site antes de liberar para venda.
 
+RECEBIMENTO DE PRODUTO DE COMPRA
+Situação: Chegou produto derivado de compra.
+Ação (Gerência):
+1. Recebe e confere quantidade com a NF
+2. Confere cadastro do produto no Bling
+3. Ajusta nomenclatura comercial do pedido de compra
+4. Ajusta SKU se necessário
+5. Ajusta valor (cálculo baseado no valor da NF)
+6. Verifica se está cadastrado no site:
+   - Se sim: ajusta preço + estoque no site
+   - Se não: passa SKU para Marketing com solicitação de cadastro
+
 CADEIA DE ASSINATURA DA GT
 João CEO: assina com assinatura oficial.
 Luis Gerente Comercial: assina com P.P. mais nome completo.
@@ -91,8 +103,62 @@ Logística reversa: portalpostal.com.br, Logística Reversa, Gerar Autorização
 SEPARAÇÃO DE RECEITA
 Pro Hunters e Calibre Restrito têm CNPJs distintos. Lançar na conta correta conforme origem. Dúvida: confirmar gerência antes. Nunca lançar por suposição.
 
+VENDA COM ITENS EM EMPRESAS DIFERENTES
+Situação: Vendi dois itens que estão em empresas diferentes. Como faz?
+Procedimento:
+- Fazer dois pedidos no Bling (um em cada empresa)
+- Cobrar cada valor em sua respectiva empresa
+- Frete: cobrado na Pro Hunters
+- Prioridade: receber o frete na Pro Hunters (Correios tem contrato com Pro Hunters)
+
 RODÍZIO PJ ANTIGOS
 Controlado no quadro da sala comercial. Ao vender para cliente PJ antigo, passar vez para o próximo consultor.
+
+GERADOR DE DESCRIÇÃO DE ARMAS
+
+Como usar:
+1. Copie as informações da arma neste formato:
+Marca: [sua marca]
+Modelo: [seu modelo]
+Calibre: [seu calibre]
+Acabamento: [seu acabamento]
+Funcionamento: [seu funcionamento]
+País de Fabricação: [seu país]
+Carregador: [quantidade e tipo]
+[Campos opcionais: Comprimento Total, Comprimento Cano, Capacidade, Raiamento, Frame, Slide, Peso, Ação, Massa de Mira, Alça de Mira, etc.]
+
+2. Envie para o assistente com o pedido: "Gere descrição de arma"
+
+3. IA valida e responde com o padrão:
+Marca: X - Modelo: Y - Calibre: Z - Acabamento: A - Funcionamento: F - Carregador: C - Comprimento Cano: CC - País de fabricação: P - Nº de Série:
+
+CAMPOS OBRIGATÓRIOS (IA vai validar):
+- Marca
+- Modelo
+- Calibre
+- Acabamento
+- Funcionamento
+- Carregador (quantidade e tipo)
+- País de Fabricação
+
+CAMPOS OPCIONAIS (inclui se disponível):
+- Comprimento Total
+- Comprimento Cano
+- Capacidade
+- Raiamento
+- Frame
+- Slide
+- Peso
+- Ação
+- Massa de Mira
+- Alça de Mira
+
+VALIDAÇÃO:
+Se faltar qualquer campo obrigatório, responda com:
+"⚠️ Informações obrigatórias faltando: [listar exatamente quais]. Não é possível gerar descrição sem esses dados. Consulte Luis ou a gerência."
+
+Exemplo de resposta com falta:
+"⚠️ Informações obrigatórias faltando: Marca, Carregador. Não é possível gerar descrição sem esses dados. Consulte Luis ou a gerência."
 
 FERRAMENTAS DO VENDEDOR
 Lista de contatos e fornecedores, planilha de juros de cartão, planilha de controle de armas (fonte oficial de estoque), automatizadores de contrato, lista de produtos Fenix (encomenda: preço USD x 1,5777 x cotação dólar, pedido mínimo USD 5.000).
