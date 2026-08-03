@@ -4,9 +4,9 @@
       "id": 1,
       "name": "Pedro Dickmann",
       "foto": "consultor_pedro.jpg",
-      "fat": 131023.65000000001,
-      "etiqueta": 100,
-      "tarefas": 100,
+      "fat": 0,
+      "etiqueta": 0,
+      "tarefas": 0,
       "atrasos": 0,
       "faltas": 0
     },
@@ -14,9 +14,9 @@
       "id": 2,
       "name": "Enzo Boschetto",
       "foto": "consultor_enzo.jpg",
-      "fat": 111667.63,
-      "etiqueta": 100,
-      "tarefas": 100,
+      "fat": 0,
+      "etiqueta": 0,
+      "tarefas": 0,
       "atrasos": 0,
       "faltas": 0
     },
@@ -24,16 +24,54 @@
       "id": 3,
       "name": "Wesley Mathias",
       "foto": "consultor_wesley.jpg",
-      "fat": 112415.65,
-      "etiqueta": 100,
-      "tarefas": 100,
+      "fat": 0,
+      "etiqueta": 0,
+      "tarefas": 0,
       "atrasos": 0,
       "faltas": 0
     }
   ],
   "diasCorridos": 31,
   "diasMes": 31,
-  "mesReferencia": "2026-07",
-  "history": [],
-  "savedAt": "2026-07-31T21:01:37.371Z"
+  "mesReferencia": "2026-08",
+  "history": [
+    {
+      "mesReferencia": "2026-07",
+      "vencedor": "Pedro Dickmann",
+      "sellers": [
+        {
+          "id": 1,
+          "name": "Pedro Dickmann",
+          "foto": "consultor_pedro.jpg",
+          "fat": 131023.65000000001,
+          "etiqueta": 100,
+          "tarefas": 100,
+          "atrasos": 0,
+          "faltas": 0
+        },
+        {
+          "id": 2,
+          "name": "Enzo Boschetto",
+          "foto": "consultor_enzo.jpg",
+          "fat": 111667.63,
+          "etiqueta": 100,
+          "tarefas": 100,
+          "atrasos": 0,
+          "faltas": 0
+        },
+        {
+          "id": 3,
+          "name": "Wesley Mathias",
+          "foto": "consultor_wesley.jpg",
+          "fat": 112415.65,
+          "etiqueta": 100,
+          "tarefas": 100,
+          "atrasos": 0,
+          "faltas": 0
+        }
+      ],
+      "fechadoEm": "2026-08-03T11:06:21.307Z"
+    }
+  ],
+  "savedAt": "2026-08-03T11:06:21.308Z"
 }
