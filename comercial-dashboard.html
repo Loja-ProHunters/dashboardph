@@ -589,6 +589,70 @@ tbody td {
 .podium-block.pos-2 .podium-riser{ height:80px;background:linear-gradient(180deg,rgba(200,204,208,.18),rgba(200,204,208,.04)); border-top:2px solid #c8ccd0 }
 .podium-block.pos-3 .podium-riser{ height:56px;background:linear-gradient(180deg,rgba(205,138,76,.18),rgba(205,138,76,.04)); border-top:2px solid #cd8a4c }
 
+.podium-layout{
+  display:flex;align-items:center;justify-content:center;gap:56px;
+  width:100%;max-width:1180px;margin:0 auto;position:relative;z-index:2;
+}
+.podium-main{display:flex;flex-direction:column;align-items:center;flex:1;min-width:0}
+
+.last-champion-banner{
+  flex:0 0 260px;display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:32px 24px;
+  background:linear-gradient(160deg,rgba(240,201,107,.10),rgba(240,201,107,.02) 60%);
+  border:1px solid rgba(240,201,107,.35);border-radius:18px;position:relative;overflow:hidden;
+  animation:fadeUp .5s ease both;
+}
+.last-champion-banner::before{
+  content:'';position:absolute;left:-40px;top:-40px;width:180px;height:180px;border-radius:50%;
+  background:radial-gradient(circle,rgba(240,201,107,.16),transparent 70%);
+}
+.last-champion-label{
+  font-size:10.5px;letter-spacing:1.8px;color:var(--gray4);text-transform:uppercase;font-weight:700;
+  margin-bottom:16px;position:relative;z-index:1;
+}
+.last-champion-photo{
+  width:104px;height:104px;border-radius:50%;object-fit:cover;
+  border:4px solid #f0c96b;box-shadow:0 0 0 6px rgba(240,201,107,.15),0 0 30px rgba(240,201,107,.3);
+  position:relative;z-index:1;margin-bottom:6px;
+}
+.last-champion-crown{font-size:22px;margin-bottom:10px;position:relative;z-index:1;filter:drop-shadow(0 0 8px rgba(240,201,107,.5))}
+.last-champion-name{
+  font-family:'Bebas Neue',sans-serif;font-size:28px;color:#f0c96b;letter-spacing:.5px;line-height:1.15;
+  position:relative;z-index:1;
+}
+.last-champion-month{font-size:11px;color:var(--gray4);margin-top:4px;position:relative;z-index:1}
+.last-champion-fat{
+  font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--white2);
+  margin-top:14px;position:relative;z-index:1;
+}
+.last-champion-fat-label{font-size:9.5px;color:var(--gray4);text-transform:uppercase;letter-spacing:1px;margin-top:2px;position:relative;z-index:1}
+.last-champion-divider{width:40px;height:1px;background:rgba(240,201,107,.3);margin:16px auto;position:relative;z-index:1}
+.last-champion-phrase{
+  font-size:13px;color:var(--white2);line-height:1.5;font-style:italic;position:relative;z-index:1;
+}
+
+@media (max-width: 980px){
+  .podium-layout{flex-direction:column;gap:28px}
+  .last-champion-banner{flex:0 0 auto;width:100%;max-width:340px}
+}
+
+.podium-race{width:100%;max-width:640px;position:relative;z-index:2}
+.hist-trophy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+.hist-trophy-card{
+  background:var(--black3);border:1px solid var(--border2);border-radius:14px;padding:20px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.hist-trophy-card.leader{border-color:rgba(240,201,107,.4);background:linear-gradient(135deg,rgba(240,201,107,.06),rgba(240,201,107,.01))}
+.hist-trophy-photo{width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid var(--border2);margin-bottom:10px}
+.hist-trophy-card.leader .hist-trophy-photo{border-color:#f0c96b}
+.hist-trophy-name{font-weight:700;font-size:14px;color:var(--white);margin-bottom:6px}
+.hist-trophy-count{font-family:'Bebas Neue',sans-serif;font-size:30px;color:#f0c96b;line-height:1}
+.hist-trophy-count-label{font-size:10px;color:var(--gray4);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.hist-trophy-total{font-size:11px;color:var(--gray5);margin-top:10px}
+
+.hist-empty{text-align:center;padding:60px 20px;color:var(--gray4)}
+.hist-empty-icon{font-size:32px;margin-bottom:12px;opacity:.5}
+
 .podium-race{width:100%;max-width:640px;position:relative;z-index:2}
 .podium-race-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
 .podium-race-photo{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border2)}
@@ -916,6 +980,7 @@ tbody td {
  <button class="tab-btn" onclick="showTab('graficos')"> Gráficos</button>
  <button class="tab-btn" onclick="showTab('diario')"> Controle Diário</button>
  <button class="tab-btn" onclick="showTab('alertas')"> Alertas</button>
+ <button class="tab-btn" onclick="showTab('historico')"> Histórico</button>
  <button class="tab-btn" id="tabbtn-dados" onclick="showTab('dados')"> Dados</button>
 </div>
 
@@ -926,6 +991,11 @@ tbody td {
 ═══════════════════════════════════════════ -->
 <div class="tab-panel active" id="tab-podio">
  <div class="podium-stage">
+ <div class="podium-layout">
+
+ <div class="last-champion-banner" id="last-champion-banner"></div>
+
+ <div class="podium-main">
  <div class="podium-title-wrap">
  <div class="podium-live-dot"></div>
  <h2 class="podium-title">Corrida do Consultor do Mês</h2>
@@ -942,6 +1012,9 @@ tbody td {
  <button onclick="registrarVenda()">Registrar Venda</button>
  </div>
  <div class="rv-status" id="rvStatus"></div>
+ </div>
+ </div>
+
  </div>
  </div>
 </div>
@@ -1227,6 +1300,33 @@ tbody td {
 </div>
 
 <!-- ═══════════════════════════════════════════
+ TAB — HISTÓRICO (PLACAR ANUAL)
+═══════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-historico">
+
+ <div class="section-title"> Placar Anual — Consultor do Mês</div>
+ <div id="hist-trophy-grid" class="hist-trophy-grid"></div>
+
+ <div class="divider"></div>
+ <div class="section-title"> Histórico de Meses Fechados</div>
+ <div class="table-wrap">
+ <table>
+ <thead>
+ <tr>
+ <th>Mês</th>
+ <th>Consultor do Mês</th>
+ <th>Faturamento do Vencedor</th>
+ <th>Faturamento Total do Mês</th>
+ <th>Fechado em</th>
+ </tr>
+ </thead>
+ <tbody id="hist-table-body"></tbody>
+ </table>
+ </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════
  TAB 8 — DADOS (INPUT)
 ═══════════════════════════════════════════ -->
 <div class="tab-panel" id="tab-dados">
@@ -1408,7 +1508,14 @@ function renderAll() {
  const ticket = sellers.length > 0 ? totalFat / sellers.length : 0;
 
  const scores = sellers.map(s => calcScore(s));
- const maxScoreIdx = scores.indexOf(Math.max(...scores));
+ const maxScore = Math.max(...scores);
+ const tiedIdxs = scores.reduce((acc, sc, i) => { if (sc === maxScore) acc.push(i); return acc; }, []);
+ const lastChampionName = (historyData && historyData[0]) ? historyData[0].vencedor : null;
+ let maxScoreIdx = tiedIdxs[0];
+ if (tiedIdxs.length > 1 && lastChampionName) {
+ const championIdx = tiedIdxs.find(i => sellers[i].name === lastChampionName);
+ if (championIdx !== undefined) maxScoreIdx = championIdx;
+ }
  const consultorMes = sellers[maxScoreIdx]?.name || '—';
 
  // ── KPIs Executivos ──
@@ -1476,6 +1583,109 @@ function renderAll() {
 
  // ── Score Breakdown ──
  renderScoreBreakdown();
+
+ // ── Campeão do mês passado + Histórico ──
+ renderLastChampion();
+ renderHistorico();
+}
+
+function formatMesReferencia(mesRef) {
+ if (!mesRef) return '—';
+ const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+ const [ano, mes] = mesRef.split('-');
+ const idx = parseInt(mes, 10) - 1;
+ return `${MESES[idx] || mes} de ${ano}`;
+}
+
+function renderLastChampion() {
+ const el = document.getElementById('last-champion-banner');
+ if (!el) return;
+ if (!historyData || historyData.length === 0) {
+ el.style.display = 'none';
+ el.innerHTML = '';
+ return;
+ }
+ const last = historyData[0]; // mais recente primeiro
+ if (!last || !last.vencedor) { el.style.display = 'none'; el.innerHTML = ''; return; }
+
+ el.style.display = 'flex';
+ const vencedorSeller = (last.sellers || []).find(s => s.name === last.vencedor);
+ const foto = vencedorSeller?.foto ? `/assets/${vencedorSeller.foto}` : '';
+ const fat = vencedorSeller ? fmtBRL(vencedorSeller.fat || 0) : null;
+ const firstName = last.vencedor.split(' ')[0];
+
+ el.innerHTML = `
+ <div class="last-champion-label"> Consultor do Mês</div>
+ <img class="last-champion-photo" src="${foto}" alt="${last.vencedor}" onerror="this.style.display='none'">
+ <div class="last-champion-crown">👑</div>
+ <div class="last-champion-name">${last.vencedor}</div>
+ <div class="last-champion-month">${formatMesReferencia(last.mesReferencia)}</div>
+ <div class="last-champion-divider"></div>
+ <div class="last-champion-phrase">Parabéns, ${firstName}! Você levantou a taça — agora é defender o título. Quem encara o desafio esse mês?</div>
+ ${fat ? `<div class="last-champion-fat">${fat}</div><div class="last-champion-fat-label">faturamento do mês</div>` : ''}
+ `;
+}
+
+function renderHistorico() {
+ const trophyEl = document.getElementById('hist-trophy-grid');
+ const tableBodyEl = document.getElementById('hist-table-body');
+ if (!trophyEl || !tableBodyEl) return;
+
+ if (!historyData || historyData.length === 0) {
+ trophyEl.innerHTML = `<div class="hist-empty" style="grid-column:1/-1">
+ <div class="hist-empty-icon"></div>
+ <div>Ainda não há meses fechados no histórico.</div>
+ <div style="font-size:12px;margin-top:4px">Quando o mês encerrar (automático ou manual), ele aparece aqui.</div>
+ </div>`;
+ tableBodyEl.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--gray4);padding:24px">Nenhum mês fechado ainda.</td></tr>`;
+ return;
+ }
+
+ // ── Placar de vitórias por consultor (conta quantas vezes cada um venceu) ──
+ const winCount = {};
+ const totalFatBySeller = {};
+ const fotoBySeller = {};
+ sellers.forEach(s => { fotoBySeller[s.name] = s.foto; totalFatBySeller[s.name] = s.fat || 0; });
+ historyData.forEach(h => {
+ if (h.vencedor) winCount[h.vencedor] = (winCount[h.vencedor] || 0) + 1;
+ (h.sellers || []).forEach(s => {
+ fotoBySeller[s.name] = fotoBySeller[s.name] || s.foto;
+ totalFatBySeller[s.name] = (totalFatBySeller[s.name] || 0) + (s.fat || 0);
+ });
+ });
+
+ const allNames = Object.keys(totalFatBySeller);
+ const maxWins = Math.max(...allNames.map(n => winCount[n] || 0), 0);
+ const rankedNames = allNames.sort((a, b) => (winCount[b] || 0) - (winCount[a] || 0));
+
+ trophyEl.innerHTML = rankedNames.map(name => {
+ const wins = winCount[name] || 0;
+ const isLeader = wins > 0 && wins === maxWins;
+ const foto = fotoBySeller[name] ? `/assets/${fotoBySeller[name]}` : '';
+ return `
+ <div class="hist-trophy-card ${isLeader ? 'leader' : ''}">
+ <img class="hist-trophy-photo" src="${foto}" alt="${name}" onerror="this.style.display='none'">
+ <div class="hist-trophy-name">${name}</div>
+ <div class="hist-trophy-count">${wins}</div>
+ <div class="hist-trophy-count-label">${wins === 1 ? 'vez consultor do mês' : 'vezes consultor do mês'}</div>
+ <div class="hist-trophy-total">Total acumulado: ${fmtBRL(totalFatBySeller[name])}</div>
+ </div>`;
+ }).join('');
+
+ // ── Tabela de meses fechados ──
+ tableBodyEl.innerHTML = historyData.map(h => {
+ const vencedorSeller = (h.sellers || []).find(s => s.name === h.vencedor);
+ const fatVencedor = vencedorSeller ? vencedorSeller.fat || 0 : 0;
+ const fatTotalMes = (h.sellers || []).reduce((a, s) => a + (s.fat || 0), 0);
+ const fechadoEm = h.fechadoEm ? new Date(h.fechadoEm).toLocaleDateString('pt-BR') : '—';
+ return `<tr>
+ <td>${formatMesReferencia(h.mesReferencia)}</td>
+ <td class="td-name"> ${h.vencedor || '—'}</td>
+ <td>${fmtBRL(fatVencedor)}</td>
+ <td>${fmtBRL(fatTotalMes)}</td>
+ <td>${fechadoEm}</td>
+ </tr>`;
+ }).join('');
 }
 
 function renderMainTable(corridos, mes) {
@@ -1572,9 +1782,20 @@ function renderPodium() {
  if (prevVal) sellerSel.value = prevVal;
  }
 
+ const lastChampion = (historyData && historyData[0]) ? historyData[0].vencedor : null;
+
  const ranked = [...sellers]
  .map(s => ({ ...s, score: calcScore(s), ipc: calcIPC(s) }))
- .sort((a, b) => b.score - a.score);
+ .sort((a, b) => {
+ if (b.score !== a.score) return b.score - a.score;
+ // Empate: o campeão vigente (vencedor do mês passado) defende a coroa
+ // até alguém realmente ultrapassá-lo com faturamento/score maior.
+ if (lastChampion) {
+ if (a.name === lastChampion) return -1;
+ if (b.name === lastChampion) return 1;
+ }
+ return 0;
+ });
 
  checkLeaderChange(ranked[0] ? ranked[0].id : undefined);
 
