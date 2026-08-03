@@ -589,22 +589,54 @@ tbody td {
 .podium-block.pos-2 .podium-riser{ height:80px;background:linear-gradient(180deg,rgba(200,204,208,.18),rgba(200,204,208,.04)); border-top:2px solid #c8ccd0 }
 .podium-block.pos-3 .podium-riser{ height:56px;background:linear-gradient(180deg,rgba(205,138,76,.18),rgba(205,138,76,.04)); border-top:2px solid #cd8a4c }
 
+.podium-layout{
+  display:flex;align-items:center;justify-content:center;gap:56px;
+  width:100%;max-width:1180px;margin:0 auto;position:relative;z-index:2;
+}
+.podium-main{display:flex;flex-direction:column;align-items:center;flex:1;min-width:0}
+
 .last-champion-banner{
-  display:flex;align-items:center;gap:16px;justify-content:center;
-  max-width:520px;margin:0 auto 40px;padding:14px 22px;
-  background:linear-gradient(135deg,rgba(240,201,107,.10),rgba(240,201,107,.02));
-  border:1px solid rgba(240,201,107,.35);border-radius:14px;position:relative;z-index:2;
+  flex:0 0 260px;display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:32px 24px;
+  background:linear-gradient(160deg,rgba(240,201,107,.10),rgba(240,201,107,.02) 60%);
+  border:1px solid rgba(240,201,107,.35);border-radius:18px;position:relative;overflow:hidden;
   animation:fadeUp .5s ease both;
 }
-.last-champion-photo{
-  width:52px;height:52px;border-radius:50%;object-fit:cover;
-  border:3px solid #f0c96b;box-shadow:0 0 0 4px rgba(240,201,107,.15);flex-shrink:0;
+.last-champion-banner::before{
+  content:'';position:absolute;left:-40px;top:-40px;width:180px;height:180px;border-radius:50%;
+  background:radial-gradient(circle,rgba(240,201,107,.16),transparent 70%);
 }
-.last-champion-text{text-align:left}
-.last-champion-label{font-size:10px;letter-spacing:1.5px;color:var(--gray4);text-transform:uppercase;font-weight:700}
-.last-champion-name{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#f0c96b;letter-spacing:.5px;line-height:1.2}
-.last-champion-sub{font-size:11px;color:var(--gray4);margin-top:2px}
+.last-champion-label{
+  font-size:10.5px;letter-spacing:1.8px;color:var(--gray4);text-transform:uppercase;font-weight:700;
+  margin-bottom:16px;position:relative;z-index:1;
+}
+.last-champion-photo{
+  width:104px;height:104px;border-radius:50%;object-fit:cover;
+  border:4px solid #f0c96b;box-shadow:0 0 0 6px rgba(240,201,107,.15),0 0 30px rgba(240,201,107,.3);
+  position:relative;z-index:1;margin-bottom:6px;
+}
+.last-champion-crown{font-size:22px;margin-bottom:10px;position:relative;z-index:1;filter:drop-shadow(0 0 8px rgba(240,201,107,.5))}
+.last-champion-name{
+  font-family:'Bebas Neue',sans-serif;font-size:28px;color:#f0c96b;letter-spacing:.5px;line-height:1.15;
+  position:relative;z-index:1;
+}
+.last-champion-month{font-size:11px;color:var(--gray4);margin-top:4px;position:relative;z-index:1}
+.last-champion-fat{
+  font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--white2);
+  margin-top:14px;position:relative;z-index:1;
+}
+.last-champion-fat-label{font-size:9.5px;color:var(--gray4);text-transform:uppercase;letter-spacing:1px;margin-top:2px;position:relative;z-index:1}
+.last-champion-divider{width:40px;height:1px;background:rgba(240,201,107,.3);margin:16px auto;position:relative;z-index:1}
+.last-champion-phrase{
+  font-size:13px;color:var(--white2);line-height:1.5;font-style:italic;position:relative;z-index:1;
+}
 
+@media (max-width: 980px){
+  .podium-layout{flex-direction:column;gap:28px}
+  .last-champion-banner{flex:0 0 auto;width:100%;max-width:340px}
+}
+
+.podium-race{width:100%;max-width:640px;position:relative;z-index:2}
 .hist-trophy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
 .hist-trophy-card{
   background:var(--black3);border:1px solid var(--border2);border-radius:14px;padding:20px;text-align:center;
@@ -959,12 +991,16 @@ tbody td {
 ═══════════════════════════════════════════ -->
 <div class="tab-panel active" id="tab-podio">
  <div class="podium-stage">
+ <div class="podium-layout">
+
+ <div id="last-champion-banner"></div>
+
+ <div class="podium-main">
  <div class="podium-title-wrap">
  <div class="podium-live-dot"></div>
  <h2 class="podium-title">Corrida do Consultor do Mês</h2>
  <p class="podium-sub">Ranking em tempo real por Score</p>
  </div>
- <div id="last-champion-banner"></div>
  <div class="podium-stand" id="podium-stand"></div>
  <div class="podium-race" id="podium-race"></div>
 
@@ -976,6 +1012,9 @@ tbody td {
  <button onclick="registrarVenda()">Registrar Venda</button>
  </div>
  <div class="rv-status" id="rvStatus"></div>
+ </div>
+ </div>
+
  </div>
  </div>
 </div>
@@ -1562,21 +1601,29 @@ function renderLastChampion() {
  const el = document.getElementById('last-champion-banner');
  if (!el) return;
  if (!historyData || historyData.length === 0) {
+ el.style.display = 'none';
  el.innerHTML = '';
  return;
  }
  const last = historyData[0]; // mais recente primeiro
- if (!last || !last.vencedor) { el.innerHTML = ''; return; }
+ if (!last || !last.vencedor) { el.style.display = 'none'; el.innerHTML = ''; return; }
+
+ el.style.display = 'flex';
  const vencedorSeller = (last.sellers || []).find(s => s.name === last.vencedor);
  const foto = vencedorSeller?.foto ? `/assets/${vencedorSeller.foto}` : '';
- const fat = vencedorSeller ? fmtBRL(vencedorSeller.fat || 0) : '';
+ const fat = vencedorSeller ? fmtBRL(vencedorSeller.fat || 0) : null;
+ const firstName = last.vencedor.split(' ')[0];
+
  el.innerHTML = `
+ <div class="last-champion-label"> Consultor do Mês</div>
  <img class="last-champion-photo" src="${foto}" alt="${last.vencedor}" onerror="this.style.display='none'">
- <div class="last-champion-text">
- <div class="last-champion-label"> Consultor do Mês — ${formatMesReferencia(last.mesReferencia)}</div>
+ <div class="last-champion-crown">👑</div>
  <div class="last-champion-name">${last.vencedor}</div>
- <div class="last-champion-sub">${fat ? fat + ' em faturamento · ' : ''}quem repete a dose esse mês?</div>
- </div>`;
+ <div class="last-champion-month">${formatMesReferencia(last.mesReferencia)}</div>
+ <div class="last-champion-divider"></div>
+ <div class="last-champion-phrase">Parabéns, ${firstName}! Você levantou a taça — agora é defender o título. Quem encara o desafio esse mês?</div>
+ ${fat ? `<div class="last-champion-fat">${fat}</div><div class="last-champion-fat-label">faturamento do mês</div>` : ''}
+ `;
 }
 
 function renderHistorico() {
