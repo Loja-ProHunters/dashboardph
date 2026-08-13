@@ -481,30 +481,14 @@ tbody tr:nth-child(even) td{background:var(--bg)}
         <div id="gtGollogBox" style="display:none">
           <div class="ct-sec">Verso GT + Minuta Gollog</div>
           <div class="ct-row">
-            <div class="ct-field"><label>Aeroporto de retirada</label><input id="gtGAeroporto"></div>
-            <div class="ct-field"><label>Trecho (origem - destino)</label><input id="gtGTrecho"></div>
+            <div class="ct-field"><label>Aeroporto de retirada (código)</label><input id="gtGAeroporto" placeholder="Ex: MOC, GRU, CNF"></div>
+            <div class="ct-field"><label>Trecho (nome do aeroporto)</label><input id="gtGTrecho" placeholder="Ex: Aeroporto de Montes Claros - Mário Ribeiro"></div>
           </div>
           <div class="ct-row">
-            <div class="ct-field"><label>Forma de pagamento</label><input id="gtGFormaPagamento" placeholder="Ex: A vista"></div>
-            <div class="ct-field"><label>Tipo de entrega</label><input id="gtGTipoEntrega" placeholder="Ex: Proprio"></div>
+            <div class="ct-field"><label>Peso total</label><input id="gtGPesoTotal" placeholder="Ex: 3Kg"></div>
+            <div class="ct-field"><label>Medidas da embalagem</label><input id="gtGMedidas" placeholder="Ex: 40x20x10"></div>
           </div>
-          <div class="ct-row">
-            <div class="ct-field"><label>Tomador do frete</label><input id="gtGTomadorFrete"></div>
-            <div class="ct-field"><label>CNPJ do tomador</label><input id="gtGCnpjTomador"></div>
-          </div>
-          <div class="ct-row">
-            <div class="ct-field"><label>Nº conta Gollog</label><input id="gtGContaGollog"></div>
-            <div class="ct-field"><label>Peso total</label><input id="gtGPesoTotal" placeholder="Ex: 8kg"></div>
-          </div>
-          <div class="ct-row">
-            <div class="ct-field"><label>Tipo de embalagem</label><input id="gtGTipoEmbalagem"></div>
-            <div class="ct-field"><label>Produto predominante</label><input id="gtGProdutoPredominante"></div>
-          </div>
-          <div class="ct-row">
-            <div class="ct-field"><label>Medidas da embalagem</label><input id="gtGMedidas" placeholder="Ex: 40x30x20cm"></div>
-            <div class="ct-field"><label>Tipo de seguro</label><input id="gtGTipoSeguro"></div>
-          </div>
-          <div class="ct-field"><label>Valor da mercadoria</label><input id="gtGValorMercadoria" placeholder="R$ 0,00"></div>
+          <div class="ct-field"><label>Tipo de embalagem</label><input id="gtGTipoEmbalagem" placeholder="Ex: Caixa de Papelão"></div>
         </div>
 
         <button class="btn-save" id="gtBtnGerar" onclick="gtGerar()" style="margin-top:8px">Gerar GT (PDF)</button>
@@ -1206,17 +1190,9 @@ function gtGerar() {
     payload.gollog = {
       aeroporto: document.getElementById('gtGAeroporto').value.trim(),
       trecho: document.getElementById('gtGTrecho').value.trim(),
-      formaPagamento: document.getElementById('gtGFormaPagamento').value.trim(),
-      tipoEntrega: document.getElementById('gtGTipoEntrega').value.trim(),
-      tomadorFrete: document.getElementById('gtGTomadorFrete').value.trim(),
-      cnpjTomador: document.getElementById('gtGCnpjTomador').value.trim(),
-      nContaGollog: document.getElementById('gtGContaGollog').value.trim(),
       pesoTotal: document.getElementById('gtGPesoTotal').value.trim(),
       tipoEmbalagem: document.getElementById('gtGTipoEmbalagem').value.trim(),
-      produtoPredominante: document.getElementById('gtGProdutoPredominante').value.trim(),
       medidasEmbalagens: document.getElementById('gtGMedidas').value.trim(),
-      tipoSeguro: document.getElementById('gtGTipoSeguro').value.trim(),
-      valorMercadoria: document.getElementById('gtGValorMercadoria').value.trim(),
       nVolumes: String(numVolumes),
     };
   }
