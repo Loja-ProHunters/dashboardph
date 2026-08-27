@@ -429,9 +429,9 @@ tbody tr:nth-child(even) td{background:var(--bg)}
 
       <div class="ct-subpane" id="ctpane-gt">
       <div class="ct-card" style="max-width:900px">
-        <div class="ct-sec">Nota Fiscal (opcional — preenche automaticamente)</div>
+        <div class="ct-sec">Nota(s) Fiscal(is) (opcional — preenche automaticamente)</div>
         <div class="ct-row">
-          <div class="ct-field"><label>Upload da NF (PDF)</label><input type="file" id="gtNfFile" accept="application/pdf"></div>
+          <div class="ct-field"><label>Upload da(s) NF(s) (PDF) — pode selecionar mais de uma</label><input type="file" id="gtNfFile" accept="application/pdf" multiple></div>
           <div class="ct-field" style="justify-content:flex-end"><label>&nbsp;</label><button type="button" class="ct-add" id="gtBtnExtrair" onclick="gtExtrairNF()">Extrair dados da NF</button></div>
         </div>
         <div class="save-status" id="gtNfStatus"></div>
@@ -1093,52 +1093,88 @@ function gtIsoFromBR(br) {
 
 function gtExtrairNF() {
   var fileInput = document.getElementById('gtNfFile');
-  if (!fileInput.files || !fileInput.files[0]) {
-    gtSetStatus('gtNfStatus', false, 'Selecione o PDF da NF primeiro.');
+  if (!fileInput.files || !fileInput.files.length) {
+    gtSetStatus('gtNfStatus', false, 'Selecione o(s) PDF(s) da NF primeiro.');
     return;
   }
-  var file = fileInput.files[0];
+  var files = Array.from(fileInput.files);
   var btn = document.getElementById('gtBtnExtrair');
   btn.disabled = true;
-  gtSetStatus('gtNfStatus', true, 'Lendo a NF e extraindo os dados...');
+  var total = files.length;
+  gtSetStatus('gtNfStatus', true, 'Extraindo NF 1 de ' + total + '...');
 
-  var reader = new FileReader();
-  reader.onload = function() {
-    var base64 = reader.result.split(',')[1];
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/nf-extract', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = function() {
+  var resultados = [];
+
+  function processarProxima(idx) {
+    if (idx >= files.length) {
+      // Todas processadas — mesclar resultados
       btn.disabled = false;
-      try {
-        var data = JSON.parse(xhr.responseText);
-        if (xhr.status !== 200 || data.error) {
-          gtSetStatus('gtNfStatus', false, data.error || 'Erro ao extrair dados.');
-          return;
-        }
-        if (data.empresaSugerida) document.getElementById('gtEmpresa').value = data.empresaSugerida;
-        if (data.notaFiscal) document.getElementById('gtNotaFiscal').value = data.notaFiscal;
-        if (data.cliente) {
-          document.getElementById('gtDestNome').value = data.cliente.nome || '';
-          document.getElementById('gtDestDoc').value = data.cliente.doc || '';
-          document.getElementById('gtDestEndereco').value = data.cliente.endereco || '';
-          document.getElementById('gtDestTelefone').value = data.cliente.telefone || '';
-          document.getElementById('gtDestUf').value = data.cliente.uf || '';
-          gtUpdateSfpc();
-        }
-        gtClearProdutos();
-        (data.produtosControlados || []).forEach(function(p) { gtAddProduto(p); });
-        if (!data.produtosControlados || !data.produtosControlados.length) gtAddProduto();
-        var avisos = (data.avisos || []).join(' | ');
-        gtSetStatus('gtNfStatus', true, 'Dados extraidos! Revise TODOS os campos antes de gerar.' + (avisos ? ' Avisos: ' + avisos : ''));
-      } catch (e) {
-        gtSetStatus('gtNfStatus', false, 'Erro ao processar resposta da IA.');
+      if (!resultados.length) { gtSetStatus('gtNfStatus', false, 'Nenhuma NF processada.'); return; }
+
+      // Empresa e cliente vêm da primeira NF
+      var primeiro = resultados[0];
+      if (primeiro.empresaSugerida) document.getElementById('gtEmpresa').value = primeiro.empresaSugerida;
+      if (primeiro.cliente) {
+        document.getElementById('gtDestNome').value = primeiro.cliente.nome || '';
+        document.getElementById('gtDestDoc').value = primeiro.cliente.doc || '';
+        document.getElementById('gtDestEndereco').value = primeiro.cliente.endereco || '';
+        document.getElementById('gtDestTelefone').value = primeiro.cliente.telefone || '';
+        document.getElementById('gtDestUf').value = primeiro.cliente.uf || '';
+        gtUpdateSfpc();
       }
+
+      // Notas fiscais combinadas com /
+      var nfs = resultados.map(function(r) { return r.notaFiscal || ''; }).filter(Boolean);
+      document.getElementById('gtNotaFiscal').value = nfs.join(' / ');
+
+      // Produtos de todas as NFs juntos
+      gtClearProdutos();
+      var todosAvisos = [];
+      resultados.forEach(function(r) {
+        (r.produtosControlados || []).forEach(function(p) { gtAddProduto(p); });
+        (r.avisos || []).forEach(function(a) { todosAvisos.push(a); });
+      });
+      if (!document.querySelectorAll('#gtProdutosList .gt-prod').length) gtAddProduto();
+
+      var msg = total === 1
+        ? 'Dados extraidos! Revise TODOS os campos antes de gerar.'
+        : total + ' NFs extraidas e mescladas! Revise TODOS os campos antes de gerar.';
+      if (todosAvisos.length) msg += ' Avisos: ' + todosAvisos.join(' | ');
+      gtSetStatus('gtNfStatus', true, msg);
+      return;
+    }
+
+    var file = files[idx];
+    if (total > 1) gtSetStatus('gtNfStatus', true, 'Extraindo NF ' + (idx + 1) + ' de ' + total + '...');
+
+    var reader = new FileReader();
+    reader.onload = function() {
+      var base64 = reader.result.split(',')[1];
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/nf-extract', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onload = function() {
+        try {
+          var data = JSON.parse(xhr.responseText);
+          if (xhr.status !== 200 || data.error) {
+            gtSetStatus('gtNfStatus', false, 'Erro na NF ' + (idx + 1) + ': ' + (data.error || 'Erro ao extrair.'));
+            btn.disabled = false;
+            return;
+          }
+          resultados.push(data);
+          processarProxima(idx + 1);
+        } catch (e) {
+          gtSetStatus('gtNfStatus', false, 'Erro ao processar resposta da NF ' + (idx + 1) + '.');
+          btn.disabled = false;
+        }
+      };
+      xhr.onerror = function() { btn.disabled = false; gtSetStatus('gtNfStatus', false, 'Falha de conexao na NF ' + (idx + 1) + '.'); };
+      xhr.send(JSON.stringify({ pdfBase64: base64 }));
     };
-    xhr.onerror = function() { btn.disabled = false; gtSetStatus('gtNfStatus', false, 'Falha de conexao.'); };
-    xhr.send(JSON.stringify({ pdfBase64: base64 }));
-  };
-  reader.readAsDataURL(file);
+    reader.readAsDataURL(file);
+  }
+
+  processarProxima(0);
 }
 
 function gtGerar() {
