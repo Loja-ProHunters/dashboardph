@@ -1441,7 +1441,10 @@ function calcScore(s) {
  (Math.min(100, s.etiqueta) * 1) +
  (Math.min(100, s.tarefas) * 1);
  const maxScore = 100 * (3 + 1 + 1);
- return Math.round((score / maxScore) * 100);
+ const base = Math.round((score / maxScore) * 100);
+ // Penalidade pesada: cada advertência reduz 15 pontos do score
+ const penalidade = (s.advertencias || 0) * 15;
+ return Math.max(0, base - penalidade);
 }
 
 function calcProjection(fat, diasCorridos, diasMes) {
@@ -1496,6 +1499,7 @@ function readInputs() {
  s.tarefas = v('tarefas');
  s.atrasos = v('atr');
  s.faltas = v('falt');
+ s.advertencias = v('adv');
  // editable name
  const nEl = document.getElementById(`inp-${s.id}-name`);
  if (nEl) s.name = nEl.value || s.name;
@@ -2083,6 +2087,36 @@ function renderAlertas(corridos, mes) {
  `).join('');
 }
 
+function registrarAdvertencia(sellerId) {
+ const seller = sellers.find(s => s.id === sellerId);
+ if (!seller) return;
+ const motivoEl = document.getElementById(`inp-${sellerId}-adv-motivo`);
+ const motivo = motivoEl ? motivoEl.value.trim() : '';
+ if (!motivo) { alert('Informe o motivo da advertencia.'); return; }
+ if (!seller.advertenciasLog) seller.advertenciasLog = [];
+ seller.advertenciasLog.push({
+ data: new Date().toLocaleDateString('pt-BR'),
+ motivo: motivo,
+ });
+ seller.advertencias = (seller.advertencias || 0) + 1;
+ // Atualizar o input do contador
+ const advInput = document.getElementById(`inp-${sellerId}-adv`);
+ if (advInput) advInput.value = seller.advertencias;
+ if (motivoEl) motivoEl.value = '';
+ renderAdvLog(sellerId);
+ recalculate();
+}
+
+function renderAdvLog(sellerId) {
+ const seller = sellers.find(s => s.id === sellerId);
+ const logEl = document.getElementById(`adv-log-${sellerId}`);
+ if (!logEl || !seller) return;
+ const logs = seller.advertenciasLog || [];
+ if (!logs.length) { logEl.innerHTML = ''; return; }
+ logEl.innerHTML = '<div style="margin-bottom:4px;color:var(--red);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:1px">Historico de advertencias:</div>' +
+ logs.map(l => `<div style="padding:3px 0;border-bottom:1px solid var(--border2)"><span style="color:var(--gray5)">${l.data}</span> — ${l.motivo}</div>`).join('');
+}
+
 function buildDataInputs() {
  const container = document.getElementById('data-inputs-container');
  container.innerHTML = sellers.map(s => `
@@ -2099,9 +2133,17 @@ function buildDataInputs() {
  <div class="input-group"><label>Tarefas Operacionais (0-100)</label><input id="inp-${s.id}-tarefas" type="number" value="${s.tarefas}" min="0" max="100"></div>
  <div class="input-group"><label>Faltas</label><input id="inp-${s.id}-falt" type="number" value="${s.faltas}" min="0"></div>
  <div class="input-group"><label>Atrasos</label><input id="inp-${s.id}-atr" type="number" value="${s.atrasos}" min="0"></div>
+ <div class="input-group"><label>Advertencias (${s.advertencias || 0})</label><input id="inp-${s.id}-adv" type="number" value="${s.advertencias || 0}" min="0"></div>
  </div>
+ <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+ <input id="inp-${s.id}-adv-motivo" type="text" placeholder="Motivo da advertencia..." style="flex:1;background:var(--black3);border:1px solid var(--border2);color:var(--white);padding:6px 10px;border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif">
+ <button onclick="registrarAdvertencia(${s.id})" style="background:var(--red);color:white;border:none;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap">+ Advertencia</button>
+ </div>
+ <div id="adv-log-${s.id}" style="margin-top:8px;font-size:11px;color:var(--gray4)"></div>
  </div>
  `).join('');
+ // Renderizar logs de advertencia
+ sellers.forEach(s => renderAdvLog(s.id));
 }
 
 // ═══════════════════════════════════════
@@ -2414,8 +2456,10 @@ document.addEventListener('DOMContentLoaded', async () => {
  setInp('tarefas', s.tarefas);
  setInp('atr', s.atrasos);
  setInp('falt', s.faltas);
+ setInp('adv', s.advertencias || 0);
  const nEl = document.getElementById(`inp-${s.id}-name`);
  if (nEl) nEl.value = s.name;
+ renderAdvLog(s.id);
  });
 
  const dateStr = typeof savedAt === 'string'
