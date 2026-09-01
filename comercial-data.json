@@ -4,19 +4,19 @@
       "id": 1,
       "name": "Pedro Dickmann",
       "foto": "consultor_pedro.jpg",
-      "fat": 155461,
-      "etiqueta": 100,
-      "tarefas": 72,
+      "fat": 0,
+      "etiqueta": 0,
+      "tarefas": 0,
       "atrasos": 0,
-      "faltas": 2
+      "faltas": 0
     },
     {
       "id": 2,
       "name": "Enzo Boschetto",
       "foto": "consultor_enzo.jpg",
-      "fat": 107590.43400000002,
-      "etiqueta": 95,
-      "tarefas": 95,
+      "fat": 0,
+      "etiqueta": 0,
+      "tarefas": 0,
       "atrasos": 0,
       "faltas": 0
     },
@@ -24,17 +24,54 @@
       "id": 3,
       "name": "Wesley Mathias",
       "foto": "consultor_wesley.jpg",
-      "fat": 126697.91000000002,
-      "etiqueta": 100,
-      "tarefas": 96,
+      "fat": 0,
+      "etiqueta": 0,
+      "tarefas": 0,
       "atrasos": 0,
       "faltas": 0
     }
   ],
   "diasCorridos": 31,
   "diasMes": 31,
-  "mesReferencia": "2026-08",
+  "mesReferencia": "2026-09",
   "history": [
+    {
+      "mesReferencia": "2026-08",
+      "vencedor": "Pedro Dickmann",
+      "sellers": [
+        {
+          "id": 1,
+          "name": "Pedro Dickmann",
+          "foto": "consultor_pedro.jpg",
+          "fat": 155461,
+          "etiqueta": 100,
+          "tarefas": 72,
+          "atrasos": 0,
+          "faltas": 2
+        },
+        {
+          "id": 2,
+          "name": "Enzo Boschetto",
+          "foto": "consultor_enzo.jpg",
+          "fat": 107590.43400000002,
+          "etiqueta": 95,
+          "tarefas": 95,
+          "atrasos": 0,
+          "faltas": 0
+        },
+        {
+          "id": 3,
+          "name": "Wesley Mathias",
+          "foto": "consultor_wesley.jpg",
+          "fat": 126697.91000000002,
+          "etiqueta": 100,
+          "tarefas": 96,
+          "atrasos": 0,
+          "faltas": 0
+        }
+      ],
+      "fechadoEm": "2026-09-01T11:10:13.454Z"
+    },
     {
       "mesReferencia": "2026-07",
       "vencedor": "Pedro Dickmann",
@@ -73,5 +110,5 @@
       "fechadoEm": "2026-08-03T11:06:21.307Z"
     }
   ],
-  "savedAt": "2026-08-31T21:03:46.690Z"
+  "savedAt": "2026-09-01T11:10:13.454Z"
 }
