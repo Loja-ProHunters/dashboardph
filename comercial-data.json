@@ -9,7 +9,13 @@
       "tarefas": 0,
       "atrasos": 0,
       "faltas": 0,
-      "advertencias": 0
+      "advertencias": 1,
+      "advertenciasLog": [
+        {
+          "data": "01/09/2026",
+          "motivo": "Envio munição sem GT e tentou corrigir sem notificar a Gerência"
+        }
+      ]
     },
     {
       "id": 2,
@@ -113,5 +119,5 @@
       "fechadoEm": "2026-08-03T11:06:21.307Z"
     }
   ],
-  "savedAt": "2026-09-01T13:48:08.752Z"
+  "savedAt": "2026-09-01T13:48:34.985Z"
 }
