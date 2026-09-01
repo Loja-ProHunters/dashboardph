@@ -1324,6 +1324,20 @@ tbody td {
  </table>
  </div>
 
+ <div class="divider"></div>
+ <div class="section-title"> Faturamento Mensal por Consultor</div>
+ <div class="table-wrap">
+ <table>
+ <thead>
+ <tr>
+ <th>Mês</th>
+ <th id="hist-fat-th-sellers"></th>
+ </tr>
+ </thead>
+ <tbody id="hist-fat-body"></tbody>
+ </table>
+ </div>
+
 </div>
 
 <!-- ═══════════════════════════════════════════
@@ -1511,10 +1525,19 @@ function renderAll() {
  const maxScore = Math.max(...scores);
  const tiedIdxs = scores.reduce((acc, sc, i) => { if (sc === maxScore) acc.push(i); return acc; }, []);
  const lastChampionName = (historyData && historyData[0]) ? historyData[0].vencedor : null;
- let maxScoreIdx = tiedIdxs[0];
- if (tiedIdxs.length > 1 && lastChampionName) {
- const championIdx = tiedIdxs.find(i => sellers[i].name === lastChampionName);
+ // Filtrar quem tem falta — não pode ser consultor do mês
+ const elegiveisIdx = tiedIdxs.filter(i => !(sellers[i].faltas > 0));
+ const poolIdx = elegiveisIdx.length > 0 ? elegiveisIdx : tiedIdxs;
+ let maxScoreIdx = poolIdx[0];
+ if (poolIdx.length > 1 && lastChampionName) {
+ const championIdx = poolIdx.find(i => sellers[i].name === lastChampionName);
  if (championIdx !== undefined) maxScoreIdx = championIdx;
+ }
+ // Se todos empatados mas o melhor tem falta, buscar o melhor sem falta
+ if (sellers[maxScoreIdx]?.faltas > 0) {
+ const semFalta = sellers.map((s, i) => ({ ...s, idx: i, score: scores[i] }))
+ .filter(s => !(s.faltas > 0)).sort((a, b) => b.score - a.score);
+ if (semFalta.length) maxScoreIdx = semFalta[0].idx;
  }
  const consultorMes = sellers[maxScoreIdx]?.name || '—';
 
@@ -1686,6 +1709,26 @@ function renderHistorico() {
  <td>${fechadoEm}</td>
  </tr>`;
  }).join('');
+
+ // ── Tabela de faturamento mensal por consultor ──
+ const fatThEl = document.getElementById('hist-fat-th-sellers');
+ const fatBodyEl = document.getElementById('hist-fat-body');
+ if (fatThEl && fatBodyEl) {
+ const allSellerNames = [];
+ sellers.forEach(s => { if (!allSellerNames.includes(s.name)) allSellerNames.push(s.name); });
+ historyData.forEach(h => (h.sellers || []).forEach(s => { if (!allSellerNames.includes(s.name)) allSellerNames.push(s.name); }));
+ fatThEl.outerHTML = allSellerNames.map(n => `<th>${n}</th>`).join('');
+ fatBodyEl.innerHTML = historyData.map(h => {
+ const sellerMap = {};
+ (h.sellers || []).forEach(s => { sellerMap[s.name] = s.fat || 0; });
+ const cells = allSellerNames.map(n => {
+ const val = sellerMap[n];
+ const isWinner = (h.vencedor === n);
+ return `<td style="${isWinner ? 'color:#f0c96b;font-weight:700' : ''}">${val !== undefined ? fmtBRL(val) : '-'}</td>`;
+ }).join('');
+ return `<tr><td>${formatMesReferencia(h.mesReferencia)}</td>${cells}</tr>`;
+ }).join('');
+ }
 }
 
 function renderMainTable(corridos, mes) {
@@ -1787,9 +1830,12 @@ function renderPodium() {
  const ranked = [...sellers]
  .map(s => ({ ...s, score: calcScore(s), ipc: calcIPC(s) }))
  .sort((a, b) => {
+ // Regra: quem tem falta NÃO pode ser consultor do mês (fica abaixo de quem não tem)
+ const aFalta = (a.faltas || 0) > 0 ? 1 : 0;
+ const bFalta = (b.faltas || 0) > 0 ? 1 : 0;
+ if (aFalta !== bFalta) return aFalta - bFalta;
  if (b.score !== a.score) return b.score - a.score;
  // Empate: o campeão vigente (vencedor do mês passado) defende a coroa
- // até alguém realmente ultrapassá-lo com faturamento/score maior.
  if (lastChampion) {
  if (a.name === lastChampion) return -1;
  if (b.name === lastChampion) return 1;
