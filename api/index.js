@@ -655,6 +655,56 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // POST /api/generate — Gerador de Conteúdo (usa a MESMA chave Anthropic do portal)
+  if (req.method === 'POST' && url === '/api/generate') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    const apiKey = config.anthropicApiKey;
+    if (!apiKey) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'API key não configurada' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { system, userMessage } = JSON.parse(body);
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({
+          model: 'claude-opus-4-5',
+          max_tokens: 8000,
+          system,
+          messages: [{ role: 'user', content: userMessage }],
+        }),
+      });
+      if (!r.ok) {
+        let err = {};
+        try { err = await r.json(); } catch (e) {}
+        res.writeHead(r.status, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: (err.error && err.error.message) || 'Erro na API' }));
+        return;
+      }
+      const data = await r.json();
+      const textBlock = (data.content || []).find(b => b.type === 'text');
+      if (!textBlock) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Sem resposta de texto' }));
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ text: textBlock.text }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
   // Proteger tudo
   const sess = getSession(req);
   if (!sess) {
@@ -680,3 +730,7 @@ module.exports = async (req, res) => {
     res.end('Erro ao carregar portal: ' + e.message);
   }
 };
+
+// Permite que a geração de conteúdo (chamada à IA, que pode levar mais que
+// os 10s padrão) rode até 60s. Aditivo — não altera roteamento nem o resto do portal.
+module.exports.config = { maxDuration: 60 };
