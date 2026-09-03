@@ -234,6 +234,7 @@ tbody tr:nth-child(even) td{background:var(--bg)}
     <button class="ni" onclick="goTab('bling',this)">Curso Bling</button>
     <button class="ni" onclick="goTab('processos',this)">Processos</button>
     <button class="ni" onclick="goTab('contratos',this)">Documentos</button>
+    <button class="ni" onclick="goTab('contatos',this)">Contatos Úteis</button>
   </div>
   <div class="sb-grp" id="grp-comercial" style="display:none">
     <div class="sb-lbl">Comercial</div>
@@ -541,6 +542,136 @@ tbody tr:nth-child(even) td{background:var(--bg)}
       </div>
     </div>
 
+    <!-- CONTATOS ÚTEIS (aba adicionada) -->
+    <div class="tab" id="tab-contatos">
+      <style>
+        #tab-contatos .ct-sub{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+        #tab-contatos .ct-sub button{background:var(--wh);border:1px solid var(--bd);border-radius:20px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--dk);cursor:pointer;font-family:inherit}
+        #tab-contatos .ct-sub button.on{background:var(--gl);border-color:var(--gm);color:var(--gd)}
+        #tab-contatos .ct-tools{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+        #tab-contatos .ct-search{flex:1;min-width:200px;background:var(--wh);border:1px solid var(--bd);border-radius:8px;padding:9px 13px;font-size:14px;font-family:inherit;color:var(--k)}
+        #tab-contatos .ct-search:focus{outline:none;border-color:var(--g)}
+        #tab-contatos .ct-new{background:var(--g);color:#fff;border:none;border-radius:8px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+        #tab-contatos .ct-new:hover{background:var(--gd)}
+        #tab-contatos .ct-count{font-size:12px;color:var(--gy);margin-bottom:12px}
+        #tab-contatos .ct-list{display:flex;flex-direction:column;gap:9px}
+        #tab-contatos .ct-row{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:12px 15px;display:flex;align-items:center;gap:13px;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+        #tab-contatos .ct-av{width:40px;height:40px;border-radius:10px;background:var(--gl);color:var(--gd);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;flex-shrink:0}
+        #tab-contatos .ct-info{flex:1;min-width:150px}
+        #tab-contatos .ct-nm{font-size:14px;font-weight:700;color:var(--k)}
+        #tab-contatos .ct-tel{font-size:13px;color:var(--gy);margin-top:2px}
+        #tab-contatos .ct-acts{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+        #tab-contatos .ct-wa{background:#25d366;color:#fff;border:none;border-radius:8px;padding:8px 13px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
+        #tab-contatos .ct-wa:hover{background:#1da851}
+        #tab-contatos .ct-nowa{font-size:12px;color:var(--gl2);padding:8px 2px}
+        #tab-contatos .ct-ib{border:1px solid var(--bd);background:var(--wh);border-radius:7px;padding:7px 10px;font-size:12px;cursor:pointer;font-family:inherit;color:var(--dk)}
+        #tab-contatos .ct-ib:hover{border-color:var(--g);color:var(--gd)}
+        #tab-contatos .ct-empty{text-align:center;padding:40px;color:var(--gy)}
+        .ct-modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:center;z-index:300;padding:20px}
+        .ct-modal.on{display:grid}
+        .ct-box{background:var(--wh);border-radius:14px;padding:22px;width:min(430px,100%);box-shadow:0 20px 50px rgba(0,0,0,.25)}
+        .ct-box h3{font-size:16px;margin-bottom:16px;color:var(--k)}
+        .ct-fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+        .ct-fg label{font-size:12px;color:var(--gy);font-weight:600}
+        .ct-fg input,.ct-fg select{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--k)}
+        .ct-fg input:focus,.ct-fg select:focus{outline:none;border-color:var(--g)}
+        .ct-chk{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--k);margin-bottom:4px}
+        .ct-chk input{width:17px;height:17px;accent-color:#25d366}
+        .ct-foot{display:flex;justify-content:flex-end;gap:9px;margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)}
+        .ct-btn{border:none;border-radius:8px;padding:10px 15px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+        .ct-btn.pri{background:var(--g);color:#fff}.ct-btn.pri:hover{background:var(--gd)}
+        .ct-btn.gh{background:var(--bg);color:var(--dk);border:1px solid var(--bd)}
+        .ct-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(160%);background:var(--k);color:#fff;padding:11px 20px;border-radius:9px;font-size:13px;font-weight:600;z-index:400;transition:.3s}
+        .ct-toast.on{transform:translateX(-50%) translateY(0)}
+      </style>
+      <div class="ct-sub" id="ctSub"></div>
+      <div class="ct-tools">
+        <input class="ct-search" id="ctSearch" placeholder="Buscar por nome ou telefone…" oninput="renderCt()">
+        <button class="ct-new" id="ctNovo" style="display:none" onclick="openCt(null)">+ Novo contato</button>
+      </div>
+      <div class="ct-count" id="ctCount"></div>
+      <div class="ct-list" id="ctList"><div class="ct-empty">Carregando…</div></div>
+    </div>
+
+    <div class="ct-modal" id="ctModal"><div class="ct-box">
+      <h3 id="ctTitle">Novo contato</h3>
+      <input type="hidden" id="ct-id">
+      <div class="ct-fg"><label>Nome / descrição</label><input id="ct-nome" placeholder="Ex.: Taurus — Comercial"></div>
+      <div class="ct-fg"><label>Tipo</label><select id="ct-tipo"><option>Fornecedor</option><option>Utilidade</option></select></div>
+      <div class="ct-fg"><label>Telefone (com DDD)</label><input id="ct-tel" placeholder="(54) 99999-9999"></div>
+      <label class="ct-chk"><input type="checkbox" id="ct-wa" checked> Tem WhatsApp</label>
+      <div class="ct-foot"><button class="ct-btn gh" onclick="closeCt()">Cancelar</button><button class="ct-btn pri" onclick="saveCt()">Salvar</button></div>
+    </div></div>
+    <div class="ct-toast" id="ctToast"></div>
+    <script>
+      var CT = { itens: [], canEdit: false, tab: 'Fornecedor', loaded: false };
+      function ctEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+      function ctWaDigits(tel){ var d=String(tel||'').replace(/\D/g,''); if(!d) return ''; if(d.slice(0,2)==='55'&&d.length>=12) return d; if(d.length===10||d.length===11) return '55'+d; return d; }
+      function loadContatos(){
+        fetch('/api/contatos').then(function(r){return r.json();}).then(function(d){
+          if(d.error){ document.getElementById('ctList').innerHTML='<div class="ct-empty">'+ctEsc(d.error)+'</div>'; return; }
+          CT.itens = d.contatos || []; CT.canEdit = !!d.canEdit; CT.loaded = true;
+          document.getElementById('ctNovo').style.display = CT.canEdit ? '' : 'none';
+          renderCtTabs(); renderCt();
+        }).catch(function(){ document.getElementById('ctList').innerHTML='<div class="ct-empty">Erro ao carregar contatos.</div>'; });
+      }
+      function renderCtTabs(){
+        var f=CT.itens.filter(function(c){return c.tipo==='Fornecedor';}).length;
+        var u=CT.itens.filter(function(c){return c.tipo!=='Fornecedor';}).length;
+        document.getElementById('ctSub').innerHTML =
+          '<button class="'+(CT.tab==='Fornecedor'?'on':'')+'" onclick="ctSetTab(\'Fornecedor\')">🏭 Fornecedores ('+f+')</button>'+
+          '<button class="'+(CT.tab==='Utilidade'?'on':'')+'" onclick="ctSetTab(\'Utilidade\')">📞 Telefones Úteis ('+u+')</button>';
+      }
+      function ctSetTab(t){ CT.tab=t; renderCtTabs(); renderCt(); }
+      function renderCt(){
+        var q=(document.getElementById('ctSearch').value||'').toLowerCase();
+        var list=CT.itens.filter(function(c){ return (CT.tab==='Fornecedor'? c.tipo==='Fornecedor' : c.tipo!=='Fornecedor') && ((c.nome||'')+' '+(c.telefone||'')).toLowerCase().indexOf(q)>=0; });
+        list.sort(function(a,b){ return (a.nome||'').localeCompare(b.nome||'','pt'); });
+        document.getElementById('ctCount').textContent = list.length+' contato(s)';
+        document.getElementById('ctList').innerHTML = list.map(function(c){
+          var ini=((c.nome||'?').trim()[0]||'?').toUpperCase();
+          var wa = c.wa ? '<a class="ct-wa" href="https://wa.me/'+c.wa+'" target="_blank" rel="noopener">💬 WhatsApp</a>' : '<span class="ct-nowa">sem WhatsApp</span>';
+          var ed = CT.canEdit ? '<button class="ct-ib" onclick="openCt(\''+c.id+'\')">Editar</button><button class="ct-ib" onclick="removeCt(\''+c.id+'\')">✕</button>' : '';
+          return '<div class="ct-row"><div class="ct-av">'+ctEsc(ini)+'</div><div class="ct-info"><div class="ct-nm">'+ctEsc(c.nome)+'</div><div class="ct-tel">'+ctEsc(c.telefone)+'</div></div><div class="ct-acts">'+wa+ed+'</div></div>';
+        }).join('') || '<div class="ct-empty">Nenhum contato aqui ainda.</div>';
+      }
+      function openCt(id){
+        var c = id ? CT.itens.filter(function(x){return x.id===id;})[0] : null;
+        document.getElementById('ctTitle').textContent = c ? 'Editar contato' : 'Novo contato';
+        document.getElementById('ct-id').value = c ? c.id : '';
+        document.getElementById('ct-nome').value = c ? c.nome : '';
+        document.getElementById('ct-tipo').value = c ? c.tipo : CT.tab;
+        document.getElementById('ct-tel').value = c ? c.telefone : '';
+        document.getElementById('ct-wa').checked = c ? !!c.wa : true;
+        document.getElementById('ctModal').classList.add('on');
+      }
+      function closeCt(){ document.getElementById('ctModal').classList.remove('on'); }
+      function ctToast(m){ var t=document.getElementById('ctToast'); t.textContent=m; t.classList.add('on'); setTimeout(function(){t.classList.remove('on');},2600); }
+      function saveCt(){
+        var id=document.getElementById('ct-id').value;
+        var nome=document.getElementById('ct-nome').value.trim();
+        var tipo=document.getElementById('ct-tipo').value;
+        var tel=document.getElementById('ct-tel').value.trim();
+        var temWa=document.getElementById('ct-wa').checked;
+        if(!nome){ ctToast('Preencha o nome'); return; }
+        var wa = (temWa && tel) ? ctWaDigits(tel) : '';
+        if(id){ var it=CT.itens.filter(function(x){return x.id===id;})[0]; if(it){ it.nome=nome; it.tipo=tipo; it.telefone=tel; it.wa=wa; } }
+        else { CT.itens.push({ id:'c'+Date.now(), nome:nome, tipo:tipo, telefone:tel, wa:wa }); }
+        persistCt(function(){ closeCt(); renderCtTabs(); renderCt(); ctToast('✓ Contato salvo'); });
+      }
+      function removeCt(id){
+        if(!confirm('Remover este contato?')) return;
+        CT.itens = CT.itens.filter(function(x){return x.id!==id;});
+        persistCt(function(){ renderCtTabs(); renderCt(); ctToast('Contato removido'); });
+      }
+      function persistCt(cb){
+        fetch('/api/contatos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contatos:CT.itens})})
+          .then(function(r){return r.json();}).then(function(d){ if(d.error){ ctToast('Erro: '+d.error); loadContatos(); } else if(cb){ cb(); } })
+          .catch(function(){ ctToast('Erro de conexão'); });
+      }
+      document.getElementById('ctModal').addEventListener('click',function(e){ if(e.target.id==='ctModal') closeCt(); });
+    </script>
+
   </div>
 </main>
 </div>
@@ -553,6 +684,7 @@ var tabMeta = {
   bling:     ['Curso Bling','Tipos de pedido, cadastros e video aulas'],
   processos: ['Processos','Armas, GT, Portal Postal, Documentacao'],
   contratos: ['Documentos','Contratos e Guias de Transito'],
+  contatos:  ['Contatos Úteis','Fornecedores e telefones úteis'],
   comercial: ['Dashboard Comercial','Ranking, metas e performance da equipe'],
   ia:        ['IA Pro Hunters','Assistente de conhecimento interno'],
   admin:     ['Base de Conhecimento','Gerenciar o que a IA sabe']
@@ -582,6 +714,7 @@ function goTab(id, el) {
   document.getElementById('tb-s').textContent = tabMeta[id][1];
   closeSB();
   if (id === 'admin') loadKB();
+  if (id === 'contatos') loadContatos();
 }
 
 function toggleSB() {
