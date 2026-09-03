@@ -8,6 +8,7 @@ const { gerarGT } = require('../lib/gt');
 const { extrairNF } = require('../lib/nfExtract');
 const { extrairPedido } = require('../lib/pedidoExtract');
 const { getComercialData, saveComercialData, resetMonth, registrarVenda } = require('../lib/comercialStore');
+const { getContatos, saveContatos } = require('../lib/contatosStore');
 
 function getRole(usuario) {
   if (usuario === 'gerencia') return 'admin';    // acesso total
@@ -609,6 +610,47 @@ module.exports = async (req, res) => {
     } catch (e) {
       res.writeHead(500);
       res.end('Erro ao carregar dashboard comercial: ' + e.message);
+    }
+    return;
+  }
+
+  // GET /api/contatos — lista de contatos úteis (qualquer usuário logado pode ver)
+  if (req.method === 'GET' && url === '/api/contatos') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    try {
+      const contatos = await getContatos();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ contatos, canEdit: canEditComercial(sess) }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao carregar contatos: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/contatos — salva a lista completa (somente admin/gerencia)
+  if (req.method === 'POST' && url === '/api/contatos') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para editar contatos.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { contatos } = JSON.parse(body);
+      if (!Array.isArray(contatos)) throw new Error('Formato inválido.');
+      await saveContatos(contatos);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao salvar: ' + e.message }));
     }
     return;
   }
