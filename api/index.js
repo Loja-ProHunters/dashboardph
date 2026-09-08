@@ -10,6 +10,7 @@ const { extrairPedido } = require('../lib/pedidoExtract');
 const { getComercialData, saveComercialData, resetMonth, registrarVenda } = require('../lib/comercialStore');
 const { getContatos, saveContatos } = require('../lib/contatosStore');
 const { getEditorial, saveEditorial } = require('../lib/editorialStore');
+const { getTarifas, saveTarifas } = require('../lib/tarifasStore');
 
 function getRole(usuario) {
   if (usuario === 'gerencia') return 'admin';    // acesso total
@@ -688,6 +689,47 @@ module.exports = async (req, res) => {
       const { state } = JSON.parse(body);
       if (!state || typeof state !== 'object' || Array.isArray(state)) throw new Error('Formato inválido.');
       await saveEditorial(state);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao salvar: ' + e.message }));
+    }
+    return;
+  }
+
+  // GET /api/tarifas — taxas das operadoras (qualquer usuário logado usa a calculadora)
+  if (req.method === 'GET' && url === '/api/tarifas') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    try {
+      const tarifas = await getTarifas();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ tarifas, canEdit: canEditComercial(sess) }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao carregar tarifas: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/tarifas — salva as taxas (somente gerencia)
+  if (req.method === 'POST' && url === '/api/tarifas') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para editar tarifas.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { tarifas } = JSON.parse(body);
+      if (!tarifas || typeof tarifas !== 'object' || Array.isArray(tarifas)) throw new Error('Formato inválido.');
+      await saveTarifas(tarifas);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
     } catch (e) {
