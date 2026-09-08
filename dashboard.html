@@ -211,7 +211,7 @@ tbody tr:nth-child(even) td{background:var(--bg)}
   .ia-note{display:none}
 }
 </style>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="hbg" onclick="toggleSB()"><span></span><span></span><span></span></div>
@@ -245,6 +245,7 @@ tbody tr:nth-child(even) td{background:var(--bg)}
     <div class="sb-lbl">Inteligência</div>
     <button class="ni" onclick="goTab('ia',this)">IA Pro Hunters<span class="badge">NOVO</span></button>
     <button class="ni" onclick="goTab('gerador',this)">Gerador de Conteúdo</button>
+    <button class="ni" id="ni-linhaeditorial" onclick="goTab('linhaeditorial',this)" style="display:none">Linha Editorial<span class="badge-admin">ADMIN</span></button>
   </div>
   <div class="sb-grp" id="grp-admin" style="display:none">
     <div class="sb-lbl">Administração</div>
@@ -1362,6 +1363,761 @@ function gerInit(){ if(window.__gerInit) return; window.__gerInit=true; buildPer
 
 
 
+<!-- ===== LINHA EDITORIAL (nativo, restrito à gerência) ===== -->
+<div class="tab" id="tab-linhaeditorial">
+<style>
+#tab-linhaeditorial{
+  --green: #80c78a;
+  --green-dark: #4a9a56;
+  --green-mid: #5fb86b;
+  --green-light: #eaf5ec;
+  --black: #0e0e0e;
+  --gray-900: #1c1c1c;
+  --gray-800: #2a2a2a;
+  --gray-700: #3d3d3d;
+  --gray-600: #555;
+  --gray-500: #777;
+  --gray-400: #999;
+  --gray-300: #c8c8c8;
+  --gray-200: #e2e2e2;
+  --gray-100: #f2f2f2;
+  --gray-50:  #f8f8f8;
+  --white: #fff;
+  --blue: #2d7dd2;
+  --blue-light: #e6f1fb;
+  --amber: #e8a020;
+  --amber-light: #fdf3e0;
+  --pink: #c4546e;
+  --pink-light: #fae8ed;
+  --teal: #2a9d8f;
+  --teal-light: #e4f5f3;
+  --done-bg: #d4edda;
+  --done-border: #28a745;
+  --done-text: #155724;
+  --sidebar-w: 220px;
+  --topbar-h: 52px;
+}
+#tab-linhaeditorial *, #tab-linhaeditorial *::before, #tab-linhaeditorial *::after{box-sizing:border-box;margin:0;padding:0;}
+#tab-linhaeditorial{font-size:14px;scroll-behavior:smooth;}
+#tab-linhaeditorial{font-family:'Barlow',sans-serif;background:var(--gray-100);color:var(--black);min-height:100vh;}
+#tab-linhaeditorial #loginScreen{
+  position:fixed;inset:0;background:var(--black);
+  display:flex;align-items:center;justify-content:center;z-index:999;
+}
+#tab-linhaeditorial .login-box{width:360px;padding:40px;}
+#tab-linhaeditorial .login-logo{
+  font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;
+  color:var(--white);letter-spacing:-0.01em;margin-bottom:6px;
+}
+#tab-linhaeditorial .login-logo span{color:var(--green);}
+#tab-linhaeditorial .login-sub{font-size:12px;color:var(--gray-500);margin-bottom:32px;}
+#tab-linhaeditorial .login-label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);margin-bottom:6px;display:block;}
+#tab-linhaeditorial .login-input{
+  width:100%;padding:10px 14px;background:var(--gray-900);
+  border:1px solid var(--gray-700);color:var(--white);font-family:'Barlow',sans-serif;font-size:14px;
+  margin-bottom:14px;outline:none;transition:border-color 0.15s;
+}
+#tab-linhaeditorial .login-input:focus{border-color:var(--green);}
+#tab-linhaeditorial .login-btn{
+  width:100%;padding:11px;background:var(--green);color:var(--black);
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  border:none;cursor:pointer;transition:background 0.15s;
+}
+#tab-linhaeditorial .login-btn:hover{background:var(--green-mid);}
+#tab-linhaeditorial .login-err{font-size:11px;color:#e05a5a;margin-top:8px;display:none;}
+#tab-linhaeditorial #app{display:none;flex-direction:column;height:100vh;}
+#tab-linhaeditorial .le-topbar{
+  height:var(--topbar-h);background:var(--black);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;flex-shrink:0;position:sticky;top:0;z-index:40;
+}
+#tab-linhaeditorial .tb-left{display:flex;align-items:center;gap:16px;}
+#tab-linhaeditorial .tb-brand{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:var(--white);}
+#tab-linhaeditorial .tb-brand span{color:var(--green);}
+#tab-linhaeditorial .tb-divider{width:1px;height:20px;background:var(--gray-700);}
+#tab-linhaeditorial .nav-tabs{display:flex;gap:2px;}
+#tab-linhaeditorial .nav-tab{
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  padding:6px 14px;color:var(--gray-500);background:none;border:none;cursor:pointer;transition:all 0.15s;
+}
+#tab-linhaeditorial .nav-tab:hover{color:var(--white);}
+#tab-linhaeditorial .nav-tab.active{color:var(--black);background:var(--green);}
+#tab-linhaeditorial .tb-right{display:flex;align-items:center;gap:12px;}
+#tab-linhaeditorial .month-nav{display:flex;align-items:center;gap:8px;}
+#tab-linhaeditorial .mnav-btn{
+  background:var(--gray-800);color:var(--white);border:none;
+  width:28px;height:28px;cursor:pointer;font-size:15px;
+  display:flex;align-items:center;justify-content:center;transition:background 0.15s;
+}
+#tab-linhaeditorial .mnav-btn:hover{background:var(--green-dark);}
+#tab-linhaeditorial .month-lbl{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--white);min-width:140px;text-align:center;}
+#tab-linhaeditorial .logout-btn{
+  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  background:none;border:1px solid var(--gray-700);color:var(--gray-500);padding:5px 12px;cursor:pointer;transition:all 0.15s;
+}
+#tab-linhaeditorial .logout-btn:hover{border-color:var(--green);color:var(--green);}
+#tab-linhaeditorial .layout{display:flex;flex:1;overflow:hidden;}
+#tab-linhaeditorial .sidebar{
+  width:var(--sidebar-w);flex-shrink:0;background:var(--white);
+  border-right:1px solid var(--gray-200);overflow-y:auto;
+}
+#tab-linhaeditorial .sb-section{padding:16px 0;border-bottom:1px solid var(--gray-100);}
+#tab-linhaeditorial .sb-title{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-400);padding:0 16px 10px;}
+#tab-linhaeditorial .canal-tog{
+  display:flex;align-items:center;gap:9px;padding:7px 16px;cursor:pointer;
+  transition:background 0.1s;user-select:none;
+}
+#tab-linhaeditorial .canal-tog:hover{background:var(--gray-50);}
+#tab-linhaeditorial .tog-pip{width:9px;height:9px;border-radius:2px;flex-shrink:0;transition:all 0.15s;}
+#tab-linhaeditorial .canal-tog:not(.on) .tog-pip{background:transparent!important;border:2px solid var(--gray-300);}
+#tab-linhaeditorial .tog-info{}
+#tab-linhaeditorial .tog-name{font-size:12px;font-weight:500;color:var(--gray-700);line-height:1.2;}
+#tab-linhaeditorial .tog-sub{font-size:10px;color:var(--gray-400);}
+#tab-linhaeditorial .sb-legend{padding:12px 16px;}
+#tab-linhaeditorial .leg-row{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--gray-600);margin-bottom:8px;}
+#tab-linhaeditorial .leg-pip{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+#tab-linhaeditorial .progress-wrap{padding:14px 16px;}
+#tab-linhaeditorial .prog-label{font-size:11px;color:var(--gray-500);margin-bottom:5px;display:flex;justify-content:space-between;}
+#tab-linhaeditorial .prog-label strong{color:var(--black);font-weight:600;}
+#tab-linhaeditorial .prog-bar{height:5px;background:var(--gray-100);border-radius:2px;overflow:hidden;}
+#tab-linhaeditorial .prog-fill{height:100%;background:var(--green);transition:width 0.4s;}
+#tab-linhaeditorial .le-mainwrap{flex:1;overflow:auto;padding:20px 24px;}
+#tab-linhaeditorial .summary-row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+#tab-linhaeditorial .sum-chip{background:var(--white);border:1px solid var(--gray-200);padding:10px 16px;display:flex;align-items:center;gap:10px;}
+#tab-linhaeditorial .sum-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--black);line-height:1;}
+#tab-linhaeditorial .sum-label{font-size:10px;color:var(--gray-500);line-height:1.4;}
+#tab-linhaeditorial .sum-chip.highlight .sum-val{color:var(--green-dark);}
+#tab-linhaeditorial .week-header{
+  display:grid;grid-template-columns:120px repeat(7,1fr);
+  background:var(--white);border:1px solid var(--gray-200);
+  border-bottom:2px solid var(--black);position:sticky;top:0;z-index:10;
+}
+#tab-linhaeditorial .wh-empty{background:var(--black);}
+#tab-linhaeditorial .wh-day{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);padding:7px 8px;text-align:center;border-left:1px solid var(--gray-100);}
+#tab-linhaeditorial .wh-day.wknd{color:var(--gray-200);}
+#tab-linhaeditorial .canal-block{margin-bottom:4px;}
+#tab-linhaeditorial .cbh{
+  display:grid;grid-template-columns:120px 1fr;
+  background:var(--black);border-left:4px solid var(--green);
+}
+#tab-linhaeditorial .cbh.min{border-left-color:var(--gray-600);}
+#tab-linhaeditorial .cbh-left{padding:7px 12px;border-right:1px solid rgba(255,255,255,0.08);}
+#tab-linhaeditorial .cbh-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--white);line-height:1.2;}
+#tab-linhaeditorial .cbh-sub{font-size:10px;color:rgba(255,255,255,0.35);}
+#tab-linhaeditorial .cbh-badge{
+  font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;
+  letter-spacing:0.08em;padding:2px 6px;border-radius:1px;display:inline-block;margin-top:3px;
+}
+#tab-linhaeditorial .cbh-badge.focus{background:var(--green);color:var(--black);}
+#tab-linhaeditorial .cbh-badge.min{background:var(--gray-700);color:var(--white);}
+#tab-linhaeditorial .cbh-right{display:flex;align-items:center;gap:20px;padding:0 16px;}
+#tab-linhaeditorial .cbh-stat{font-size:10px;color:rgba(255,255,255,0.4);}
+#tab-linhaeditorial .cbh-stat strong{font-family:'Barlow Condensed',sans-serif;font-size:15px;color:var(--white);margin-right:3px;}
+#tab-linhaeditorial .week-row{
+  display:grid;grid-template-columns:120px repeat(7,1fr);
+  background:var(--white);border-left:1px solid var(--gray-200);
+  border-right:1px solid var(--gray-200);border-bottom:1px solid var(--gray-100);
+}
+#tab-linhaeditorial .week-row:last-of-type{border-bottom:1px solid var(--gray-200);}
+#tab-linhaeditorial .wk-label{padding:8px 10px;border-right:1px solid var(--gray-100);background:var(--gray-50);display:flex;flex-direction:column;justify-content:center;}
+#tab-linhaeditorial .wk-num{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--gray-700);}
+#tab-linhaeditorial .wk-theme{font-size:9px;color:var(--gray-500);margin-top:2px;line-height:1.3;}
+#tab-linhaeditorial .wk-dates{font-size:9px;color:var(--gray-300);margin-top:2px;}
+#tab-linhaeditorial .day-cell{border-left:1px solid var(--gray-100);padding:5px 4px;min-height:60px;}
+#tab-linhaeditorial .day-cell.wknd{background:var(--gray-50);}
+#tab-linhaeditorial .day-cell.out{opacity:.3;}
+#tab-linhaeditorial .day-num{font-size:9px;font-weight:600;color:var(--gray-300);margin-bottom:3px;text-align:right;}
+#tab-linhaeditorial .day-num.today{background:var(--black);color:var(--white);width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-left:auto;font-size:9px;}
+#tab-linhaeditorial .post-chip{
+  font-size:10px;padding:4px 6px;margin-bottom:3px;
+  border-left:3px solid;line-height:1.3;cursor:pointer;
+  transition:filter 0.1s,opacity 0.1s;position:relative;
+}
+#tab-linhaeditorial .post-chip:hover{filter:brightness(0.94);}
+#tab-linhaeditorial .post-chip .pt{display:block;font-weight:600;font-size:10px;}
+#tab-linhaeditorial .post-chip .ps{opacity:.7;font-size:9px;}
+#tab-linhaeditorial .post-chip .done-mark{
+  position:absolute;top:3px;right:4px;
+  font-size:11px;line-height:1;
+}
+#tab-linhaeditorial .post-chip.done{
+  opacity:.65;
+  background:var(--done-bg)!important;
+  border-color:var(--done-border)!important;
+  color:var(--done-text)!important;
+}
+#tab-linhaeditorial .post-chip.done .pt{text-decoration:line-through;}
+#tab-linhaeditorial .p-green{background:var(--green-light);border-color:var(--green-dark);color:#1e4a22;}
+#tab-linhaeditorial .p-blue{background:var(--blue-light);border-color:var(--blue);color:#0e3a6a;}
+#tab-linhaeditorial .p-amber{background:var(--amber-light);border-color:var(--amber);color:#6a3c00;}
+#tab-linhaeditorial .p-pink{background:var(--pink-light);border-color:var(--pink);color:#6a1f38;}
+#tab-linhaeditorial .p-teal{background:var(--teal-light);border-color:var(--teal);color:#0e4a44;}
+#tab-linhaeditorial .p-gray{background:var(--gray-100);border-color:var(--gray-300);color:var(--gray-500);}
+#tab-linhaeditorial .panel{display:none;padding:0;}
+#tab-linhaeditorial .panel.active{display:block;}
+#tab-linhaeditorial .le-hero{background:var(--black);padding:32px 28px;margin-bottom:0;}
+#tab-linhaeditorial .le-hero-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);margin-bottom:8px;}
+#tab-linhaeditorial .le-hero-title{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:800;color:var(--white);line-height:1.05;margin-bottom:8px;}
+#tab-linhaeditorial .le-hero-sub{font-size:13px;color:var(--gray-500);line-height:1.6;}
+#tab-linhaeditorial .le-body{padding:24px 28px;}
+#tab-linhaeditorial .le-section{margin-bottom:32px;}
+#tab-linhaeditorial .le-section-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--black);padding-bottom:10px;border-bottom:2px solid var(--black);margin-bottom:16px;}
+#tab-linhaeditorial .pillars-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+#tab-linhaeditorial .pilar-card{border:1px solid var(--gray-200);border-top:3px solid;padding:16px 14px;}
+#tab-linhaeditorial .pilar-card.p1{border-top-color:var(--green-dark);}
+#tab-linhaeditorial .pilar-card.p2{border-top-color:var(--blue);}
+#tab-linhaeditorial .pilar-card.p3{border-top-color:var(--amber);}
+#tab-linhaeditorial .pilar-card.p4{border-top-color:var(--pink);}
+#tab-linhaeditorial .pilar-num{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;}
+#tab-linhaeditorial .p1 .pilar-num{color:var(--green-dark);}
+#tab-linhaeditorial .p2 .pilar-num{color:var(--blue);}
+#tab-linhaeditorial .p3 .pilar-num{color:var(--amber);}
+#tab-linhaeditorial .p4 .pilar-num{color:var(--pink);}
+#tab-linhaeditorial .pilar-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;color:var(--black);margin-bottom:8px;line-height:1.1;}
+#tab-linhaeditorial .pilar-desc{font-size:11px;color:var(--gray-600);line-height:1.55;margin-bottom:10px;}
+#tab-linhaeditorial .pilar-tags{display:flex;flex-wrap:wrap;gap:4px;}
+#tab-linhaeditorial .ptag{font-size:10px;padding:2px 7px;border:1px solid var(--gray-200);color:var(--gray-500);font-family:'Barlow Condensed',sans-serif;font-weight:600;}
+#tab-linhaeditorial .rotation-box{background:var(--gray-900);color:var(--white);padding:16px 20px;display:flex;align-items:center;gap:0;overflow-x:auto;}
+#tab-linhaeditorial .rot-item{text-align:center;flex:1;min-width:110px;}
+#tab-linhaeditorial .rot-num{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);margin-bottom:4px;}
+#tab-linhaeditorial .rot-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--white);line-height:1.2;}
+#tab-linhaeditorial .rot-arrow{color:var(--gray-700);font-size:20px;padding:0 8px;flex-shrink:0;}
+#tab-linhaeditorial .canal-table{width:100%;border-collapse:collapse;}
+#tab-linhaeditorial .canal-table th{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);padding:8px 12px;text-align:left;border-bottom:2px solid var(--black);}
+#tab-linhaeditorial .canal-table td{padding:11px 12px;border-bottom:1px solid var(--gray-100);font-size:12px;color:var(--gray-700);vertical-align:top;}
+#tab-linhaeditorial .canal-table tr:last-child td{border-bottom:none;}
+#tab-linhaeditorial .canal-table tr.focus-row td{background:var(--green-light);}
+#tab-linhaeditorial .ct-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--black);}
+#tab-linhaeditorial .le-ctsub{font-size:10px;color:var(--gray-400);margin-top:1px;}
+#tab-linhaeditorial .ct-badge{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;padding:2px 7px;border-radius:1px;}
+#tab-linhaeditorial .ct-badge.focus{background:var(--green);color:var(--black);}
+#tab-linhaeditorial .ct-badge.min{background:var(--gray-300);color:var(--gray-700);}
+#tab-linhaeditorial .ct-badge.off{background:#fce8e8;color:#a33;}
+#tab-linhaeditorial .guia-body{padding:24px 28px;}
+#tab-linhaeditorial .guia-section{margin-bottom:28px;}
+#tab-linhaeditorial .guia-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--black);padding-bottom:10px;border-bottom:2px solid var(--black);margin-bottom:16px;}
+#tab-linhaeditorial .sem-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+#tab-linhaeditorial .sem-card{border:1px solid var(--gray-200);overflow:hidden;}
+#tab-linhaeditorial .sem-card-head{padding:12px 14px 10px;border-bottom:1px solid var(--gray-100);}
+#tab-linhaeditorial .sem-card-num{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:4px;}
+#tab-linhaeditorial .sem-card-theme{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--black);line-height:1.1;}
+#tab-linhaeditorial .sem-card-body{padding:12px 14px;}
+#tab-linhaeditorial .sem-item{font-size:11px;color:var(--gray-600);padding:5px 0;border-bottom:1px solid var(--gray-50);line-height:1.45;}
+#tab-linhaeditorial .sem-item:last-child{border-bottom:none;}
+#tab-linhaeditorial .sem-item strong{color:var(--black);font-weight:600;display:block;font-size:11px;}
+#tab-linhaeditorial .sem-item span{font-size:10px;}
+#tab-linhaeditorial .checklist{list-style:none;}
+#tab-linhaeditorial .checklist li{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:12px;color:var(--gray-700);padding:9px 0;
+  border-bottom:1px solid var(--gray-100);line-height:1.5;
+}
+#tab-linhaeditorial .checklist li:last-child{border-bottom:none;}
+#tab-linhaeditorial .cl-num{
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
+  color:var(--white);background:var(--black);
+  width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;
+}
+#tab-linhaeditorial .tip-box{background:var(--amber-light);border-left:3px solid var(--amber);padding:12px 16px;font-size:12px;color:#6a3c00;line-height:1.6;margin-top:12px;}
+#tab-linhaeditorial .tip-box strong{font-weight:600;display:block;margin-bottom:3px;}
+#tab-linhaeditorial .tooltip{
+  position:fixed;background:var(--black);color:var(--white);
+  padding:9px 13px;font-size:11px;line-height:1.5;max-width:230px;
+  z-index:999;pointer-events:none;display:none;border-left:3px solid var(--green);
+}
+#tab-linhaeditorial .tooltip strong{font-size:12px;display:block;margin-bottom:2px;}
+#tab-linhaeditorial .tooltip .tt-c{color:var(--green);font-size:10px;margin-bottom:3px;display:block;}
+#tab-linhaeditorial .tooltip .tt-d{color:rgba(255,255,255,0.65);font-size:10px;}
+#tab-linhaeditorial .tooltip .tt-status{margin-top:6px;font-size:10px;color:var(--green);font-weight:600;}
+@media(max-width:800px){
+#tab-linhaeditorial .sidebar{display:none;}
+#tab-linhaeditorial .pillars-grid{grid-template-columns:1fr 1fr;}
+#tab-linhaeditorial .sem-cards{grid-template-columns:1fr 1fr;}
+}
+
+/* --- ajustes de encaixe no portal --- */
+#tab-linhaeditorial{min-height:auto;background:transparent;}
+#tab-linhaeditorial #app{display:flex;flex-direction:column;height:auto;min-height:0;}
+#tab-linhaeditorial .le-topbar{position:static;}
+#tab-linhaeditorial .layout{overflow:visible;}
+#tab-linhaeditorial .sidebar{overflow-y:visible;}
+
+</style>
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div class="le-topbar">
+    <div class="tb-left">
+      <div class="tb-brand">Pro Hunters <span>Group</span></div>
+      <div class="tb-divider"></div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('calendario',this)">📅 Calendário</button>
+        <button class="nav-tab" onclick="switchTab('editorial',this)">📋 Linha Editorial</button>
+        <button class="nav-tab" onclick="switchTab('guia',this)">🎬 Guia de Gravação</button>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="month-nav" id="monthNav">
+        <button class="mnav-btn" onclick="changeMonth(-1)">‹</button>
+        <div class="month-lbl" id="monthLbl"></div>
+        <button class="mnav-btn" onclick="changeMonth(1)">›</button>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="sb-section">
+        <div class="sb-title">Canais</div>
+        <div class="canal-tog on" data-c="yt-long" onclick="toggleCanal(this)">
+          <div class="tog-pip" style="background:var(--blue)"></div>
+          <div class="tog-info"><div class="tog-name">YT Long-form</div><div class="tog-sub">Pro Hunters</div></div>
+        </div>
+        <div class="canal-tog on" data-c="yt-short" onclick="toggleCanal(this)">
+          <div class="tog-pip" style="background:var(--amber)"></div>
+          <div class="tog-info"><div class="tog-name">YT Shorts</div><div class="tog-sub">Pro Hunters</div></div>
+        </div>
+        <div class="canal-tog on" data-c="ig-ph" onclick="toggleCanal(this)">
+          <div class="tog-pip" style="background:var(--green-dark)"></div>
+          <div class="tog-info"><div class="tog-name">Instagram Feed</div><div class="tog-sub">Pro Hunters</div></div>
+        </div>
+        <div class="canal-tog on" data-c="blog" onclick="toggleCanal(this)">
+          <div class="tog-pip" style="background:var(--teal)"></div>
+          <div class="tog-info"><div class="tog-name">Blog SEO</div><div class="tog-sub">Pro Hunters</div></div>
+        </div>
+        <div class="canal-tog on" data-c="ig-red" onclick="toggleCanal(this)">
+          <div class="tog-pip" style="background:var(--gray-500)"></div>
+          <div class="tog-info"><div class="tog-name">Instagram</div><div class="tog-sub">Reduto</div></div>
+        </div>
+        <div class="canal-tog on" data-c="ig-fenix" onclick="toggleCanal(this)">
+          <div class="tog-pip" style="background:var(--gray-500)"></div>
+          <div class="tog-info"><div class="tog-name">Instagram</div><div class="tog-sub">Fenix Store</div></div>
+        </div>
+        <div class="canal-tog on" data-c="ig-rec" onclick="toggleCanal(this)">
+          <div class="tog-pip" style="background:var(--gray-500)"></div>
+          <div class="tog-info"><div class="tog-name">Instagram</div><div class="tog-sub">Reconect</div></div>
+        </div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-title">Pilares</div>
+        <div class="sb-legend">
+          <div class="leg-row"><div class="leg-pip" style="background:var(--green-dark)"></div>P1 · Uso na prática</div>
+          <div class="leg-row"><div class="leg-pip" style="background:var(--blue)"></div>P2 · Comparativo</div>
+          <div class="leg-row"><div class="leg-pip" style="background:var(--amber)"></div>P3 · Polêmico / Opinião</div>
+          <div class="leg-row"><div class="leg-pip" style="background:var(--pink)"></div>P4 · Autoridade</div>
+          <div class="leg-row"><div class="leg-pip" style="background:var(--teal)"></div>Blog SEO</div>
+          <div class="leg-row"><div class="leg-pip" style="background:var(--gray-300)"></div>Template fixo</div>
+          <div class="leg-row"><div class="leg-pip" style="background:var(--done-border);border-radius:50%"></div>Programado ✅</div>
+        </div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-title">Progresso do mês</div>
+        <div class="progress-wrap">
+          <div class="prog-label"><span>Programados</span><strong id="progTxt">0 / 0</strong></div>
+          <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="le-mainwrap" id="mainArea">
+
+      <!-- TAB: CALENDÁRIO -->
+      <div class="panel active" id="tab-calendario">
+        <div class="summary-row" id="summaryRow"></div>
+        <div class="week-header">
+          <div class="wh-empty"></div>
+          <div class="wh-day">SEG</div><div class="wh-day">TER</div><div class="wh-day">QUA</div>
+          <div class="wh-day">QUI</div><div class="wh-day">SEX</div>
+          <div class="wh-day wknd">SÁB</div><div class="wh-day wknd">DOM</div>
+        </div>
+        <div id="calBody"></div>
+      </div>
+
+      <!-- TAB: LINHA EDITORIAL -->
+      <div class="panel" id="tab-editorial">
+        <div class="le-hero">
+          <div class="le-hero-eyebrow">Documento interno · Pro Hunters Group</div>
+          <div class="le-hero-title">Linha Editorial</div>
+          <div class="le-hero-sub">Estratégia de canais, pilares de conteúdo e rotação mensal. Referência para toda a equipe.</div>
+        </div>
+        <div class="le-body">
+          <div class="le-section">
+            <div class="le-section-title">4 Pilares de conteúdo</div>
+            <div class="pillars-grid">
+              <div class="pilar-card p1">
+                <div class="pilar-num">P1 · Âncora</div>
+                <div class="pilar-name">Uso na prática</div>
+                <div class="pilar-desc">Demonstração real em campo ou durante o uso. Alta credibilidade — mostra o produto no contexto real do cliente.</div>
+                <div class="pilar-tags"><span class="ptag">Long-form YT</span><span class="ptag">Reels</span><span class="ptag">Carrossel</span></div>
+              </div>
+              <div class="pilar-card p2">
+                <div class="pilar-num">P2 · Alcance</div>
+                <div class="pilar-name">Comparativo</div>
+                <div class="pilar-desc">A vs B — produtos, calibres, marcas. Alto potencial de busca orgânica e debate nos comentários.</div>
+                <div class="pilar-tags"><span class="ptag">Long-form YT</span><span class="ptag">Shorts</span><span class="ptag">Blog SEO</span></div>
+              </div>
+              <div class="pilar-card p3">
+                <div class="pilar-num">P3 · Engajamento</div>
+                <div class="pilar-name">Polêmico / Opinião</div>
+                <div class="pilar-desc">Ponto de vista claro sobre tema da comunidade. Gera comentários, shares e novos seguidores.</div>
+                <div class="pilar-tags"><span class="ptag">Shorts</span><span class="ptag">Reels</span><span class="ptag">Stories</span></div>
+              </div>
+              <div class="pilar-card p4">
+                <div class="pilar-num">P4 · Autoridade</div>
+                <div class="pilar-name">Autoridade / Conhecimento</div>
+                <div class="pilar-desc">Tutoriais, recarga, manutenção, legislação. Posiciona a Pro Hunters como referência técnica do setor.</div>
+                <div class="pilar-tags"><span class="ptag">Long-form YT</span><span class="ptag">Carrossel</span><span class="ptag">Blog SEO</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="le-section">
+            <div class="le-section-title">Rotação mensal — long-form</div>
+            <div class="rotation-box">
+              <div class="rot-item"><div class="rot-num">Semana 1</div><div class="rot-name">Comparativo</div></div>
+              <div class="rot-arrow">→</div>
+              <div class="rot-item"><div class="rot-num">Semana 2</div><div class="rot-name">Uso na prática</div></div>
+              <div class="rot-arrow">→</div>
+              <div class="rot-item"><div class="rot-num">Semana 3</div><div class="rot-name">Tutorial técnico</div></div>
+              <div class="rot-arrow">→</div>
+              <div class="rot-item"><div class="rot-num">Semana 4</div><div class="rot-name">Review / Opinião</div></div>
+            </div>
+          </div>
+          <div class="le-section">
+            <div class="le-section-title">Mapa de canais</div>
+            <table class="canal-table">
+              <thead><tr><th>Canal</th><th>Modo</th><th>Cadência</th><th>Estratégia</th></tr></thead>
+              <tbody>
+                <tr class="focus-row"><td><div class="ct-name">YouTube Long-form</div><div class="le-ctsub">Pro Hunters · ~50K inscritos</div></td><td><span class="ct-badge focus">Foco total</span></td><td>1×/semana<br><small>toda quinta</small></td><td>Canal âncora. Gera todos os derivativos. Pilares em rotação mensal.</td></tr>
+                <tr class="focus-row"><td><div class="ct-name">YouTube Shorts</div><div class="le-ctsub">Pro Hunters · derivativo</div></td><td><span class="ct-badge focus">Foco total</span></td><td>2×/semana<br><small>terça + sexta</small></td><td>Recorte do long ou ângulo polêmico. 35–60s. Hook nos primeiros 3s.</td></tr>
+                <tr class="focus-row"><td><div class="ct-name">Instagram Feed</div><div class="le-ctsub">Pro Hunters · ~11K seguidores</div></td><td><span class="ct-badge focus">Foco total</span></td><td>3×/semana<br><small>seg · qua · sex</small></td><td>Reels 40–60s + carrossel técnico. Stories leves. Tudo derivado do YT.</td></tr>
+                <tr class="focus-row"><td><div class="ct-name">Blog SEO</div><div class="le-ctsub">Pro Hunters · Google</div></td><td><span class="ct-badge focus">Foco total</span></td><td>2×/mês<br><small>sem 1 e 3</small></td><td>Artigo derivado do roteiro do vídeo. Palavra-chave do pilar. IA-assisted.</td></tr>
+                <tr><td><div class="ct-name">Instagram Reduto</div><div class="le-ctsub">~3.800 seguidores</div></td><td><span class="ct-badge min">Mín. viável</span></td><td>1×/semana</td><td>Template fixo pré-aprovado. Sem revisão individual.</td></tr>
+                <tr><td><div class="ct-name">Instagram Fenix Store</div><div class="le-ctsub">Vitrine de tráfego pago</div></td><td><span class="ct-badge min">Mín. viável</span></td><td>1×/quinzena</td><td>Produto + preço + link. Sem storytelling. Template de catálogo.</td></tr>
+                <tr><td><div class="ct-name">Instagram Reconect</div><div class="le-ctsub">~65 seguidores</div></td><td><span class="ct-badge min">Mín. viável</span></td><td>1×/semana</td><td>Manter presença. Crescimento orgânico lento. Sem produção original.</td></tr>
+                <tr><td><div class="ct-name">YouTube Fenix Store</div><div class="le-ctsub">Baixo retorno</div></td><td><span class="ct-badge off">Abandonado</span></td><td>—</td><td>Canal encerrado. Sem sinergia com o ecossistema principal.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: GUIA DE GRAVAÇÃO -->
+      <div class="panel" id="tab-guia">
+        <div class="le-hero">
+          <div class="le-hero-eyebrow">Referência para equipe de produção</div>
+          <div class="le-hero-title">Guia de Gravação</div>
+          <div class="le-hero-sub">O que gravar, quando gravar e como transformar 1 sessão em 9 peças publicadas.</div>
+        </div>
+        <div class="guia-body">
+          <div class="guia-section">
+            <div class="guia-title">O que gravar — por semana do mês</div>
+            <div class="sem-cards">
+              <div class="sem-card">
+                <div class="sem-card-head" style="border-top:3px solid var(--blue)">
+                  <div class="sem-card-num">Semana 1</div>
+                  <div class="sem-card-theme">Comparativo</div>
+                </div>
+                <div class="sem-card-body">
+                  <div class="sem-item"><strong>Long-form (âncora)</strong><span>Comparativo A vs B — produto, calibre ou técnica. 15–25 min.</span></div>
+                  <div class="sem-item"><strong>Recorte polêmico</strong><span>Isolar um trecho com opinião forte para Short. 40–50s.</span></div>
+                  <div class="sem-item"><strong>Batalha rápida</strong><span>Formato "A vs B em 1 minuto" — Short independente.</span></div>
+                  <div class="sem-item"><strong>Artigo Blog</strong><span>Derivado do roteiro. Palavra-chave de comparativo.</span></div>
+                </div>
+              </div>
+              <div class="sem-card">
+                <div class="sem-card-head" style="border-top:3px solid var(--green-dark)">
+                  <div class="sem-card-num">Semana 2</div>
+                  <div class="sem-card-theme">Uso na prática</div>
+                </div>
+                <div class="sem-card-body">
+                  <div class="sem-item"><strong>Long-form (âncora)</strong><span>Uso real em campo, tiro ou contexto de aplicação. Footage autêntico.</span></div>
+                  <div class="sem-item"><strong>Moment highlight</strong><span>Melhor momento do campo em Short. 35–45s.</span></div>
+                  <div class="sem-item"><strong>Opinião rápida</strong><span>Take do apresentador sobre o que vivenciou em campo.</span></div>
+                </div>
+              </div>
+              <div class="sem-card">
+                <div class="sem-card-head" style="border-top:3px solid var(--pink)">
+                  <div class="sem-card-num">Semana 3</div>
+                  <div class="sem-card-theme">Tutorial técnico</div>
+                </div>
+                <div class="sem-card-body">
+                  <div class="sem-item"><strong>Long-form (âncora)</strong><span>Tutorial passo a passo. Recarga, manutenção, legislação. 18–25 min.</span></div>
+                  <div class="sem-item"><strong>Dica técnica rápida</strong><span>Ponto mais valioso do tutorial em 45s.</span></div>
+                  <div class="sem-item"><strong>Mito ou verdade?</strong><span>Formato polêmico derivado do conteúdo técnico.</span></div>
+                  <div class="sem-item"><strong>Artigo Blog</strong><span>Busca informacional. "Como fazer", "o que é", "como funciona".</span></div>
+                </div>
+              </div>
+              <div class="sem-card">
+                <div class="sem-card-head" style="border-top:3px solid var(--amber)">
+                  <div class="sem-card-num">Semana 4</div>
+                  <div class="sem-card-theme">Review / Opinião</div>
+                </div>
+                <div class="sem-card-body">
+                  <div class="sem-item"><strong>Long-form (âncora)</strong><span>Review honesto — prós, contras, veredito. 18–25 min.</span></div>
+                  <div class="sem-item"><strong>Veredito em 1 min</strong><span>Conclusão do review em Short. Alta retenção.</span></div>
+                  <div class="sem-item"><strong>Comparativo rápido</strong><span>Produto do review vs concorrente. 45s.</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="guia-section">
+            <div class="guia-title">Fluxo da sessão de gravação</div>
+            <ul class="checklist">
+              <li><div class="cl-num">1</div><div><strong>Definir a pauta do long-form</strong> com base no pilar da semana. Usar o Gerador de Conteúdo para criar o roteiro. O roteiro é a base de tudo que vem depois.</div></li>
+              <li><div class="cl-num">2</div><div><strong>Gravar o long-form completo</strong> na sexta-feira. Dentro da gravação, identificar os trechos de recorte para Shorts/Reels (sinalizar no roteiro enquanto grava).</div></li>
+              <li><div class="cl-num">3</div><div><strong>Editar o long-form</strong> e publicar na quinta-feira seguinte. Thumbnail com gancho A vs B ou número/resultado forte.</div></li>
+              <li><div class="cl-num">4</div><div><strong>Cortar os Shorts/Reels</strong> a partir do long-form. 2 peças por semana — publicar na terça e sexta. Hook obrigatório nos primeiros 3 segundos.</div></li>
+              <li><div class="cl-num">5</div><div><strong>Adaptar para Instagram</strong> — Reels (recorte do long), carrossel (conteúdo visual do tema), Stories (enquete ou bastidor). 3 posts na semana: segunda, quarta, sexta.</div></li>
+              <li><div class="cl-num">6</div><div><strong>Gerar o artigo de blog</strong> usando o roteiro do vídeo como base. IA-assisted. Revisão humana de 15–20 min. Publicar nas semanas 1 e 3.</div></li>
+              <li><div class="cl-num">7</div><div><strong>Templates fixos</strong> para Reduto, Fenix e Reconect. Sem processo de aprovação individual — trocar produto/texto e publicar.</div></li>
+            </ul>
+            <div class="tip-box">
+              <strong>Regra de ouro</strong>
+              Uma gravação por semana é o limite de produção. Se a semana apertar, o long-form da Pro Hunters é o único canal que não pode cair. Todos os outros são derivativos ou templates — não existem sem o long-form.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /layout -->
+</div><!-- /app -->
+
+<div class="tooltip" id="tooltip"></div>
+<script>
+// ══ DATA ══
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const THEMES = ['Comparativo','Uso na prática','Tutorial técnico','Review / Opinião'];
+
+const CANALS_DEF = [
+  { id:'yt-long',  name:'YouTube Long-form', sub:'Pro Hunters', mode:'focus', color:'var(--blue)' },
+  { id:'yt-short', name:'YouTube Shorts',    sub:'Pro Hunters', mode:'focus', color:'var(--amber)' },
+  { id:'ig-ph',    name:'Instagram Feed',    sub:'Pro Hunters', mode:'focus', color:'var(--green-dark)' },
+  { id:'blog',     name:'Blog SEO',          sub:'Pro Hunters', mode:'focus', color:'var(--teal)' },
+  { id:'ig-red',   name:'Instagram',         sub:'Reduto',      mode:'min',   color:'var(--gray-500)' },
+  { id:'ig-fenix', name:'Instagram',         sub:'Fenix Store', mode:'min',   color:'var(--gray-500)' },
+  { id:'ig-rec',   name:'Instagram',         sub:'Reconect',    mode:'min',   color:'var(--gray-500)' },
+];
+
+const SCHED = [
+  { 'yt-long': [{day:3,cls:'p-blue',t:'Comparativo de produtos',s:'P2 · 15–25 min',d:'Vídeo âncora da semana. Thumbnail com gancho A vs B. Pilar de alcance e busca orgânica.'}],
+    'yt-short':[{day:1,cls:'p-amber',t:'Short polêmico',s:'Recorte · 40s',d:'Ângulo de opinião extraído do long-form. Hook nos primeiros 3s.'},{day:4,cls:'p-blue',t:'Batalha rápida A vs B',s:'50s',d:'Formato batalha derivado do comparativo. Alto potencial de engajamento.'}],
+    'ig-ph':   [{day:0,cls:'p-blue',t:'Reels comparativo',s:'Recorte long · 50s',d:'Corte do long-form adaptado para Reels. CTA para o vídeo completo.'},{day:2,cls:'p-blue',t:'Carrossel A vs B',s:'4–6 slides',d:'Versão visual do comparativo. Alto índice de salvamento.'},{day:4,cls:'p-gray',t:'Stories bastidor',s:'Enquete',d:'Enquete sobre o tema da semana. Ativa comunidade.'}],
+    'blog':    [{day:0,cls:'p-teal',t:'Artigo SEO',s:'Palavra-chave comparativo',d:'Derivado do roteiro. 800–1.200 palavras. CTA para o vídeo.'}],
+    'ig-red':  [{day:2,cls:'p-gray',t:'Template produto',s:'Reduto · fixo',d:'Post semanal com template pré-aprovado.'}],
+    'ig-fenix':[],
+    'ig-rec':  [{day:3,cls:'p-gray',t:'Template nicho',s:'Reconect · fixo',d:'Post semanal com template pré-aprovado.'}] },
+  { 'yt-long': [{day:3,cls:'p-green',t:'Uso em campo',s:'P1 · 15–20 min',d:'Vídeo âncora de campo. Footage real. Máxima credibilidade.'}],
+    'yt-short':[{day:1,cls:'p-green',t:'Moment highlight',s:'Campo · 40s',d:'Melhor momento do vídeo de campo.'},{day:4,cls:'p-amber',t:'Opinião rápida',s:'35s',d:'Take direto do apresentador.'}],
+    'ig-ph':   [{day:0,cls:'p-green',t:'Reels campo',s:'Cenas reais de uso',d:'Cenas de uso real. Alta autenticidade.'},{day:2,cls:'p-pink',t:'Dica técnica',s:'Carrossel 3–4 slides',d:'Derivado técnico do conteúdo de campo.'},{day:4,cls:'p-gray',t:'Stories enquete',s:'Comunidade',d:'Pergunta à comunidade.'}],
+    'blog':    [],
+    'ig-red':  [{day:2,cls:'p-gray',t:'Template produto',s:'Reduto · fixo',d:'Post semanal com template pré-aprovado.'}],
+    'ig-fenix':[{day:2,cls:'p-gray',t:'Produto + preço',s:'Fenix · quinzenal',d:'Post quinzenal de catálogo. Produto, preço, link.'}],
+    'ig-rec':  [{day:3,cls:'p-gray',t:'Template nicho',s:'Reconect · fixo',d:'Post semanal com template pré-aprovado.'}] },
+  { 'yt-long': [{day:3,cls:'p-pink',t:'Tutorial passo a passo',s:'P4 · 18–25 min',d:'Vídeo técnico de autoridade. Posiciona a marca como referência.'}],
+    'yt-short':[{day:1,cls:'p-pink',t:'Dica técnica rápida',s:'Recorte · 45s',d:'Ponto mais valioso do tutorial.'},{day:4,cls:'p-amber',t:'Mito ou verdade?',s:'40s',d:'Formato polêmico derivado do técnico.'}],
+    'ig-ph':   [{day:0,cls:'p-pink',t:'Reels técnico',s:'Recorte tutorial',d:'Corte do tutorial para Reels.'},{day:2,cls:'p-pink',t:'Passo a passo',s:'Carrossel 5–6 slides',d:'Tutorial visual em carrossel. Maior salvamento.'},{day:4,cls:'p-gray',t:'Stories quiz',s:'Pergunta técnica',d:'Quiz para medir engajamento.'}],
+    'blog':    [{day:0,cls:'p-teal',t:'Artigo SEO',s:'Busca informacional',d:'Artigo derivado do tutorial.'}],
+    'ig-red':  [{day:2,cls:'p-gray',t:'Template produto',s:'Reduto · fixo',d:'Post semanal com template pré-aprovado.'}],
+    'ig-fenix':[],
+    'ig-rec':  [{day:3,cls:'p-gray',t:'Template nicho',s:'Reconect · fixo',d:'Post semanal com template pré-aprovado.'}] },
+  { 'yt-long': [{day:3,cls:'p-amber',t:'Review completo de produto',s:'P3+P2 · 18–25 min',d:'Review honesto com prós e contras reais.'}],
+    'yt-short':[{day:1,cls:'p-amber',t:'Veredito em 1 minuto',s:'Conclusão review',d:'Síntese do review em formato rápido.'},{day:4,cls:'p-blue',t:'Comparativo rápido',s:'Review vs concorrente',d:'Posiciona o produto vs concorrente.'}],
+    'ig-ph':   [{day:0,cls:'p-green',t:'Produto em uso real',s:'P1 visual',d:'Foto ou vídeo do produto sendo usado.'},{day:2,cls:'p-amber',t:'Reels review',s:'Opinião forte',d:'Recorte do review com a opinião mais impactante.'},{day:4,cls:'p-gray',t:'Stories resultado do mês',s:'Métricas + CTA',d:'Números do mês + CTA para inscrição.'}],
+    'blog':    [],
+    'ig-red':  [{day:2,cls:'p-gray',t:'Template produto',s:'Reduto · fixo',d:'Post semanal com template pré-aprovado.'}],
+    'ig-fenix':[{day:2,cls:'p-gray',t:'Produto + preço',s:'Fenix · quinzenal',d:'Post quinzenal de catálogo.'}],
+    'ig-rec':  [{day:3,cls:'p-gray',t:'Template nicho',s:'Reconect · fixo',d:'Post semanal com template pré-aprovado.'}] },
+];
+
+// ══ STATE ══
+let curDate = new Date(); curDate.setDate(1);
+let hidden = new Set();
+let doneState = {}; // key: "month-year-canalId-wi-postIdx"
+
+// Estado COMPARTILHADO no servidor: todos da gerência veem as mesmas marcações,
+// de qualquer dispositivo (persistido via GitHub, igual aos Contatos Úteis).
+async function loadState() {
+  try {
+    const r = await fetch('/api/editorial');
+    if (r.ok) { const d = await r.json(); doneState = (d && d.state) ? d.state : {}; }
+  } catch(e){}
+}
+async function saveState() {
+  try {
+    await fetch('/api/editorial', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ state: doneState })
+    });
+  } catch(e){}
+}
+function doneKey(yr, mo, canalId, wi, pi) { return `${yr}-${mo}-${canalId}-${wi}-${pi}`; }
+
+// ══ UTILS ══
+function getWeeks(y, m) {
+  const first = new Date(y,m,1), last = new Date(y,m+1,0);
+  let s = new Date(first);
+  const dow = s.getDay(); s.setDate(s.getDate() + (dow===0?-6:1-dow));
+  const weeks=[]; let cur=new Date(s), wi=0;
+  while(wi<4){
+    const days=[]; for(let d=0;d<7;d++){days.push(new Date(cur));cur.setDate(cur.getDate()+1);}
+    if(days.some(d=>d.getMonth()===m)){weeks.push(days);wi++;}
+    if(cur>last&&wi>=4)break;
+  }
+  return weeks.slice(0,4);
+}
+
+// ══ RENDER ══
+function renderSummary() {
+  const yr=curDate.getFullYear(), mo=curDate.getMonth();
+  let total=0, done=0;
+  SCHED.forEach((week,wi)=>{
+    CANALS_DEF.forEach(c=>{
+      if(hidden.has(c.id))return;
+      (week[c.id]||[]).forEach((_,pi)=>{
+        total++;
+        if(doneState[doneKey(yr,mo,c.id,wi,pi)]) done++;
+      });
+    });
+  });
+  const vis = CANALS_DEF.filter(c=>!hidden.has(c.id));
+  const focusCnt = vis.filter(c=>c.mode==='focus').length;
+  const minCnt = vis.filter(c=>c.mode==='min').length;
+  document.getElementById('summaryRow').innerHTML=`
+    <div class="sum-chip highlight"><div class="sum-val">${done}/${total}</div><div class="sum-label">programados<br>este mês</div></div>
+    <div class="sum-chip"><div class="sum-val">${Math.round(total/4)}</div><div class="sum-label">posts<br>por semana</div></div>
+    <div class="sum-chip"><div class="sum-val">${focusCnt}</div><div class="sum-label">canais<br>foco total</div></div>
+    <div class="sum-chip"><div class="sum-val">${minCnt}</div><div class="sum-label">canais mínimo<br>viável</div></div>
+    <div class="sum-chip"><div class="sum-val">1×</div><div class="sum-label">gravação<br>por semana</div></div>
+  `;
+  // progress bar
+  const pct = total>0?Math.round(done/total*100):0;
+  document.getElementById('progTxt').textContent=`${done} / ${total}`;
+  document.getElementById('progFill').style.width=pct+'%';
+}
+
+function renderCal() {
+  const yr=curDate.getFullYear(), mo=curDate.getMonth();
+  document.getElementById('monthLbl').textContent = MONTHS[mo]+' '+yr;
+  const weeks = getWeeks(yr,mo);
+  const today = new Date();
+  const body = document.getElementById('calBody');
+  body.innerHTML='';
+  const vis = CANALS_DEF.filter(c=>!hidden.has(c.id));
+
+  vis.forEach(canal=>{
+    const block=document.createElement('div');
+    block.className='canal-block';
+    // header
+    const totalPosts = SCHED.reduce((a,w)=>a+(w[canal.id]||[]).length,0);
+    let donePosts=0;
+    SCHED.forEach((w,wi)=>(w[canal.id]||[]).forEach((_,pi)=>{if(doneState[doneKey(yr,mo,canal.id,wi,pi)])donePosts++;}));
+    const ch=document.createElement('div');
+    ch.className=`cbh${canal.mode==='min'?' min':''}`;
+    ch.innerHTML=`
+      <div class="cbh-left">
+        <div class="cbh-name">${canal.name}</div>
+        <div class="cbh-sub">${canal.sub}</div>
+        <span class="cbh-badge ${canal.mode}">${canal.mode==='focus'?'FOCO TOTAL':'MÍN. VIÁVEL'}</span>
+      </div>
+      <div class="cbh-right">
+        <div class="cbh-stat"><strong>${donePosts}/${totalPosts}</strong> programados</div>
+      </div>`;
+    block.appendChild(ch);
+
+    // week rows
+    weeks.forEach((wdays,wi)=>{
+      const row=document.createElement('div'); row.className='week-row';
+      const s=wdays[0],e=wdays[6];
+      const wl=document.createElement('div'); wl.className='wk-label';
+      wl.innerHTML=`<div class="wk-num">Sem ${wi+1}</div><div class="wk-theme">${THEMES[wi]}</div><div class="wk-dates">${s.getDate()}/${s.getMonth()+1} – ${e.getDate()}/${e.getMonth()+1}</div>`;
+      row.appendChild(wl);
+
+      for(let d=0;d<7;d++){
+        const date=wdays[d];
+        const inMo=date.getMonth()===mo;
+        const isToday=date.toDateString()===today.toDateString();
+        const cell=document.createElement('div');
+        cell.className=`day-cell${d>=5?' wknd':''}${!inMo?' out':''}`;
+        const dn=document.createElement('div');
+        dn.className='day-num'+(isToday?' today':'');
+        dn.textContent=date.getDate();
+        cell.appendChild(dn);
+        if(inMo){
+          const posts=(SCHED[wi]?.[canal.id]||[]).filter(p=>p.day===d);
+          posts.forEach((p,pi)=>{
+            // find real pi in all posts of this canal/week
+            const allPosts=(SCHED[wi]?.[canal.id]||[]);
+            const realPi=allPosts.indexOf(p);
+            const key=doneKey(yr,mo,canal.id,wi,realPi);
+            const isDone=!!doneState[key];
+            const el=document.createElement('div');
+            el.className=`post-chip ${p.cls}${isDone?' done':''}`;
+            el.innerHTML=`<span class="pt">${p.t}</span><span class="ps">${p.s}</span><span class="done-mark">${isDone?'✅':''}</span>`;
+            el.title='Clique para marcar como programado';
+            el.addEventListener('click',()=>{
+              doneState[key]=!doneState[key];
+              saveState();
+              renderCal();
+              renderSummary();
+            });
+            el.addEventListener('mouseover',e=>showTip(e,p,canal,isDone));
+            el.addEventListener('mouseout',hideTip);
+            cell.appendChild(el);
+          });
+        }
+        row.appendChild(cell);
+      }
+      block.appendChild(row);
+    });
+
+    body.appendChild(block);
+    const sp=document.createElement('div'); sp.style.height='6px';
+    body.appendChild(sp);
+  });
+  renderSummary();
+}
+
+function showTip(e,p,c,done){
+  const t=document.getElementById('tooltip');
+  t.innerHTML=`<strong>${p.t}</strong><span class="tt-c">${c.name} · ${c.sub}</span><span class="tt-d">${p.d}</span><span class="tt-status">${done?'✅ Programado — clique para desmarcar':'Clique para marcar como programado'}</span>`;
+  t.style.display='block'; moveTip(e);
+}
+function hideTip(){document.getElementById('tooltip').style.display='none';}
+function moveTip(e){
+  const t=document.getElementById('tooltip');
+  if(t.style.display!=='block')return;
+  let x=e.clientX+14,y=e.clientY-10;
+  if(x+240>window.innerWidth)x=e.clientX-240;
+  if(y+120>window.innerHeight)y=e.clientY-120;
+  t.style.left=x+'px';t.style.top=y+'px';
+}
+document.addEventListener('mousemove',moveTip);
+
+function changeMonth(d){ curDate.setMonth(curDate.getMonth()+d); renderCal(); }
+function toggleCanal(el){ const c=el.dataset.c; if(hidden.has(c))hidden.delete(c);else hidden.add(c); el.classList.toggle('on'); renderCal(); }
+
+function switchTab(id, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+  document.getElementById('monthNav').style.display = id==='calendario'?'flex':'none';
+  document.getElementById('sidebar').style.display = id==='calendario'?'':'none';
+}
+
+async function edInit(){ if(window.__edInit) return; window.__edInit=true; await loadState(); renderCal(); renderSummary(); }
+</script>
+</div>
+<!-- ===== FIM LINHA EDITORIAL ===== -->
+
     <!-- IA -->
     <div class="tab" id="tab-ia">
       <div class="ia-wrap">
@@ -1547,6 +2303,7 @@ var tabMeta = {
   comercial: ['Dashboard Comercial','Ranking, metas e performance da equipe'],
   ia:        ['IA Pro Hunters','Assistente de conhecimento interno'],
   gerador:   ['Gerador de Conteúdo','Criação de conteúdo com IA'],
+  linhaeditorial: ['Linha Editorial','Calendário e estratégia de conteúdo'],
   admin:     ['Base de Conhecimento','Gerenciar o que a IA sabe']
 };
 
@@ -1554,6 +2311,7 @@ var tabMeta = {
 window.onload = function() {
   if (typeof IS_ADMIN !== 'undefined' && IS_ADMIN) {
     document.getElementById('grp-admin').style.display = 'block';
+    var _niLE = document.getElementById('ni-linhaeditorial'); if (_niLE) _niLE.style.display = '';
   }
   if (typeof CAN_VIEW_COMERCIAL !== 'undefined' && CAN_VIEW_COMERCIAL) {
     document.getElementById('grp-comercial').style.display = 'block';
@@ -1576,6 +2334,7 @@ function goTab(id, el) {
   if (id === 'admin') loadKB();
   if (id === 'contatos') loadContatos();
   if (id === 'gerador') gerInit();
+  if (id === 'linhaeditorial') edInit();
 }
 
 function toggleSB() {
