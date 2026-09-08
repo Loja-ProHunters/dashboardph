@@ -236,6 +236,7 @@ tbody tr:nth-child(even) td{background:var(--bg)}
     <button class="ni" onclick="goTab('processos',this)">Processos</button>
     <button class="ni" onclick="goTab('contratos',this)">Documentos</button>
     <button class="ni" onclick="goTab('contatos',this)">Contatos Úteis</button>
+    <button class="ni" onclick="goTab('calculadora',this)">Calculadora de Juros</button>
   </div>
   <div class="sb-grp" id="grp-comercial" style="display:none">
     <div class="sb-lbl">Comercial</div>
@@ -2118,6 +2119,297 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
 </div>
 <!-- ===== FIM LINHA EDITORIAL ===== -->
 
+<!-- ===== CALCULADORA DE JUROS (cartão) ===== -->
+<div class="tab" id="tab-calculadora">
+<style>
+#tab-calculadora{max-width:960px}
+#tab-calculadora [hidden]{display:none!important}
+#tab-calculadora .calc-intro{font-size:13px;color:var(--gy);margin-bottom:16px;line-height:1.5}
+#tab-calculadora .calc-ops{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+#tab-calculadora .calc-op{flex:1;min-width:160px;border:1.5px solid var(--bd);background:var(--wh);border-radius:10px;padding:14px 18px;cursor:pointer;text-align:left;transition:all .15s}
+#tab-calculadora .calc-op:hover{border-color:var(--g)}
+#tab-calculadora .calc-op.active{border-color:var(--g);background:var(--gl);box-shadow:0 1px 4px rgba(0,0,0,.05)}
+#tab-calculadora .calc-op-nome{font-size:15px;font-weight:700;color:var(--k)}
+#tab-calculadora .calc-op-sub{font-size:11px;color:var(--gy);margin-top:2px}
+#tab-calculadora .calc-blu-opts{display:flex;gap:22px;flex-wrap:wrap;background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:12px 16px;margin-bottom:14px}
+#tab-calculadora .calc-optgrp{display:flex;align-items:center;gap:8px}
+#tab-calculadora .calc-optlbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--gy)}
+#tab-calculadora .calc-seg{border:1.5px solid var(--bd);background:var(--wh);border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--dk);cursor:pointer;transition:all .15s}
+#tab-calculadora .calc-seg:hover{border-color:var(--g)}
+#tab-calculadora .calc-seg.active{border-color:var(--g);background:var(--g);color:#fff}
+#tab-calculadora .calc-inrow{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;max-width:360px}
+#tab-calculadora .calc-inrow label{font-size:12px;font-weight:700;color:var(--dk)}
+#tab-calculadora .calc-input{border:1.5px solid var(--bd);border-radius:9px;padding:12px 14px;font-size:20px;font-weight:700;color:var(--k);outline:none;transition:border-color .15s;font-family:inherit}
+#tab-calculadora .calc-input:focus{border-color:var(--g)}
+#tab-calculadora .calc-liq{font-size:12px;color:var(--gd);margin:6px 0 18px;font-weight:600}
+#tab-calculadora .calc-warn{background:var(--rl);border:1px solid #f5c0c0;color:var(--r);font-size:12px;padding:10px 14px;border-radius:8px;margin-bottom:14px}
+#tab-calculadora .calc-tablewrap{overflow-x:auto;border:1px solid var(--bd);border-radius:10px;background:var(--wh)}
+#tab-calculadora table.calc-table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+#tab-calculadora .calc-table th{background:var(--gl);color:var(--gd);font-size:10px;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:10px 12px;text-align:right;border-bottom:1px solid var(--gm)}
+#tab-calculadora .calc-table th:first-child{text-align:left}
+#tab-calculadora .calc-table td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--bd);white-space:nowrap}
+#tab-calculadora .calc-table td:first-child{text-align:left;font-weight:700;color:var(--k)}
+#tab-calculadora .calc-table tr:last-child td{border-bottom:none}
+#tab-calculadora .calc-table tr:hover td{background:var(--bg)}
+#tab-calculadora .calc-parcela{font-weight:700;color:var(--k)}
+#tab-calculadora .calc-total{color:var(--dk)}
+#tab-calculadora .calc-taxa{color:var(--gy);font-size:12px}
+#tab-calculadora .calc-cp{border:1px solid var(--bd);background:var(--wh);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--gd);cursor:pointer;transition:all .15s;font-weight:600}
+#tab-calculadora .calc-cp:hover{border-color:var(--g);background:var(--gl)}
+#tab-calculadora .calc-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+#tab-calculadora .calc-copyall{background:var(--g);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+#tab-calculadora .calc-copyall:hover{background:var(--gd)}
+#tab-calculadora .calc-empty{padding:26px;text-align:center;color:var(--gl2);font-size:13px}
+#tab-calculadora .calc-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--k);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;pointer-events:none}
+#tab-calculadora .calc-toast.show{opacity:1;visibility:visible}
+/* editor admin */
+#tab-calculadora .calc-admin{margin-top:30px;border-top:1px dashed var(--bd);padding-top:20px}
+#tab-calculadora .calc-admin-h{font-size:13px;font-weight:700;color:var(--k);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+#tab-calculadora .calc-admin-sub{font-size:12px;color:var(--gy);margin-bottom:16px}
+#tab-calculadora .calc-egrid-h{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gd);margin:18px 0 8px}
+#tab-calculadora .calc-egrid{display:grid;gap:8px}
+#tab-calculadora .calc-egrid.g1{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+#tab-calculadora .calc-erow{display:flex;align-items:center;gap:6px;background:var(--wh);border:1px solid var(--bd);border-radius:7px;padding:5px 8px}
+#tab-calculadora .calc-erow span{font-size:11px;color:var(--gy);font-weight:700;min-width:30px}
+#tab-calculadora .calc-erow input{width:100%;border:none;outline:none;font-size:13px;font-weight:600;color:var(--k);text-align:right;font-family:inherit;background:transparent}
+#tab-calculadora .calc-erow .pctm{font-size:11px;color:var(--gl2)}
+#tab-calculadora .calc-etbl{overflow-x:auto}
+#tab-calculadora table.calc-e{border-collapse:collapse;font-size:12px;min-width:340px}
+#tab-calculadora .calc-e th{font-size:10px;text-transform:uppercase;color:var(--gd);font-weight:700;padding:6px 8px;text-align:center}
+#tab-calculadora .calc-e td{padding:3px 6px;text-align:center}
+#tab-calculadora .calc-e td:first-child{font-weight:700;color:var(--k)}
+#tab-calculadora .calc-e input{width:66px;border:1px solid var(--bd);border-radius:6px;padding:5px 6px;font-size:12px;text-align:right;outline:none;font-family:inherit}
+#tab-calculadora .calc-e input:focus{border-color:var(--g)}
+</style>
+
+<div class="calc-intro">Digite o valor líquido que você quer receber e a calculadora mostra quanto cobrar do cliente em cada parcela. Use o botão copiar para enviar a simulação pronta no WhatsApp.</div>
+
+<div class="calc-ops" id="calcOps"></div>
+
+<div class="calc-blu-opts" id="calcBluOpts" hidden>
+  <div class="calc-optgrp">
+    <span class="calc-optlbl">Antecipação</span>
+    <button class="calc-seg active" data-cen="sem">Não</button>
+    <button class="calc-seg" data-cen="com">Sim</button>
+  </div>
+  <div class="calc-optgrp">
+    <span class="calc-optlbl">Bandeira</span>
+    <button class="calc-seg active" data-band="vm">Visa / Master</button>
+    <button class="calc-seg" data-band="amex">Amex / Elo</button>
+  </div>
+</div>
+
+<div class="calc-inrow">
+  <label for="calcValor">Valor líquido que quero receber (R$)</label>
+  <input class="calc-input" id="calcValor" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off">
+</div>
+<div class="calc-liq" id="calcLiq"></div>
+
+<div class="calc-warn" id="calcWarn" hidden></div>
+
+<div class="calc-tablewrap">
+  <table class="calc-table" id="calcTable"></table>
+</div>
+
+<div class="calc-actions">
+  <button class="calc-copyall" id="calcCopyAll">📋 Copiar todas as opções</button>
+</div>
+
+<div class="calc-admin" id="calcAdmin" hidden>
+  <div class="calc-admin-h">⚙ Editar taxas <span class="badge-admin">ADMIN</span></div>
+  <div class="calc-admin-sub">Taxas em % (custo total por parcela). Ajuste conforme as operadoras e clique em salvar — vale para todos os vendedores.</div>
+  <div id="calcEditor"></div>
+  <button class="btn-save" id="calcSaveTaxas">Salvar taxas</button>
+  <div class="save-status" id="calcTaxasStatus"></div>
+</div>
+
+<div class="calc-toast" id="calcToast"></div>
+</div>
+
+<script>
+(function(){
+  var TAR=null, canEdit=false;
+  var op='pagarme', cen='sem', band='vm';
+  var moeda=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+  function $(id){return document.getElementById(id);}
+  function fmtPct(v){return (Number(v).toFixed(2)).replace('.',',')+'%';}
+  function parseValor(s){
+    if(!s) return 0;
+    s=(''+s).replace(/[^\d,.-]/g,'').replace(/\./g,'').replace(',','.');
+    var n=parseFloat(s); return isFinite(n)?n:0;
+  }
+  function taxasAtuais(){
+    if(!TAR) return null;
+    if(op==='pagarme') return TAR.pagarme && TAR.pagarme.taxas ? {taxas:TAR.pagarme.taxas, max:TAR.pagarme.maxParcelas||12} : null;
+    var c=TAR.blu && TAR.blu.cenarios && TAR.blu.cenarios[cen];
+    if(!c) return null;
+    return {taxas:c[band]||{}, max:TAR.blu.maxParcelas||21};
+  }
+  function linhas(){
+    var t=taxasAtuais(); if(!t) return [];
+    var liq=parseValor($('calcValor').value); var out=[];
+    for(var n=1;n<=t.max;n++){
+      var tx=t.taxas[n]; if(tx==null||tx==='') continue;
+      var custo=Number(tx)/100;
+      var total = custo>=1 ? 0 : liq/(1-custo);
+      out.push({n:n, taxa:Number(tx), total:total, parcela:n>0?total/n:0, juros:total-liq});
+    }
+    return out;
+  }
+  function opNome(){
+    if(op==='pagarme') return 'Pagar.me';
+    var cn = cen==='com' ? 'com antecipação' : 'sem antecipação';
+    var bn = band==='amex' ? 'Amex/Elo' : 'Visa/Master';
+    return 'Blu ('+cn+' · '+bn+')';
+  }
+  function renderOps(){
+    if(!TAR) return;
+    var html='';
+    html+='<button class="calc-op'+(op==='pagarme'?' active':'')+'" data-op="pagarme"><div class="calc-op-nome">Pagar.me</div><div class="calc-op-sub">1x a 12x</div></button>';
+    html+='<button class="calc-op'+(op==='blu'?' active':'')+'" data-op="blu"><div class="calc-op-nome">Blu</div><div class="calc-op-sub">1x a 21x · com/sem antecipação</div></button>';
+    $('calcOps').innerHTML=html;
+    Array.prototype.forEach.call($('calcOps').querySelectorAll('.calc-op'),function(b){
+      b.addEventListener('click',function(){op=b.getAttribute('data-op');$('calcBluOpts').hidden=(op!=='blu');renderOps();render();});
+    });
+    $('calcBluOpts').hidden=(op!=='blu');
+  }
+  function render(){
+    var liq=parseValor($('calcValor').value);
+    $('calcLiq').textContent = liq>0 ? ('Você recebe líquido: '+moeda.format(liq)+' — abaixo, quanto cobrar do cliente ('+opNome()+')') : '';
+    var t=taxasAtuais();
+    var warn=$('calcWarn');
+    if(!t){ warn.hidden=false; warn.textContent='Taxas desta operadora ainda não configuradas.'; $('calcTable').innerHTML=''; return; }
+    warn.hidden=true;
+    var rows=linhas();
+    if(liq<=0){ $('calcTable').innerHTML='<tr><td colspan="5" class="calc-empty">Digite o valor líquido acima para ver as parcelas.</td></tr>'; return; }
+    var h='<thead><tr><th>Parcelas</th><th>Taxa</th><th>Valor da parcela</th><th>Total do cliente</th><th></th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      h+='<tr>'
+       +'<td>'+r.n+'x</td>'
+       +'<td class="calc-taxa">'+fmtPct(r.taxa)+'</td>'
+       +'<td class="calc-parcela">'+moeda.format(r.parcela)+'</td>'
+       +'<td class="calc-total">'+moeda.format(r.total)+'</td>'
+       +'<td><button class="calc-cp" data-n="'+r.n+'">Copiar</button></td>'
+       +'</tr>';
+    });
+    h+='</tbody>';
+    $('calcTable').innerHTML=h;
+    Array.prototype.forEach.call($('calcTable').querySelectorAll('.calc-cp'),function(b){
+      b.addEventListener('click',function(){ copiarUma(parseInt(b.getAttribute('data-n'),10)); });
+    });
+  }
+  function msgUma(r){
+    if(r.n===1) return '💳 *Pagamento no cartão — Pro Hunters*\n\nÀ vista (1x): '+moeda.format(r.total)+'\n\n_Valor sujeito a confirmação no momento da venda._';
+    return '💳 *Pagamento no cartão — Pro Hunters*\n\n'+r.n+'x de '+moeda.format(r.parcela)+'\nTotal: '+moeda.format(r.total)+'\n\n_Valores sujeitos a confirmação no momento da venda._';
+  }
+  function copiarUma(n){
+    var r=linhas().filter(function(x){return x.n===n;})[0]; if(!r) return;
+    copiar(msgUma(r),'Simulação de '+n+'x copiada');
+  }
+  function copiarTodas(){
+    var liq=parseValor($('calcValor').value); if(liq<=0){toast('Digite o valor primeiro');return;}
+    var rows=linhas(); if(!rows.length){toast('Sem taxas configuradas');return;}
+    var m='💳 *Opções de pagamento no cartão — Pro Hunters*\n\n';
+    rows.forEach(function(r){
+      if(r.n===1) m+='À vista (1x): '+moeda.format(r.total)+'\n';
+      else m+=r.n+'x de '+moeda.format(r.parcela)+' — total '+moeda.format(r.total)+'\n';
+    });
+    m+='\n_Valores sujeitos a confirmação no momento da venda._';
+    copiar(m,'Todas as opções copiadas');
+  }
+  function copiar(txt,ok){
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){toast(ok);},function(){fallback(txt,ok);});
+    } else fallback(txt,ok);
+  }
+  function fallback(txt,ok){
+    try{var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast(ok);}catch(e){toast('Não foi possível copiar');}
+  }
+  var toastT=null;
+  function toast(msg){var el=$('calcToast');el.textContent=msg;el.classList.add('show');if(toastT)clearTimeout(toastT);toastT=setTimeout(function(){el.classList.remove('show');},1800);}
+
+  // ---- editor admin ----
+  function gridParcelas(taxas,max,prefixo){
+    var h='<table class="calc-e"><thead><tr><th>Parc.</th><th>Taxa %</th></tr></thead><tbody>';
+    for(var n=1;n<=max;n++){
+      var v=(taxas[n]==null?'':taxas[n]);
+      h+='<tr><td>'+n+'x</td><td><input data-k="'+prefixo+'.'+n+'" value="'+v+'" inputmode="decimal"></td></tr>';
+    }
+    return h+'</tbody></table>';
+  }
+  function gridBlu(cen){
+    var c=TAR.blu.cenarios[cen], max=TAR.blu.maxParcelas||21;
+    var h='<table class="calc-e"><thead><tr><th>Parc.</th><th>Visa/Master %</th><th>Amex/Elo %</th></tr></thead><tbody>';
+    for(var n=1;n<=max;n++){
+      var vm=(c.vm[n]==null?'':c.vm[n]), am=(c.amex[n]==null?'':c.amex[n]);
+      h+='<tr><td>'+n+'x</td>'
+       +'<td><input data-k="blu.'+cen+'.vm.'+n+'" value="'+vm+'" inputmode="decimal"></td>'
+       +'<td><input data-k="blu.'+cen+'.amex.'+n+'" value="'+am+'" inputmode="decimal"></td></tr>';
+    }
+    return h+'</tbody></table>';
+  }
+  function renderEditor(){
+    if(!canEdit){ $('calcAdmin').hidden=true; return; }
+    $('calcAdmin').hidden=false;
+    var h='';
+    h+='<div class="calc-egrid-h">Pagar.me — 1x a 12x</div><div class="calc-etbl">'+gridParcelas(TAR.pagarme.taxas,TAR.pagarme.maxParcelas||12,'pagarme')+'</div>';
+    h+='<div class="calc-egrid-h">Blu — Sem antecipação</div><div class="calc-etbl">'+gridBlu('sem')+'</div>';
+    h+='<div class="calc-egrid-h">Blu — Com antecipação</div><div class="calc-etbl">'+gridBlu('com')+'</div>';
+    $('calcEditor').innerHTML=h;
+  }
+  function salvarTaxas(){
+    var inputs=$('calcEditor').querySelectorAll('input[data-k]');
+    Array.prototype.forEach.call(inputs,function(inp){
+      var k=inp.getAttribute('data-k').split('.');
+      var val=inp.value.trim().replace(',','.'); var num=(val===''?null:parseFloat(val));
+      if(k[0]==='pagarme'){ TAR.pagarme.taxas[k[1]]=num; }
+      else if(k[0]==='blu'){ TAR.blu.cenarios[k[1]][k[2]][k[3]]=num; }
+    });
+    var st=$('calcTaxasStatus'); var btn=$('calcSaveTaxas'); btn.disabled=true;
+    fetch('/api/tarifas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tarifas:TAR})})
+      .then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d};});})
+      .then(function(res){
+        btn.disabled=false;
+        if(res.ok){ st.className='save-status ok'; st.textContent='✓ Taxas salvas para todos.'; render(); }
+        else { st.className='save-status err'; st.textContent=(res.d&&res.d.error)||'Erro ao salvar.'; }
+      })
+      .catch(function(){ btn.disabled=false; st.className='save-status err'; st.textContent='Erro de conexão.'; });
+  }
+
+  var started=false;
+  window.calcInit=function(){
+    if(started){ render(); return; }
+    started=true;
+    fetch('/api/tarifas').then(function(r){return r.json();}).then(function(d){
+      TAR=d.tarifas||{}; canEdit=!!d.canEdit;
+      if(!TAR.pagarme) TAR.pagarme={nome:'Pagar.me',maxParcelas:12,taxas:{}};
+      if(!TAR.blu) TAR.blu={nome:'Blu',maxParcelas:21,cenarios:{sem:{vm:{},amex:{}},com:{vm:{},amex:{}}}};
+      renderOps(); renderEditor(); render();
+    }).catch(function(){
+      $('calcWarn').hidden=false; $('calcWarn').textContent='Não foi possível carregar as taxas.';
+    });
+
+    $('calcValor').addEventListener('input',render);
+    Array.prototype.forEach.call($('calcBluOpts').querySelectorAll('.calc-seg'),function(b){
+      b.addEventListener('click',function(){
+        if(b.hasAttribute('data-cen')){ cen=b.getAttribute('data-cen'); segAtivo(b,'data-cen'); }
+        else { band=b.getAttribute('data-band'); segAtivo(b,'data-band'); }
+        render();
+      });
+    });
+    $('calcCopyAll').addEventListener('click',copiarTodas);
+    $('calcSaveTaxas').addEventListener('click',salvarTaxas);
+  };
+  function segAtivo(btn,attr){
+    var grupo=btn.parentNode.querySelectorAll('['+attr+']');
+    Array.prototype.forEach.call(grupo,function(x){x.classList.remove('active');});
+    btn.classList.add('active');
+  }
+})();
+</script>
+<!-- ===== FIM CALCULADORA ===== -->
+
+
     <!-- IA -->
     <div class="tab" id="tab-ia">
       <div class="ia-wrap">
@@ -2300,6 +2592,7 @@ var tabMeta = {
   processos: ['Processos','Armas, GT, Portal Postal, Documentacao'],
   contratos: ['Documentos','Contratos e Guias de Transito'],
   contatos:  ['Contatos Úteis','Fornecedores e telefones úteis'],
+  calculadora: ['Calculadora de Juros','Simulação de parcelamento no cartão'],
   comercial: ['Dashboard Comercial','Ranking, metas e performance da equipe'],
   ia:        ['IA Pro Hunters','Assistente de conhecimento interno'],
   gerador:   ['Gerador de Conteúdo','Criação de conteúdo com IA'],
@@ -2333,6 +2626,7 @@ function goTab(id, el) {
   closeSB();
   if (id === 'admin') loadKB();
   if (id === 'contatos') loadContatos();
+  if (id === 'calculadora') calcInit();
   if (id === 'gerador') gerInit();
   if (id === 'linhaeditorial') edInit();
 }
