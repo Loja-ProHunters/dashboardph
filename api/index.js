@@ -184,11 +184,13 @@ function callAnthropic(messages, system) {
 // ── Login page ───────────────────────────────────────────────
 function loginPage(erro) {
   return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pro Hunters</title><link rel="icon" href="/assets/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
-  font-family:'Segoe UI',system-ui,sans-serif;
+  font-family:'Barlow','Segoe UI',system-ui,sans-serif;
   background:radial-gradient(circle at 50% 20%, #12241c 0%, #0a1410 45%, #060a08 100%);
   display:flex;align-items:center;justify-content:center;min-height:100vh;
   overflow:hidden;position:relative;
@@ -236,16 +238,18 @@ h2{font-size:16px;font-weight:700;text-align:center;margin-bottom:4px;color:#f2f
 label{font-size:11px;font-weight:700;color:#bcd4c4;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px}
 input{
   width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(120,200,150,.25);
-  border-radius:8px;padding:11px 13px;font-size:14px;outline:none;margin-bottom:16px;
-  font-family:inherit;color:#f2f5f2;transition:border-color .15s,background .15s;
+  border-radius:10px;padding:13px 15px;font-size:15px;outline:none;margin-bottom:18px;
+  font-family:inherit;color:#f2f5f2;transition:border-color .18s,background .18s,box-shadow .18s;
 }
 input::placeholder{color:#5c6e63}
-input:focus{border-color:#4caf7a;background:rgba(255,255,255,.07)}
+input:focus{border-color:#4caf7a;background:rgba(255,255,255,.07);box-shadow:0 0 0 3px rgba(90,170,102,.22)}
 button{
   width:100%;background:linear-gradient(135deg,#2d6a4f,#1b4332);color:#fff;border:none;
-  border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;
-  letter-spacing:.3px;transition:filter .15s,transform .1s;
+  border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;
+  letter-spacing:.4px;transition:filter .18s,transform .1s,box-shadow .18s;
+  box-shadow:0 6px 18px rgba(27,67,50,.45);
 }
+button:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(90,170,102,.45)}
 button:hover{filter:brightness(1.15)}
 button:active{transform:scale(.98)}
 .err{background:rgba(224,48,48,.15);border:1px solid rgba(224,48,48,.4);border-radius:8px;padding:10px 14px;font-size:12px;color:#ff9d9d;margin-bottom:16px;text-align:center}
