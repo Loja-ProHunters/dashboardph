@@ -9,6 +9,7 @@ const { extrairNF } = require('../lib/nfExtract');
 const { extrairPedido } = require('../lib/pedidoExtract');
 const { getComercialData, saveComercialData, resetMonth, registrarVenda } = require('../lib/comercialStore');
 const { getContatos, saveContatos } = require('../lib/contatosStore');
+const { getEditorial, saveEditorial } = require('../lib/editorialStore');
 
 function getRole(usuario) {
   if (usuario === 'gerencia') return 'admin';    // acesso total
@@ -646,6 +647,47 @@ module.exports = async (req, res) => {
       const { contatos } = JSON.parse(body);
       if (!Array.isArray(contatos)) throw new Error('Formato inválido.');
       await saveContatos(contatos);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao salvar: ' + e.message }));
+    }
+    return;
+  }
+
+  // GET /api/editorial — marcações do calendário da Linha Editorial (somente gerencia)
+  if (req.method === 'GET' && url === '/api/editorial') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const state = await getEditorial();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ state }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao carregar: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/editorial — salva as marcações (compartilhado; somente gerencia)
+  if (req.method === 'POST' && url === '/api/editorial') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para editar.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { state } = JSON.parse(body);
+      if (!state || typeof state !== 'object' || Array.isArray(state)) throw new Error('Formato inválido.');
+      await saveEditorial(state);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
     } catch (e) {
