@@ -47,6 +47,19 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
 #tab-comercial.tab.on{display:flex;flex-direction:column}
 @media (max-width:768px){ #tab-comercial.tab{height:calc(100% + 28px);margin:-14px} }
 .tab{display:none}.tab.on{display:block}
+.ini-hero{background:var(--gl);border:1px solid var(--gm);border-radius:12px;padding:20px 22px;margin-bottom:18px}
+.ini-hero-t{font-size:20px;font-weight:700;color:var(--k)}
+.ini-hero-s{font-size:13px;color:var(--dk);margin-top:6px;max-width:760px;line-height:1.55}
+.ini-steps{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.ini-step{display:flex;gap:10px;align-items:flex-start;background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;flex:1;min-width:210px;font-size:12px;color:var(--dk);text-align:left;cursor:pointer;transition:border-color .15s,box-shadow .15s;font-family:inherit}
+.ini-step:hover{border-color:var(--g);box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.ini-step-n{background:var(--g);color:#fff;font-weight:700;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.ini-step-tx{line-height:1.4}
+.ini-nav{display:flex;gap:4px;border-bottom:2px solid var(--bd);margin-bottom:20px;flex-wrap:wrap}
+.ini-navbtn{background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:10px 16px;font-size:14px;font-weight:600;color:var(--gy);cursor:pointer;transition:all .15s;font-family:inherit}
+.ini-navbtn:hover{color:var(--k)}
+.ini-navbtn.on{color:var(--gd);border-bottom-color:var(--g);font-weight:700}
+.ini-pane{display:none}.ini-pane.on{display:block}
 .sec-title{font-size:14px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--gm)}
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
 .kpi{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
@@ -228,11 +241,9 @@ tbody tr:nth-child(even) td{background:var(--bg)}
   <div class="sb-grp">
     <div class="sb-lbl">Principal</div>
     <button class="ni on" onclick="goTab('inicio',this)">Início</button>
-    <button class="ni" onclick="goTab('taco',this)">Método T.A.C.O</button>
   </div>
   <div class="sb-grp">
     <div class="sb-lbl">Operacional</div>
-    <button class="ni" onclick="goTab('bling',this)">Curso Bling</button>
     <button class="ni" onclick="goTab('processos',this)">Processos</button>
     <button class="ni" onclick="goTab('contratos',this)">Documentos</button>
     <button class="ni" onclick="goTab('contatos',this)">Contatos Úteis</button>
@@ -268,6 +279,23 @@ tbody tr:nth-child(even) td{background:var(--bg)}
 
     <!-- INÍCIO -->
     <div class="tab on" id="tab-inicio">
+      <div class="ini-hero">
+        <div class="ini-hero-t">Bem-vindo(a) ao Portal Interno da Pro Hunters 👋</div>
+        <div class="ini-hero-s">Tudo o que você precisa para começar está reunido aqui. Siga a ordem abaixo: conheça o grupo, aprenda o nosso método de vendas e veja o passo a passo dos pedidos.</div>
+        <div class="ini-steps">
+          <button class="ini-step" onclick="iniSub('visao',document.querySelector('#tab-inicio .ini-navbtn[data-k=&quot;visao&quot;]'))"><span class="ini-step-n">1</span><span class="ini-step-tx"><b>Visão Geral</b><br>As empresas do grupo e as metas.</span></button>
+          <button class="ini-step" onclick="iniSub('taco',document.querySelector('#tab-inicio .ini-navbtn[data-k=&quot;taco&quot;]'))"><span class="ini-step-n">2</span><span class="ini-step-tx"><b>Método T.A.C.O</b><br>O passo a passo de um bom atendimento.</span></button>
+          <button class="ini-step" onclick="iniSub('bling',document.querySelector('#tab-inicio .ini-navbtn[data-k=&quot;bling&quot;]'))"><span class="ini-step-n">3</span><span class="ini-step-tx"><b>Curso Bling</b><br>Como lançar cada pedido, com vídeo-aulas.</span></button>
+        </div>
+      </div>
+
+      <div class="ini-nav">
+        <button class="ini-navbtn on" data-k="visao" onclick="iniSub('visao',this)">Visão Geral</button>
+        <button class="ini-navbtn" data-k="taco" onclick="iniSub('taco',this)">Método T.A.C.O</button>
+        <button class="ini-navbtn" data-k="bling" onclick="iniSub('bling',this)">Curso Bling</button>
+      </div>
+
+      <div class="ini-pane on" id="ini-visao">
       <div class="kpi-grid">
         <div class="kpi"><div class="kpi-lbl">Conversão mínima</div><div class="kpi-val">10%</div><div class="kpi-sub">Meta ideal: 15%</div></div>
         <div class="kpi"><div class="kpi-lbl">Ticket mínimo</div><div class="kpi-val">R$1k</div><div class="kpi-sub">Por atendimento</div></div>
@@ -282,10 +310,9 @@ tbody tr:nth-child(even) td{background:var(--bg)}
         <div class="co"><div class="co-tag">MÍDIA</div><div class="co-name">Reconect</div><div class="co-desc">Estúdio de podcast do grupo.</div></div>
       </div>
       <div class="cl red"><div class="cl-t">Atenção — Chronus</div><ul><li>Empresa encerrada. Não nos associamos de forma alguma.</li><li>Se o cliente perguntar: informar que encerrou e auxiliar sem assumir responsabilidade.</li></ul></div>
-    </div>
-
-    <!-- T.A.C.O -->
-    <div class="tab" id="tab-taco">
+    
+      </div>
+      <div class="ini-pane" id="ini-taco">
       <div class="taco-grid">
         <div class="taco"><div class="taco-l">T</div><div class="taco-n">Triagem</div><div class="taco-b">Qualifique o cliente antes de qualquer indicação.<br><br>• Qual a experiência?<br>• Tipo de uso pretendido?<br>• Possui CR (se aplicável)?<br><br>Classifique: Quente / Morno / Frio</div></div>
         <div class="taco"><div class="taco-l">A</div><div class="taco-n">Abordagem</div><div class="taco-b">Posicione-se como especialista. Demonstre domínio técnico.</div><div class="taco-q">"Deixa eu te indicar algo certo pra tua realidade."</div></div>
@@ -298,10 +325,9 @@ tbody tr:nth-child(even) td{background:var(--bg)}
         <div class="meta-p"><div class="meta-n">R$1k+</div><div class="meta-l">Ticket mínimo</div></div>
       </div>
       <div class="cl red"><div class="cl-t">Erros não tolerados</div><ul><li>Vender sem triagem</li><li>Não ligar para lead quente</li><li>Fechar sem upsell</li><li>Deixar CRM sem próxima ação definida</li></ul></div>
-    </div>
-
-    <!-- BLING -->
-    <div class="tab" id="tab-bling">
+    
+      </div>
+      <div class="ini-pane" id="ini-bling">
       <div class="cl"><div class="cl-t">Regra de ouro</div><ul><li>Pedido só após confirmação de entrada ou pagamento total. Para orçamentos: proposta comercial.</li></ul></div>
       <div class="sec-title" style="margin-top:18px">Tipos de pedido</div>
       <div class="acc-list">
@@ -322,6 +348,8 @@ tbody tr:nth-child(even) td{background:var(--bg)}
           <div class="vid-card"><div class="vid-thumb" id="vt5" onclick="playVid('vt5','1FqTLffu3xQI5AG0M_hyVDm56XFNscdUC')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 05</div><div class="vid-name">Cadastro — PF</div><div class="vid-desc">Campos obrigatórios e dados fiscais PF.</div><span class="vs ok">Disponível</span></div></div>
           <div class="vid-card"><div class="vid-thumb" id="vt6" onclick="playVid('vt6','1neRF6_TrWWuxB-j_p80LGolRj5N7gXiN')"><div class="vui"><div class="vbtn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><span class="vlbl">Clique para assistir</span></div><iframe allowfullscreen></iframe></div><div class="vid-info"><div class="vid-num">Aula 06</div><div class="vid-name">Cadastro — PJ</div><div class="vid-desc">Campos obrigatórios e dados fiscais PJ.</div><span class="vs ok">Disponível</span></div></div>
         </div>
+      </div>
+    
       </div>
     </div>
 
@@ -2488,8 +2516,8 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
         .ct-btn{border:none;border-radius:8px;padding:10px 15px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
         .ct-btn.pri{background:var(--g);color:#fff}.ct-btn.pri:hover{background:var(--gd)}
         .ct-btn.gh{background:var(--bg);color:var(--dk);border:1px solid var(--bd)}
-        .ct-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(160%);background:var(--k);color:#fff;padding:11px 20px;border-radius:9px;font-size:13px;font-weight:600;z-index:400;transition:.3s}
-        .ct-toast.on{transform:translateX(-50%) translateY(0)}
+        .ct-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(160%);background:var(--k);color:#fff;padding:11px 20px;border-radius:9px;font-size:13px;font-weight:600;z-index:400;transition:.3s;opacity:0;visibility:hidden;pointer-events:none}
+        .ct-toast.on{transform:translateX(-50%) translateY(0);opacity:1;visibility:visible}
       </style>
       <div class="ct-sub" id="ctSub"></div>
       <div class="ct-tools">
@@ -2587,8 +2615,6 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
 
 var tabMeta = {
   inicio:    ['Inicio','Visao geral do portal'],
-  taco:      ['Metodo T.A.C.O','Processo comercial oficial'],
-  bling:     ['Curso Bling','Tipos de pedido, cadastros e video aulas'],
   processos: ['Processos','Armas, GT, Portal Postal, Documentacao'],
   contratos: ['Documentos','Contratos e Guias de Transito'],
   contatos:  ['Contatos Úteis','Fornecedores e telefones úteis'],
@@ -2613,6 +2639,16 @@ window.onload = function() {
     document.getElementById('user-pill').textContent = USER_NOME;
   }
 };
+
+function iniSub(key, btn){
+  var panes=document.querySelectorAll('#tab-inicio .ini-pane');
+  for(var i=0;i<panes.length;i++) panes[i].classList.remove('on');
+  var pane=document.getElementById('ini-'+key); if(pane) pane.classList.add('on');
+  var btns=document.querySelectorAll('#tab-inicio .ini-navbtn');
+  for(var j=0;j<btns.length;j++) btns[j].classList.remove('on');
+  if(btn) btn.classList.add('on');
+  var c=document.querySelector('.content'); if(c) c.scrollTop=0;
+}
 
 function goTab(id, el) {
   var tabs = document.querySelectorAll('.tab');
