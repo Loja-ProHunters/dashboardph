@@ -26,7 +26,13 @@
       "tarefas": 0,
       "atrasos": 0,
       "faltas": 0,
-      "advertencias": 0
+      "advertencias": 1,
+      "advertenciasLog": [
+        {
+          "data": "09/09/2026",
+          "motivo": "Fez o envio errado de produto controlado, cliente comprou uma coisa e lançou outra no pedido"
+        }
+      ]
     },
     {
       "id": 3,
@@ -119,5 +125,5 @@
       "fechadoEm": "2026-08-03T11:06:21.307Z"
     }
   ],
-  "savedAt": "2026-09-09T12:49:21.554Z"
+  "savedAt": "2026-09-09T13:06:05.886Z"
 }
