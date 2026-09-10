@@ -11,6 +11,7 @@ const { getComercialData, saveComercialData, resetMonth, registrarVenda } = requ
 const { getContatos, saveContatos } = require('../lib/contatosStore');
 const { getEditorial, saveEditorial } = require('../lib/editorialStore');
 const { getTarifas, saveTarifas } = require('../lib/tarifasStore');
+const { getParceiros, saveParceiros } = require('../lib/parceirosStore');
 
 function getRole(usuario) {
   if (usuario === 'gerencia') return 'admin';    // acesso total
@@ -742,6 +743,328 @@ module.exports = async (req, res) => {
     }
     return;
   }
+
+
+  // ═══ PARCEIROS / INFLUENCIADORES ═══════════════════════════════════════════
+  // Todas as rotas /api/parceiros/*. Persistência via parceirosStore (GitHub).
+
+  // helper local: id curto e único
+  const _prcId = () => 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const _round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+
+  function _resumoInfluenciador(inf, vendas, pagamentos) {
+    const dele = vendas.filter(v => v.influenciadorId === inf.id && !v.cancelada);
+    const totalVendido = _round2(dele.reduce((a, v) => a + (Number(v.valorLiquido) || 0), 0));
+    const totalComissao = _round2(dele.reduce((a, v) => a + (Number(v.comissao) || 0), 0));
+    const totalPago = _round2(pagamentos.filter(p => p.influenciadorId === inf.id).reduce((a, p) => a + (Number(p.valor) || 0), 0));
+    const saldoAberto = _round2(totalComissao - totalPago);
+    const qtdVendas = dele.length;
+    const ultimaVenda = dele.length ? dele.map(v => v.data).sort().slice(-1)[0] : null;
+    return { totalVendido, totalComissao, totalPago, saldoAberto, qtdVendas, ultimaVenda };
+  }
+
+  // GET /api/parceiros — dados completos (só gerência)
+  if (req.method === 'GET' && url === '/api/parceiros') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const d = await getParceiros();
+      const resumos = {};
+      d.influenciadores.forEach(inf => { resumos[inf.id] = _resumoInfluenciador(inf, d.vendas, d.pagamentos); });
+      const totalDevido = _round2(Object.values(resumos).reduce((a, r) => a + r.saldoAberto, 0));
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        influenciadores: d.influenciadores,
+        vendas: d.vendas,
+        pagamentos: d.pagamentos,
+        tray: { modoTeste: !!d.tray.modoTeste, ultimaSync: d.tray.ultimaSync, configurado: !!(d.tray.consumer_key && d.tray.code) },
+        resumos,
+        totalDevido,
+      }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao carregar parceiros: ' + e.message }));
+    }
+    return;
+  }
+
+  // GET /api/parceiros/ranking — só posições e volume relativo (visão vendas)
+  if (req.method === 'GET' && url === '/api/parceiros/ranking') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    try {
+      const d = await getParceiros();
+      const hoje = new Date();
+      const ini = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().slice(0, 10);
+      const rankTodos = d.influenciadores.filter(i => i.ativo !== false).map(inf => {
+        const dele = d.vendas.filter(v => v.influenciadorId === inf.id && !v.cancelada);
+        const doMes = dele.filter(v => (v.data || '') >= ini);
+        return {
+          nome: inf.nome, handle: inf.handle || '', cupom: inf.cupom,
+          qtdMes: doMes.length, qtdTotal: dele.length,
+          volumeMes: _round2(doMes.reduce((a, v) => a + (Number(v.valorLiquido) || 0), 0)),
+        };
+      }).sort((a, b) => b.volumeMes - a.volumeMes || b.qtdMes - a.qtdMes);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ mes: ini.slice(0, 7), ranking: rankTodos }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/influenciador — criar/atualizar/desativar (só gerência)
+  if (req.method === 'POST' && url === '/api/parceiros/influenciador') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const body = JSON.parse(await readBody(req));
+      const inf = body.influenciador || {};
+      if (!inf.nome || !inf.cupom) throw new Error('Nome e cupom sao obrigatorios.');
+      inf.cupom = String(inf.cupom).trim().toUpperCase();
+      inf.comissaoPct = Number(inf.comissaoPct);
+      if (!isFinite(inf.comissaoPct) || inf.comissaoPct < 0 || inf.comissaoPct > 100) inf.comissaoPct = 5;
+      inf.ativo = inf.ativo !== false;
+      const d = await getParceiros();
+      // cupom precisa ser único
+      const outroComMesmoCupom = d.influenciadores.find(x => x.cupom === inf.cupom && x.id !== inf.id);
+      if (outroComMesmoCupom) throw new Error('Cupom "' + inf.cupom + '" já está em uso por ' + outroComMesmoCupom.nome + '.');
+      if (inf.id) {
+        const idx = d.influenciadores.findIndex(x => x.id === inf.id);
+        if (idx < 0) throw new Error('Influenciador não encontrado.');
+        d.influenciadores[idx] = Object.assign({}, d.influenciadores[idx], inf);
+      } else {
+        inf.id = _prcId();
+        inf.cadastradoEm = new Date().toISOString().slice(0, 10);
+        d.influenciadores.push(inf);
+      }
+      await saveParceiros(d);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, id: inf.id }));
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/venda — lança 1..N vendas manualmente (só gerência)
+  if (req.method === 'POST' && url === '/api/parceiros/venda') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const body = JSON.parse(await readBody(req));
+      const lista = Array.isArray(body.vendas) ? body.vendas : [body.venda].filter(Boolean);
+      if (!lista.length) throw new Error('Nenhuma venda enviada.');
+      const d = await getParceiros();
+      const criadas = [];
+      for (const raw of lista) {
+        const cupom = String(raw.cupom || '').trim().toUpperCase();
+        const inf = d.influenciadores.find(x => x.cupom === cupom);
+        if (!inf) { criadas.push({ pedido: raw.pedidoTray, erro: 'Cupom ' + cupom + ' sem influenciador cadastrado.' }); continue; }
+        // deduplica por pedidoTray (não lança 2x o mesmo pedido)
+        if (raw.pedidoTray && d.vendas.some(v => v.pedidoTray === String(raw.pedidoTray))) {
+          criadas.push({ pedido: raw.pedidoTray, erro: 'Pedido já lançado.' }); continue;
+        }
+        const vBruto = Number(raw.valorBruto) || 0;
+        const vFrete = Number(raw.valorFrete) || 0;
+        const vLiquido = _round2(vBruto - vFrete);
+        const comissao = _round2(vLiquido * (Number(inf.comissaoPct) || 0) / 100);
+        const venda = {
+          id: _prcId(),
+          pedidoTray: raw.pedidoTray ? String(raw.pedidoTray) : '',
+          cupom,
+          influenciadorId: inf.id,
+          data: raw.data || new Date().toISOString().slice(0, 10),
+          cliente: raw.cliente || '',
+          valorBruto: _round2(vBruto),
+          valorFrete: _round2(vFrete),
+          valorLiquido: vLiquido,
+          comissaoPct: Number(inf.comissaoPct) || 0,
+          comissao,
+          origem: raw.origem || 'manual',
+          statusTray: raw.statusTray || 'Enviado',
+          cancelada: false,
+          criadaEm: new Date().toISOString(),
+        };
+        d.vendas.push(venda);
+        criadas.push({ pedido: venda.pedidoTray, id: venda.id, comissao });
+      }
+      await saveParceiros(d);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, criadas }));
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/venda-cancelar — cancela uma venda (não conta na comissão)
+  if (req.method === 'POST' && url === '/api/parceiros/venda-cancelar') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const { id } = JSON.parse(await readBody(req));
+      const d = await getParceiros();
+      const v = d.vendas.find(x => x.id === id);
+      if (!v) throw new Error('Venda não encontrada.');
+      v.cancelada = true;
+      v.canceladaEm = new Date().toISOString();
+      await saveParceiros(d);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/pagar — registra pagamento que zera o saldo em aberto
+  if (req.method === 'POST' && url === '/api/parceiros/pagar') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const body = JSON.parse(await readBody(req));
+      const influenciadorId = body.influenciadorId;
+      const obs = body.observacao || '';
+      const d = await getParceiros();
+      const inf = d.influenciadores.find(x => x.id === influenciadorId);
+      if (!inf) throw new Error('Influenciador não encontrado.');
+      const r = _resumoInfluenciador(inf, d.vendas, d.pagamentos);
+      if (r.saldoAberto <= 0) throw new Error('Não há saldo em aberto para este influenciador.');
+      const pag = {
+        id: _prcId(),
+        influenciadorId,
+        data: body.data || new Date().toISOString().slice(0, 10),
+        valor: r.saldoAberto,
+        observacao: obs,
+        vendasIds: d.vendas.filter(v => v.influenciadorId === influenciadorId && !v.cancelada).map(v => v.id),
+        criadoEm: new Date().toISOString(),
+        criadoPor: sess.usuario,
+      };
+      d.pagamentos.push(pag);
+      await saveParceiros(d);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, valor: pag.valor }));
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/sync-tray — puxa da Tray (ou simula em modo teste)
+  if (req.method === 'POST' && url === '/api/parceiros/sync-tray') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const d = await getParceiros();
+      const modoTeste = !d.tray.consumer_key || !d.tray.code;
+      let novas = 0, erros = 0, msg = '';
+      if (modoTeste) {
+        // gera 2..5 vendas fictícias entre os cupons cadastrados
+        const infs = d.influenciadores.filter(i => i.ativo !== false);
+        if (!infs.length) throw new Error('Cadastre ao menos um influenciador antes de sincronizar em modo teste.');
+        const nClientes = ['João Souza', 'Maria Silva', 'Pedro Oliveira', 'Ana Costa', 'Carlos Lima', 'Julia Alves', 'Rafael Nunes'];
+        const qtd = 2 + Math.floor(Math.random() * 4);
+        for (let i = 0; i < qtd; i++) {
+          const inf = infs[Math.floor(Math.random() * infs.length)];
+          const pedidoTray = 'TEST-' + Date.now().toString().slice(-6) + '-' + i;
+          if (d.vendas.some(v => v.pedidoTray === pedidoTray)) continue;
+          const vBruto = 200 + Math.random() * 1800;
+          const vFrete = 30 + Math.random() * 60;
+          const vLiquido = _round2(vBruto - vFrete);
+          const comissao = _round2(vLiquido * (Number(inf.comissaoPct) || 0) / 100);
+          d.vendas.push({
+            id: _prcId(),
+            pedidoTray,
+            cupom: inf.cupom,
+            influenciadorId: inf.id,
+            data: new Date(Date.now() - Math.floor(Math.random() * 20) * 86400000).toISOString().slice(0, 10),
+            cliente: nClientes[Math.floor(Math.random() * nClientes.length)],
+            valorBruto: _round2(vBruto), valorFrete: _round2(vFrete), valorLiquido: vLiquido,
+            comissaoPct: Number(inf.comissaoPct) || 0, comissao,
+            origem: 'tray-teste', statusTray: 'Enviado', cancelada: false,
+            criadaEm: new Date().toISOString(),
+          });
+          novas++;
+        }
+        msg = 'Modo teste: ' + novas + ' venda(s) simulada(s) criada(s).';
+      } else {
+        // TODO: integração real com API da Tray (consumer_key/consumer_secret/code).
+        // Endpoint a implementar: GET /orders com filtro por status=Enviado (após ultimaSync).
+        // Cada pedido com coupon → mapeia pra influenciador pelo campo cupom.
+        msg = 'Integração real com a Tray ainda não implementada. Configure e me avise.';
+      }
+      d.tray.ultimaSync = new Date().toISOString();
+      await saveParceiros(d);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, novas, erros, msg, modoTeste }));
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/tray-config — salva credenciais da Tray (só gerência)
+  if (req.method === 'POST' && url === '/api/parceiros/tray-config') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const body = JSON.parse(await readBody(req));
+      const d = await getParceiros();
+      d.tray = Object.assign({}, d.tray, {
+        consumer_key: body.consumer_key || null,
+        consumer_secret: body.consumer_secret || null,
+        code: body.code || null,
+        modoTeste: !(body.consumer_key && body.code),
+      });
+      await saveParceiros(d);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, modoTeste: d.tray.modoTeste }));
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+  // ═══ FIM PARCEIROS ═════════════════════════════════════════════════════════
 
   // POST /api/generate — Gerador de Conteúdo (usa a MESMA chave Anthropic do portal)
   if (req.method === 'POST' && url === '/api/generate') {
