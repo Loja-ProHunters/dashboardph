@@ -349,6 +349,7 @@ tbody tr:hover td{background:var(--gl)}
   <div class="sb-grp" id="grp-comercial" style="display:none">
     <div class="sb-lbl">Comercial</div>
     <button class="ni" onclick="goTab('comercial',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><rect x="5" y="11" width="3.6" height="7" rx="1"/><rect x="10.2" y="6" width="3.6" height="12" rx="1"/><rect x="15.4" y="14" width="3.6" height="4" rx="1"/></svg></span><span class="ni-tx">Dashboard Comercial</span></button>
+    <button class="ni" onclick="goTab('parceiros',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.6"/><path d="M2.6 20c0-3.5 2.9-6.2 6.4-6.2s6.4 2.7 6.4 6.2"/><circle cx="17" cy="7" r="2.6"/><path d="M15.5 14.2c2.7.4 4.7 2.7 4.7 5.4"/></svg></span><span class="ni-tx">Parceiros</span></button>
   </div>
   <div class="sb-grp">
     <div class="sb-lbl">Inteligência</div>
@@ -2536,6 +2537,504 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
 <!-- ===== FIM CALCULADORA ===== -->
 
 
+<!-- ===== PARCEIROS / INFLUENCIADORES ===== -->
+<div class="tab" id="tab-parceiros">
+<style>
+#tab-parceiros{max-width:1180px}
+#tab-parceiros [hidden]{display:none!important}
+#tab-parceiros .pc-topline{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+#tab-parceiros .pc-topline .pill{font-size:11px}
+#tab-parceiros .pc-mode{font-size:11px;font-weight:700;padding:5px 12px;border-radius:var(--r-full);background:var(--rl);color:var(--r);border:1px solid #f5c0c0;letter-spacing:.05em}
+#tab-parceiros .pc-mode.on{background:var(--gl);color:var(--gd);border-color:var(--gm)}
+#tab-parceiros .pc-btn{background:var(--wh);border:1px solid var(--bd);color:var(--dk);border-radius:var(--r-sm);padding:8px 14px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .18s var(--ez);font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+#tab-parceiros .pc-btn:hover{border-color:var(--g);color:var(--gd)}
+#tab-parceiros .pc-btn.pri{background:var(--g);border-color:var(--g);color:#fff}
+#tab-parceiros .pc-btn.pri:hover{background:var(--gd);border-color:var(--gd);color:#fff}
+#tab-parceiros .pc-btn.ghost{background:transparent}
+#tab-parceiros .pc-btn.rm{background:var(--rl);border-color:#f5c0c0;color:var(--r)}
+#tab-parceiros .pc-btn.rm:hover{background:#fbe3e3;color:var(--r)}
+#tab-parceiros .pc-btn:disabled{opacity:.5;cursor:not-allowed}
+#tab-parceiros .pc-kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:22px}
+#tab-parceiros .pc-kpi-c{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r-md);padding:16px 18px;box-shadow:var(--sh-1)}
+#tab-parceiros .pc-kpi-l{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--gy);font-weight:700;margin-bottom:6px}
+#tab-parceiros .pc-kpi-v{font-size:24px;font-weight:700;color:var(--gd);letter-spacing:-.02em;line-height:1}
+#tab-parceiros .pc-kpi-v.r{color:var(--r)}
+#tab-parceiros .pc-kpi-s{font-size:11px;color:var(--gy);margin-top:4px}
+#tab-parceiros .pc-sec{font-size:12px;font-weight:700;margin:20px 0 12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gy);display:flex;align-items:center;gap:10px}
+#tab-parceiros .pc-sec::after{content:'';flex:1;height:1px;background:var(--bd)}
+#tab-parceiros .pc-sec-r{margin-left:auto;display:flex;gap:8px}
+#tab-parceiros .pc-infs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+#tab-parceiros .pc-inf{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r-md);padding:16px 18px;box-shadow:var(--sh-1);transition:box-shadow .2s,border-color .2s;cursor:pointer;position:relative}
+#tab-parceiros .pc-inf:hover{box-shadow:var(--sh-2);border-color:var(--gm)}
+#tab-parceiros .pc-inf.off{opacity:.6}
+#tab-parceiros .pc-inf-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+#tab-parceiros .pc-inf-n{font-size:14.5px;font-weight:700;color:var(--k);line-height:1.2}
+#tab-parceiros .pc-inf-h{font-size:11.5px;color:var(--gy);margin-top:2px}
+#tab-parceiros .pc-cupom{background:var(--k);color:var(--gm);font-family:ui-monospace,Menlo,monospace;font-size:11px;padding:3px 9px;border-radius:5px;font-weight:700;letter-spacing:.05em;white-space:nowrap}
+#tab-parceiros .pc-inf-body{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--bd)}
+#tab-parceiros .pc-lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--gy);font-weight:700;margin-bottom:2px}
+#tab-parceiros .pc-val{font-size:13px;font-weight:700;color:var(--k)}
+#tab-parceiros .pc-val.pos{color:var(--gd)}
+#tab-parceiros .pc-val.due{color:var(--r)}
+#tab-parceiros .pc-val.mut{color:var(--gy);font-weight:600}
+#tab-parceiros .pc-inf-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+#tab-parceiros .pc-inf-actions .pc-btn{padding:6px 12px;font-size:11.5px}
+#tab-parceiros .pc-badge{display:inline-block;font-size:9px;font-weight:800;padding:2px 7px;border-radius:var(--r-full);background:var(--rl);color:var(--r);letter-spacing:.06em;text-transform:uppercase}
+#tab-parceiros .pc-badge.ok{background:var(--gl);color:var(--gd)}
+#tab-parceiros .pc-empty{padding:36px;text-align:center;color:var(--gl2);background:var(--wh);border:1px dashed var(--bd);border-radius:var(--r-md);font-size:13px}
+#tab-parceiros .pc-tblwrap{overflow-x:auto;border:1px solid var(--bd);border-radius:var(--r-md);background:var(--wh);box-shadow:var(--sh-1)}
+#tab-parceiros table.pc-tbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:720px}
+#tab-parceiros .pc-tbl th{background:var(--gl);color:var(--gd);font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;padding:10px 12px;text-align:left;border-bottom:1px solid var(--gm);white-space:nowrap}
+#tab-parceiros .pc-tbl td{padding:10px 12px;border-bottom:1px solid var(--bd);vertical-align:middle}
+#tab-parceiros .pc-tbl tr:last-child td{border-bottom:none}
+#tab-parceiros .pc-tbl tr:hover td{background:var(--bg)}
+#tab-parceiros .pc-tbl td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+#tab-parceiros .pc-tbl .pc-cupom-inline{background:var(--gl);color:var(--gd);border:1px solid var(--gm);padding:2px 8px;border-radius:5px;font-family:ui-monospace,Menlo,monospace;font-size:10.5px;font-weight:700}
+#tab-parceiros .pc-tbl tr.cancel td{color:var(--gl2);text-decoration:line-through}
+#tab-parceiros .pc-filter{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+#tab-parceiros .pc-filter select,#tab-parceiros .pc-filter input{border:1px solid var(--bd);border-radius:var(--r-xs);padding:7px 10px;font-size:12.5px;background:var(--wh);outline:none;font-family:inherit}
+#tab-parceiros .pc-filter select:focus,#tab-parceiros .pc-filter input:focus{border-color:var(--g)}
+/* ranking (vendas) */
+#tab-parceiros .pc-rank{display:flex;flex-direction:column;gap:8px}
+#tab-parceiros .pc-rank-item{display:flex;align-items:center;gap:14px;background:var(--wh);border:1px solid var(--bd);border-radius:var(--r-md);padding:14px 18px;box-shadow:var(--sh-1)}
+#tab-parceiros .pc-rank-pos{font-family:var(--fc);font-size:28px;font-weight:800;color:var(--gm);width:38px;text-align:center;line-height:1}
+#tab-parceiros .pc-rank-item:nth-child(1) .pc-rank-pos{color:var(--g)}
+#tab-parceiros .pc-rank-item:nth-child(2) .pc-rank-pos{color:var(--gd)}
+#tab-parceiros .pc-rank-item:nth-child(3) .pc-rank-pos{color:var(--gm)}
+#tab-parceiros .pc-rank-body{flex:1;min-width:0}
+#tab-parceiros .pc-rank-nome{font-size:14px;font-weight:700}
+#tab-parceiros .pc-rank-sub{font-size:11.5px;color:var(--gy);margin-top:2px}
+#tab-parceiros .pc-rank-num{text-align:right}
+#tab-parceiros .pc-rank-qtd{font-size:20px;font-weight:700;color:var(--gd);letter-spacing:-.02em}
+#tab-parceiros .pc-rank-qtd-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gy);font-weight:700}
+/* modal */
+#tab-parceiros .pc-modal{position:fixed;inset:0;background:rgba(17,20,18,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+#tab-parceiros .pc-modal.on{display:flex;animation:tabIn .2s var(--ez)}
+#tab-parceiros .pc-mbx{background:var(--wh);border-radius:var(--r-lg);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--sh-3)}
+#tab-parceiros .pc-mhd{padding:18px 22px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+#tab-parceiros .pc-mhd h3{font-size:15px;font-weight:700}
+#tab-parceiros .pc-mx{background:none;border:none;color:var(--gy);font-size:22px;cursor:pointer;line-height:1;padding:2px 8px;border-radius:5px}
+#tab-parceiros .pc-mx:hover{background:var(--bg);color:var(--k)}
+#tab-parceiros .pc-mbd{padding:20px 22px}
+#tab-parceiros .pc-mft{padding:14px 22px;border-top:1px solid var(--bd);display:flex;gap:10px;justify-content:flex-end;background:var(--bg);border-radius:0 0 var(--r-lg) var(--r-lg)}
+#tab-parceiros .pc-fld{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+#tab-parceiros .pc-fld label{font-size:11.5px;font-weight:700;color:var(--dk)}
+#tab-parceiros .pc-fld input,#tab-parceiros .pc-fld select,#tab-parceiros .pc-fld textarea{border:1px solid var(--bd);border-radius:var(--r-sm);padding:10px 12px;font-size:13px;font-family:inherit;outline:none;transition:border-color .18s,box-shadow .18s;background:var(--wh)}
+#tab-parceiros .pc-fld input:focus,#tab-parceiros .pc-fld select:focus,#tab-parceiros .pc-fld textarea:focus{border-color:var(--g);box-shadow:var(--ring)}
+#tab-parceiros .pc-fld-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#tab-parceiros .pc-hint{font-size:11px;color:var(--gy);margin-top:-6px;margin-bottom:10px}
+#tab-parceiros .pc-err{background:var(--rl);color:var(--r);border:1px solid #f5c0c0;padding:9px 12px;border-radius:var(--r-sm);font-size:12px;margin-bottom:10px;display:none}
+#tab-parceiros .pc-err.on{display:block}
+@media(max-width:768px){
+  #tab-parceiros .pc-inf-body{grid-template-columns:1fr 1fr}
+  #tab-parceiros .pc-fld-row{grid-template-columns:1fr}
+}
+</style>
+
+<!-- ═══ VISÃO GERÊNCIA ═══ -->
+<div id="pc-gerencia" hidden>
+  <div class="pc-topline">
+    <span class="pc-mode" id="pc-modo">MODO TESTE</span>
+    <span class="user-pill" id="pc-lastsync">Nunca sincronizado</span>
+    <button class="pc-btn ghost" onclick="pcOpenTrayCfg()">⚙ Configurar Tray</button>
+    <div style="flex:1"></div>
+    <button class="pc-btn" id="pc-btn-sync" onclick="pcSync()">↻ Sincronizar Tray</button>
+    <button class="pc-btn pri" onclick="pcOpenInf()">+ Influenciador</button>
+    <button class="pc-btn" onclick="pcOpenVenda()">+ Venda manual</button>
+  </div>
+
+  <div class="pc-kpi">
+    <div class="pc-kpi-c"><div class="pc-kpi-l">Influenciadores ativos</div><div class="pc-kpi-v" id="pc-k-inf">0</div><div class="pc-kpi-s" id="pc-k-inf-s">de 0 cadastrados</div></div>
+    <div class="pc-kpi-c"><div class="pc-kpi-l">Vendas com cupom (mês)</div><div class="pc-kpi-v" id="pc-k-vmes">0</div><div class="pc-kpi-s" id="pc-k-vmes-s">R$ 0,00 em volume</div></div>
+    <div class="pc-kpi-c"><div class="pc-kpi-l">Comissão devida agora</div><div class="pc-kpi-v r" id="pc-k-devido">R$ 0,00</div><div class="pc-kpi-s">A pagar aos parceiros</div></div>
+    <div class="pc-kpi-c"><div class="pc-kpi-l">Total pago no ano</div><div class="pc-kpi-v" id="pc-k-pago">R$ 0,00</div><div class="pc-kpi-s">Pagamentos registrados</div></div>
+  </div>
+
+  <div class="pc-sec">Influenciadores</div>
+  <div id="pc-infs-wrap"></div>
+
+  <div class="pc-sec">Vendas <span class="pc-sec-r">
+    <select id="pc-flt-inf" onchange="pcRenderVendas()"><option value="">Todos influenciadores</option></select>
+    <input type="search" id="pc-flt-busca" placeholder="Buscar pedido/cliente" oninput="pcRenderVendas()">
+  </span></div>
+  <div id="pc-vendas-wrap"></div>
+
+  <div class="pc-sec">Pagamentos</div>
+  <div id="pc-pags-wrap"></div>
+</div>
+
+<!-- ═══ VISÃO VENDAS (só ranking) ═══ -->
+<div id="pc-vendas-only" hidden>
+  <div class="ini-hero" style="margin-bottom:22px">
+    <div class="ini-hero-t">Ranking de Influenciadores</div>
+    <div class="ini-hero-s">Ranking do mês atual por volume de vendas com cupom. Quem está trazendo mais clientes.</div>
+  </div>
+  <div class="pc-sec" id="pc-rank-mes">Este mês</div>
+  <div id="pc-rank-wrap"></div>
+</div>
+
+<!-- Modal: influenciador -->
+<div class="pc-modal" id="pc-mi">
+  <div class="pc-mbx">
+    <div class="pc-mhd"><h3 id="pc-mi-tit">Novo influenciador</h3><button class="pc-mx" onclick="pcCloseInf()">×</button></div>
+    <div class="pc-mbd">
+      <div class="pc-err" id="pc-mi-err"></div>
+      <input type="hidden" id="pc-i-id">
+      <div class="pc-fld-row">
+        <div class="pc-fld"><label>Nome *</label><input id="pc-i-nome" placeholder="Nome completo"></div>
+        <div class="pc-fld"><label>@ / usuário</label><input id="pc-i-handle" placeholder="@mariasilva"></div>
+      </div>
+      <div class="pc-fld-row">
+        <div class="pc-fld"><label>Cupom * <span style="font-weight:400;color:var(--gy);font-size:10px">(fica em maiúsculo)</span></label><input id="pc-i-cupom" placeholder="MARIA10" style="text-transform:uppercase"></div>
+        <div class="pc-fld"><label>Comissão % *</label><input id="pc-i-pct" type="number" step="0.5" min="0" max="100" value="5"></div>
+      </div>
+      <div class="pc-fld-row">
+        <div class="pc-fld"><label>PIX (chave)</label><input id="pc-i-pix" placeholder="CPF, email, telefone ou chave aleatória"></div>
+        <div class="pc-fld"><label>Telefone</label><input id="pc-i-tel" placeholder="(51) 99999-9999"></div>
+      </div>
+      <div class="pc-fld"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="pc-i-ativo" checked style="width:16px;height:16px;accent-color:var(--g)"> Ativo</label></div>
+    </div>
+    <div class="pc-mft">
+      <button class="pc-btn ghost" onclick="pcCloseInf()">Cancelar</button>
+      <button class="pc-btn pri" id="pc-i-save" onclick="pcSaveInf()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: venda manual -->
+<div class="pc-modal" id="pc-mv">
+  <div class="pc-mbx">
+    <div class="pc-mhd"><h3>Lançar venda manualmente</h3><button class="pc-mx" onclick="pcCloseVenda()">×</button></div>
+    <div class="pc-mbd">
+      <div class="pc-err" id="pc-mv-err"></div>
+      <div class="pc-hint">Use isto para lançar vendas que não vieram da Tray (ex: venda direta com cupom).</div>
+      <div class="pc-fld-row">
+        <div class="pc-fld"><label>Cupom *</label><select id="pc-v-cupom"></select></div>
+        <div class="pc-fld"><label>Nº pedido</label><input id="pc-v-pedido" placeholder="opcional"></div>
+      </div>
+      <div class="pc-fld-row">
+        <div class="pc-fld"><label>Valor bruto (R$) *</label><input id="pc-v-bruto" type="number" step="0.01" min="0" placeholder="1000.00"></div>
+        <div class="pc-fld"><label>Valor do frete (R$)</label><input id="pc-v-frete" type="number" step="0.01" min="0" value="0"></div>
+      </div>
+      <div class="pc-fld-row">
+        <div class="pc-fld"><label>Data</label><input id="pc-v-data" type="date"></div>
+        <div class="pc-fld"><label>Cliente</label><input id="pc-v-cliente" placeholder="opcional"></div>
+      </div>
+      <div class="pc-hint" id="pc-v-preview" style="color:var(--gd);font-weight:700"></div>
+    </div>
+    <div class="pc-mft">
+      <button class="pc-btn ghost" onclick="pcCloseVenda()">Cancelar</button>
+      <button class="pc-btn pri" onclick="pcSaveVenda()">Lançar venda</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: configurar Tray -->
+<div class="pc-modal" id="pc-mt">
+  <div class="pc-mbx">
+    <div class="pc-mhd"><h3>Configurar integração Tray</h3><button class="pc-mx" onclick="pcCloseTrayCfg()">×</button></div>
+    <div class="pc-mbd">
+      <div class="pc-err" id="pc-mt-err"></div>
+      <div class="pc-hint">Enquanto não estiver configurada, a aba funciona em <b>modo teste</b> com vendas simuladas. Cadastre o app da Pro Hunters no <b>Portal do Parceiro Tray</b> e cole as credenciais abaixo.</div>
+      <div class="pc-fld"><label>Consumer Key</label><input id="pc-t-key" placeholder="..."></div>
+      <div class="pc-fld"><label>Consumer Secret</label><input id="pc-t-sec" placeholder="..." type="password"></div>
+      <div class="pc-fld"><label>Code (autorização da loja)</label><input id="pc-t-code" placeholder="..."></div>
+    </div>
+    <div class="pc-mft">
+      <button class="pc-btn ghost" onclick="pcCloseTrayCfg()">Cancelar</button>
+      <button class="pc-btn pri" onclick="pcSaveTrayCfg()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var PC={ dados:null, ranking:null, loaded:false };
+  var moeda=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+  var dtFmt=new Intl.DateTimeFormat('pt-BR');
+  function $(id){return document.getElementById(id);}
+  function fmtBRL(n){return moeda.format(Number(n)||0);}
+  function fmtDt(s){if(!s) return '—';var d=new Date(s+(s.length===10?'T12:00:00':''));return dtFmt.format(d);}
+
+  window.parceirosInit=function(){
+    if(PC.loaded){ pcRefresh(); return; }
+    PC.loaded=true;
+    var admin = typeof CAN_EDIT_COMERCIAL!=='undefined' && CAN_EDIT_COMERCIAL;
+    $('pc-gerencia').hidden = !admin;
+    $('pc-vendas-only').hidden = admin;
+    pcRefresh();
+  };
+
+  function pcRefresh(){
+    var admin = typeof CAN_EDIT_COMERCIAL!=='undefined' && CAN_EDIT_COMERCIAL;
+    if(admin){
+      fetch('/api/parceiros').then(function(r){return r.json();}).then(function(d){
+        if(d.error){ return; }
+        PC.dados=d; pcRenderAll();
+      });
+    } else {
+      fetch('/api/parceiros/ranking').then(function(r){return r.json();}).then(function(d){
+        if(d.error){ return; }
+        PC.ranking=d; pcRenderRanking();
+      });
+    }
+  }
+
+  // ═══ VISÃO GERÊNCIA ═══
+  function pcRenderAll(){
+    if(!PC.dados) return;
+    var d=PC.dados;
+    // KPIs
+    var ativos=d.influenciadores.filter(function(i){return i.ativo!==false;}).length;
+    $('pc-k-inf').textContent=ativos;
+    $('pc-k-inf-s').textContent='de '+d.influenciadores.length+' cadastrados';
+    var hoje=new Date(); var iniMes=new Date(hoje.getFullYear(),hoje.getMonth(),1).toISOString().slice(0,10);
+    var vMes=d.vendas.filter(function(v){return !v.cancelada && (v.data||'')>=iniMes;});
+    $('pc-k-vmes').textContent=vMes.length;
+    $('pc-k-vmes-s').textContent=fmtBRL(vMes.reduce(function(a,v){return a+(v.valorLiquido||0);},0))+' em volume';
+    $('pc-k-devido').textContent=fmtBRL(d.totalDevido);
+    var anoIni=hoje.getFullYear()+'-01-01';
+    var pagoAno=d.pagamentos.filter(function(p){return (p.data||'')>=anoIni;}).reduce(function(a,p){return a+(p.valor||0);},0);
+    $('pc-k-pago').textContent=fmtBRL(pagoAno);
+    // Modo Tray
+    var m=$('pc-modo');
+    if(d.tray && d.tray.configurado){ m.textContent='TRAY CONECTADA'; m.classList.add('on'); } else { m.textContent='MODO TESTE'; m.classList.remove('on'); }
+    $('pc-lastsync').textContent = d.tray && d.tray.ultimaSync ? ('Última sync: '+new Date(d.tray.ultimaSync).toLocaleString('pt-BR')) : 'Nunca sincronizado';
+    // filtro
+    var sel=$('pc-flt-inf'); var cur=sel.value;
+    sel.innerHTML='<option value="">Todos influenciadores</option>'+d.influenciadores.map(function(i){return '<option value="'+i.id+'">'+esc(i.nome)+'</option>';}).join('');
+    sel.value=cur;
+    pcRenderInfs(); _pcRenderVendas(); pcRenderPags();
+  }
+
+  function pcRenderInfs(){
+    var d=PC.dados; var w=$('pc-infs-wrap');
+    if(!d.influenciadores.length){ w.innerHTML='<div class="pc-empty">Nenhum influenciador cadastrado. Clique em <b>+ Influenciador</b> para começar.</div>'; return; }
+    w.innerHTML='<div class="pc-infs">'+d.influenciadores.map(function(i){
+      var r=d.resumos[i.id]||{totalComissao:0,totalPago:0,saldoAberto:0,qtdVendas:0};
+      var offCls=i.ativo===false?' off':'';
+      var badge=i.ativo===false?'<span class="pc-badge">INATIVO</span>':'<span class="pc-badge ok">'+i.comissaoPct+'%</span>';
+      return '<div class="pc-inf'+offCls+'">'
+       +'<div class="pc-inf-hd"><div><div class="pc-inf-n">'+esc(i.nome)+'</div>'+(i.handle?'<div class="pc-inf-h">'+esc(i.handle)+'</div>':'')+'</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">'+badge+'<span class="pc-cupom">'+esc(i.cupom)+'</span></div></div>'
+       +'<div class="pc-inf-body">'
+       +'<div><div class="pc-lbl">Vendas</div><div class="pc-val">'+r.qtdVendas+'</div></div>'
+       +'<div><div class="pc-lbl">Comissão total</div><div class="pc-val pos">'+fmtBRL(r.totalComissao)+'</div></div>'
+       +'<div><div class="pc-lbl">Já pago</div><div class="pc-val mut">'+fmtBRL(r.totalPago)+'</div></div>'
+       +'<div><div class="pc-lbl">Saldo aberto</div><div class="pc-val '+(r.saldoAberto>0?'due':'mut')+'">'+fmtBRL(r.saldoAberto)+'</div></div>'
+       +'</div>'
+       +'<div class="pc-inf-actions">'
+       +'<button class="pc-btn pri" onclick="pcPagar(\''+i.id+'\',\''+jsq(i.nome)+'\','+r.saldoAberto+')"'+(r.saldoAberto<=0?' disabled':'')+'>💰 Registrar pagamento</button>'
+       +'<button class="pc-btn ghost" onclick="pcEditInf(\''+i.id+'\')">Editar</button>'
+       +'</div>'
+       +'</div>';
+    }).join('')+'</div>';
+  }
+
+  window.pcRenderVendas=function(){ _pcRenderVendas(); };
+  function _pcRenderVendas(){
+    var d=PC.dados; var w=$('pc-vendas-wrap');
+    var flt=$('pc-flt-inf').value; var q=($('pc-flt-busca').value||'').toLowerCase().trim();
+    var lista=d.vendas.slice().reverse();
+    if(flt) lista=lista.filter(function(v){return v.influenciadorId===flt;});
+    if(q) lista=lista.filter(function(v){return (v.pedidoTray||'').toLowerCase().includes(q)||(v.cliente||'').toLowerCase().includes(q);});
+    if(!lista.length){ w.innerHTML='<div class="pc-empty">Nenhuma venda para os filtros atuais.</div>'; return; }
+    var map={}; d.influenciadores.forEach(function(i){map[i.id]=i;});
+    w.innerHTML='<div class="pc-tblwrap"><table class="pc-tbl"><thead><tr>'
+      +'<th>Data</th><th>Pedido</th><th>Cupom</th><th>Influenciador</th><th>Cliente</th>'
+      +'<th class="n">Bruto</th><th class="n">Frete</th><th class="n">Líquido</th><th class="n">Comissão</th><th>Origem</th><th></th>'
+      +'</tr></thead><tbody>'
+      +lista.map(function(v){
+        var inf=map[v.influenciadorId]||{nome:'?'};
+        return '<tr'+(v.cancelada?' class="cancel"':'')+'>'
+          +'<td>'+fmtDt(v.data)+'</td>'
+          +'<td>'+esc(v.pedidoTray||'—')+'</td>'
+          +'<td><span class="pc-cupom-inline">'+esc(v.cupom)+'</span></td>'
+          +'<td>'+esc(inf.nome)+'</td>'
+          +'<td>'+esc(v.cliente||'—')+'</td>'
+          +'<td class="n">'+fmtBRL(v.valorBruto)+'</td>'
+          +'<td class="n">'+fmtBRL(v.valorFrete)+'</td>'
+          +'<td class="n">'+fmtBRL(v.valorLiquido)+'</td>'
+          +'<td class="n" style="color:var(--gd);font-weight:700">'+fmtBRL(v.comissao)+'</td>'
+          +'<td><span class="pc-badge '+(v.origem==='manual'?'':'ok')+'" style="text-transform:none">'+(v.origem==='tray-teste'?'TRAY (teste)':v.origem==='manual'?'Manual':'TRAY')+'</span></td>'
+          +'<td>'+(v.cancelada?'':'<button class="pc-btn rm" style="padding:4px 10px;font-size:11px" onclick="pcCancelarVenda(\''+v.id+'\')">Cancelar</button>')+'</td>'
+          +'</tr>';
+      }).join('')+'</tbody></table></div>';
+  }
+
+  function pcRenderPags(){
+    var d=PC.dados; var w=$('pc-pags-wrap');
+    if(!d.pagamentos.length){ w.innerHTML='<div class="pc-empty">Nenhum pagamento registrado ainda.</div>'; return; }
+    var map={}; d.influenciadores.forEach(function(i){map[i.id]=i;});
+    var lista=d.pagamentos.slice().reverse();
+    w.innerHTML='<div class="pc-tblwrap"><table class="pc-tbl"><thead><tr>'
+      +'<th>Data</th><th>Influenciador</th><th class="n">Valor</th><th>Observação</th><th>Registrado por</th>'
+      +'</tr></thead><tbody>'
+      +lista.map(function(p){
+        var inf=map[p.influenciadorId]||{nome:'?'};
+        return '<tr><td>'+fmtDt(p.data)+'</td><td>'+esc(inf.nome)+'</td>'
+          +'<td class="n" style="color:var(--gd);font-weight:700">'+fmtBRL(p.valor)+'</td>'
+          +'<td>'+esc(p.observacao||'—')+'</td>'
+          +'<td style="color:var(--gy)">'+esc(p.criadoPor||'—')+'</td></tr>';
+      }).join('')+'</tbody></table></div>';
+  }
+
+  // ═══ MODAIS ═══
+  window.pcOpenInf=function(){ pcResetInf(); $('pc-mi').classList.add('on'); setTimeout(function(){$('pc-i-nome').focus();},50); };
+  window.pcCloseInf=function(){ $('pc-mi').classList.remove('on'); };
+  window.pcEditInf=function(id){
+    var i=PC.dados.influenciadores.find(function(x){return x.id===id;});
+    if(!i) return;
+    pcResetInf();
+    $('pc-mi-tit').textContent='Editar '+i.nome;
+    $('pc-i-id').value=i.id; $('pc-i-nome').value=i.nome; $('pc-i-handle').value=i.handle||'';
+    $('pc-i-cupom').value=i.cupom; $('pc-i-pct').value=i.comissaoPct;
+    $('pc-i-pix').value=i.pix||''; $('pc-i-tel').value=i.telefone||'';
+    $('pc-i-ativo').checked=i.ativo!==false;
+    $('pc-mi').classList.add('on');
+  };
+  function pcResetInf(){
+    $('pc-mi-tit').textContent='Novo influenciador'; $('pc-mi-err').classList.remove('on');
+    ['pc-i-id','pc-i-nome','pc-i-handle','pc-i-cupom','pc-i-pix','pc-i-tel'].forEach(function(x){$(x).value='';});
+    $('pc-i-pct').value='5'; $('pc-i-ativo').checked=true;
+  }
+  window.pcSaveInf=function(){
+    var e=$('pc-mi-err'); e.classList.remove('on');
+    var inf={
+      id: $('pc-i-id').value || undefined,
+      nome: $('pc-i-nome').value.trim(),
+      handle: $('pc-i-handle').value.trim(),
+      cupom: $('pc-i-cupom').value.trim(),
+      comissaoPct: parseFloat($('pc-i-pct').value),
+      pix: $('pc-i-pix').value.trim(),
+      telefone: $('pc-i-tel').value.trim(),
+      ativo: $('pc-i-ativo').checked,
+    };
+    if(!inf.nome || !inf.cupom){ e.textContent='Nome e cupom são obrigatórios.'; e.classList.add('on'); return; }
+    $('pc-i-save').disabled=true;
+    fetch('/api/parceiros/influenciador',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({influenciador:inf})})
+      .then(function(r){return r.json();})
+      .then(function(res){
+        $('pc-i-save').disabled=false;
+        if(res.error){ e.textContent=res.error; e.classList.add('on'); return; }
+        pcCloseInf(); pcRefresh();
+      });
+  };
+
+  window.pcOpenVenda=function(){
+    if(!PC.dados || !PC.dados.influenciadores.length){ alert('Cadastre ao menos um influenciador primeiro.'); return; }
+    $('pc-mv-err').classList.remove('on');
+    var sel=$('pc-v-cupom');
+    sel.innerHTML=PC.dados.influenciadores.filter(function(i){return i.ativo!==false;}).map(function(i){return '<option value="'+i.cupom+'">'+esc(i.cupom)+' — '+esc(i.nome)+' ('+i.comissaoPct+'%)</option>';}).join('');
+    ['pc-v-pedido','pc-v-bruto','pc-v-cliente'].forEach(function(x){$(x).value='';});
+    $('pc-v-frete').value='0';
+    $('pc-v-data').value=new Date().toISOString().slice(0,10);
+    $('pc-v-preview').textContent='';
+    $('pc-mv').classList.add('on');
+    ['pc-v-cupom','pc-v-bruto','pc-v-frete'].forEach(function(id){$(id).oninput=pcVPreview;$(id).onchange=pcVPreview;});
+  };
+  function pcVPreview(){
+    var cupom=$('pc-v-cupom').value;
+    var inf=PC.dados.influenciadores.find(function(i){return i.cupom===cupom;});
+    if(!inf){$('pc-v-preview').textContent='';return;}
+    var b=parseFloat($('pc-v-bruto').value)||0, f=parseFloat($('pc-v-frete').value)||0;
+    var liq=Math.max(0,b-f), com=liq*inf.comissaoPct/100;
+    $('pc-v-preview').textContent = b>0 ? 'Líquido: '+fmtBRL(liq)+' · Comissão ('+inf.comissaoPct+'%): '+fmtBRL(com) : '';
+  }
+  window.pcCloseVenda=function(){ $('pc-mv').classList.remove('on'); };
+  window.pcSaveVenda=function(){
+    var e=$('pc-mv-err'); e.classList.remove('on');
+    var v={
+      cupom: $('pc-v-cupom').value,
+      pedidoTray: $('pc-v-pedido').value.trim(),
+      valorBruto: parseFloat($('pc-v-bruto').value)||0,
+      valorFrete: parseFloat($('pc-v-frete').value)||0,
+      data: $('pc-v-data').value,
+      cliente: $('pc-v-cliente').value.trim(),
+    };
+    if(!v.cupom){ e.textContent='Selecione o cupom.'; e.classList.add('on'); return; }
+    if(v.valorBruto<=0){ e.textContent='Informe o valor bruto.'; e.classList.add('on'); return; }
+    fetch('/api/parceiros/venda',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({venda:v})})
+      .then(function(r){return r.json();})
+      .then(function(res){
+        if(res.error){ e.textContent=res.error; e.classList.add('on'); return; }
+        var c=(res.criadas||[])[0];
+        if(c && c.erro){ e.textContent=c.erro; e.classList.add('on'); return; }
+        pcCloseVenda(); pcRefresh();
+      });
+  };
+
+  window.pcCancelarVenda=function(id){
+    if(!confirm('Cancelar esta venda? Ela não vai mais contar na comissão.')) return;
+    fetch('/api/parceiros/venda-cancelar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})})
+      .then(function(r){return r.json();}).then(function(res){ if(!res.error) pcRefresh(); else alert(res.error); });
+  };
+
+  window.pcPagar=function(id,nome,saldo){
+    if(saldo<=0){ alert('Sem saldo em aberto.'); return; }
+    var obs=prompt('Registrar pagamento para '+nome+'\n\nValor: '+fmtBRL(saldo)+'\n\nObservação (opcional):','PIX');
+    if(obs===null) return;
+    fetch('/api/parceiros/pagar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({influenciadorId:id,observacao:obs})})
+      .then(function(r){return r.json();}).then(function(res){
+        if(res.error){ alert(res.error); return; }
+        pcRefresh();
+      });
+  };
+
+  window.pcSync=function(){
+    var btn=$('pc-btn-sync'); btn.disabled=true; var txtOld=btn.textContent; btn.textContent='Sincronizando…';
+    fetch('/api/parceiros/sync-tray',{method:'POST'})
+      .then(function(r){return r.json();}).then(function(res){
+        btn.disabled=false; btn.textContent=txtOld;
+        if(res.error){ alert(res.error); return; }
+        alert(res.msg);
+        pcRefresh();
+      }).catch(function(){ btn.disabled=false; btn.textContent=txtOld; alert('Erro na sincronização.'); });
+  };
+
+  window.pcOpenTrayCfg=function(){
+    $('pc-mt-err').classList.remove('on');
+    ['pc-t-key','pc-t-sec','pc-t-code'].forEach(function(x){$(x).value='';});
+    $('pc-mt').classList.add('on');
+  };
+  window.pcCloseTrayCfg=function(){ $('pc-mt').classList.remove('on'); };
+  window.pcSaveTrayCfg=function(){
+    fetch('/api/parceiros/tray-config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      consumer_key:$('pc-t-key').value.trim(), consumer_secret:$('pc-t-sec').value.trim(), code:$('pc-t-code').value.trim()
+    })}).then(function(r){return r.json();}).then(function(res){
+      if(res.error){ $('pc-mt-err').textContent=res.error; $('pc-mt-err').classList.add('on'); return; }
+      pcCloseTrayCfg(); pcRefresh();
+    });
+  };
+
+  // ═══ VISÃO VENDAS ═══
+  function pcRenderRanking(){
+    var r=PC.ranking; if(!r) return;
+    $('pc-rank-mes').innerHTML=(new Date(r.mes+'-01T12:00:00')).toLocaleString('pt-BR',{month:'long',year:'numeric'});
+    var lista=r.ranking.filter(function(x){return x.qtdMes>0;});
+    if(!lista.length){ $('pc-rank-wrap').innerHTML='<div class="pc-empty">Nenhuma venda com cupom neste mês ainda.</div>'; return; }
+    var maxV=Math.max.apply(null, lista.map(function(x){return x.volumeMes;}));
+    $('pc-rank-wrap').innerHTML='<div class="pc-rank">'+lista.map(function(x,i){
+      var pct=maxV>0?Math.round(x.volumeMes/maxV*100):0;
+      return '<div class="pc-rank-item">'
+        +'<div class="pc-rank-pos">'+(i+1)+'º</div>'
+        +'<div class="pc-rank-body">'
+          +'<div class="pc-rank-nome">'+esc(x.nome)+'</div>'
+          +'<div class="pc-rank-sub">'+esc(x.handle||'')+' · cupom <span class="pc-cupom-inline">'+esc(x.cupom)+'</span></div>'
+          +'<div style="height:6px;background:var(--bd);border-radius:3px;margin-top:8px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,var(--gm),var(--g));width:'+pct+'%;transition:width .6s ease"></div></div>'
+        +'</div>'
+        +'<div class="pc-rank-num"><div class="pc-rank-qtd">'+x.qtdMes+'</div><div class="pc-rank-qtd-lbl">vendas/mês</div></div>'
+        +'</div>';
+    }).join('')+'</div>';
+  }
+
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function jsq(s){return String(s).replace(/'/g,"\\'");}
+})();
+</script>
+</div>
+<!-- ===== FIM PARCEIROS ===== -->
+
+
     <!-- IA -->
     <div class="tab" id="tab-ia">
       <div class="ia-wrap">
@@ -2718,6 +3217,7 @@ var tabMeta = {
   contatos:  ['Contatos Úteis','Fornecedores e telefones úteis'],
   calculadora: ['Calculadora de Juros','Simulação de parcelamento no cartão'],
   comercial: ['Dashboard Comercial','Ranking, metas e performance da equipe'],
+  parceiros: ['Parceiros','Influenciadores, comissões e pagamentos'],
   ia:        ['IA Pro Hunters','Assistente de conhecimento interno'],
   gerador:   ['Gerador de Conteúdo','Criação de conteúdo com IA'],
   linhaeditorial: ['Linha Editorial','Calendário e estratégia de conteúdo'],
@@ -2763,6 +3263,7 @@ function goTab(id, el) {
   if (id === 'calculadora') calcInit();
   if (id === 'gerador') gerInit();
   if (id === 'linhaeditorial') edInit();
+  if (id === 'parceiros') parceirosInit();
 }
 
 function toggleSB() {
