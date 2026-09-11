@@ -1,11 +1,12 @@
 {
   "gerencia": {
     "nome": "Gerência",
-    "hash": "$2b$10$lp6AW8QgjY/vLQV3RVdqpuGATkfJxFYdJwHo8.K7NK4v.6HSpYSdq",
+    "hash": "$2b$10$V9HyfPnC86S2IlGtacpl3uV27qfivz5oEYyQoTcd7TCfJTAjdKrl2",
     "role": "admin",
     "email": null,
     "mustChange": false,
-    "criadoEm": "2026-01-01"
+    "criadoEm": "2026-01-01",
+    "senhaAlteradaEm": "2026-09-11T12:51:00.141Z"
   },
   "auxiliar": {
     "nome": "Auxiliar",
