@@ -359,6 +359,7 @@ tbody tr:hover td{background:var(--gl)}
   </div>
   <div class="sb-grp" id="grp-admin" style="display:none">
     <div class="sb-lbl">Administração</div>
+    <button class="ni" onclick="goTab('usuarios',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.6"/><path d="M2.6 20c0-3.5 2.9-6.2 6.4-6.2s6.4 2.7 6.4 6.2"/><circle cx="17" cy="7" r="2.6"/><path d="M15.5 14.2c2.7.4 4.7 2.7 4.7 5.4"/></svg></span><span class="ni-tx">Usuários</span><span class="badge-admin">ADMIN</span></button>
     <button class="ni" onclick="goTab('admin',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></span><span class="ni-tx">Base de Conhecimento</span><span class="badge-admin">ADMIN</span></button>
   </div>
   <div class="sb-foot">v2.2 · Blumenau, SC</div>
@@ -3035,6 +3036,297 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
 <!-- ===== FIM PARCEIROS ===== -->
 
 
+<!-- ═══ MUDANÇA DE SENHA OBRIGATÓRIA (overlay full-screen) ═══ -->
+<div id="chpwd-overlay" hidden style="position:fixed;inset:0;background:rgba(15,20,17,.92);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--wh);border-radius:var(--r-lg);width:100%;max-width:440px;padding:32px 30px;box-shadow:var(--sh-3);font-family:var(--ff)">
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="width:52px;height:52px;background:var(--gl);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px">
+        <svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:none;stroke:var(--gd);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      </div>
+      <h2 style="font-size:19px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px">Bem-vindo(a)! 👋</h2>
+      <p style="font-size:13.5px;color:var(--gy);line-height:1.5">Esta é sua primeira vez no portal.<br>Escolha uma senha nova pra continuar.</p>
+    </div>
+    <div id="chpwd-err" style="display:none;background:var(--rl);color:var(--r);border:1px solid #f5c0c0;padding:10px 14px;border-radius:var(--r-sm);font-size:12.5px;margin-bottom:12px"></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div>
+        <label style="font-size:11.5px;font-weight:700;color:var(--dk);display:block;margin-bottom:5px">Senha atual (a que te passaram)</label>
+        <input id="chpwd-atual" type="password" autocomplete="current-password" style="width:100%;border:1px solid var(--bd);border-radius:var(--r-sm);padding:11px 13px;font-size:14px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11.5px;font-weight:700;color:var(--dk);display:block;margin-bottom:5px">Nova senha (mínimo 8 caracteres)</label>
+        <input id="chpwd-nova" type="password" autocomplete="new-password" style="width:100%;border:1px solid var(--bd);border-radius:var(--r-sm);padding:11px 13px;font-size:14px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11.5px;font-weight:700;color:var(--dk);display:block;margin-bottom:5px">Confirme a nova senha</label>
+        <input id="chpwd-nova2" type="password" autocomplete="new-password" style="width:100%;border:1px solid var(--bd);border-radius:var(--r-sm);padding:11px 13px;font-size:14px;outline:none">
+      </div>
+      <button id="chpwd-btn" onclick="chpwdSubmit()" style="background:var(--g);color:#fff;border:none;border-radius:var(--r-sm);padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px">Salvar nova senha</button>
+    </div>
+  </div>
+</div>
+<script>
+window.chpwdOpen = function(force){
+  var ov = document.getElementById('chpwd-overlay');
+  ov.hidden = false; ov.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  ov.dataset.forced = force ? '1' : '0';
+  setTimeout(function(){ document.getElementById('chpwd-atual').focus(); }, 100);
+};
+window.chpwdClose = function(){
+  var ov = document.getElementById('chpwd-overlay');
+  if (ov.dataset.forced === '1') return; // não fecha se for obrigatório
+  ov.hidden = true; ov.style.display = 'none';
+  document.body.style.overflow = '';
+};
+window.chpwdSubmit = function(){
+  var e = document.getElementById('chpwd-err'); e.style.display='none';
+  var atual = document.getElementById('chpwd-atual').value;
+  var nova = document.getElementById('chpwd-nova').value;
+  var nova2 = document.getElementById('chpwd-nova2').value;
+  if (!atual) { e.textContent='Informe sua senha atual.'; e.style.display='block'; return; }
+  if (!nova || nova.length < 8) { e.textContent='A nova senha precisa ter pelo menos 8 caracteres.'; e.style.display='block'; return; }
+  if (nova !== nova2) { e.textContent='As duas senhas não conferem.'; e.style.display='block'; return; }
+  if (nova === atual) { e.textContent='A nova senha precisa ser diferente da atual.'; e.style.display='block'; return; }
+  var btn = document.getElementById('chpwd-btn'); btn.disabled = true; btn.textContent = 'Salvando…';
+  fetch('/api/change-password', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({senhaAtual:atual, novaSenha:nova})})
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      btn.disabled=false; btn.textContent='Salvar nova senha';
+      if (res.error) { e.textContent = res.error; e.style.display='block'; return; }
+      alert('Senha alterada com sucesso!');
+      var ov = document.getElementById('chpwd-overlay');
+      ov.dataset.forced = '0'; ov.hidden = true; ov.style.display='none';
+      document.body.style.overflow = '';
+      window.MUST_CHANGE_PASSWORD = false;
+    })
+    .catch(function(){ btn.disabled=false; btn.textContent='Salvar nova senha'; e.textContent='Erro de conexão.'; e.style.display='block'; });
+};
+</script>
+
+<!-- ═══ ABA USUÁRIOS (só gerência) ═══ -->
+<div class="tab" id="tab-usuarios">
+<style>
+#tab-usuarios{max-width:1080px}
+#tab-usuarios [hidden]{display:none!important}
+#tab-usuarios .us-top{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+#tab-usuarios .us-btn{background:var(--wh);border:1px solid var(--bd);color:var(--dk);border-radius:var(--r-sm);padding:8px 14px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .18s var(--ez);font-family:inherit}
+#tab-usuarios .us-btn:hover{border-color:var(--g);color:var(--gd)}
+#tab-usuarios .us-btn.pri{background:var(--g);border-color:var(--g);color:#fff}
+#tab-usuarios .us-btn.pri:hover{background:var(--gd);border-color:var(--gd)}
+#tab-usuarios .us-btn.rm{background:var(--rl);border-color:#f5c0c0;color:var(--r)}
+#tab-usuarios .us-btn.rm:hover{background:#fbe3e3}
+#tab-usuarios .us-btn:disabled{opacity:.5;cursor:not-allowed}
+#tab-usuarios .us-tblwrap{overflow-x:auto;background:var(--wh);border:1px solid var(--bd);border-radius:var(--r-md);box-shadow:var(--sh-1)}
+#tab-usuarios table.us-tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:680px}
+#tab-usuarios .us-tbl th{background:var(--gl);color:var(--gd);font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;padding:10px 12px;text-align:left;border-bottom:1px solid var(--gm);white-space:nowrap}
+#tab-usuarios .us-tbl td{padding:11px 12px;border-bottom:1px solid var(--bd);vertical-align:middle}
+#tab-usuarios .us-tbl tr:last-child td{border-bottom:none}
+#tab-usuarios .us-tbl tr:hover td{background:var(--bg)}
+#tab-usuarios .us-pill{display:inline-block;padding:2px 9px;border-radius:var(--r-full);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+#tab-usuarios .us-pill.admin{background:#efe3ff;color:#6c3fb0}
+#tab-usuarios .us-pill.vendas{background:var(--gl);color:var(--gd)}
+#tab-usuarios .us-pill.auxiliar{background:#fff2d9;color:#a06e00}
+#tab-usuarios .us-warn{background:#fff8e6;border:1px solid #f0d78e;color:#8a5a00;font-size:11.5px;padding:2px 8px;border-radius:var(--r-full);font-weight:700}
+#tab-usuarios .us-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+#tab-usuarios .us-actions .us-btn{padding:5px 10px;font-size:11.5px}
+/* modal */
+#tab-usuarios .us-modal{position:fixed;inset:0;background:rgba(17,20,18,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+#tab-usuarios .us-modal.on{display:flex}
+#tab-usuarios .us-mbx{background:var(--wh);border-radius:var(--r-lg);width:100%;max-width:480px;box-shadow:var(--sh-3)}
+#tab-usuarios .us-mhd{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+#tab-usuarios .us-mhd h3{font-size:15px;font-weight:700}
+#tab-usuarios .us-mx{background:none;border:none;color:var(--gy);font-size:22px;cursor:pointer;padding:2px 8px;line-height:1;border-radius:5px}
+#tab-usuarios .us-mx:hover{background:var(--bg)}
+#tab-usuarios .us-mbd{padding:20px}
+#tab-usuarios .us-mft{padding:14px 20px;border-top:1px solid var(--bd);display:flex;gap:10px;justify-content:flex-end;background:var(--bg);border-radius:0 0 var(--r-lg) var(--r-lg)}
+#tab-usuarios .us-fld{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+#tab-usuarios .us-fld label{font-size:11.5px;font-weight:700;color:var(--dk)}
+#tab-usuarios .us-fld input,#tab-usuarios .us-fld select{border:1px solid var(--bd);border-radius:var(--r-sm);padding:10px 12px;font-size:13px;font-family:inherit;outline:none;transition:border-color .18s;background:var(--wh)}
+#tab-usuarios .us-fld input:focus,#tab-usuarios .us-fld select:focus{border-color:var(--g);box-shadow:var(--ring)}
+#tab-usuarios .us-mrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#tab-usuarios .us-hint{font-size:11px;color:var(--gy);margin-top:-6px;margin-bottom:8px}
+#tab-usuarios .us-err{background:var(--rl);color:var(--r);border:1px solid #f5c0c0;padding:9px 12px;border-radius:var(--r-sm);font-size:12px;margin-bottom:10px;display:none}
+#tab-usuarios .us-err.on{display:block}
+#tab-usuarios .us-sec{font-size:12px;font-weight:700;margin:24px 0 12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gy);display:flex;align-items:center;gap:10px}
+#tab-usuarios .us-sec::after{content:'';flex:1;height:1px;background:var(--bd)}
+#tab-usuarios .us-log{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;line-height:1.7;color:var(--dk);background:var(--wh);border:1px solid var(--bd);border-radius:var(--r-md);padding:14px;max-height:280px;overflow-y:auto}
+#tab-usuarios .us-log .ev{color:var(--gd);font-weight:700}
+#tab-usuarios .us-log .ev.fal{color:var(--r)}
+#tab-usuarios .us-log .dt{color:var(--gl2)}
+@media(max-width:768px){#tab-usuarios .us-mrow{grid-template-columns:1fr}}
+</style>
+
+<div class="us-top">
+  <button class="us-btn pri" onclick="usOpen()">+ Novo usuário</button>
+  <button class="us-btn" onclick="usChangeMinha()">🔑 Trocar minha senha</button>
+</div>
+
+<div class="us-tblwrap"><table class="us-tbl" id="us-tbl"></table></div>
+
+<div class="us-sec">Últimos acessos e alterações</div>
+<div class="us-log" id="us-log">Carregando…</div>
+
+<!-- modal usuário -->
+<div class="us-modal" id="us-modal">
+  <div class="us-mbx">
+    <div class="us-mhd"><h3 id="us-tit">Novo usuário</h3><button class="us-mx" onclick="usClose()">×</button></div>
+    <div class="us-mbd">
+      <div class="us-err" id="us-err"></div>
+      <input type="hidden" id="us-editando">
+      <div class="us-mrow">
+        <div class="us-fld"><label>Login *</label><input id="us-usuario" placeholder="ex: joao" autocomplete="off"></div>
+        <div class="us-fld"><label>Perfil *</label><select id="us-role"><option value="vendas">Vendas</option><option value="auxiliar">Auxiliar</option><option value="admin">Admin (gerência)</option></select></div>
+      </div>
+      <div class="us-fld"><label>Nome completo *</label><input id="us-nome" placeholder="Nome do usuário"></div>
+      <div class="us-fld"><label>Email</label><input id="us-email" type="email" placeholder="opcional"></div>
+      <div class="us-fld" id="us-senha-wrap">
+        <label>Senha inicial *</label>
+        <input id="us-senha" placeholder="mínimo 8 caracteres">
+        <div class="us-hint">Copie e passe pro usuário. Ele será obrigado a trocar no primeiro login.</div>
+      </div>
+    </div>
+    <div class="us-mft">
+      <button class="us-btn" onclick="usClose()">Cancelar</button>
+      <button class="us-btn pri" id="us-save" onclick="usSave()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var USR = { data: null };
+  var dtFmt = new Intl.DateTimeFormat('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function fmtDt(iso){ if(!iso) return '—'; try{return dtFmt.format(new Date(iso));}catch(e){return iso;} }
+
+  window.usuariosInit = function(){
+    usLoad(); usLoadLog();
+  };
+
+  function usLoad(){
+    fetch('/api/users').then(function(r){return r.json();}).then(function(d){
+      if (d.error) { $('us-tbl').innerHTML = '<tbody><tr><td>'+esc(d.error)+'</td></tr></tbody>'; return; }
+      USR.data = d.users || {};
+      usRender();
+    });
+  }
+
+  function usRender(){
+    var eu = (typeof USER_USUARIO !== 'undefined') ? USER_USUARIO : '';
+    var rows = Object.entries(USR.data).map(function(pair){
+      var u = pair[0], v = pair[1];
+      var role = v.role || 'vendas';
+      var pill = '<span class="us-pill '+role+'">'+role+'</span>';
+      var warn = v.mustChange ? '<span class="us-warn">SENHA TEMPORÁRIA</span>' : '';
+      var isMe = u === eu;
+      var acts = '<button class="us-btn" onclick="usEdit(\''+u+'\')">Editar</button>';
+      if (!isMe) {
+        acts += '<button class="us-btn" onclick="usReset(\''+u+'\',\''+esc((v.nome||u)).replace(/\\'/g,"\\'")+'\')">Resetar senha</button>';
+        acts += '<button class="us-btn rm" onclick="usDelete(\''+u+'\',\''+esc((v.nome||u)).replace(/\\'/g,"\\'")+'\')">Excluir</button>';
+      }
+      return '<tr>'
+        +'<td><b>'+esc(u)+'</b>'+(isMe?' <span style="color:var(--gl2);font-size:10px">(você)</span>':'')+'</td>'
+        +'<td>'+esc(v.nome||'—')+'</td>'
+        +'<td>'+pill+' '+warn+'</td>'
+        +'<td>'+esc(v.email||'—')+'</td>'
+        +'<td style="color:var(--gy)">'+esc(v.criadoEm||'—')+'</td>'
+        +'<td><div class="us-actions">'+acts+'</div></td>'
+      +'</tr>';
+    }).join('');
+    $('us-tbl').innerHTML = '<thead><tr><th>Login</th><th>Nome</th><th>Perfil</th><th>Email</th><th>Criado</th><th></th></tr></thead><tbody>'+rows+'</tbody>';
+  }
+
+  function usLoadLog(){
+    fetch('/api/access-log').then(function(r){return r.json();}).then(function(d){
+      if (d.error) { $('us-log').textContent = d.error; return; }
+      if (!d.entries || !d.entries.length) { $('us-log').textContent = 'Sem eventos registrados neste mês.'; return; }
+      $('us-log').innerHTML = d.entries.map(function(e){
+        var fal = /_falha|_deletado/.test(e.evento);
+        var meta = [];
+        if (e.usuario) meta.push('usuário='+esc(e.usuario));
+        if (e.alvo) meta.push('alvo='+esc(e.alvo));
+        if (e.por) meta.push('por='+esc(e.por));
+        if (e.role) meta.push('perfil='+esc(e.role));
+        return '<div><span class="dt">'+fmtDt(e.at)+'</span> · <span class="ev'+(fal?' fal':'')+'">'+esc(e.evento)+'</span> · '+meta.join(' · ')+(e.ip?' · <span style="color:var(--gl2)">'+esc(e.ip)+'</span>':'')+'</div>';
+      }).join('');
+    });
+  }
+
+  window.usOpen = function(){
+    $('us-tit').textContent = 'Novo usuário';
+    $('us-err').classList.remove('on');
+    ['us-editando','us-usuario','us-nome','us-email','us-senha'].forEach(function(x){$(x).value='';});
+    $('us-role').value = 'vendas';
+    $('us-usuario').disabled = false;
+    $('us-senha-wrap').style.display = '';
+    $('us-modal').classList.add('on');
+    setTimeout(function(){$('us-usuario').focus();},50);
+  };
+  window.usClose = function(){ $('us-modal').classList.remove('on'); };
+
+  window.usEdit = function(usuario){
+    var u = USR.data[usuario]; if(!u) return;
+    $('us-tit').textContent = 'Editar '+usuario;
+    $('us-err').classList.remove('on');
+    $('us-editando').value = usuario;
+    $('us-usuario').value = usuario;
+    $('us-usuario').disabled = true; // login não muda
+    $('us-nome').value = u.nome || '';
+    $('us-email').value = u.email || '';
+    $('us-role').value = u.role || 'vendas';
+    $('us-senha').value = '';
+    $('us-senha-wrap').style.display = 'none'; // não trocamos senha aqui (usa "Resetar senha")
+    $('us-modal').classList.add('on');
+  };
+
+  window.usSave = function(){
+    var e = $('us-err'); e.classList.remove('on');
+    var editando = $('us-editando').value;
+    var usuario = $('us-usuario').value.trim().toLowerCase();
+    var dados = { nome: $('us-nome').value.trim(), email: $('us-email').value.trim(), role: $('us-role').value };
+    if (!editando && $('us-senha').value) dados.senha = $('us-senha').value;
+    if (!usuario) { e.textContent='Login obrigatório.'; e.classList.add('on'); return; }
+    if (!dados.nome) { e.textContent='Nome obrigatório.'; e.classList.add('on'); return; }
+    if (!editando && (!dados.senha || dados.senha.length < 8)) { e.textContent='Senha inicial de pelo menos 8 caracteres.'; e.classList.add('on'); return; }
+    $('us-save').disabled = true;
+    fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario, dados})})
+      .then(function(r){return r.json();}).then(function(res){
+        $('us-save').disabled = false;
+        if (res.error) { e.textContent = res.error; e.classList.add('on'); return; }
+        usClose(); usLoad(); usLoadLog();
+      });
+  };
+
+  window.usReset = function(usuario, nome){
+    if (!confirm('Gerar nova senha temporária para '+nome+'?\nA senha atual dele para de funcionar.')) return;
+    fetch('/api/users/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario})})
+      .then(function(r){return r.json();}).then(function(res){
+        if (res.error) { alert('Erro: '+res.error); return; }
+        prompt('Senha temporária para '+nome+' (copie e passe pra ele):', res.senhaTemporaria);
+        usLoad(); usLoadLog();
+      });
+  };
+
+  window.usDelete = function(usuario, nome){
+    if (!confirm('Excluir definitivamente o usuário '+nome+'?')) return;
+    fetch('/api/users/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario})})
+      .then(function(r){return r.json();}).then(function(res){
+        if (res.error) { alert('Erro: '+res.error); return; }
+        usLoad(); usLoadLog();
+      });
+  };
+
+  window.usChangeMinha = function(){
+    // reusa a mesma tela do force-change, mas em modo opcional
+    window.chpwdOpen(false);
+  };
+})();
+</script>
+</div>
+<!-- ═══ FIM USUÁRIOS ═══ -->
+
+
     <!-- IA -->
     <div class="tab" id="tab-ia">
       <div class="ia-wrap">
@@ -3221,6 +3513,7 @@ var tabMeta = {
   ia:        ['IA Pro Hunters','Assistente de conhecimento interno'],
   gerador:   ['Gerador de Conteúdo','Criação de conteúdo com IA'],
   linhaeditorial: ['Linha Editorial','Calendário e estratégia de conteúdo'],
+  usuarios:  ['Usuários','Gerenciar acessos e senhas'],
   admin:     ['Base de Conhecimento','Gerenciar o que a IA sabe']
 };
 
@@ -3235,6 +3528,10 @@ window.onload = function() {
   }
   if (typeof USER_NOME !== 'undefined' && USER_NOME) {
     document.getElementById('user-pill').textContent = USER_NOME;
+  }
+  // Se veio flag pra trocar senha (primeiro login ou reset), força a tela cheia
+  if (typeof MUST_CHANGE_PASSWORD !== 'undefined' && MUST_CHANGE_PASSWORD && typeof chpwdOpen === 'function') {
+    chpwdOpen(true);
   }
 };
 
@@ -3264,6 +3561,7 @@ function goTab(id, el) {
   if (id === 'gerador') gerInit();
   if (id === 'linhaeditorial') edInit();
   if (id === 'parceiros') parceirosInit();
+  if (id === 'usuarios') usuariosInit();
 }
 
 function toggleSB() {
