@@ -14,6 +14,7 @@ const { getTarifas, saveTarifas } = require('../lib/tarifasStore');
 const { getParceiros, saveParceiros } = require('../lib/parceirosStore');
 const { verifyPassword, setPassword, upsertUser, deleteUser, getAllUsers, generateTempPassword, getRoleSync } = require('../lib/usersStore');
 const accessLog = require('../lib/accessLog');
+const { calcularProgressoMeta, getFeriadosCustom, saveFeriadosCustom } = require('../lib/metaDiaria');
 
 // Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
 // Fallback pro esquema antigo (baseado no nome do usuário) fica só como safety-net.
@@ -453,6 +454,44 @@ module.exports = async (req, res) => {
       const entries = await accessLog.readRecent(200);
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ entries }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // GET /api/meta-diaria — progresso da meta acumulada por vendedor (todos logados)
+  if (req.method === 'GET' && url === '/api/meta-diaria') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const d = await getComercialData();
+      const progresso = await calcularProgressoMeta(d.sellers || []);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(progresso));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // GET /api/feriados — lista de feriados customizados (todos logados podem ler)
+  if (req.method === 'GET' && url === '/api/feriados') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const feriados = await getFeriadosCustom();
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ feriados, canEdit: canEditComercial(sess) }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // POST /api/feriados — atualiza lista (só gerência)
+  if (req.method === 'POST' && url === '/api/feriados') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const { feriados } = JSON.parse(await readBody(req));
+      if (!Array.isArray(feriados)) throw new Error('Formato inválido.');
+      // Valida: strings AAAA-MM-DD
+      const validos = feriados.filter(f => typeof f === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(f)).sort();
+      await saveFeriadosCustom(validos);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, feriados: validos }));
+    } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
   }
 
