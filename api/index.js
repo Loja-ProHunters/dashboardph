@@ -735,7 +735,24 @@ module.exports = async (req, res) => {
       if (!sellerId || !valorNum || valorNum <= 0) {
         throw new Error('Informe o vendedor e um valor de venda maior que zero.');
       }
-      const data = await registrarVenda(Number(sellerId), valorNum);
+      let targetId = Number(sellerId);
+      // Se quem lança é vendedor, força o sellerId pro próprio (impede lançar
+      // pro colega mesmo via devtools ou POST direto). Gerência/auxiliar podem
+      // escolher qualquer vendedor.
+      if (sess.role === 'vendas') {
+        const dataAtual = await getComercialData();
+        const login = String(sess.usuario || '').toLowerCase();
+        const meu = (dataAtual.sellers || []).find(s => String(s.name || '').toLowerCase().includes(login));
+        if (!meu) {
+          throw new Error('Seu login não está vinculado a nenhum vendedor cadastrado.');
+        }
+        if (targetId !== meu.id) {
+          // silenciosamente redireciona pro próprio; o front já trava, então só
+          // chegaria aqui via tentativa manual.
+          targetId = meu.id;
+        }
+      }
+      const data = await registrarVenda(targetId, valorNum);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true, sellers: data.sellers }));
     } catch (e) {
@@ -761,8 +778,12 @@ module.exports = async (req, res) => {
     try {
       let html = fs.readFileSync(path.join(ROOT, 'comercial-dashboard.html'), 'utf-8');
       const canEditCom = canEditComercial(sess) ? 'true' : 'false';
+      const escJs = s => String(s || '').replace(/["\\]/g, '\\$&').replace(/[\r\n]/g,' ');
       html = html.replace('/* %%INJECT_COMERCIAL%% */',
-        'window.CAN_EDIT_COMERCIAL=' + canEditCom + '; window.USER_NOME="' + sess.nome + '";'
+        'window.CAN_EDIT_COMERCIAL=' + canEditCom
+        + '; window.USER_NOME="' + escJs(sess.nome) + '"'
+        + '; window.USER_USUARIO="' + escJs(sess.usuario) + '"'
+        + '; window.USER_ROLE="' + escJs(sess.role || '') + '";'
       );
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(html);
