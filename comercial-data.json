@@ -43,7 +43,13 @@
       "tarefas": 0,
       "atrasos": 0,
       "faltas": 0,
-      "advertencias": 0
+      "advertencias": 1,
+      "advertenciasLog": [
+        {
+          "data": "11/09/2026",
+          "motivo": "Fez o envio de um pedido de projétil que era para ser retirada"
+        }
+      ]
     }
   ],
   "diasCorridos": 11,
@@ -125,5 +131,5 @@
       "fechadoEm": "2026-08-03T11:06:21.307Z"
     }
   ],
-  "savedAt": "2026-09-11T12:48:40.987Z"
+  "savedAt": "2026-09-11T12:59:31.266Z"
 }
