@@ -990,6 +990,85 @@ tbody td {
  TAB 0 — PÓDIO (COMPETIÇÃO AO VIVO)
 ═══════════════════════════════════════════ -->
 <div class="tab-panel active" id="tab-podio">
+
+ <!-- ═══════════════════════════════════════════
+      PISTA DA META DIÁRIA — régua gamificada
+      atualiza a cada venda registrada
+ ═══════════════════════════════════════════ -->
+ <style>
+ .meta-track{background:linear-gradient(180deg,#0d0d0d,#0a0a0a);border:1px solid var(--border);border-radius:14px;padding:22px 22px 20px;margin-bottom:22px;position:relative;overflow:hidden}
+ .meta-track::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--brand2),var(--gold),var(--brand2));background-size:200% 100%;animation:mt-shine 4s linear infinite}
+ @keyframes mt-shine{0%{background-position:0% 0}100%{background-position:200% 0}}
+ .mt-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+ .mt-titwrap{display:flex;align-items:center;gap:10px}
+ .mt-flag{font-size:22px;filter:drop-shadow(0 0 6px rgba(29,185,84,.4))}
+ .mt-tit{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1.5px;color:var(--white);margin:0;line-height:1}
+ .mt-sub{font-size:11px;color:#9a9a9a;margin-top:3px;letter-spacing:.5px}
+ .mt-days{display:flex;align-items:center;gap:8px;background:var(--black3);border:1px solid var(--border2);border-radius:99px;padding:7px 14px;font-size:11px;color:#c9c9c9;font-weight:600}
+ .mt-days-num{color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:16px;line-height:1}
+ .mt-lanes{display:flex;flex-direction:column;gap:14px}
+ .mt-lane{background:var(--black3);border:1px solid var(--border2);border-radius:12px;padding:14px 16px 12px;transition:transform .3s,box-shadow .3s;position:relative;overflow:hidden}
+ .mt-lane.up{border-color:rgba(29,185,84,.3);box-shadow:0 0 24px -12px rgba(29,185,84,.6)}
+ .mt-lane.gold{border-color:rgba(212,168,67,.5);box-shadow:0 0 32px -10px rgba(212,168,67,.75)}
+ .mt-lane.gold::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 90% 50%,rgba(212,168,67,.12),transparent 60%);pointer-events:none;animation:mt-glow 3s ease-in-out infinite}
+ @keyframes mt-glow{0%,100%{opacity:.6}50%{opacity:1}}
+ .mt-lane-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+ .mt-lane-l{display:flex;align-items:center;gap:10px;min-width:0}
+ .mt-emoji{font-size:22px;line-height:1;flex-shrink:0}
+ .mt-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .mt-tag{font-size:9.5px;font-weight:800;letter-spacing:1.5px;padding:3px 9px;border-radius:99px;text-transform:uppercase}
+ .mt-tag.up{background:rgba(29,185,84,.15);color:var(--green)}
+ .mt-tag.dn{background:rgba(224,48,48,.15);color:var(--red)}
+ .mt-tag.gold{background:rgba(212,168,67,.2);color:var(--gold)}
+ .mt-pct{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.5px;line-height:1}
+ .mt-pct.up{color:var(--green)}
+ .mt-pct.dn{color:var(--red)}
+ .mt-pct.gold{color:var(--gold);text-shadow:0 0 12px rgba(212,168,67,.6)}
+ .mt-bar-wrap{position:relative;height:14px;background:var(--black4);border-radius:99px;overflow:hidden;border:1px solid var(--border2)}
+ .mt-bar{height:100%;border-radius:99px;transition:width 1s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden}
+ .mt-bar.up{background:linear-gradient(90deg,var(--green3),var(--green))}
+ .mt-bar.dn{background:linear-gradient(90deg,#5a1010,var(--red))}
+ .mt-bar.gold{background:linear-gradient(90deg,var(--gold),#ffd97a,var(--gold));background-size:200% 100%;animation:mt-goldshine 2.5s linear infinite}
+ @keyframes mt-goldshine{0%{background-position:0 0}100%{background-position:200% 0}}
+ .mt-bar::after{content:'';position:absolute;top:0;bottom:0;right:0;width:6px;background:rgba(255,255,255,.35);filter:blur(3px)}
+ .mt-marker{position:absolute;top:-3px;bottom:-3px;width:2px;background:rgba(255,255,255,.5);z-index:2}
+ .mt-marker-lbl{position:absolute;top:-18px;transform:translateX(-50%);font-size:9px;color:#a0a0a0;letter-spacing:1px;font-weight:600;white-space:nowrap}
+ .mt-foot{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;font-size:11.5px;color:#b0b0b0;gap:8px;flex-wrap:wrap}
+ .mt-foot-l{display:flex;flex-direction:column;gap:2px}
+ .mt-foot-r{display:flex;flex-direction:column;gap:2px;text-align:right}
+ .mt-vendido{font-family:'JetBrains Mono',monospace;color:var(--white);font-size:13px;font-weight:600}
+ .mt-saldo{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700}
+ .mt-saldo.up{color:var(--green)}
+ .mt-saldo.dn{color:var(--red)}
+ .mt-lbl{font-size:9.5px;letter-spacing:1.2px;color:#7a7a7a;text-transform:uppercase}
+ .mt-empty{text-align:center;padding:24px;color:#7a7a7a;font-size:12px}
+ .mt-fx{position:absolute;pointer-events:none;top:0;left:0;right:0;bottom:0;overflow:hidden}
+ .mt-fx span{position:absolute;top:-10px;font-size:14px;animation:mt-fall 2s linear infinite}
+ @keyframes mt-fall{to{transform:translateY(200px) rotate(360deg);opacity:0}}
+ @media (max-width:640px){
+   .mt-tit{font-size:20px}.mt-name{font-size:17px}.mt-pct{font-size:22px}
+   .mt-head{flex-direction:column;align-items:flex-start}
+ }
+ </style>
+ <div class="meta-track" id="meta-track">
+   <div class="mt-head">
+     <div class="mt-titwrap">
+       <div class="mt-flag">🏁</div>
+       <div>
+         <h2 class="mt-tit">Pista da Meta Diária</h2>
+         <div class="mt-sub" id="mt-sub">Carregando…</div>
+       </div>
+     </div>
+     <div class="mt-days">
+       <span>DIA ÚTIL</span>
+       <span class="mt-days-num" id="mt-days-num">–</span>
+       <span>de</span>
+       <span class="mt-days-num" id="mt-days-tot">–</span>
+     </div>
+   </div>
+   <div class="mt-lanes" id="mt-lanes"></div>
+ </div>
+
  <div class="podium-stage">
  <div class="podium-layout">
 
@@ -1470,7 +1549,8 @@ function getDias() {
 }
 
 function fmtBRL(v) {
- return 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+ const n = Number(v) || 0;
+ return 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function pctColor(pct) {
@@ -1504,6 +1584,46 @@ function readInputs() {
  const nEl = document.getElementById(`inp-${s.id}-name`);
  if (nEl) s.name = nEl.value || s.name;
  });
+}
+
+// Faturamento — botões +/- e formatação em R$
+function fatStep(sellerId, delta) {
+ const hidden = document.getElementById(`inp-${sellerId}-fat`);
+ const display = document.getElementById(`inp-${sellerId}-fat-display`);
+ if (!hidden || !display) return;
+ const atual = parseFloat(hidden.value) || 0;
+ const novo = Math.max(0, Math.round((atual + delta) * 100) / 100);
+ hidden.value = novo;
+ display.value = fmtBRL(novo);
+ recalculate();
+}
+function fatOnFocus(sellerId) {
+ const hidden = document.getElementById(`inp-${sellerId}-fat`);
+ const display = document.getElementById(`inp-${sellerId}-fat-display`);
+ if (hidden && display) display.value = String(parseFloat(hidden.value) || 0).replace('.', ',');
+}
+function fatOnBlur(sellerId) {
+ const hidden = document.getElementById(`inp-${sellerId}-fat`);
+ const display = document.getElementById(`inp-${sellerId}-fat-display`);
+ if (!hidden || !display) return;
+ // aceita: "12345", "12.345,67", "12,345.67", "R$ 12.345,67"
+ let raw = String(display.value || '').replace(/[R$\s]/g,'').trim();
+ // Se tem vírgula E ponto, assume padrão BR (ponto=milhar, vírgula=decimal)
+ if (raw.includes(',') && raw.includes('.')) raw = raw.replace(/\./g,'').replace(',', '.');
+ else if (raw.includes(',')) raw = raw.replace(/\./g,'').replace(',', '.');
+ const n = Math.max(0, Math.round((parseFloat(raw) || 0) * 100) / 100);
+ hidden.value = n;
+ display.value = fmtBRL(n);
+ recalculate();
+}
+// Etiqueta/Tarefas — botão − para descontar 1 ponto
+function pontoStep(sellerId, campo, delta) {
+ const el = document.getElementById(`inp-${sellerId}-${campo}`);
+ if (!el) return;
+ const atual = parseInt(el.value) || 0;
+ const novo = Math.max(0, Math.min(100, atual + delta));
+ el.value = novo;
+ recalculate();
 }
 
 function renderAll() {
@@ -2128,9 +2248,28 @@ function buildDataInputs() {
  placeholder="Nome">
  </div>
  <div class="input-grid">
- <div class="input-group"><label>Faturamento (R$)</label><input id="inp-${s.id}-fat" type="number" value="${s.fat}" min="0"></div>
- <div class="input-group"><label>Etiqueta (0-100)</label><input id="inp-${s.id}-etiq" type="number" value="${s.etiqueta}" min="0" max="100"></div>
- <div class="input-group"><label>Tarefas Operacionais (0-100)</label><input id="inp-${s.id}-tarefas" type="number" value="${s.tarefas}" min="0" max="100"></div>
+ <div class="input-group" style="grid-column:1/-1"><label>Faturamento (R$)</label>
+   <div style="display:flex;gap:4px;align-items:stretch;flex-wrap:wrap">
+     <button type="button" onclick="fatStep(${s.id},-10000)" title="-R$ 10.000" style="background:var(--black3);color:var(--white);border:1px solid var(--border2);border-radius:6px;padding:0 8px;cursor:pointer;font-weight:700;font-size:11px">−10k</button>
+     <button type="button" onclick="fatStep(${s.id},-1000)" title="-R$ 1.000" style="background:var(--black3);color:var(--white);border:1px solid var(--border2);border-radius:6px;padding:0 8px;cursor:pointer;font-weight:700;font-size:11px">−1k</button>
+     <input id="inp-${s.id}-fat-display" type="text" value="${fmtBRL(s.fat||0)}" style="flex:1;min-width:0;text-align:right;font-variant-numeric:tabular-nums" onblur="fatOnBlur(${s.id})" onfocus="fatOnFocus(${s.id})">
+     <input id="inp-${s.id}-fat" type="hidden" value="${s.fat||0}">
+     <button type="button" onclick="fatStep(${s.id},1000)" title="+R$ 1.000" style="background:var(--black3);color:var(--white);border:1px solid var(--border2);border-radius:6px;padding:0 8px;cursor:pointer;font-weight:700;font-size:11px">+1k</button>
+     <button type="button" onclick="fatStep(${s.id},10000)" title="+R$ 10.000" style="background:var(--black3);color:var(--white);border:1px solid var(--border2);border-radius:6px;padding:0 8px;cursor:pointer;font-weight:700;font-size:11px">+10k</button>
+   </div>
+ </div>
+ <div class="input-group"><label>Etiqueta (0-100)</label>
+   <div style="display:flex;gap:4px;align-items:stretch">
+     <button type="button" onclick="pontoStep(${s.id},'etiq',-1)" title="−1 ponto" style="background:var(--red);color:#fff;border:none;border-radius:6px;padding:0 12px;cursor:pointer;font-weight:700">−</button>
+     <input id="inp-${s.id}-etiq" type="number" value="${s.etiqueta}" min="0" max="100" style="flex:1;min-width:0;text-align:center">
+   </div>
+ </div>
+ <div class="input-group"><label>Tarefas Operacionais (0-100)</label>
+   <div style="display:flex;gap:4px;align-items:stretch">
+     <button type="button" onclick="pontoStep(${s.id},'tarefas',-1)" title="−1 ponto" style="background:var(--red);color:#fff;border:none;border-radius:6px;padding:0 12px;cursor:pointer;font-weight:700">−</button>
+     <input id="inp-${s.id}-tarefas" type="number" value="${s.tarefas}" min="0" max="100" style="flex:1;min-width:0;text-align:center">
+   </div>
+ </div>
  <div class="input-group"><label>Faltas</label><input id="inp-${s.id}-falt" type="number" value="${s.faltas}" min="0"></div>
  <div class="input-group"><label>Atrasos</label><input id="inp-${s.id}-atr" type="number" value="${s.atrasos}" min="0"></div>
  <div class="input-group"><label>Advertencias (${s.advertencias || 0})</label><input id="inp-${s.id}-adv" type="number" value="${s.advertencias || 0}" min="0"></div>
@@ -2239,6 +2378,62 @@ function checkLeaderChange(newLeaderId) {
 }
 
 // ═══════════════════════════════════════
+// PISTA DA META DIÁRIA — busca e renderiza
+// ═══════════════════════════════════════
+function _mtEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);}
+function _mtFmt(v){return 'R$ '+Math.round(v).toLocaleString('pt-BR');}
+function renderPistaMeta(d){
+  const sub = document.getElementById('mt-sub');
+  const numEl = document.getElementById('mt-days-num');
+  const totEl = document.getElementById('mt-days-tot');
+  const lanes = document.getElementById('mt-lanes');
+  if (!lanes) return;
+  if (!d || d.error) { if(sub) sub.textContent = 'Não foi possível carregar.'; return; }
+  const dia = d.metaDia.toLocaleString('pt-BR');
+  const acum = _mtFmt(d.metaAcumulada);
+  if (sub) sub.textContent = 'Meta de hoje: R$ ' + dia + ' por vendedor · acumulado até hoje: ' + acum;
+  if (numEl) numEl.textContent = d.uteisAte;
+  if (totEl) totEl.textContent = d.uteisMes;
+  if (!d.vendedores || !d.vendedores.length) {
+    lanes.innerHTML = '<div class="mt-empty">Nenhum vendedor cadastrado no comercial.</div>';
+    return;
+  }
+  const ord = d.vendedores.slice().sort((a,b)=> b.pct - a.pct);
+  const emojis = ['🥇','🥈','🥉'];
+  lanes.innerHTML = ord.map((v,i)=>{
+    const isGold = v.pct >= 100;
+    const up = v.saldo >= 0;
+    const cls = isGold ? 'gold' : (up ? 'up' : 'dn');
+    const emoji = isGold ? '🔥' : (up ? (emojis[i] || '💪') : '⏳');
+    const tag = isGold ? 'BATEU A META' : (up ? 'ADIANTADO' : 'PRECISA CORRER');
+    const pctBar = Math.max(1.5, Math.min(100, v.pct)); // cap visual em 100 (barra cheia = meta cumprida)
+    const saldoTxt = (up ? '+' : '') + _mtFmt(v.saldo);
+    const saldoLbl = up ? 'FOLGA PRO PRÓXIMO DIA' : 'FALTA PRA HOJE';
+    const fx = isGold ? '<div class="mt-fx"><span style="left:10%;animation-delay:0s">🎉</span><span style="left:30%;animation-delay:.4s">✨</span><span style="left:55%;animation-delay:.8s">🎊</span><span style="left:75%;animation-delay:.2s">⭐</span><span style="left:90%;animation-delay:.6s">🎉</span></div>' : '';
+    return '<div class="mt-lane '+cls+'">'
+      + fx
+      + '<div class="mt-lane-hd">'
+        + '<div class="mt-lane-l"><div class="mt-emoji">'+emoji+'</div><div class="mt-name">'+_mtEsc(v.name)+'</div><div class="mt-tag '+cls+'">'+tag+'</div></div>'
+        + '<div class="mt-pct '+cls+'">'+v.pct+'%</div>'
+      + '</div>'
+      + '<div class="mt-bar-wrap"><div class="mt-bar '+cls+'" style="width:'+pctBar+'%"></div></div>'
+      + '<div class="mt-foot">'
+        + '<div class="mt-foot-l"><span class="mt-lbl">Vendido no mês</span><span class="mt-vendido">'+_mtFmt(v.faturamento)+'</span></div>'
+        + '<div class="mt-foot-r"><span class="mt-lbl">'+saldoLbl+'</span><span class="mt-saldo '+cls+'">'+saldoTxt+'</span></div>'
+      + '</div>'
+    + '</div>';
+  }).join('');
+}
+async function loadPistaMeta(){
+  try {
+    const r = await fetch('/api/meta-diaria');
+    if (!r.ok) return;
+    const d = await r.json();
+    renderPistaMeta(d);
+  } catch (e) { /* silencioso */ }
+}
+
+// ═══════════════════════════════════════
 // AUTOLANÇAMENTO DE VENDA (pelo próprio vendedor) + atualização em tempo real
 // ═══════════════════════════════════════
 async function registrarVenda() {
@@ -2271,6 +2466,8 @@ async function registrarVenda() {
  if (s) s.fat = saved.fat;
  const fatEl = document.getElementById(`inp-${saved.id}-fat`);
  if (fatEl) fatEl.value = saved.fat;
+ const fatDisplay = document.getElementById(`inp-${saved.id}-fat-display`);
+ if (fatDisplay) fatDisplay.value = fmtBRL(saved.fat);
  });
  const nome = sellers.find(s => s.id === sellerId)?.name || '';
  valEl.value = '';
@@ -2278,6 +2475,7 @@ async function registrarVenda() {
  statusEl.textContent = `Venda de ${fmtBRL(valor)} registrada para ${nome}!`;
  playSaleSound();
  renderAll();
+ loadPistaMeta(); // atualiza a régua imediatamente
  } catch (e) {
  statusEl.className = 'rv-status err';
  statusEl.textContent = 'Falha de conexao.';
@@ -2299,9 +2497,12 @@ async function pollComercialData() {
  s.fat = saved.fat;
  const fatEl = document.getElementById(`inp-${saved.id}-fat`);
  if (fatEl && document.activeElement !== fatEl) fatEl.value = saved.fat;
+ const fatDisplay = document.getElementById(`inp-${saved.id}-fat-display`);
+ if (fatDisplay && document.activeElement !== fatDisplay) fatDisplay.value = fmtBRL(saved.fat);
  }
  });
  renderAll();
+ loadPistaMeta(); // mantém a régua em sincronia com vendas de outras pessoas
  } catch (e) { /* silencioso — tenta de novo no proximo ciclo */ }
 }
 
@@ -2452,6 +2653,8 @@ document.addEventListener('DOMContentLoaded', async () => {
  if (el) el.value = val;
  };
  setInp('fat', s.fat);
+ const fatDisp = document.getElementById(`inp-${s.id}-fat-display`);
+ if (fatDisp) fatDisp.value = fmtBRL(s.fat || 0);
  setInp('etiq', s.etiqueta);
  setInp('tarefas', s.tarefas);
  setInp('atr', s.atrasos);
@@ -2469,6 +2672,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  }
 
  recalculate();
+ loadPistaMeta(); // carga inicial da Pista da Meta Diária
 });
 
 
