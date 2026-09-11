@@ -12,15 +12,20 @@ const { getContatos, saveContatos } = require('../lib/contatosStore');
 const { getEditorial, saveEditorial } = require('../lib/editorialStore');
 const { getTarifas, saveTarifas } = require('../lib/tarifasStore');
 const { getParceiros, saveParceiros } = require('../lib/parceirosStore');
+const { verifyPassword, setPassword, upsertUser, deleteUser, getAllUsers, generateTempPassword, getRoleSync } = require('../lib/usersStore');
+const accessLog = require('../lib/accessLog');
 
-function getRole(usuario) {
-  if (usuario === 'gerencia') return 'admin';    // acesso total
-  if (usuario === 'auxiliar') return 'auxiliar'; // acesso total à aba Documentos, sem KB, sem dashboard comercial
-  return 'vendas';                                // padrão: ve tudo, exceto KB; ve comercial mas nao edita
+// Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
+// Fallback pro esquema antigo (baseado no nome do usuário) fica só como safety-net.
+function getRole(usuario, sess) {
+  if (sess && sess.role) return sess.role;
+  if (usuario === 'gerencia') return 'admin';
+  if (usuario === 'auxiliar') return 'auxiliar';
+  return 'vendas';
 }
-function canEditComercial(sess) { return sess && getRole(sess.usuario) === 'admin'; }
-function canViewComercial(sess) { return sess && getRole(sess.usuario) !== 'auxiliar'; }
-function canUseDocumentos(sess) { return sess && sess.usuario; } // Qualquer usuário logado pode usar Documentos (gerencia, vendas, auxiliar)
+function canEditComercial(sess) { return sess && getRole(sess.usuario, sess) === 'admin'; }
+function canViewComercial(sess) { return sess && getRole(sess.usuario, sess) !== 'auxiliar'; }
+function canUseDocumentos(sess) { return sess && sess.usuario; } // Qualquer usuário logado pode usar Documentos
 
 const SESSION_MS = (config.sessionHours || 8) * 60 * 60 * 1000;
 const ROOT       = path.join(__dirname, '..');
@@ -321,13 +326,20 @@ module.exports = async (req, res) => {
   if (req.method === 'POST' && url === '/login') {
     const body = await readBody(req);
     const { usuario, senha } = parseForm(body);
-    const user = (config.users || []).find(u => u.usuario === usuario && u.senha === senha);
+    let user = null;
+    try { user = await verifyPassword(usuario, senha); }
+    catch (e) { console.warn('[login] erro em verifyPassword:', e.message); }
     if (!user) {
+      accessLog.log('login_falha', req, { usuario: String(usuario || '').slice(0, 60) });
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(loginPage(true));
       return;
     }
-    const token = newToken({ nome: user.nome, usuario: user.usuario, expiry: Date.now() + SESSION_MS });
+    accessLog.log('login_ok', req, { usuario: user.usuario, role: user.role });
+    const token = newToken({
+      nome: user.nome, usuario: user.usuario, role: user.role,
+      mustChange: !!user.mustChange, expiry: Date.now() + SESSION_MS,
+    });
     res.writeHead(302, {
       'Set-Cookie': 'ph_session=' + token + '; HttpOnly; Path=/; Max-Age=' + Math.floor(SESSION_MS/1000),
       'Location': '/',
@@ -338,8 +350,109 @@ module.exports = async (req, res) => {
 
   // GET /logout
   if (url === '/logout') {
+    const sess = getSession(req);
+    if (sess) accessLog.log('logout', req, { usuario: sess.usuario });
     res.writeHead(302, { 'Set-Cookie': 'ph_session=; HttpOnly; Path=/; Max-Age=0', 'Location': '/' });
     res.end();
+    return;
+  }
+
+  // POST /api/change-password — trocar a própria senha (qualquer usuário logado)
+  if (req.method === 'POST' && url === '/api/change-password') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401, {'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const { senhaAtual, novaSenha } = JSON.parse(await readBody(req));
+      // Confirma senha atual antes de trocar
+      const ok = await verifyPassword(sess.usuario, senhaAtual);
+      if (!ok) throw new Error('Senha atual incorreta.');
+      await setPassword(sess.usuario, novaSenha, { mustChange: false });
+      accessLog.log('senha_alterada', req, { usuario: sess.usuario });
+      // Renova o cookie removendo o mustChange
+      const token = newToken({
+        nome: sess.nome, usuario: sess.usuario, role: sess.role,
+        mustChange: false, expiry: Date.now() + SESSION_MS,
+      });
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Set-Cookie': 'ph_session=' + token + '; HttpOnly; Path=/; Max-Age=' + Math.floor(SESSION_MS/1000),
+      });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(400, {'Content-Type':'application/json'}); res.end(JSON.stringify({error: e.message}));
+    }
+    return;
+  }
+
+  // ═══ ADMIN DE USUÁRIOS (só gerência) ═══════════════════════════════════════
+  // GET /api/users — lista
+  if (req.method === 'GET' && url === '/api/users') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const users = await getAllUsers();
+      // Nunca devolver os hashes
+      const safe = {};
+      for (const [k,v] of Object.entries(users)) safe[k] = { nome: v.nome, role: v.role, email: v.email, ativo: v.ativo !== false, mustChange: !!v.mustChange, criadoEm: v.criadoEm, senhaAlteradaEm: v.senhaAlteradaEm };
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ users: safe }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // POST /api/users — criar/atualizar
+  if (req.method === 'POST' && url === '/api/users') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const { usuario, dados } = JSON.parse(await readBody(req));
+      if (!usuario || !/^[a-z0-9._-]{2,32}$/i.test(usuario)) throw new Error('Usuário deve ter 2-32 caracteres alfanuméricos.');
+      const created = await upsertUser(String(usuario).toLowerCase(), dados || {});
+      accessLog.log('usuario_upsert', req, { por: sess.usuario, alvo: usuario });
+      const safe = { nome: created.nome, role: created.role, email: created.email, mustChange: !!created.mustChange };
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, usuario, ...safe }));
+    } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // POST /api/users/reset — gera nova senha temporária pra outro usuário (só gerência)
+  if (req.method === 'POST' && url === '/api/users/reset') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const { usuario } = JSON.parse(await readBody(req));
+      if (!usuario) throw new Error('usuario ausente.');
+      if (usuario === sess.usuario) throw new Error('Use "trocar minha senha" pra sua própria conta.');
+      const temp = generateTempPassword();
+      await setPassword(usuario, temp, { mustChange: true });
+      accessLog.log('senha_resetada', req, { por: sess.usuario, alvo: usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, senhaTemporaria: temp }));
+    } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // POST /api/users/delete
+  if (req.method === 'POST' && url === '/api/users/delete') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const { usuario } = JSON.parse(await readBody(req));
+      if (!usuario) throw new Error('usuario ausente.');
+      if (usuario === sess.usuario) throw new Error('Não pode se deletar.');
+      await deleteUser(usuario);
+      accessLog.log('usuario_deletado', req, { por: sess.usuario, alvo: usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+    } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // GET /api/access-log — últimos eventos (só gerência)
+  if (req.method === 'GET' && url === '/api/access-log') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const entries = await accessLog.readRecent(200);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ entries }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
   }
 
@@ -1130,9 +1243,13 @@ module.exports = async (req, res) => {
     const isAdmin = canEditComercial(sess) ? 'true' : 'false';
     const canViewCom = canViewComercial(sess) ? 'true' : 'false';
     const canEditCom = canEditComercial(sess) ? 'true' : 'false';
+    const usuarioEsc = String(sess.usuario || '').replace(/"/g, '\\"');
+    const nomeEsc = String(sess.nome || '').replace(/"/g, '\\"');
+    const mustChange = sess.mustChange ? 'true' : 'false';
     html = html.replace('/* %%INJECT%% */',
-      'var IS_ADMIN=' + isAdmin + '; var USER_NOME="' + sess.nome + '"; ' +
-      'var CAN_VIEW_COMERCIAL=' + canViewCom + '; var CAN_EDIT_COMERCIAL=' + canEditCom + ';'
+      'var IS_ADMIN=' + isAdmin + '; var USER_NOME="' + nomeEsc + '"; var USER_USUARIO="' + usuarioEsc + '"; ' +
+      'var CAN_VIEW_COMERCIAL=' + canViewCom + '; var CAN_EDIT_COMERCIAL=' + canEditCom + '; ' +
+      'var MUST_CHANGE_PASSWORD=' + mustChange + ';'
     );
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(html);
