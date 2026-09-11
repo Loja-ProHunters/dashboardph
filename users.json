@@ -1,0 +1,42 @@
+{
+  "gerencia": {
+    "nome": "Gerência",
+    "hash": "$2b$10$lp6AW8QgjY/vLQV3RVdqpuGATkfJxFYdJwHo8.K7NK4v.6HSpYSdq",
+    "role": "admin",
+    "email": null,
+    "mustChange": false,
+    "criadoEm": "2026-01-01"
+  },
+  "auxiliar": {
+    "nome": "Auxiliar",
+    "hash": "$2b$10$iSDhmzBWGqJY7K2u3/6t0OXZG6Sph7oOaMrSrLIMUa5XsHZ4gVMVC",
+    "role": "auxiliar",
+    "email": null,
+    "mustChange": false,
+    "criadoEm": "2026-01-01"
+  },
+  "mathias": {
+    "nome": "Wesley Mathias Ciesielsky",
+    "email": "vendas2.prohunters@gmail.com",
+    "role": "vendas",
+    "hash": "$2b$10$4ePl5IcjVYbEk26.TIJqtOFGjvKj4mhNJQBZWGGk385HZGH19LqLC",
+    "mustChange": true,
+    "criadoEm": "2026-09-11"
+  },
+  "dickmann": {
+    "nome": "Pedro Henrique Dickmann",
+    "email": "vendas3.prohunters@gmail.com",
+    "role": "vendas",
+    "hash": "$2b$10$tdjv0UFsWNC9ag7PP.P0TurgRIa6/N4QCJizlO.zJxZPoethW5oc2",
+    "mustChange": true,
+    "criadoEm": "2026-09-11"
+  },
+  "boschetto": {
+    "nome": "Enzo dos Santos Boschetto",
+    "email": "vendas1.prohunters@gmail.com",
+    "role": "vendas",
+    "hash": "$2b$10$c0PSeUqMMUI803hvNXKg4uB3DWcew/gGbB9PZcGg2IZVrwkmb5xdq",
+    "mustChange": true,
+    "criadoEm": "2026-09-11"
+  }
+}
