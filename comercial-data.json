@@ -9,11 +9,15 @@
       "tarefas": 0,
       "atrasos": 0,
       "faltas": 0,
-      "advertencias": 1,
+      "advertencias": 2,
       "advertenciasLog": [
         {
           "data": "01/09/2026",
           "motivo": "Envio munição sem GT e tentou corrigir sem notificar a Gerência"
+        },
+        {
+          "data": "14/09/2026",
+          "motivo": "Autorizou por conta um desconto acima do permitido, em uma negociação de uma Tanfoglio"
         }
       ]
     },
@@ -131,5 +135,5 @@
       "fechadoEm": "2026-08-03T11:06:21.307Z"
     }
   ],
-  "savedAt": "2026-09-14T11:12:25.785Z"
+  "savedAt": "2026-09-14T11:12:54.327Z"
 }
