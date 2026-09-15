@@ -16,6 +16,20 @@ const { verifyPassword, setPassword, upsertUser, deleteUser, getAllUsers, genera
 const accessLog = require('../lib/accessLog');
 const { calcularProgressoMeta, getFeriadosCustom, saveFeriadosCustom } = require('../lib/metaDiaria');
 
+// ═══════════════════════════════════════════════════════════════
+// CRM Pro Hunters — Fatia 1 (Fundação)
+// ═══════════════════════════════════════════════════════════════
+const crmStore    = require('../lib/crm/store');
+const crmUtils    = require('../lib/crm/utils');
+const crmColl     = require('../lib/crm/collections');
+const crmOcr      = require('../lib/crm/docsOcr');
+const crmSchemas  = require('../lib/crm/docsSchemas');
+
+// Bling API v3
+const blingOauth      = require('../lib/bling/oauth');
+const blingTokenStore = require('../lib/bling/tokenStore');
+const blingApi        = require('../lib/bling/api');
+
 // Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
 // Fallback pro esquema antigo (baseado no nome do usuário) fica só como safety-net.
 function getRole(usuario, sess) {
@@ -492,6 +506,527 @@ module.exports = async (req, res) => {
       await saveFeriadosCustom(validos);
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, feriados: validos }));
     } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // CRM Pro Hunters — rotas /api/crm/*
+  // Fatia 1: CRUD REST genérico por coleção + session-info + migração parceiros.
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /api/crm/session-info — quem sou eu + posso acessar o CRM?
+  if (req.method === 'GET' && url === '/api/crm/session-info') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    const r = crmUtils.role(sess);
+    res.writeHead(200,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({
+      usuario: sess.usuario,
+      nome: sess.nome || sess.usuario,
+      role: r,
+      canAccess: crmUtils.canAccessCRM(sess),
+      canSeeAll: crmUtils.canSeeAll(sess),
+      isAdmin: r === 'admin',
+    }));
+    return;
+  }
+
+  // Roteador genérico das coleções CRM
+  // Formato: /api/crm/<colecao>[/<id>]
+  const crmMatch = url.match(/^\/api\/crm\/([a-z_]+)(?:\/([A-Za-z0-9\-_.]+))?$/);
+  if (crmMatch && crmMatch[1] !== 'session-info' && crmMatch[1] !== 'migrate-parceiros' && crmMatch[1] !== 'docs' && crmMatch[1] !== 'cron') {
+    const colName = crmMatch[1];
+    const docId = crmMatch[2] || null;
+    const reg = crmColl.REGISTRY[colName];
+    if (!reg) {
+      res.writeHead(404,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'Coleção CRM desconhecida: ' + colName}));
+      return;
+    }
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    if (!crmUtils.canAccessCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso ao CRM.'})); return;
+    }
+
+    try {
+      // LIST — GET /api/crm/<col>
+      if (req.method === 'GET' && !docId) {
+        const filter = crmUtils.scopeFilter(sess);
+        const docs = await crmStore.listDocs(colName, filter);
+        // ordena mais novos primeiro
+        docs.sort((a,b) => String(b.criado_em||'').localeCompare(String(a.criado_em||'')));
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ docs, count: docs.length }));
+        return;
+      }
+      // DETAIL — GET /api/crm/<col>/<id>
+      if (req.method === 'GET' && docId) {
+        const doc = await crmStore.getDoc(colName, docId);
+        if (!doc) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Não encontrado.'})); return; }
+        if (!crmUtils.canReadDoc(sess, doc)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ doc }));
+        return;
+      }
+      // CREATE — POST /api/crm/<col>
+      if (req.method === 'POST' && !docId) {
+        const body = await readBody(req);
+        let dados;
+        try { dados = JSON.parse(body || '{}'); } catch (e) { throw new crmColl.ValidationError('JSON inválido no body.'); }
+        // Força owner se vendedor; admin pode escolher
+        dados = crmUtils.enforceOwner(sess, dados);
+        const doc = reg.build(dados);
+        const saved = await crmStore.createDoc(colName, doc, sess.usuario);
+        res.writeHead(201,{'Content-Type':'application/json'}); res.end(JSON.stringify({ doc: saved }));
+        return;
+      }
+      // UPDATE — PUT /api/crm/<col>/<id>
+      if (req.method === 'PUT' && docId) {
+        const cur = await crmStore.getDoc(colName, docId);
+        if (!cur) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Não encontrado.'})); return; }
+        if (!crmUtils.canWriteDoc(sess, cur)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao pra editar este documento.'})); return; }
+        const body = await readBody(req);
+        let patch;
+        try { patch = JSON.parse(body || '{}'); } catch (e) { throw new crmColl.ValidationError('JSON inválido no body.'); }
+        // Vendedor não muda owner_id pra outro (impede transferir doc pra fora do próprio escopo)
+        if (!crmUtils.canSeeAll(sess) && patch.owner_id && patch.owner_id !== sess.usuario) {
+          throw new crmColl.ValidationError('Vendedor não pode transferir owner de documento.');
+        }
+        // Roda o build passando o merge — pega validações
+        const merged = { ...cur, ...patch, id: docId };
+        const rebuilt = reg.build(merged);
+        // updateDoc mantém criado_em/por e escreve
+        const saved = await crmStore.updateDoc(colName, docId, rebuilt, sess.usuario);
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ doc: saved }));
+        return;
+      }
+      // DELETE — DELETE /api/crm/<col>/<id> (só admin)
+      if (req.method === 'DELETE' && docId) {
+        if (!crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência pode deletar.'})); return; }
+        const ok = await crmStore.deleteDoc(colName, docId);
+        if (!ok) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Não encontrado.'})); return; }
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+        return;
+      }
+      res.writeHead(405,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Método não suportado.'}));
+    } catch (e) {
+      const status = e && e.http ? e.http : 500;
+      res.writeHead(status,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ error: e.message || String(e) }));
+    }
+    return;
+  }
+
+  // POST /api/crm/migrate-parceiros — importa parceiros.json → crm/referrals.json (só admin, idempotente)
+  if (req.method === 'POST' && url === '/api/crm/migrate-parceiros') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const parceiros = await getParceiros();
+      const lista = Array.isArray(parceiros) ? parceiros : (parceiros && parceiros.parceiros ? parceiros.parceiros : []);
+      const existentes = await crmStore.getCollection('referrals');
+      // Marca por indicante_nome + telefone pra idempotência
+      const chaveExistente = (r) => (String(r.indicante_nome||'').trim().toLowerCase() + '|' + String(r.indicante_telefone||'').replace(/\D/g,''));
+      const jaImportadas = new Set(Object.values(existentes).map(chaveExistente));
+      let criados = 0, ignorados = 0;
+      for (const p of lista) {
+        const dados = {
+          indicante_nome: p.nome || p.name || p.indicante || 'Sem nome',
+          indicante_telefone: p.telefone || p.whatsapp || p.phone || null,
+          indicante_email: p.email || null,
+          tipo: 'influenciador',
+          status: 'ativo',
+          owner_id: sess.usuario,
+          reward_status: 'nao_aplica',
+          notas: 'Migrado de parceiros.json em ' + new Date().toISOString().slice(0,10),
+        };
+        const chave = chaveExistente(dados);
+        if (jaImportadas.has(chave)) { ignorados++; continue; }
+        const doc = crmColl.REGISTRY.referrals.build(dados);
+        await crmStore.createDoc('referrals', doc, sess.usuario);
+        jaImportadas.add(chave);
+        criados++;
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, criados, ignorados, total_parceiros: lista.length }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // CRM Módulo Documentos — OCR + confirmação + cron de vencimentos
+  // ═════════════════════════════════════════════════════════════
+
+  // POST /api/crm/docs/ocr — recebe { file_base64, media_type, tipo_hint? }
+  // Retorna { hash, tipo, motivo_classificacao, dados, duplicado? }.
+  if (req.method === 'POST' && url === '/api/crm/docs/ocr') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso ao CRM.'})); return;
+    }
+    try {
+      const body = await readBody(req);
+      const { file_base64, media_type, tipo_hint } = JSON.parse(body || '{}');
+      if (!file_base64) throw new Error('file_base64 obrigatório.');
+      if (!media_type) throw new Error('media_type obrigatório (ex: image/jpeg, application/pdf).');
+      const resultado = await crmOcr.processarDocumento(file_base64, media_type, tipo_hint);
+      // Checa duplicata: já tem documento com esse hash?
+      const existentes = await crmStore.listDocs('documentos', d => d.hash_arquivo === resultado.hash);
+      if (existentes.length) {
+        resultado.duplicado = true;
+        resultado.documento_existente_id = existentes[0].id;
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(resultado));
+    } catch (e) {
+      const status = e && e.http ? e.http : 500;
+      res.writeHead(status,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ error: e.message || String(e) }));
+    }
+    return;
+  }
+
+  // POST /api/crm/docs/confirm — recebe dados revisados e persiste.
+  // Body: { tipo, hash, dados_revisados, forcar_duplicado? }
+  //   dados_revisados = objeto com todos os campos que o vendedor confirmou/editou.
+  // Efeitos:
+  //   1) encontra ou cria Account pelo CPF
+  //   2) cria o Documento
+  //   3) se tipo=craf, encontra ou cria Arma pelo numero_serie
+  //   4) retorna { account_id, documento_id, arma_id?, criou_account, criou_arma }
+  if (req.method === 'POST' && url === '/api/crm/docs/confirm') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso ao CRM.'})); return;
+    }
+    try {
+      const body = await readBody(req);
+      const { tipo, hash, dados_revisados, forcar_duplicado } = JSON.parse(body || '{}');
+      if (!tipo || !crmSchemas.TIPOS[tipo]) throw new Error('tipo inválido: ' + tipo);
+      if (!hash) throw new Error('hash obrigatório.');
+      if (!dados_revisados) throw new Error('dados_revisados obrigatório.');
+
+      // Duplicata
+      if (!forcar_duplicado) {
+        const existentes = await crmStore.listDocs('documentos', d => d.hash_arquivo === hash);
+        if (existentes.length) {
+          throw Object.assign(new Error('Documento já cadastrado (mesmo hash). Use forcar_duplicado=true pra ignorar.'), { http: 409 });
+        }
+      }
+
+      const cpf = crmUtils.normalizaCpfCnpj(dados_revisados.cpf);
+      if (!crmUtils.validaCpfCnpj(cpf)) throw new Error('CPF inválido no doc revisado.');
+
+      // 1) Encontra ou cria Account
+      const accountsIndex = await crmStore.listDocs('accounts', a => crmUtils.normalizaCpfCnpj(a.cpf_cnpj) === cpf);
+      let account, criou_account = false;
+      if (accountsIndex.length) {
+        account = accountsIndex[0];
+      } else {
+        // Cria automaticamente com dados básicos extraídos
+        const dadosAcc = crmUtils.enforceOwner(sess, {
+          tipo: 'pf',
+          nome: dados_revisados.titular_nome || 'Sem nome',
+          cpf_cnpj: cpf,
+          status: 'ativo',
+        });
+        const buildAcc = crmColl.REGISTRY.accounts.build(dadosAcc);
+        account = await crmStore.createDoc('accounts', buildAcc, sess.usuario);
+        criou_account = true;
+      }
+
+      // 2) Se for CRAF, cuida da Arma antes do Documento (pra ter arma_id)
+      let arma = null, criou_arma = false;
+      if (tipo === 'craf') {
+        const serie = String(dados_revisados.arma_numero_serie || '').trim();
+        if (!serie) throw new Error('CRAF sem número de série extraído. Não dá pra criar a arma.');
+        const armasCliente = await crmStore.listDocs('armas', a => a.account_id === account.id && String(a.numero_serie).trim() === serie);
+        if (armasCliente.length) {
+          arma = armasCliente[0]; // mantém a arma, só vai atualizar CRAF vigente
+        } else {
+          const dadosArma = crmUtils.enforceOwner(sess, {
+            account_id: account.id,
+            numero_serie: serie,
+            numero_sigma: dados_revisados.arma_numero_sigma || null,
+            tipo: dados_revisados.arma_tipo || null,
+            marca: dados_revisados.arma_marca || null,
+            modelo: dados_revisados.arma_modelo || null,
+            calibre: dados_revisados.arma_calibre || null,
+            acionamento: 'pendente',
+            classificacao: 'pendente',
+            acervo: 'pendente',
+          });
+          const buildArm = crmColl.REGISTRY.armas.build(dadosArma);
+          arma = await crmStore.createDoc('armas', buildArm, sess.usuario);
+          criou_arma = true;
+        }
+      }
+
+      // 3) Cria o Documento
+      const validade = dados_revisados.validade || null;
+      const numero = dados_revisados.numero_registro || dados_revisados.numero_cr || dados_revisados.numero || null;
+      const dadosDoc = crmUtils.enforceOwner(sess, {
+        tipo,
+        account_id: account.id,
+        cpf,
+        titular_nome: dados_revisados.titular_nome || null,
+        numero,
+        validade,
+        orgao_emissor: dados_revisados.orgao_emissor || null,
+        data_emissao: dados_revisados.data_emissao || dados_revisados.data_expedicao || null,
+        dados_extraidos: dados_revisados,
+        hash_arquivo: hash,
+        arma_id: arma ? arma.id : null,
+        revisado_por: sess.usuario,
+        revisado_em: new Date().toISOString(),
+        avisos_ocr: Array.isArray(dados_revisados.avisos) ? dados_revisados.avisos : [],
+      });
+      const buildDoc = crmColl.REGISTRY.documentos.build(dadosDoc);
+      const documento = await crmStore.createDoc('documentos', buildDoc, sess.usuario);
+
+      // 4) Se criou arma via CRAF, atualiza craf_atual_id
+      if (arma && tipo === 'craf') {
+        const patchArma = { craf_atual_id: documento.id };
+        if (arma.craf_atual_id && arma.craf_atual_id !== documento.id) {
+          patchArma.crafs_historico = [...(arma.crafs_historico || []), arma.craf_atual_id];
+        }
+        await crmStore.updateDoc('armas', arma.id, { ...arma, ...patchArma }, sess.usuario);
+      }
+
+      // 5) Se doc vencido ou perto de vencer, cria Activity de renovação
+      const st = crmSchemas.calcularStatusValidade(validade);
+      if (st.status === 'vencido' || st.status === 'critico' || st.status === 'vence_em_60' || st.status === 'vence_em_90') {
+        try {
+          const dadosAct = crmUtils.enforceOwner(sess, {
+            tipo: 'manual',
+            status: 'pendente',
+            entidade_tipo: 'account',
+            entidade_id: account.id,
+            titulo: (st.status === 'vencido' ? '🔴 ' : '⚠ ') + crmSchemas.TIPOS[tipo].label + ' de ' + (dadosDoc.titular_nome || '?') + (st.status === 'vencido' ? ' VENCIDO' : ' vence em ' + st.dias_pra_vencer + ' dias'),
+            descricao: 'Documento ' + numero + '. Validade: ' + validade + '.',
+            prazo: (validade || new Date().toISOString().slice(0,10)),
+            pontos_base: st.status === 'vencido' ? 30 : 15,
+            gerada_automaticamente: true,
+            trigger_id: 'renovacao_doc_' + documento.id + '_' + st.status,
+          });
+          const buildAct = crmColl.REGISTRY.activities.build(dadosAct);
+          await crmStore.createDoc('activities', buildAct, sess.usuario);
+        } catch (e) { /* activity é bonus — não bloqueia o salvamento se falhar */ }
+      }
+
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({
+        ok: true,
+        account_id: account.id,
+        criou_account,
+        documento_id: documento.id,
+        arma_id: arma ? arma.id : null,
+        criou_arma,
+        status_validade: st.status,
+      }));
+    } catch (e) {
+      const status = e && e.http ? e.http : 500;
+      res.writeHead(status,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ error: e.message || String(e) }));
+    }
+    return;
+  }
+
+  // GET /api/crm/cron/vencimentos — varre docs e cria Activities pendentes.
+  // Idempotente: usa `trigger_id: 'renovacao_doc_<id>_<marco>'` como chave anti-duplicata.
+  // Protegido por token: header `x-cron-secret: <config.cronSecret>` ou sessão admin.
+  if (req.method === 'GET' && url === '/api/crm/cron/vencimentos') {
+    const sess = getSession(req);
+    const cronToken = req.headers['x-cron-secret'];
+    const autorizado = (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return;
+    }
+    try {
+      const docs = await crmStore.listDocs('documentos');
+      const activitiesExistentes = await crmStore.listDocs('activities', a => a.gerada_automaticamente && a.trigger_id && a.trigger_id.startsWith('renovacao_doc_'));
+      const triggersUsados = new Set(activitiesExistentes.map(a => a.trigger_id));
+      let criadas = 0, atualizadas_status = 0;
+      for (const d of docs) {
+        const st = crmSchemas.calcularStatusValidade(d.validade);
+        // Atualiza status_validade no doc se mudou (evita ficar defasado)
+        if (d.status_validade !== st.status) {
+          try { await crmStore.updateDoc('documentos', d.id, { ...d, status_validade: st.status }, 'cron'); atualizadas_status++; } catch(e){}
+        }
+        // Marco atual
+        const marco = st.status;
+        if (marco === 'em_dia' || marco === 'sem_validade') continue;
+        const trigger = 'renovacao_doc_' + d.id + '_' + marco;
+        if (triggersUsados.has(trigger)) continue;
+        try {
+          const label = crmSchemas.TIPOS[d.tipo] ? crmSchemas.TIPOS[d.tipo].label : d.tipo;
+          const dadosAct = {
+            tipo: 'manual',
+            status: 'pendente',
+            owner_id: d.owner_id || 'gerencia',
+            entidade_tipo: 'account',
+            entidade_id: d.account_id,
+            titulo: (marco === 'vencido' ? '🔴 ' : '⚠ ') + label + ' de ' + (d.titular_nome || '?') + (marco === 'vencido' ? ' VENCIDO' : ' vence em ' + st.dias_pra_vencer + ' dias'),
+            descricao: 'Documento ' + (d.numero||'') + '. Validade: ' + (d.validade||'?') + '.',
+            prazo: d.validade || new Date().toISOString().slice(0,10),
+            pontos_base: marco === 'vencido' ? 30 : 15,
+            gerada_automaticamente: true,
+            trigger_id: trigger,
+          };
+          const buildAct = crmColl.REGISTRY.activities.build(dadosAct);
+          await crmStore.createDoc('activities', buildAct, 'cron');
+          triggersUsados.add(trigger);
+          criadas++;
+        } catch(e) { /* silencia — segue pra próxima */ }
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, docs_varridos: docs.length, activities_criadas: criadas, docs_atualizados: atualizadas_status }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error: e.message}));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // Bling — OAuth 2.0 (integração com API v3)
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /api/bling/authorize — só gerência. Gera state, guarda em cookie,
+  // redireciona pro Bling. O gerente autoriza no painel do Bling e o Bling
+  // redireciona de volta pra /api/bling/callback.
+  if (req.method === 'GET' && url === '/api/bling/authorize') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) {
+      res.writeHead(403,{'Content-Type':'text/html; charset=utf-8'});
+      res.end('<h2>Só gerência.</h2>');
+      return;
+    }
+    if (!config.blingClientId || !config.blingRedirectUri) {
+      res.writeHead(500,{'Content-Type':'text/html; charset=utf-8'});
+      res.end('<h2>Bling não configurado.</h2><p>Faltam env vars: BLING_CLIENT_ID e BLING_REDIRECT_URI na Vercel.</p>');
+      return;
+    }
+    const state = blingOauth.generateState();
+    const authUrl = blingOauth.buildAuthorizeUrl(state);
+    // Cookie efêmero, apenas pra conferir no callback (10 min de vida).
+    // HttpOnly + SameSite=Lax pra sobreviver ao redirect do Bling.
+    const cookieVal = state + '|' + Buffer.from(sess.usuario).toString('base64url');
+    const cookie = 'bling_oauth_state=' + cookieVal + '; Max-Age=600; Path=/; HttpOnly; Secure; SameSite=Lax';
+    res.writeHead(302, { 'Location': authUrl, 'Set-Cookie': cookie });
+    res.end();
+    return;
+  }
+
+  // GET /api/bling/callback?code=...&state=...
+  // Recebe o code, confere o state, troca por token, redireciona pra
+  // uma página de sucesso simples (que fecha se abriu em popup, senão
+  // volta pro dashboard).
+  if (req.method === 'GET' && url.startsWith('/api/bling/callback')) {
+    try {
+      const u = new URL('http://x' + url);
+      const code = u.searchParams.get('code');
+      const stateRecebido = u.searchParams.get('state');
+      const errParam = u.searchParams.get('error');
+      if (errParam) throw new Error('Bling recusou: ' + errParam + ' — ' + (u.searchParams.get('error_description') || ''));
+      if (!code) throw new Error('code ausente no callback.');
+      const cookieMatch = (req.headers.cookie || '').match(/bling_oauth_state=([^;]+)/);
+      if (!cookieMatch) throw new Error('Cookie de state ausente. Recomece a autorização.');
+      const [stateSalvo, actorB64] = decodeURIComponent(cookieMatch[1]).split('|');
+      if (!stateSalvo || stateSalvo !== stateRecebido) throw new Error('State não confere (possível CSRF).');
+      const actorLogin = actorB64 ? Buffer.from(actorB64, 'base64url').toString('utf8') : null;
+      await blingOauth.exchangeCodeForToken(code, actorLogin);
+      // Limpa cookie state
+      const clear = 'bling_oauth_state=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax';
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Set-Cookie': clear });
+      res.end(
+        '<!doctype html><html><head><meta charset="utf-8"><title>Bling conectado</title>' +
+        '<style>body{font-family:system-ui;background:#f5f5f5;padding:40px;text-align:center;color:#222}' +
+        '.card{max-width:480px;margin:0 auto;background:#fff;padding:32px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.08)}' +
+        '.ok{color:#0a6e2e;font-size:48px;margin-bottom:12px}' +
+        'h1{font-size:20px;margin:0 0 8px}p{color:#666;font-size:14px}' +
+        '.btn{display:inline-block;background:#0a6e2e;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;margin-top:16px}' +
+        '</style></head><body><div class="card"><div class="ok">✓</div>' +
+        '<h1>Bling conectado com sucesso</h1>' +
+        '<p>Você já pode fechar esta aba ou voltar pro Painel.</p>' +
+        '<a class="btn" href="/">← Voltar ao Portal</a>' +
+        '</div></body></html>'
+      );
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(
+        '<!doctype html><html><head><meta charset="utf-8"><title>Erro Bling</title>' +
+        '<style>body{font-family:system-ui;background:#f5f5f5;padding:40px;text-align:center;color:#222}' +
+        '.card{max-width:520px;margin:0 auto;background:#fff;padding:32px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.08)}' +
+        '.err{color:#a01818;font-size:48px;margin-bottom:12px}' +
+        '</style></head><body><div class="card"><div class="err">✗</div>' +
+        '<h1>Não deu pra conectar o Bling</h1>' +
+        '<p style="color:#a01818;background:#fbe6e6;padding:10px;border-radius:6px;font-size:13px">' + String(e.message).replace(/</g,'&lt;') + '</p>' +
+        '<a href="/api/bling/authorize" style="color:#0a6e2e">← Tentar de novo</a>' +
+        '</div></body></html>'
+      );
+    }
+    return;
+  }
+
+  // GET /api/bling/status — JSON pra UI mostrar estado da conexão.
+  // Não retorna tokens em claro; só metadados.
+  if (req.method === 'GET' && url === '/api/bling/status') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return;
+    }
+    try {
+      const info = await blingTokenStore.loadTokenInfo();
+      const configOk = !!(config.blingClientId && config.blingClientSecret && config.blingRedirectUri);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ...info, configurado: configOk }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/bling/refresh — força refresh manual (debug/manutenção).
+  if (req.method === 'POST' && url === '/api/bling/refresh') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      await blingOauth.refreshAccessToken();
+      const info = await blingTokenStore.loadTokenInfo();
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, ...info }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/bling/disconnect — revoga o token local (não invalida no Bling,
+  // só apaga do lado nosso).
+  if (req.method === 'POST' && url === '/api/bling/disconnect') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      await blingTokenStore.deleteToken();
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/bling/test — chama um endpoint leve do Bling pra provar que o
+  // token está válido e a integração responde.
+  if (req.method === 'GET' && url === '/api/bling/test') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const r = await blingApi.testConnection();
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, resposta: r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message, status:e.status||500}));
+    }
     return;
   }
 
