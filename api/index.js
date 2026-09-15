@@ -29,6 +29,7 @@ const crmSchemas  = require('../lib/crm/docsSchemas');
 const blingOauth      = require('../lib/bling/oauth');
 const blingTokenStore = require('../lib/bling/tokenStore');
 const blingApi        = require('../lib/bling/api');
+const blingBackfill   = require('../lib/bling/backfill');
 
 // Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
 // Fallback pro esquema antigo (baseado no nome do usuário) fica só como safety-net.
@@ -1042,6 +1043,108 @@ module.exports = async (req, res) => {
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, resposta: r }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message, status:e.status||500}));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // Bling sync — backfill (com checkpoint) + incremental (manual/cron)
+  // ═════════════════════════════════════════════════════════════
+
+  // Helper: carrega users.json pra mapear vendedor Bling → login CRM
+  async function _loadUsersMap() {
+    try { return await require('../lib/usersStore').getAllUsers(); }
+    catch (e) { return {}; }
+  }
+
+  // GET /api/bling/backfill/status — situação atual do backfill
+  if (req.method === 'GET' && url === '/api/bling/backfill/status') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const cp = await blingBackfill.lerCheckpoint();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ checkpoint: cp }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/bling/backfill/iniciar — puxa lista de IDs do range
+  if (req.method === 'POST' && url === '/api/bling/backfill/iniciar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const body = await readBody(req);
+      const { meses = 12 } = JSON.parse(body || '{}');
+      const mesesNum = Math.max(1, Math.min(60, Number(meses) || 12));
+      const r = await blingBackfill.iniciar({ meses: mesesNum, iniciado_por: sess.usuario });
+      res.writeHead(r.ok ? 200 : 409, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/bling/backfill/continuar — processa próximo lote
+  if (req.method === 'POST' && url === '/api/bling/backfill/continuar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const usersJson = await _loadUsersMap();
+      const r = await blingBackfill.continuar({ usersJson, ownerFallback: 'gerencia' });
+      res.writeHead(r.ok ? 200 : 409, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/bling/backfill/cancelar — apaga checkpoint (sem apagar dados)
+  if (req.method === 'POST' && url === '/api/bling/backfill/cancelar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      await blingBackfill.apagarCheckpoint();
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ok:true}));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/bling/sync-agora — sync incremental manual (últimos N dias)
+  if (req.method === 'POST' && url === '/api/bling/sync-agora') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const body = await readBody(req);
+      const { dias = 1 } = JSON.parse(body || '{}');
+      const usersJson = await _loadUsersMap();
+      const r = await blingBackfill.syncIncremental({ dias: Math.max(1, Math.min(30, Number(dias) || 1)), usersJson });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/bling/cron/sync — pra Vercel Cron ou disparo externo
+  // Protegido por x-cron-secret ou sessão admin.
+  if (req.method === 'GET' && url === '/api/bling/cron/sync') {
+    const sess = getSession(req);
+    const cronToken = req.headers['x-cron-secret'];
+    const autorizado = (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+    try {
+      const usersJson = await _loadUsersMap();
+      const r = await blingBackfill.syncIncremental({ dias: 1, usersJson });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
     return;
   }
