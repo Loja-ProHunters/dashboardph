@@ -10,11 +10,12 @@
   },
   "auxiliar": {
     "nome": "Auxiliar",
-    "hash": "$2b$10$iSDhmzBWGqJY7K2u3/6t0OXZG6Sph7oOaMrSrLIMUa5XsHZ4gVMVC",
+    "hash": "$2b$10$nBZFrqYqGFB.q6GWQ0njJu2d5CRfsC4U5rmNhH4NtVS4PNnZwrP.S",
     "role": "auxiliar",
     "email": null,
-    "mustChange": false,
-    "criadoEm": "2026-01-01"
+    "mustChange": true,
+    "criadoEm": "2026-01-01",
+    "senhaAlteradaEm": "2026-09-15T12:14:13.569Z"
   },
   "mathias": {
     "nome": "Wesley Mathias Ciesielsky",
