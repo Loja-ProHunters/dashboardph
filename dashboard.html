@@ -349,6 +349,7 @@ tbody tr:hover td{background:var(--gl)}
   <div class="sb-grp" id="grp-comercial" style="display:none">
     <div class="sb-lbl">Comercial</div>
     <button class="ni" onclick="goTab('comercial',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><rect x="5" y="11" width="3.6" height="7" rx="1"/><rect x="10.2" y="6" width="3.6" height="12" rx="1"/><rect x="15.4" y="14" width="3.6" height="4" rx="1"/></svg></span><span class="ni-tx">Dashboard Comercial</span></button>
+    <button class="ni" id="ni-crm" onclick="goTab('crm',this)" style="display:none"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M4 5h16v4H4z"/><path d="M4 11h16v4H4z"/><path d="M4 17h16v2H4z"/><circle cx="7.5" cy="7" r="1" fill="currentColor"/><circle cx="7.5" cy="13" r="1" fill="currentColor"/></svg></span><span class="ni-tx">CRM</span><span class="badge">NOVO</span></button>
     <button class="ni" onclick="goTab('parceiros',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.6"/><path d="M2.6 20c0-3.5 2.9-6.2 6.4-6.2s6.4 2.7 6.4 6.2"/><circle cx="17" cy="7" r="2.6"/><path d="M15.5 14.2c2.7.4 4.7 2.7 4.7 5.4"/></svg></span><span class="ni-tx">Parceiros</span></button>
   </div>
   <div class="sb-grp">
@@ -3497,6 +3498,15 @@ window.chpwdSubmit = function(){
       document.getElementById('ctModal').addEventListener('click',function(e){ if(e.target.id==='ctModal') closeCt(); });
     </script>
 
+    <!-- CRM Pro Hunters (Fatia 1) — tab dentro do .content -->
+    <div class="tab" id="tab-crm">
+      <div class="crm-hd">
+        <div class="crm-sub" id="crm-sub"></div>
+        <div class="crm-actions" id="crm-actions"></div>
+      </div>
+      <div id="crm-view"></div>
+    </div>
+
   </div>
 </main>
 </div>
@@ -3515,7 +3525,8 @@ var tabMeta = {
   gerador:   ['Gerador de Conteúdo','Criação de conteúdo com IA'],
   linhaeditorial: ['Linha Editorial','Calendário e estratégia de conteúdo'],
   usuarios:  ['Usuários','Gerenciar acessos e senhas'],
-  admin:     ['Base de Conhecimento','Gerenciar o que a IA sabe']
+  admin:     ['Base de Conhecimento','Gerenciar o que a IA sabe'],
+  crm:       ['CRM','Contas, leads, oportunidades, atividades e pedidos']
 };
 
 // Mostrar abas condicionais e nome do usuario
@@ -3526,6 +3537,9 @@ window.onload = function() {
   }
   if (typeof CAN_VIEW_COMERCIAL !== 'undefined' && CAN_VIEW_COMERCIAL) {
     document.getElementById('grp-comercial').style.display = 'block';
+    // O CRM em v1 é liberado pros mesmos usuários que veem o comercial (admin + vendas).
+    // O botão nasce oculto e é revelado aqui.
+    var _niCrm = document.getElementById('ni-crm'); if (_niCrm) _niCrm.style.display = '';
   }
   if (typeof USER_NOME !== 'undefined' && USER_NOME) {
     document.getElementById('user-pill').textContent = USER_NOME;
@@ -3563,6 +3577,7 @@ function goTab(id, el) {
   if (id === 'linhaeditorial') edInit();
   if (id === 'parceiros') parceirosInit();
   if (id === 'usuarios') usuariosInit();
+  if (id === 'crm') crmInit();
 }
 
 function toggleSB() {
@@ -4401,6 +4416,906 @@ async function gerarContratoParceiro() {
     status.style.background = '#f8d7da';
     status.style.color = '#721c24';
     status.textContent = `❌ Erro: ${err.message}`;
+  }
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CRM Pro Hunters — Fatia 1 (Fundação)
+     Bloco autocontido: estilos, HTML da tab, e toda a lógica JS.
+═══════════════════════════════════════════════════════════════ -->
+<style>
+#tab-crm{padding-top:8px}
+#tab-crm .crm-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+#tab-crm .crm-sub{display:flex;gap:6px;flex-wrap:wrap}
+#tab-crm .crm-sub button{background:var(--wh);border:1px solid var(--bd);color:var(--tx);padding:8px 14px;border-radius:99px;cursor:pointer;font-size:12.5px;font-weight:600;letter-spacing:.2px;transition:all .15s}
+#tab-crm .crm-sub button:hover{border-color:var(--gm);color:var(--gd)}
+#tab-crm .crm-sub button.on{background:var(--gd);color:#fff;border-color:var(--gd)}
+#tab-crm .crm-actions{display:flex;gap:8px;align-items:center}
+#tab-crm .crm-btn{background:var(--gd);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-weight:600;font-size:12.5px;cursor:pointer;transition:opacity .15s}
+#tab-crm .crm-btn:hover{opacity:.9}
+#tab-crm .crm-btn.ghost{background:var(--wh);color:var(--tx);border:1px solid var(--bd)}
+#tab-crm .crm-btn.danger{background:var(--r)}
+#tab-crm .crm-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+#tab-crm .crm-search{flex:1;max-width:340px;padding:8px 12px;border:1px solid var(--bd);border-radius:8px;font-size:13px;background:var(--wh);color:var(--tx);outline:none}
+#tab-crm .crm-search:focus{border-color:var(--gm)}
+#tab-crm .crm-empty{text-align:center;padding:40px 20px;color:var(--gy);font-size:13px;background:var(--wh);border:1px dashed var(--bd);border-radius:10px}
+#tab-crm .crm-count{font-size:12px;color:var(--gy)}
+#tab-crm .crm-list{background:var(--wh);border:1px solid var(--bd);border-radius:10px;overflow:hidden;box-shadow:var(--sh-1)}
+#tab-crm .crm-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;padding:12px 16px;border-bottom:1px solid var(--bd);align-items:center;cursor:pointer;transition:background .12s}
+#tab-crm .crm-row:hover{background:var(--bg)}
+#tab-crm .crm-row:last-child{border-bottom:none}
+#tab-crm .crm-row-main{min-width:0}
+#tab-crm .crm-row-tit{font-weight:600;font-size:13.5px;color:var(--tx);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tab-crm .crm-row-sub{font-size:11.5px;color:var(--gy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tab-crm .crm-tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:var(--bg);color:var(--gy);border:1px solid var(--bd)}
+#tab-crm .crm-tag.ok{background:#e7f5ec;color:var(--gd);border-color:#c3e5cc}
+#tab-crm .crm-tag.warn{background:#fef4e7;color:#a06210;border-color:#f7ddb1}
+#tab-crm .crm-tag.dn{background:#fbe6e6;color:#a01818;border-color:#f0bcbc}
+#tab-crm .crm-tag.info{background:#e7f0fb;color:#1454a5;border-color:#bad1ee}
+.crm-modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.crm-modal.on{display:flex}
+.crm-modal-inner{background:var(--wh);border-radius:12px;max-width:640px;width:100%;max-height:88vh;overflow-y:auto;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.crm-modal-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--bd)}
+.crm-modal-tit{font-size:17px;font-weight:700;color:var(--tx)}
+.crm-modal-x{background:transparent;border:none;font-size:22px;cursor:pointer;color:var(--gy);line-height:1;padding:0;width:32px;height:32px;border-radius:6px}
+.crm-modal-x:hover{background:var(--bg);color:var(--tx)}
+.crm-modal .crm-field{margin-bottom:12px}
+.crm-modal .crm-field label{display:block;font-size:11px;font-weight:600;letter-spacing:.6px;color:var(--gy);text-transform:uppercase;margin-bottom:5px}
+.crm-modal .crm-field input,.crm-modal .crm-field select,.crm-modal .crm-field textarea{width:100%;padding:9px 11px;border:1px solid var(--bd);border-radius:8px;font-size:13px;background:var(--wh);color:var(--tx);outline:none;font-family:inherit;box-sizing:border-box}
+.crm-modal .crm-field input:focus,.crm-modal .crm-field select:focus,.crm-modal .crm-field textarea:focus{border-color:var(--gm)}
+.crm-modal .crm-field textarea{resize:vertical;min-height:70px}
+.crm-modal .crm-field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.crm-modal .crm-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;padding-top:14px;border-top:1px solid var(--bd)}
+.crm-modal .crm-btn{background:var(--gd);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-weight:600;font-size:12.5px;cursor:pointer;transition:opacity .15s}
+.crm-modal .crm-btn:hover{opacity:.9}
+.crm-modal .crm-btn.ghost{background:var(--wh);color:var(--tx);border:1px solid var(--bd)}
+.crm-modal .crm-err{background:#fbe6e6;border:1px solid #f0bcbc;color:#7a1414;padding:10px 12px;border-radius:8px;font-size:12.5px;margin-bottom:12px;display:none}
+.crm-modal .crm-err.on{display:block}
+.crm-modal .crm-loading{text-align:center;padding:40px;color:var(--gy);font-size:12.5px}
+#tab-crm .crm-painel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+#tab-crm .crm-kpi{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:16px;box-shadow:var(--sh-1)}
+#tab-crm .crm-kpi-lbl{font-size:10.5px;font-weight:700;letter-spacing:.8px;color:var(--gy);text-transform:uppercase;margin-bottom:6px}
+#tab-crm .crm-kpi-val{font-size:24px;font-weight:700;color:var(--tx);line-height:1}
+#tab-crm .crm-kpi-sub{font-size:11px;color:var(--gy);margin-top:4px}
+#tab-crm .crm-loading{text-align:center;padding:40px;color:var(--gy);font-size:12.5px}
+#tab-crm .crm-inline-actions{display:flex;gap:6px}
+#tab-crm .crm-ib{background:transparent;border:1px solid var(--bd);color:var(--gy);padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer}
+#tab-crm .crm-ib:hover{border-color:var(--gm);color:var(--gd)}
+#tab-crm .crm-ib.del:hover{border-color:var(--r);color:var(--r)}
+@media (max-width:640px){
+  #tab-crm .crm-field-grid{grid-template-columns:1fr}
+  #tab-crm .crm-row{grid-template-columns:1fr}
+}
+</style>
+
+<!-- Modal genérico de form -->
+<div class="crm-modal" id="crm-modal">
+  <div class="crm-modal-inner">
+    <div class="crm-modal-hd">
+      <div class="crm-modal-tit" id="crm-modal-tit">Novo</div>
+      <button class="crm-modal-x" onclick="crmCloseForm()">×</button>
+    </div>
+    <div class="crm-err" id="crm-err"></div>
+    <div id="crm-form-fields"></div>
+    <div class="crm-modal-actions">
+      <button class="crm-btn ghost" onclick="crmCloseForm()">Cancelar</button>
+      <button class="crm-btn" onclick="crmSaveDoc()" id="crm-save-btn">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CRM Pro Hunters — client-side (Fatia 1)
+// ═══════════════════════════════════════════════════════════════
+window.CRM = {
+  session: null,        // { usuario, nome, role, canAccess, canSeeAll, isAdmin }
+  currentSub: 'painel', // 'painel'|'accounts'|'contacts'|'leads'|'opportunities'|'activities'|'referrals'|'orders'|'onboardings'
+  cache: {},            // { colName: [docs] }
+  loaded: false,
+  editing: null,        // { col, doc? } quando o modal está aberto
+  labels: {
+    painel:       { tit: 'Painel',        subtit: 'Visão geral' },
+    accounts:     { tit: 'Contas',        subtit: 'Empresas e pessoas',   coll: 'accounts',     singular: 'Conta' },
+    contacts:     { tit: 'Contatos',      subtit: 'Pessoas nas contas',   coll: 'contacts',     singular: 'Contato' },
+    leads:        { tit: 'Leads',         subtit: 'Prospecção',            coll: 'leads',        singular: 'Lead' },
+    opportunities:{ tit: 'Oportunidades', subtit: 'Pipeline',              coll: 'opportunities',singular: 'Oportunidade' },
+    activities:   { tit: 'Atividades',    subtit: 'Tarefas e follow-ups',  coll: 'activities',   singular: 'Atividade' },
+    referrals:    { tit: 'Referrals',     subtit: 'Indicações',            coll: 'referrals',    singular: 'Referral' },
+    orders:       { tit: 'Pedidos',       subtit: 'Vendas',                coll: 'orders',       singular: 'Pedido' },
+    onboardings:  { tit: 'Onboardings',   subtit: 'Ativação pós-venda',    coll: 'onboardings',  singular: 'Onboarding' },
+    documentos:   { tit: 'Documentos',    subtit: 'CR, CRAF, CNH...',       coll: 'documentos',   singular: 'Documento' },
+    armas:        { tit: 'Cartela',       subtit: 'Armas dos clientes',    coll: 'armas',        singular: 'Arma' },
+  },
+};
+
+function crmEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function crmFmtDate(v){ if(!v) return ''; try{ return new Date(v).toLocaleDateString('pt-BR'); }catch(e){ return String(v); } }
+function crmFmtBRL(v){ return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+async function crmInit(){
+  if (!window.CRM.loaded) {
+    try {
+      var r = await fetch('/api/crm/session-info');
+      if (!r.ok) throw new Error('Sessão inválida');
+      window.CRM.session = await r.json();
+    } catch (e) {
+      document.getElementById('crm-view').innerHTML =
+        '<div class="crm-empty">Não foi possível carregar a sessão do CRM.</div>';
+      return;
+    }
+    if (!window.CRM.session.canAccess) {
+      document.getElementById('crm-view').innerHTML =
+        '<div class="crm-empty">Seu usuário não tem acesso ao CRM. Fale com a gerência.</div>';
+      document.getElementById('crm-sub').innerHTML = '';
+      document.getElementById('crm-actions').innerHTML = '';
+      return;
+    }
+    window.CRM.loaded = true;
+  }
+  crmRenderSubTabs();
+  await crmRenderCurrent();
+}
+
+function crmRenderSubTabs(){
+  var subs = ['painel','accounts','documentos','armas','leads','opportunities','activities','referrals','orders','onboardings','contacts'];
+  var L = window.CRM.labels;
+  var html = subs.map(function(k){
+    var cls = k === window.CRM.currentSub ? 'on' : '';
+    return '<button class="'+cls+'" onclick="crmGoSub(\''+k+'\')">'+crmEsc(L[k].tit)+'</button>';
+  }).join('');
+  document.getElementById('crm-sub').innerHTML = html;
+}
+
+function crmGoSub(k){
+  window.CRM.currentSub = k;
+  crmRenderSubTabs();
+  crmRenderCurrent();
+}
+
+async function crmRenderCurrent(){
+  var k = window.CRM.currentSub;
+  var view = document.getElementById('crm-view');
+  var acts = document.getElementById('crm-actions');
+  if (k === 'painel') {
+    acts.innerHTML = '';
+    view.innerHTML = '<div class="crm-loading">Carregando painel…</div>';
+    await crmRenderPainel();
+    return;
+  }
+  // Lista de coleção
+  var meta = window.CRM.labels[k];
+  acts.innerHTML = '<button class="crm-btn" onclick="crmOpenForm(\''+meta.coll+'\')">+ '+crmEsc(meta.singular)+'</button>';
+  view.innerHTML = '<div class="crm-loading">Carregando…</div>';
+  try {
+    var r = await fetch('/api/crm/' + meta.coll);
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro ao listar.');
+    window.CRM.cache[meta.coll] = d.docs || [];
+    crmRenderList(meta, d.docs || []);
+  } catch (e) {
+    view.innerHTML = '<div class="crm-empty">Erro: '+crmEsc(e.message)+'</div>';
+  }
+}
+
+async function crmRenderPainel(){
+  var view = document.getElementById('crm-view');
+  var sess = window.CRM.session;
+  // Carrega counts em paralelo
+  var cols = ['accounts','leads','opportunities','activities','referrals','orders','onboardings'];
+  var results = await Promise.all(cols.map(function(c){
+    return fetch('/api/crm/'+c).then(function(r){return r.json();}).then(function(d){return {c:c, count:(d.docs||[]).length, docs:d.docs||[]};}).catch(function(){return {c:c,count:0,docs:[]};});
+  }));
+  var byCol = {};
+  results.forEach(function(x){ byCol[x.c] = x; window.CRM.cache[x.c] = x.docs; });
+
+  // KPIs simples
+  var activityPend = (byCol.activities.docs||[]).filter(function(a){return a.status==='pendente';}).length;
+  var activityOverdue = (byCol.activities.docs||[]).filter(function(a){return a.status==='overdue';}).length;
+  var oppAbertas = (byCol.opportunities.docs||[]).filter(function(o){return o.stage!=='fechado_ganho' && o.stage!=='fechado_perdido';}).length;
+  var oppGanhas = (byCol.opportunities.docs||[]).filter(function(o){return o.stage==='fechado_ganho';}).length;
+
+  var kpis = [
+    { lbl: 'Contas', val: byCol.accounts.count, sub: sess.canSeeAll ? 'do sistema' : 'suas' },
+    { lbl: 'Leads', val: byCol.leads.count, sub: sess.canSeeAll ? 'do sistema' : 'seus' },
+    { lbl: 'Oportunidades abertas', val: oppAbertas, sub: oppGanhas + ' já ganhas' },
+    { lbl: 'Atividades pendentes', val: activityPend, sub: activityOverdue + ' atrasadas' },
+    { lbl: 'Referrals', val: byCol.referrals.count, sub: 'indicações registradas' },
+    { lbl: 'Pedidos', val: byCol.orders.count, sub: 'no CRM' },
+    { lbl: 'Onboardings', val: byCol.onboardings.count, sub: 'em ativação' },
+  ];
+  var kpisHtml = '<div class="crm-painel-grid">' + kpis.map(function(k){
+    return '<div class="crm-kpi"><div class="crm-kpi-lbl">'+crmEsc(k.lbl)+'</div><div class="crm-kpi-val">'+k.val+'</div><div class="crm-kpi-sub">'+crmEsc(k.sub)+'</div></div>';
+  }).join('') + '</div>';
+
+  var welcome = '<div style="background:linear-gradient(135deg,var(--gm),var(--g));color:#fff;padding:18px 22px;border-radius:12px;margin-bottom:18px"><div style="font-size:17px;font-weight:700;margin-bottom:4px">Bem-vindo(a) ao CRM, '+crmEsc(sess.nome)+'</div><div style="font-size:12.5px;opacity:.9">Fatia 1 — Fundação. Você vê '+(sess.canSeeAll?'todos os dados do sistema':'apenas os seus dados')+'. Contas, leads, oportunidades e atividades estão prontos pra ser usados.</div></div>';
+
+  var migrateBtn = sess.isAdmin
+    ? '<div style="margin-top:22px;padding:16px;background:var(--bg);border:1px dashed var(--bd);border-radius:10px"><div style="font-weight:600;font-size:13px;margin-bottom:6px">Migração de Parceiros</div><div style="font-size:12px;color:var(--gy);margin-bottom:10px">Importa os partners de <code>parceiros.json</code> como Referrals. Idempotente — pode rodar quantas vezes quiser.</div><button class="crm-btn" onclick="crmMigrateParceiros()">Importar parceiros como referrals</button><div id="crm-migrate-result" style="margin-top:10px;font-size:12px"></div></div>'
+    : '';
+
+  // Card de integração Bling (só admin)
+  var blingCard = sess.isAdmin
+    ? '<div id="bling-card" style="margin-top:22px;padding:18px 20px;background:var(--wh);border:1px solid var(--bd);border-radius:12px;box-shadow:var(--sh-1)">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">' +
+          '<div><div style="font-weight:700;font-size:14px;color:var(--tx)">🔗 Integração Bling</div>' +
+          '<div style="font-size:11.5px;color:var(--gy)">Sync automática de pedidos, contatos e produtos</div></div>' +
+          '<div id="bling-status-badge" style="font-size:10.5px;font-weight:700;letter-spacing:.4px;padding:4px 10px;border-radius:99px;background:var(--bg);color:var(--gy);text-transform:uppercase">carregando…</div>' +
+        '</div>' +
+        '<div id="bling-details" style="font-size:12px;color:var(--gy);margin:8px 0"></div>' +
+        '<div id="bling-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div>' +
+        '<div id="bling-test-result" style="margin-top:10px;font-size:12px"></div>' +
+      '</div>'
+    : '';
+
+  view.innerHTML = welcome + kpisHtml + migrateBtn + blingCard;
+  if (sess.isAdmin) crmBlingRefreshStatus();
+}
+
+// ── Integração Bling (card no painel gerência) ───────────────────
+async function crmBlingRefreshStatus(){
+  const badge = document.getElementById('bling-status-badge');
+  const details = document.getElementById('bling-details');
+  const actions = document.getElementById('bling-actions');
+  if (!badge) return;
+  try {
+    const r = await fetch('/api/bling/status');
+    const s = await r.json();
+    if (!r.ok) throw new Error(s.error || 'Erro');
+    if (!s.configurado) {
+      badge.textContent = 'não configurado';
+      badge.style.background = '#fbe6e6'; badge.style.color = '#a01818';
+      details.innerHTML = 'Faltam variáveis de ambiente na Vercel: <code>BLING_CLIENT_ID</code>, <code>BLING_CLIENT_SECRET</code>, <code>BLING_REDIRECT_URI</code>. Adicione e faça redeploy.';
+      actions.innerHTML = '';
+      return;
+    }
+    if (!s.conectado) {
+      badge.textContent = 'desconectado';
+      badge.style.background = '#fef4e7'; badge.style.color = '#a06210';
+      details.innerHTML = 'Nunca conectado ou desconectado. Clique em <strong>Conectar Bling</strong> pra autorizar.';
+      actions.innerHTML = '<a class="crm-btn" href="/api/bling/authorize" target="_blank">Conectar Bling</a>';
+      return;
+    }
+    // Conectado
+    badge.textContent = 'conectado';
+    badge.style.background = '#e7f5ec'; badge.style.color = 'var(--gd)';
+    var expiraMsg;
+    if (s.expira_em_min <= 0) expiraMsg = 'Access token expirado — será renovado automaticamente na próxima chamada.';
+    else if (s.expira_em_min < 15) expiraMsg = 'Access token expira em ' + s.expira_em_min + ' min (refresh automático).';
+    else expiraMsg = 'Access token válido por mais ' + s.expira_em_min + ' min.';
+    var savedAt = s.saved_at ? new Date(s.saved_at).toLocaleString('pt-BR') : '—';
+    details.innerHTML =
+      '<div>Conectado por <strong>' + (s.account_login || '?') + '</strong> em ' + savedAt + '</div>' +
+      '<div style="margin-top:3px">' + expiraMsg + '</div>' +
+      (s.scope ? '<div style="margin-top:3px;font-size:11px">Escopos: <code>' + s.scope + '</code></div>' : '') +
+      (s.tem_refresh ? '' : '<div style="margin-top:3px;color:#a06210">⚠ Sem refresh_token — reconecte assim que possível.</div>');
+    actions.innerHTML =
+      '<button class="crm-btn" onclick="crmBlingTest()">Testar conexão</button>' +
+      '<button class="crm-btn ghost" onclick="crmBlingRefresh()">Renovar token</button>' +
+      '<a class="crm-btn ghost" href="/api/bling/authorize" target="_blank">Reconectar</a>' +
+      '<button class="crm-btn danger" onclick="crmBlingDisconnect()">Desconectar</button>';
+  } catch (e) {
+    badge.textContent = 'erro';
+    badge.style.background = '#fbe6e6'; badge.style.color = '#a01818';
+    details.textContent = 'Erro ao carregar status: ' + e.message;
+  }
+}
+async function crmBlingTest(){
+  const out = document.getElementById('bling-test-result');
+  out.textContent = 'Testando…';
+  try {
+    const r = await fetch('/api/bling/test');
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    out.innerHTML = '<span style="color:var(--gd)">✓ Conexão OK.</span> <span style="color:var(--gy)">Resposta: <code>' + crmEsc(JSON.stringify(d.resposta).substring(0,120)) + '…</code></span>';
+  } catch (e) {
+    out.innerHTML = '<span style="color:var(--r)">✗ ' + crmEsc(e.message) + '</span>';
+  }
+}
+async function crmBlingRefresh(){
+  const out = document.getElementById('bling-test-result');
+  out.textContent = 'Renovando…';
+  try {
+    const r = await fetch('/api/bling/refresh', { method: 'POST' });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    out.innerHTML = '<span style="color:var(--gd)">✓ Token renovado. Expira em ' + d.expira_em_min + ' min.</span>';
+    crmBlingRefreshStatus();
+  } catch (e) {
+    out.innerHTML = '<span style="color:var(--r)">✗ ' + crmEsc(e.message) + '</span>';
+  }
+}
+async function crmBlingDisconnect(){
+  if (!confirm('Desconectar o Bling? Você precisará reconectar depois pra sincronizar de novo.')) return;
+  try {
+    const r = await fetch('/api/bling/disconnect', { method: 'POST' });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    crmBlingRefreshStatus();
+  } catch (e) {
+    alert('Erro: ' + e.message);
+  }
+}
+
+async function crmMigrateParceiros(){
+  var out = document.getElementById('crm-migrate-result');
+  out.textContent = 'Importando…';
+  try {
+    var r = await fetch('/api/crm/migrate-parceiros', { method: 'POST' });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro.');
+    out.innerHTML = '<span style="color:var(--gd)">✓ '+d.criados+' referrals criados, '+d.ignorados+' já existiam (de '+d.total_parceiros+' parceiros no total).</span>';
+  } catch (e) {
+    out.innerHTML = '<span style="color:var(--r)">Erro: '+crmEsc(e.message)+'</span>';
+  }
+}
+
+// ── Render de lista genérico ─────────────────────────────────────
+function crmRenderList(meta, docs){
+  var view = document.getElementById('crm-view');
+  if (!docs.length) {
+    view.innerHTML =
+      '<div class="crm-toolbar"><input class="crm-search" placeholder="Buscar…" oninput="crmFilterList(this.value)"><div class="crm-count">0 itens</div></div>' +
+      '<div class="crm-empty">Nada por aqui ainda. Clique em <strong>+ '+crmEsc(meta.singular)+'</strong> pra começar.</div>';
+    return;
+  }
+  view.innerHTML =
+    '<div class="crm-toolbar"><input class="crm-search" id="crm-search-input" placeholder="Buscar…" oninput="crmFilterList(this.value)"><div class="crm-count" id="crm-count-el">'+docs.length+' itens</div></div>' +
+    '<div class="crm-list" id="crm-list-el">' + docs.map(function(d){ return crmRenderRow(meta, d); }).join('') + '</div>';
+}
+
+function crmFilterList(q){
+  var meta = window.CRM.labels[window.CRM.currentSub];
+  var all = window.CRM.cache[meta.coll] || [];
+  var ql = String(q||'').toLowerCase().trim();
+  var filtered = ql ? all.filter(function(d){ return JSON.stringify(d).toLowerCase().indexOf(ql)>=0; }) : all;
+  document.getElementById('crm-list-el').innerHTML = filtered.map(function(d){ return crmRenderRow(meta, d); }).join('') || '<div class="crm-empty" style="border:none">Nada encontrado.</div>';
+  document.getElementById('crm-count-el').textContent = filtered.length + ' itens';
+}
+
+// Cada coleção monta seu "row visual" com os campos que fazem sentido
+function crmRenderRow(meta, d){
+  var col = meta.coll;
+  var tit, sub, tag='';
+  if (col === 'accounts') {
+    tit = d.nome + (d.cpf_cnpj ? ' — '+d.cpf_cnpj : '');
+    sub = (d.tipo||'?').toUpperCase() + ' · ' + (d.telefone||d.email||'sem contato') + ' · owner: '+d.owner_id;
+    tag = '<span class="crm-tag '+(d.status==='ativo'?'ok':(d.status==='bloqueado'?'dn':''))+'">'+d.status+'</span>';
+  } else if (col === 'contacts') {
+    tit = d.nome + (d.is_primary ? ' ⭐' : '');
+    sub = (d.cargo||'') + ' · ' + (d.telefone||d.email||'sem contato');
+  } else if (col === 'leads') {
+    tit = d.nome + (d.cpf_cnpj ? ' — '+d.cpf_cnpj : '');
+    sub = 'origem: '+d.origem+' · motion: '+d.motion+' · owner: '+d.owner_id;
+    var stCls = d.status==='convertido'?'ok':(d.status==='perdido'||d.status==='descartado'?'dn':'info');
+    tag = '<span class="crm-tag '+stCls+'">'+d.status+'</span>';
+  } else if (col === 'opportunities') {
+    tit = 'Oportunidade — R$ '+Number(d.valor_esperado||0).toLocaleString('pt-BR');
+    sub = 'stage: '+d.stage+' · motion: '+d.motion+' · próxima: '+(d.next_action||'—')+(d.next_action_date?' em '+crmFmtDate(d.next_action_date):'');
+    var stCls2 = d.stage==='fechado_ganho'?'ok':(d.stage==='fechado_perdido'?'dn':'info');
+    tag = '<span class="crm-tag '+stCls2+'">'+d.stage+'</span>';
+  } else if (col === 'activities') {
+    tit = d.titulo;
+    sub = d.tipo+' · prazo: '+crmFmtDate(d.prazo)+' · '+d.entidade_tipo+':'+d.entidade_id+' · owner: '+d.owner_id;
+    var stCls3 = d.status==='concluida'?'ok':(d.status==='overdue'?'dn':(d.status==='cancelada'?'':'info'));
+    tag = '<span class="crm-tag '+stCls3+'">'+d.status+'</span>';
+  } else if (col === 'referrals') {
+    tit = d.indicante_nome + ' ('+d.tipo+')';
+    sub = 'reward: '+d.reward_status+' · receita: '+crmFmtBRL(d.revenue_atribuida)+' · owner: '+d.owner_id;
+    var stCls4 = d.status==='convertido'?'ok':(d.status==='perdido'||d.status==='descartado'?'dn':'info');
+    tag = '<span class="crm-tag '+stCls4+'">'+d.status+'</span>';
+  } else if (col === 'orders') {
+    tit = 'Pedido — '+crmFmtBRL(d.valor_total)+(d.bling_numero?' (Bling #'+d.bling_numero+')':'');
+    sub = 'data: '+crmFmtDate(d.data_pedido)+' · vendedor: '+d.vendedor_id+' · itens: '+(d.itens||[]).length;
+    var stCls5 = d.status==='pago'||d.status==='entregue'?'ok':(d.status==='cancelado'||d.status==='devolvido'?'dn':'info');
+    tag = '<span class="crm-tag '+stCls5+'">'+d.status+'</span>';
+  } else if (col === 'onboardings') {
+    var doneCount = (d.checklist||[]).filter(function(x){return x.concluido;}).length;
+    tit = 'Onboarding · '+doneCount+'/'+(d.checklist||[]).length+' itens';
+    sub = 'risco: '+d.risco+' · owner: '+d.owner_id+' · account: '+d.account_id;
+    tag = '<span class="crm-tag '+(d.status==='concluido'?'ok':(d.status==='abandonado'?'dn':'info'))+'">'+d.status+'</span>';
+  } else if (col === 'documentos') {
+    var tipoUp = (d.tipo||'').toUpperCase();
+    tit = tipoUp + ' · ' + (d.numero || 'sem número') + ' · ' + (d.titular_nome || '?');
+    sub = 'validade: ' + crmFmtDate(d.validade) + ' · CPF: ' + (d.cpf||'?') + ' · cadastrado em: ' + crmFmtDate(d.criado_em);
+    var svMap = { em_dia:['ok','em dia'], vence_em_90:['info','vence em 90d'], vence_em_60:['warn','vence em 60d'], critico:['warn','⚠ crítico'], vencido:['dn','🔴 vencido'], sem_validade:['','sem validade'] };
+    var sv = svMap[d.status_validade] || ['','?'];
+    tag = '<span class="crm-tag '+sv[0]+'">'+sv[1]+'</span>';
+  } else if (col === 'armas') {
+    tit = [d.marca, d.modelo, d.calibre].filter(Boolean).join(' ') + ' · série ' + d.numero_serie;
+    sub = 'tipo: '+(d.tipo||'?')+' · acervo: '+d.acervo+' · acionamento: '+d.acionamento+' · account: '+d.account_id;
+    var clsMap = { permitido:['ok','permitido'], restrito:['warn','restrito'], proibido:['dn','proibido'], pendente:['','⚠ classificar acionamento'] };
+    var clsX = clsMap[d.classificacao] || ['',d.classificacao];
+    tag = '<span class="crm-tag '+clsX[0]+'">'+clsX[1]+'</span>';
+  }
+  var acts = '<div class="crm-inline-actions"><button class="crm-ib" onclick="event.stopPropagation();crmOpenForm(\''+col+'\',\''+d.id+'\')">Editar</button>' +
+    (window.CRM.session && window.CRM.session.canSeeAll ? '<button class="crm-ib del" onclick="event.stopPropagation();crmDeleteDoc(\''+col+'\',\''+d.id+'\')">Del</button>' : '') + '</div>';
+  return '<div class="crm-row" onclick="crmOpenForm(\''+col+'\',\''+d.id+'\')"><div class="crm-row-main"><div class="crm-row-tit">'+crmEsc(tit||'—')+'</div><div class="crm-row-sub">'+crmEsc(sub||'')+'</div></div>'+tag+acts+'</div>';
+}
+
+// ── Modal de create/edit ─────────────────────────────────────────
+async function crmOpenForm(col, id){
+  // Fluxo especial de Documentos quando é criação: upload primeiro, OCR, depois form
+  if (col === 'documentos' && !id) return crmOpenDocUpload();
+
+  var meta = { coll: col, singular: window.CRM.labels[Object.keys(window.CRM.labels).find(function(k){return window.CRM.labels[k].coll===col;})].singular };
+  window.CRM.editing = { col: col, id: id||null, doc: null };
+  document.getElementById('crm-modal-tit').textContent = (id ? 'Editar ' : 'Novo ') + meta.singular;
+  document.getElementById('crm-err').classList.remove('on');
+  var form = document.getElementById('crm-form-fields');
+  form.innerHTML = '<div class="crm-loading">Carregando formulário…</div>';
+  document.getElementById('crm-modal').classList.add('on');
+  var doc = null;
+  if (id) {
+    try {
+      var r = await fetch('/api/crm/'+col+'/'+id);
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error||'Erro.');
+      doc = d.doc;
+      window.CRM.editing.doc = doc;
+    } catch (e) {
+      form.innerHTML = '<div class="crm-err on">'+crmEsc(e.message)+'</div>';
+      return;
+    }
+  }
+  form.innerHTML = crmFormFields(col, doc);
+}
+
+// ── Fluxo de upload + OCR + revisão do Documento ─────────────────
+function crmOpenDocUpload(){
+  window.CRM.editing = { col: 'documentos', id: null, doc: null, ocr: null };
+  document.getElementById('crm-modal-tit').textContent = 'Novo Documento';
+  document.getElementById('crm-err').classList.remove('on');
+  var form = document.getElementById('crm-form-fields');
+  form.innerHTML =
+    '<div style="text-align:center;padding:20px 8px">' +
+      '<div style="font-size:13px;color:var(--gy);margin-bottom:14px">Envie uma <strong>foto</strong> ou <strong>PDF</strong> do documento. A IA identifica o tipo (CR, CRAF, CNH) e extrai os dados.</div>' +
+      '<input type="file" id="crm-doc-file" accept="image/*,application/pdf" style="display:none" onchange="crmDocFileChosen(this)">' +
+      '<button class="crm-btn" onclick="document.getElementById(\'crm-doc-file\').click()">📎 Escolher arquivo</button>' +
+      '<div id="crm-doc-hint" style="margin-top:12px;font-size:11px;color:var(--gl2)">Aceita JPG, PNG, WEBP ou PDF · até ~10 MB</div>' +
+    '</div>';
+  // Esconde o botão Salvar até que o OCR retorne
+  document.getElementById('crm-save-btn').style.display = 'none';
+  document.getElementById('crm-modal').classList.add('on');
+}
+
+function crmDocFileChosen(input){
+  var file = input.files && input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  var form = document.getElementById('crm-form-fields');
+  form.innerHTML = '<div class="crm-loading">📄 Lendo arquivo…</div>';
+  reader.onload = function(){
+    var dataUrl = reader.result;
+    var base64 = dataUrl.split(',')[1];
+    var mediaType = file.type || 'application/octet-stream';
+    crmDocRunOcr(base64, mediaType, file.name);
+  };
+  reader.onerror = function(){ form.innerHTML = '<div class="crm-err on">Falha ao ler o arquivo.</div>'; };
+  reader.readAsDataURL(file);
+}
+
+async function crmDocRunOcr(base64, mediaType, filename){
+  var form = document.getElementById('crm-form-fields');
+  form.innerHTML = '<div class="crm-loading">🔎 Extraindo dados com IA… (pode levar 10–20 segundos)</div>';
+  try {
+    var r = await fetch('/api/crm/docs/ocr', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_base64: base64, media_type: mediaType }),
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro no OCR.');
+    if (d.duplicado) {
+      form.innerHTML =
+        '<div class="crm-err on">⚠ Este arquivo já foi cadastrado antes (hash idêntico). ' +
+        (d.documento_existente_id ? 'ID existente: '+d.documento_existente_id : '') +
+        '</div>' +
+        '<div style="text-align:center;margin-top:10px"><button class="crm-btn ghost" onclick="crmOpenDocUpload()">Enviar outro arquivo</button></div>';
+      return;
+    }
+    if (d.tipo === 'desconhecido' || !d.dados) {
+      form.innerHTML =
+        '<div class="crm-err on">A IA não conseguiu identificar o tipo do documento. Motivo: ' + crmEsc(d.motivo_classificacao||'') + '</div>' +
+        '<div style="text-align:center;margin-top:10px"><button class="crm-btn ghost" onclick="crmOpenDocUpload()">Tentar outro arquivo</button></div>';
+      return;
+    }
+    window.CRM.editing.ocr = { hash: d.hash, tipo: d.tipo, dados: d.dados, filename: filename };
+    document.getElementById('crm-modal-tit').textContent = 'Revisão — ' + (d.tipo||'').toUpperCase();
+    document.getElementById('crm-save-btn').style.display = '';
+    document.getElementById('crm-save-btn').textContent = 'Salvar documento';
+    document.getElementById('crm-save-btn').setAttribute('onclick', 'crmSaveDocConfirm()');
+    form.innerHTML = crmDocReviewForm(d.tipo, d.dados);
+  } catch (e) {
+    form.innerHTML = '<div class="crm-err on">Erro: '+crmEsc(e.message)+'</div>' +
+      '<div style="text-align:center;margin-top:10px"><button class="crm-btn ghost" onclick="crmOpenDocUpload()">Tentar de novo</button></div>';
+  }
+}
+
+// Renderiza formulário de revisão do doc com todos os campos que a IA extraiu.
+// Cada tipo tem seu conjunto de campos. Vendedor confirma/edita, depois salva.
+function crmDocReviewForm(tipo, dados){
+  function fld(name, label, val, opts) { opts=opts||{}; var v = (val==null?'':val); return '<div class="crm-field"><label>'+label+(opts.req?' *':'')+'</label><input name="'+name+'" value="'+crmEsc(v)+'"'+(opts.type?' type="'+opts.type+'"':'')+(opts.ph?' placeholder="'+crmEsc(opts.ph)+'"':'')+'></div>'; }
+  function ta(name, label, val) { return '<div class="crm-field"><label>'+label+'</label><textarea name="'+name+'">'+crmEsc(val||'')+'</textarea></div>'; }
+  var aviso = '';
+  if (Array.isArray(dados.avisos) && dados.avisos.length) {
+    aviso = '<div class="crm-err on" style="background:#fef4e7;border-color:#f7ddb1;color:#a06210">⚠ Avisos da IA: '+crmEsc(dados.avisos.join(' · '))+'</div>';
+  }
+  var comum =
+    fld('titular_nome','Nome do titular', dados.titular_nome, {req:true}) +
+    '<div class="crm-field-grid">' +
+      fld('cpf','CPF (só dígitos)', dados.cpf, {req:true}) +
+      fld('validade','Validade', dados.validade, {type:'date'}) +
+    '</div>';
+
+  var especifico = '';
+  if (tipo === 'cr') {
+    especifico =
+      fld('numero_cr','Nº CR', dados.numero_cr, {req:true}) +
+      '<div class="crm-field-grid">' +
+        fld('data_emissao','Data de emissão', dados.data_emissao, {type:'date'}) +
+        fld('sfpc_vinculacao','SFPC de vinculação', dados.sfpc_vinculacao) +
+      '</div>' +
+      fld('orgao_emissor','Órgão emissor', dados.orgao_emissor) +
+      '<div class="crm-field"><label>Atividades autorizadas (uma por linha)</label><textarea name="atividades_cac_txt">'+(Array.isArray(dados.atividades_cac)?dados.atividades_cac.join('\n'):'')+'</textarea></div>' +
+      fld('hash_autenticidade','Hash SisGCOrp', dados.hash_autenticidade);
+  } else if (tipo === 'craf') {
+    especifico =
+      fld('numero_registro','Nº registro', dados.numero_registro, {req:true}) +
+      '<div class="crm-field-grid">' +
+        fld('data_expedicao','Data de expedição', dados.data_expedicao, {type:'date'}) +
+        fld('orgao_emissor','Órgão emissor', dados.orgao_emissor) +
+      '</div>' +
+      '<div style="margin-top:14px;padding:10px 12px;background:var(--bg);border:1px solid var(--bd);border-radius:8px"><div style="font-size:11px;font-weight:700;color:var(--gy);letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">Dados da arma (vira Cartela)</div>' +
+        '<div class="crm-field-grid">' +
+          fld('arma_marca','Marca', dados.arma_marca) +
+          fld('arma_calibre','Calibre', dados.arma_calibre) +
+        '</div>' +
+        '<div class="crm-field-grid">' +
+          fld('arma_tipo','Tipo', dados.arma_tipo) +
+          fld('arma_modelo','Modelo', dados.arma_modelo) +
+        '</div>' +
+        '<div class="crm-field-grid">' +
+          fld('arma_numero_serie','Nº série', dados.arma_numero_serie, {req:true}) +
+          fld('arma_numero_sigma','Nº SIGMA', dados.arma_numero_sigma) +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--gy);margin-top:4px">Ao salvar, se essa arma ainda não existe na cartela do CPF, será criada com <strong>acionamento pendente</strong> — vendedor completa depois.</div>' +
+      '</div>' +
+      fld('titular_rg','RG do titular', dados.titular_rg) +
+      fld('titular_rg_orgao','Órgão RG', dados.titular_rg_orgao);
+  } else if (tipo === 'cnh') {
+    especifico =
+      '<div class="crm-field-grid">' +
+        fld('numero_registro','Nº registro', dados.numero_registro, {req:true}) +
+        fld('categoria','Categoria', dados.categoria) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        fld('data_emissao','Data de emissão', dados.data_emissao, {type:'date'}) +
+        fld('data_primeira_habilitacao','1ª habilitação', dados.data_primeira_habilitacao, {type:'date'}) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        fld('titular_data_nascimento','Data nascimento', dados.titular_data_nascimento, {type:'date'}) +
+        fld('local_emissao','Local emissão', dados.local_emissao) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        fld('titular_rg','RG', dados.titular_rg) +
+        fld('titular_rg_orgao','Órgão RG', dados.titular_rg_orgao) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        fld('filiacao_mae','Filiação — mãe', dados.filiacao_mae) +
+        fld('filiacao_pai','Filiação — pai', dados.filiacao_pai) +
+      '</div>' +
+      fld('orgao_emissor','Órgão emissor', dados.orgao_emissor);
+  }
+  return aviso + comum + especifico +
+    '<div style="margin-top:12px;padding:8px 12px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;font-size:11px;color:var(--gy)">💡 A IA extraiu esses campos automaticamente. Confira e corrija o que estiver errado antes de salvar.</div>';
+}
+
+async function crmSaveDocConfirm(){
+  var editing = window.CRM.editing;
+  if (!editing || !editing.ocr) return;
+  var form = document.getElementById('crm-form-fields');
+  var dados = {};
+  var els = form.querySelectorAll('input, select, textarea');
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    if (!el.name) continue;
+    if (el.type === 'checkbox') dados[el.name] = el.checked;
+    else dados[el.name] = el.value;
+  }
+  // Converte atividades_cac_txt (textarea) → array
+  if (dados.atividades_cac_txt !== undefined) {
+    dados.atividades_cac = dados.atividades_cac_txt.split(/\r?\n/).map(function(s){return s.trim();}).filter(Boolean);
+    delete dados.atividades_cac_txt;
+  }
+  // CPF só dígitos
+  if (dados.cpf) dados.cpf = String(dados.cpf).replace(/\D/g, '');
+  var btn = document.getElementById('crm-save-btn');
+  var errEl = document.getElementById('crm-err');
+  errEl.classList.remove('on');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  try {
+    var r = await fetch('/api/crm/docs/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo: editing.ocr.tipo, hash: editing.ocr.hash, dados_revisados: dados }),
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro ao salvar.');
+    crmCloseForm();
+    var msg = '✓ Documento salvo.' +
+      (d.criou_account ? ' Conta criada automaticamente.' : ' Vinculado à conta existente.') +
+      (d.criou_arma ? ' Arma adicionada à cartela.' : (d.arma_id ? ' Arma já existia na cartela.' : '')) +
+      (d.status_validade === 'vencido' ? ' 🔴 Doc vencido — activity de renovação criada.' :
+       d.status_validade === 'critico' ? ' ⚠ Vencendo em breve — activity criada.' : '');
+    alert(msg);
+    delete window.CRM.cache.documentos;
+    delete window.CRM.cache.armas;
+    delete window.CRM.cache.accounts;
+    delete window.CRM.cache.activities;
+    await crmRenderCurrent();
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.classList.add('on');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Salvar documento';
+  }
+}
+
+function crmCloseForm(){
+  document.getElementById('crm-modal').classList.remove('on');
+  window.CRM.editing = null;
+  // Restaura estado default do botão Salvar (o fluxo de doc altera texto/onclick)
+  var btn = document.getElementById('crm-save-btn');
+  if (btn) { btn.style.display = ''; btn.textContent = 'Salvar'; btn.setAttribute('onclick','crmSaveDoc()'); }
+}
+
+// Fábrica de campos de formulário por coleção. Retorna HTML com <input>s cujos
+// name= são os campos do documento. crmSaveDoc() coleta tudo em um objeto.
+function crmFormFields(col, doc){
+  doc = doc || {};
+  var sess = window.CRM.session;
+  var ownerOpts = '<option value="'+sess.usuario+'">'+crmEsc(sess.usuario)+'</option>';
+  // TODO: em próxima fatia, buscar lista de usuários pra admin escolher owner
+  var owner = doc.owner_id || sess.usuario;
+
+  function txt(name, label, val, opts){ opts=opts||{}; return '<div class="crm-field"><label>'+label+(opts.req?' *':'')+'</label><input name="'+name+'" value="'+crmEsc(val==null?'':val)+'"'+(opts.type?' type="'+opts.type+'"':'')+(opts.ph?' placeholder="'+crmEsc(opts.ph)+'"':'')+'></div>'; }
+  function ta(name, label, val){ return '<div class="crm-field"><label>'+label+'</label><textarea name="'+name+'">'+crmEsc(val||'')+'</textarea></div>'; }
+  function sel(name, label, val, opts, req){ return '<div class="crm-field"><label>'+label+(req?' *':'')+'</label><select name="'+name+'">'+opts.map(function(o){var v=typeof o==='string'?o:o.v;var t=typeof o==='string'?o:o.t;return '<option value="'+v+'"'+(v===val?' selected':'')+'>'+crmEsc(t)+'</option>';}).join('')+'</select></div>'; }
+  function ownerField(){ return sess.canSeeAll
+    ? '<div class="crm-field"><label>Owner</label><input name="owner_id" value="'+crmEsc(owner)+'" placeholder="usuário do sistema (ex: mathias)"></div>'
+    : '<input type="hidden" name="owner_id" value="'+crmEsc(sess.usuario)+'">';
+  }
+
+  if (col === 'accounts') {
+    return ownerField() +
+      '<div class="crm-field-grid">' +
+        sel('tipo','Tipo',doc.tipo||'pf',['pf','pj'],true) +
+        sel('status','Status',doc.status||'ativo',['ativo','inativo','bloqueado']) +
+      '</div>' +
+      txt('nome','Nome',doc.nome,{req:true,ph:'Nome amigável do cliente'}) +
+      '<div class="crm-field-grid">' +
+        txt('cpf_cnpj','CPF ou CNPJ',doc.cpf_cnpj,{ph:'só dígitos ou formatado'}) +
+        txt('telefone','Telefone',doc.telefone) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        txt('email','E-mail',doc.email,{type:'email'}) +
+        txt('razao_social','Razão Social (PJ)',doc.razao_social) +
+      '</div>' +
+      ta('notas','Notas',doc.notas);
+  }
+  if (col === 'contacts') {
+    return txt('account_id','ID da Conta',doc.account_id,{req:true,ph:'UUID da conta'}) +
+      txt('nome','Nome',doc.nome,{req:true}) +
+      '<div class="crm-field-grid">' +
+        txt('cargo','Cargo',doc.cargo) +
+        txt('telefone','Telefone',doc.telefone) +
+      '</div>' +
+      txt('email','E-mail',doc.email) +
+      '<div class="crm-field"><label><input type="checkbox" name="is_primary" '+(doc.is_primary?'checked':'')+'> Contato primário</label></div>' +
+      ta('notas','Notas',doc.notas);
+  }
+  if (col === 'leads') {
+    return ownerField() +
+      txt('nome','Nome',doc.nome,{req:true}) +
+      '<div class="crm-field-grid">' +
+        txt('telefone','Telefone',doc.telefone) +
+        txt('email','E-mail',doc.email) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        sel('origem','Origem',doc.origem||'inbound',['inbound','walk_in','bling_import','referral','evento','outbound'],true) +
+        sel('motion','Motion',doc.motion||'pf_loja',['pf_loja','pf_online','pj_revenda','pj_corporativo'],true) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        sel('status','Status',doc.status||'novo',['novo','contatado','qualificado','convertido','descartado','perdido']) +
+        txt('cpf_cnpj','CPF/CNPJ',doc.cpf_cnpj) +
+      '</div>' +
+      txt('referral_id','Referral ID (obrigatório se origem=referral)',doc.referral_id) +
+      txt('motivo_perda','Motivo da perda (obrigatório se perdido/descartado)',doc.motivo_perda) +
+      ta('notas','Notas',doc.notas);
+  }
+  if (col === 'opportunities') {
+    return ownerField() +
+      '<div class="crm-field-grid">' +
+        txt('account_id','ID da Conta',doc.account_id,{req:true}) +
+        txt('lead_id','ID do Lead (opcional)',doc.lead_id) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        sel('motion','Motion',doc.motion||'pf_loja',['pf_loja','pf_online','pj_revenda','pj_corporativo'],true) +
+        sel('stage','Stage',doc.stage||'novo',['novo','qualificando','proposta','negociacao','fechado_ganho','fechado_perdido']) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        txt('valor_esperado','Valor esperado (R$)',doc.valor_esperado,{type:'number'}) +
+        txt('next_action_date','Data próxima ação',doc.next_action_date,{type:'date'}) +
+      '</div>' +
+      txt('next_action','Próxima ação',doc.next_action,{ph:'Ex: Ligar amanhã pra fechar orçamento'}) +
+      txt('referral_id','Referral ID (opcional)',doc.referral_id) +
+      txt('motivo_perda','Motivo da perda (se fechado_perdido)',doc.motivo_perda) +
+      ta('notas','Notas',doc.notas);
+  }
+  if (col === 'activities') {
+    return ownerField() +
+      txt('titulo','Título',doc.titulo,{req:true}) +
+      '<div class="crm-field-grid">' +
+        sel('tipo','Tipo',doc.tipo||'follow_up',['contato','follow_up','trigger','reativacao','onboarding_step','manual'],true) +
+        sel('status','Status',doc.status||'pendente',['pendente','concluida','overdue','cancelada']) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        sel('entidade_tipo','Entidade vinculada',doc.entidade_tipo||'account',['account','lead','opportunity','referral'],true) +
+        txt('entidade_id','ID da entidade',doc.entidade_id,{req:true}) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        txt('prazo','Prazo',doc.prazo,{type:'date',req:true}) +
+        txt('pontos_base','Pontos base',doc.pontos_base==null?5:doc.pontos_base,{type:'number'}) +
+      '</div>' +
+      ta('descricao','Descrição',doc.descricao);
+  }
+  if (col === 'referrals') {
+    return ownerField() +
+      txt('indicante_nome','Nome do indicante',doc.indicante_nome,{req:true}) +
+      '<div class="crm-field-grid">' +
+        txt('indicante_telefone','Telefone',doc.indicante_telefone) +
+        txt('indicante_email','E-mail',doc.indicante_email) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        sel('tipo','Tipo',doc.tipo||'cliente',['cliente','influenciador','parceiro_comercial'],true) +
+        sel('status','Status',doc.status||'ativo',['ativo','contatado','convertido','descartado','perdido']) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        sel('reward_status','Status recompensa',doc.reward_status||'nao_aplica',['nao_aplica','pendente','pago']) +
+        txt('reward_valor','Valor recompensa (R$)',doc.reward_valor,{type:'number'}) +
+      '</div>' +
+      txt('outcome','Outcome (obrigatório se perdido/descartado)',doc.outcome) +
+      ta('notas','Notas',doc.notas);
+  }
+  if (col === 'orders') {
+    return '<div class="crm-field-grid">' +
+        txt('account_id','ID da Conta',doc.account_id,{req:true}) +
+        txt('vendedor_id','Vendedor',doc.vendedor_id||sess.usuario,{req:true}) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        txt('data_pedido','Data do pedido',doc.data_pedido||new Date().toISOString().slice(0,10),{type:'date',req:true}) +
+        sel('status','Status',doc.status||'rascunho',['rascunho','pendente_pagamento','pago','enviado','entregue','cancelado','devolvido']) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        txt('valor_total','Valor total (R$)',doc.valor_total,{type:'number'}) +
+        txt('opportunity_id','ID Oportunidade (opcional)',doc.opportunity_id) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        txt('bling_pedido_id','ID Bling',doc.bling_pedido_id) +
+        txt('bling_numero','Nº Bling',doc.bling_numero) +
+      '</div>' +
+      ta('notas','Notas',doc.notas);
+  }
+  if (col === 'onboardings') {
+    return ownerField() +
+      '<div class="crm-field-grid">' +
+        txt('account_id','ID da Conta',doc.account_id,{req:true}) +
+        txt('order_id','ID do 1º pedido',doc.order_id,{req:true}) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        sel('status','Status',doc.status||'pendente',['pendente','em_andamento','concluido','abandonado']) +
+        sel('risco','Risco',doc.risco||'baixo',['baixo','medio','alto']) +
+      '</div>';
+  }
+  if (col === 'documentos') {
+    // Só chega aqui em edição (criação vai por crmOpenDocUpload). Deixa editar os
+    // campos derivados principais + notas; dados extraídos ficam read-only.
+    return '<div class="crm-field-grid">' +
+        sel('tipo','Tipo',doc.tipo||'cr',['cr','craf','cnh'],true) +
+        txt('numero','Número',doc.numero) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        txt('titular_nome','Titular',doc.titular_nome) +
+        txt('cpf','CPF',doc.cpf) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        txt('validade','Validade',doc.validade,{type:'date'}) +
+        txt('data_emissao','Emissão',doc.data_emissao,{type:'date'}) +
+      '</div>' +
+      txt('orgao_emissor','Órgão emissor',doc.orgao_emissor) +
+      ta('notas','Notas',doc.notas);
+  }
+  if (col === 'armas') {
+    return ownerField() +
+      '<div class="crm-field-grid">' +
+        txt('account_id','ID da Conta',doc.account_id,{req:true}) +
+        txt('numero_serie','Nº Série',doc.numero_serie,{req:true}) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        txt('marca','Marca',doc.marca) +
+        txt('modelo','Modelo',doc.modelo) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        txt('tipo','Tipo',doc.tipo,{ph:'carabina, pistola, revólver, espingarda...'}) +
+        txt('calibre','Calibre',doc.calibre) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        sel('acionamento','Acionamento',doc.acionamento||'pendente',['pendente','bolt','alavanca','pump','dois_canos','semiautomatico','automatico','outro']) +
+        sel('acervo','Acervo',doc.acervo||'pendente',['pendente','tiro_desportivo','caca','colecao']) +
+      '</div>' +
+      '<div class="crm-field-grid">' +
+        sel('classificacao','Classificação',doc.classificacao||'pendente',['pendente','permitido','restrito','proibido']) +
+        txt('numero_sigma','Nº SIGMA',doc.numero_sigma) +
+      '</div>' +
+      '<div style="margin-top:6px;padding:8px 10px;background:var(--bg);border:1px dashed var(--bd);border-radius:6px;font-size:11px;color:var(--gy)">Colecionismo (opcional):</div>' +
+      '<div class="crm-field-grid">' +
+        txt('variante','Variante',doc.variante) +
+        txt('procedencia_pais','Procedência (país)',doc.procedencia_pais) +
+      '</div>' +
+      ta('notas','Notas',doc.notas);
+  }
+  return '<div class="crm-err on">Formulário ainda não implementado pra esta coleção.</div>';
+}
+
+async function crmSaveDoc(){
+  var editing = window.CRM.editing;
+  if (!editing) return;
+  var form = document.getElementById('crm-form-fields');
+  var dados = {};
+  var els = form.querySelectorAll('input, select, textarea');
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    if (!el.name) continue;
+    if (el.type === 'checkbox') dados[el.name] = el.checked;
+    else if (el.type === 'number') dados[el.name] = el.value === '' ? null : Number(el.value);
+    else dados[el.name] = el.value;
+  }
+  // Se editing.doc existe, preserva id
+  if (editing.doc && editing.doc.id) dados.id = editing.doc.id;
+  var btn = document.getElementById('crm-save-btn');
+  var errEl = document.getElementById('crm-err');
+  errEl.classList.remove('on');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  try {
+    var url = '/api/crm/' + editing.col + (editing.id ? '/' + editing.id : '');
+    var method = editing.id ? 'PUT' : 'POST';
+    var r = await fetch(url, { method: method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(dados) });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro ao salvar.');
+    crmCloseForm();
+    // Invalida cache local e recarrega
+    delete window.CRM.cache[editing.col];
+    await crmRenderCurrent();
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.classList.add('on');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Salvar';
+  }
+}
+
+async function crmDeleteDoc(col, id){
+  if (!confirm('Excluir definitivamente este registro?')) return;
+  try {
+    var r = await fetch('/api/crm/'+col+'/'+id, { method: 'DELETE' });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error||'Erro ao excluir.');
+    delete window.CRM.cache[col];
+    await crmRenderCurrent();
+  } catch (e) {
+    alert('Erro: ' + e.message);
   }
 }
 </script>

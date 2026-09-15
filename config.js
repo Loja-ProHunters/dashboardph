@@ -14,6 +14,15 @@ module.exports = {
   githubToken: process.env.GITHUB_TOKEN || '',
   githubRepo: process.env.GITHUB_REPO || 'Loja-ProHunters/dashboardph',
   githubBranch: process.env.GITHUB_BRANCH || 'main',
+
+  // Segredo do cron (usado por /api/crm/cron/vencimentos quando chamado por
+  // agendador — Vercel Cron ou similar. Também pode ser chamado por gerência logada.)
+  cronSecret: process.env.CRON_SECRET || '',
+
+  // Bling API v3 (OAuth 2.0)
+  blingClientId:     process.env.BLING_CLIENT_ID     || '',
+  blingClientSecret: process.env.BLING_CLIENT_SECRET || '',
+  blingRedirectUri:  process.env.BLING_REDIRECT_URI  || '',
   
   // Usuários (padrão: admin/gerencia/auxiliar/vendas)
   users: (() => {
