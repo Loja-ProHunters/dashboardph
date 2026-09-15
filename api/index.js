@@ -925,12 +925,28 @@ module.exports = async (req, res) => {
   // volta pro dashboard).
   if (req.method === 'GET' && url.startsWith('/api/bling/callback')) {
     try {
-      const u = new URL('http://x' + url);
-      const code = u.searchParams.get('code');
-      const stateRecebido = u.searchParams.get('state');
-      const errParam = u.searchParams.get('error');
-      if (errParam) throw new Error('Bling recusou: ' + errParam + ' — ' + (u.searchParams.get('error_description') || ''));
-      if (!code) throw new Error('code ausente no callback.');
+      // Vercel/Node podem expor query string em lugares diferentes.
+      // Tentamos múltiplas fontes pra ser robusto.
+      let code = null, stateRecebido = null, errParam = null, errDesc = null;
+      // (1) via req.url + URL parser
+      try {
+        const u = new URL('http://x' + url);
+        code = u.searchParams.get('code');
+        stateRecebido = u.searchParams.get('state');
+        errParam = u.searchParams.get('error');
+        errDesc = u.searchParams.get('error_description');
+      } catch (e) { /* segue */ }
+      // (2) fallback via req.query (Vercel serverless expõe assim quando parseia)
+      if (!code && req.query) {
+        code = code || req.query.code || null;
+        stateRecebido = stateRecebido || req.query.state || null;
+        errParam = errParam || req.query.error || null;
+        errDesc = errDesc || req.query.error_description || null;
+      }
+      // Log de debug (aparece nos Runtime Logs da Vercel)
+      console.log('[bling/callback] url=', url, 'code=', code ? '<presente>' : '<ausente>', 'state=', stateRecebido ? '<presente>' : '<ausente>', 'err=', errParam || '-');
+      if (errParam) throw new Error('Bling recusou: ' + errParam + ' — ' + (errDesc || ''));
+      if (!code) throw new Error('code ausente no callback. URL recebida: ' + url);
       const cookieMatch = (req.headers.cookie || '').match(/bling_oauth_state=([^;]+)/);
       if (!cookieMatch) throw new Error('Cookie de state ausente. Recomece a autorização.');
       const [stateSalvo, actorB64] = decodeURIComponent(cookieMatch[1]).split('|');
