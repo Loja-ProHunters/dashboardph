@@ -4692,14 +4692,131 @@ async function crmBlingRefreshStatus(){
       (s.tem_refresh ? '' : '<div style="margin-top:3px;color:#a06210">⚠ Sem refresh_token — reconecte assim que possível.</div>');
     actions.innerHTML =
       '<button class="crm-btn" onclick="crmBlingTest()">Testar conexão</button>' +
+      '<button class="crm-btn" onclick="crmBlingSyncAgora()">Sync agora (últimos 24h)</button>' +
+      '<button class="crm-btn" onclick="crmBlingBackfillIniciar()">📥 Backfill histórico</button>' +
       '<button class="crm-btn ghost" onclick="crmBlingRefresh()">Renovar token</button>' +
       '<a class="crm-btn ghost" href="/api/bling/authorize" target="_blank">Reconectar</a>' +
       '<button class="crm-btn danger" onclick="crmBlingDisconnect()">Desconectar</button>';
+    // Se tem backfill em andamento, mostra painel de progresso
+    crmBlingBackfillCheckStatus();
   } catch (e) {
     badge.textContent = 'erro';
     badge.style.background = '#fbe6e6'; badge.style.color = '#a01818';
     details.textContent = 'Erro ao carregar status: ' + e.message;
   }
+}
+
+// ── Sync incremental manual ──────────────────────────────────────
+async function crmBlingSyncAgora(){
+  const out = document.getElementById('bling-test-result');
+  out.textContent = 'Sincronizando últimos 24h…';
+  try {
+    const r = await fetch('/api/bling/sync-agora', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ dias: 1 }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    out.innerHTML = '<span style="color:var(--gd)">✓ Sync concluída.</span> ' +
+      '<span style="color:var(--gy)">' + d.pedidos_vistos + ' pedidos vistos · ' +
+      '+' + d.novos_orders + ' orders · +' + d.novas_accounts + ' accounts · ' +
+      d.avisos_count + ' avisos</span>';
+  } catch (e) {
+    out.innerHTML = '<span style="color:var(--r)">✗ ' + crmEsc(e.message) + '</span>';
+  }
+}
+
+// ── Backfill de histórico com progresso live ─────────────────────
+async function crmBlingBackfillIniciar(){
+  const meses = prompt('Quantos meses de histórico do Bling você quer puxar?\n(Recomendado: 12. Máximo: 60)', '12');
+  if (!meses) return;
+  const n = Math.max(1, Math.min(60, parseInt(meses, 10) || 12));
+  if (!confirm('Iniciar backfill dos últimos ' + n + ' meses?\n\nIsso pode levar alguns minutos dependendo do volume. Você pode fechar a tela — o backfill continua no servidor e você pode voltar pra ver o progresso a qualquer momento.')) return;
+  const out = document.getElementById('bling-test-result');
+  out.innerHTML = '<span>🔄 Buscando lista de pedidos do Bling…</span>';
+  try {
+    const r = await fetch('/api/bling/backfill/iniciar', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ meses: n }),
+    });
+    const d = await r.json();
+    if (!r.ok) {
+      out.innerHTML = '<span style="color:var(--r)">' + crmEsc(d.motivo || d.error || 'Erro') + '</span>';
+      return;
+    }
+    if (!d.checkpoint || d.checkpoint.total_original === 0) {
+      out.innerHTML = '<span>Nenhum pedido encontrado no período. Nada a fazer.</span>';
+      return;
+    }
+    out.innerHTML = '<span>✓ ' + d.checkpoint.total_original + ' pedidos encontrados. Processando em lotes…</span>';
+    // Dispara loop de processamento
+    crmBlingBackfillLoop();
+  } catch (e) {
+    out.innerHTML = '<span style="color:var(--r)">✗ ' + crmEsc(e.message) + '</span>';
+  }
+}
+
+// Loop que chama /continuar até terminar. Faz polling do status em paralelo.
+async function crmBlingBackfillLoop(){
+  const out = document.getElementById('bling-test-result');
+  let seguir = true;
+  let ultimoTotal = 0;
+  let erros_seguidos = 0;
+  while (seguir) {
+    try {
+      const r = await fetch('/api/bling/backfill/continuar', { method: 'POST' });
+      const d = await r.json();
+      if (!r.ok) {
+        erros_seguidos++;
+        if (erros_seguidos >= 3) { out.innerHTML = '<span style="color:var(--r)">Backfill parou após 3 falhas: ' + crmEsc(d.error || 'erro') + '</span>'; return; }
+        await new Promise(r => setTimeout(r, 3000));
+        continue;
+      }
+      erros_seguidos = 0;
+      const cp = d.checkpoint || {};
+      const feito = cp.processados || 0;
+      const total = cp.total_original || 1;
+      const pct = Math.round((feito / total) * 100);
+      out.innerHTML =
+        '<div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px 12px">' +
+          '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><strong>Backfill em andamento</strong><span>' + feito + ' / ' + total + ' pedidos · ' + pct + '%</span></div>' +
+          '<div style="height:6px;background:var(--bd);border-radius:99px;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:var(--gd);transition:width .3s"></div></div>' +
+          '<div style="margin-top:6px;font-size:11px;color:var(--gy)">' +
+            (cp.accounts_criadas || 0) + ' contas · ' + (cp.orders_criadas || 0) + ' pedidos · ' + ((cp.avisos && cp.avisos.length) || 0) + ' avisos' +
+          '</div>' +
+        '</div>';
+      if (d.terminou) {
+        out.innerHTML +=
+          '<div style="margin-top:10px;color:var(--gd);font-weight:600">✓ Backfill concluído! ' +
+          cp.accounts_criadas + ' contas e ' + cp.orders_criadas + ' pedidos importados.</div>';
+        seguir = false;
+        break;
+      }
+      // Se um lote não avançou (nada processado), espera 2s antes de tentar de novo
+      if (d.processados_neste_lote === 0) await new Promise(r => setTimeout(r, 2000));
+      ultimoTotal = feito;
+    } catch (e) {
+      erros_seguidos++;
+      if (erros_seguidos >= 3) { out.innerHTML = '<span style="color:var(--r)">Backfill interrompido: ' + crmEsc(e.message) + '</span>'; return; }
+      await new Promise(r => setTimeout(r, 3000));
+    }
+  }
+}
+
+// Verifica se tem backfill em andamento e retoma o loop automaticamente
+async function crmBlingBackfillCheckStatus(){
+  try {
+    const r = await fetch('/api/bling/backfill/status');
+    if (!r.ok) return;
+    const d = await r.json();
+    const cp = d.checkpoint;
+    if (!cp) return;
+    if (cp.status === 'em_andamento' && cp.ids_pendentes && cp.ids_pendentes.length > 0) {
+      const out = document.getElementById('bling-test-result');
+      if (out) out.innerHTML = '<span>🔄 Backfill em andamento detectado. Retomando…</span>';
+      crmBlingBackfillLoop();
+    }
+  } catch(e) { /* silencia */ }
 }
 async function crmBlingTest(){
   const out = document.getElementById('bling-test-result');
