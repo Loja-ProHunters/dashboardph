@@ -526,5 +526,324 @@
     "criado_por": "bling-sync",
     "atualizado_em": "2026-09-15T21:02:59.635Z",
     "atualizado_por": "bling-sync"
+  },
+  "ord_5f7d78e2404acfd6": {
+    "id": "ord_5f7d78e2404acfd6",
+    "bling_pedido_id": "26862918808",
+    "bling_numero": "27012",
+    "account_id": "acc_1ad1ccbdbd09e83d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 904.96,
+    "itens": [
+      {
+        "sku": "6942870310527-ID",
+        "descricao": "Lanterna Fenix PD36R  V2.0 1700 Lúmens (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 910.8,
+        "valor_total_item": 910.8
+      }
+    ],
+    "data_pedido": "2026-09-13",
+    "data_pagamento": null,
+    "data_envio": "2026-09-13",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6479\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\nch_yLOgwD7Oc9s5mXrk |  | 14/09/2026 02:40:12 |  |  | ch_yLOgwD7Oc9s5mXrk",
+    "sincronizado_bling_em": "2026-09-15T21:03:50.853Z",
+    "criado_em": "2026-09-15T21:03:50.853Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-15T21:03:50.853Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_e3e7c7ffebe54659": {
+    "id": "ord_e3e7c7ffebe54659",
+    "bling_pedido_id": "26862889640",
+    "bling_numero": "27011",
+    "account_id": "acc_4983fd6f698328d7",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1373.6,
+    "itens": [
+      {
+        "sku": "6942870309538-ID",
+        "descricao": "Lanterna de cabeca Fenix HM71R, 2700 Lumens, (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1374,
+        "valor_total_item": 1374
+      }
+    ],
+    "data_pedido": "2026-09-13",
+    "data_pagamento": null,
+    "data_envio": "2026-09-13",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6477\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\nch_DzyP4k6bC9h2K1MV |  | 14/09/2026 02:32:07 |  |  | ch_DzyP4k6bC9h2K1MV",
+    "sincronizado_bling_em": "2026-09-15T21:03:51.251Z",
+    "criado_em": "2026-09-15T21:03:51.251Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-15T21:03:51.251Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_d1353a70272e84dc": {
+    "id": "ord_d1353a70272e84dc",
+    "bling_pedido_id": "26862109533",
+    "bling_numero": "27010",
+    "account_id": "acc_4927806cd6d22aa8",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 634.9,
+    "itens": [
+      {
+        "sku": "6942870306186",
+        "descricao": "Lanterna de bicicleta Fenix BC05R, 10 Lumens",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 87.7,
+        "valor_total_item": 175.4
+      },
+      {
+        "sku": "6942870305950",
+        "descricao": "Lanterna de bicicleta Fenix BC25R, 600 Lumens, preta",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 217.8,
+        "valor_total_item": 435.6
+      }
+    ],
+    "data_pedido": "2026-09-13",
+    "data_pagamento": null,
+    "data_envio": "2026-09-13",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15374\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\n4558575575 | 498408******2558 | 14/09/2026 00:07:02 |  | 4558575575 | ch_OZm3yrcPqCBN6kAD",
+    "sincronizado_bling_em": "2026-09-15T21:03:51.627Z",
+    "criado_em": "2026-09-15T21:03:51.627Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-15T21:03:51.627Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_320bb123b5018928": {
+    "id": "ord_320bb123b5018928",
+    "bling_pedido_id": "26861726531",
+    "bling_numero": "27009",
+    "account_id": "acc_84ac0117c4a7a8f3",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 406.4,
+    "itens": [
+      {
+        "sku": "VEC-XASR-3031",
+        "descricao": "Trilho com anéis para acoplar Luneta/RedDot XASR-3031 30mm - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 386,
+        "valor_total_item": 386
+      }
+    ],
+    "data_pedido": "2026-09-13",
+    "data_pagamento": null,
+    "data_envio": "2026-09-13",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15372\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\n4558506560 | 498406******7519 | 13/09/2026 23:08:17 |  | 4558506560 | ch_VDgQ34iAVFDd6va7",
+    "sincronizado_bling_em": "2026-09-15T21:03:51.984Z",
+    "criado_em": "2026-09-15T21:03:51.984Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-15T21:03:51.984Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_995ba4770a9b7e91": {
+    "id": "ord_995ba4770a9b7e91",
+    "bling_pedido_id": "26860914694",
+    "bling_numero": "27008",
+    "account_id": "acc_283bb9f2d9147172",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 891.69,
+    "itens": [
+      {
+        "sku": "RED-07700",
+        "descricao": "Lubrificante Redding Imperial Dry Neck para Recarga",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 181,
+        "valor_total_item": 181
+      },
+      {
+        "sku": "RED-11001",
+        "descricao": "Shellholder Redding #1",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 200,
+        "valor_total_item": 200
+      },
+      {
+        "sku": "RED-07600",
+        "descricao": "Lubrificante Redding Imperial para Recarga 2 oz",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 225,
+        "valor_total_item": 225
+      },
+      {
+        "sku": "RED-07900",
+        "descricao": "Lubrificante Redding Imperial Application Media para Recarga",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 225,
+        "valor_total_item": 225
+      }
+    ],
+    "data_pedido": "2026-09-13",
+    "data_pagamento": null,
+    "data_envio": "2026-09-13",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15370\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\n4558301410 | 403792******9879 | 13/09/2026 20:38:01 |  | 4558301410 | ch_4vaQZo2H3fZ19R3N",
+    "sincronizado_bling_em": "2026-09-15T21:03:52.458Z",
+    "criado_em": "2026-09-15T21:03:52.458Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-15T21:03:52.458Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_1ae4b968d2551789": {
+    "id": "ord_1ae4b968d2551789",
+    "bling_pedido_id": "26857506369",
+    "bling_numero": "27007",
+    "account_id": "acc_716f6f49d51eca03",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 751.42,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-60",
+        "descricao": "Red Dot Maverick-IV 1x20 MiniMIL - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 778.7,
+        "valor_total_item": 778.7
+      },
+      {
+        "sku": "FBI-BRANCA-GG",
+        "descricao": "Camiseta Estampada FBI Branca - Tamanho GG",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 53.9,
+        "valor_total_item": 53.9
+      }
+    ],
+    "data_pedido": "2026-09-12",
+    "data_pagamento": null,
+    "data_envio": "2026-09-12",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15368\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\nch_aGAjVXoUPuwYyl23 |  | 13/09/2026 01:26:15 |  |  | ch_aGAjVXoUPuwYyl23",
+    "sincronizado_bling_em": "2026-09-15T21:03:53.042Z",
+    "criado_em": "2026-09-15T21:03:53.042Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-15T21:03:53.042Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_0a2e0c7ef2372200": {
+    "id": "ord_0a2e0c7ef2372200",
+    "bling_pedido_id": "26852422429",
+    "bling_numero": "27006",
+    "account_id": "acc_14104e45d83a24e7",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1586.95,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-36",
+        "descricao": "Red Dot Vector Optics Frenzy SCRD-36 1x22x26",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1556.1,
+        "valor_total_item": 1556.1
+      }
+    ],
+    "data_pedido": "2026-09-12",
+    "data_pagamento": null,
+    "data_envio": "2026-09-12",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15366\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\n4556142305 | 547418******5101 | 12/09/2026 05:07:31 |  | 4556142305 | ch_YjDZ4g5cNCamOM91",
+    "sincronizado_bling_em": "2026-09-15T21:03:53.435Z",
+    "criado_em": "2026-09-15T21:03:53.435Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-15T21:03:53.435Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_1cf90bd2799a96bd": {
+    "id": "ord_1cf90bd2799a96bd",
+    "bling_pedido_id": "26850091378",
+    "bling_numero": "27005",
+    "account_id": "acc_4960044d32cca9c9",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 3751.42,
+    "itens": [
+      {
+        "sku": "HORN-30395-ID",
+        "descricao": "Projétil Hornady Calibre .308 160 GR FTX® (30-30 WIN)",
+        "categoria": null,
+        "quantidade": 300,
+        "valor_unitario": 12.50473,
+        "valor_total_item": 3751.4190000000003
+      }
+    ],
+    "data_pedido": "2026-09-11",
+    "data_pagamento": null,
+    "data_envio": "2026-09-11",
+    "data_entrega": null,
+    "notas": "Valor do DIFAL: R$ 457,42\nfrete no dia da entrega: R$350",
+    "sincronizado_bling_em": "2026-09-15T21:03:53.794Z",
+    "criado_em": "2026-09-15T21:03:53.794Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-15T21:03:53.794Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_3e69476fea4113be": {
+    "id": "ord_3e69476fea4113be",
+    "bling_pedido_id": "26849881708",
+    "bling_numero": "27004",
+    "account_id": "acc_80a53f0709d13244",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 3405.23,
+    "itens": [
+      {
+        "sku": "HORN-33210-ID",
+        "descricao": "Projétil Hornady  Calibre .338 230 GR ELD-X",
+        "categoria": null,
+        "quantidade": 200,
+        "valor_unitario": 17.02615,
+        "valor_total_item": 3405.2300000000005
+      }
+    ],
+    "data_pedido": "2026-09-11",
+    "data_pagamento": null,
+    "data_envio": "2026-09-11",
+    "data_entrega": null,
+    "notas": "preço do DIFAL para o estado de (GO): R$ 227,58",
+    "sincronizado_bling_em": "2026-09-15T21:03:54.142Z",
+    "criado_em": "2026-09-15T21:03:54.142Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-15T21:03:54.142Z",
+    "atualizado_por": "bling-sync"
   }
 }
