@@ -6,31 +6,6 @@
   "ate": "2026-09-15",
   "meses": 12,
   "ids_pendentes": [
-    "24438644483",
-    "24438540796",
-    "24437637289",
-    "24432503209",
-    "24431903500",
-    "24431607682",
-    "24429322016",
-    "24423072838",
-    "24422915979",
-    "24422866891",
-    "24421331770",
-    "24420840652",
-    "24420570950",
-    "24420495503",
-    "24420334423",
-    "24419887506",
-    "24418523662",
-    "24417800763",
-    "24476546523",
-    "24417247773",
-    "24412810227",
-    "24412679560",
-    "24411941273",
-    "24410956294",
-    "24410550122",
     "24408195908",
     "24406913708",
     "24406509927",
@@ -311,12 +286,14 @@
     "25754899909",
     "25547648986",
     "24994358453",
-    "24632996787"
+    "24632996787",
+    "24422866891",
+    "24419887506"
   ],
   "total_original": 1946,
-  "processados": 1640,
-  "accounts_criadas": 1261,
-  "orders_criadas": 1619,
+  "processados": 1663,
+  "accounts_criadas": 1278,
+  "orders_criadas": 1642,
   "avisos": [
     "pedido 26694334654: Bling API 429 em GET /pedidos/vendas/26694334654: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 26588132464: sem CPF/CNPJ do contato — pulando",
@@ -332,8 +309,10 @@
     "pedido 25754899909: Bling API 429 em GET /pedidos/vendas/25754899909: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 25547648986: Bling API 429 em GET /pedidos/vendas/25547648986: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 24994358453: Bling API 429 em GET /pedidos/vendas/24994358453: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
-    "pedido 24632996787: Bling API 429 em GET /pedidos/vendas/24632996787: O limite de requisições por segundo foi atingido, tente novamente mais tarde."
+    "pedido 24632996787: Bling API 429 em GET /pedidos/vendas/24632996787: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
+    "pedido 24422866891: Bling API 429 em GET /pedidos/vendas/24422866891: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
+    "pedido 24419887506: Bling API 429 em GET /pedidos/vendas/24419887506: O limite de requisições por segundo foi atingido, tente novamente mais tarde."
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-09-16T03:42:38.363Z"
+  "ultimo_lote_em": "2026-09-16T03:42:50.727Z"
 }
