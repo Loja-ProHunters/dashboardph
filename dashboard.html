@@ -4731,7 +4731,7 @@ async function crmBlingBackfillIniciar(){
   const meses = prompt('Quantos meses de histórico do Bling você quer puxar?\n(Recomendado: 12. Máximo: 60)', '12');
   if (!meses) return;
   const n = Math.max(1, Math.min(60, parseInt(meses, 10) || 12));
-  if (!confirm('Iniciar backfill dos últimos ' + n + ' meses?\n\nIsso pode levar alguns minutos dependendo do volume. Você pode fechar a tela — o backfill continua no servidor e você pode voltar pra ver o progresso a qualquer momento.')) return;
+  if (!confirm('Iniciar backfill dos últimos ' + n + ' meses?\n\n✓ Você PODE fechar a aba — o backfill continua sozinho no servidor.\n✓ Ao voltar aqui, mostra o progresso atualizado.')) return;
   const out = document.getElementById('bling-test-result');
   out.innerHTML = '<span>🔄 Buscando lista de pedidos do Bling…</span>';
   try {
@@ -4748,8 +4748,10 @@ async function crmBlingBackfillIniciar(){
       out.innerHTML = '<span>Nenhum pedido encontrado no período. Nada a fazer.</span>';
       return;
     }
-    out.innerHTML = '<span>✓ ' + d.checkpoint.total_original + ' pedidos encontrados. Processando em lotes…</span>';
-    // Dispara loop de processamento
+    out.innerHTML = '<span>✓ ' + d.checkpoint.total_original + ' pedidos encontrados. Disparando processamento no servidor…</span>';
+    // Dispara o PRIMEIRO tick — o próprio tick auto-encadeia os próximos
+    try { await fetch('/api/bling/cron/backfill-tick'); } catch (e) {}
+    // Além disso, roda o loop na aba (mais rápido enquanto ela estiver aberta)
     crmBlingBackfillLoop();
   } catch (e) {
     out.innerHTML = '<span style="color:var(--r)">✗ ' + crmEsc(e.message) + '</span>';

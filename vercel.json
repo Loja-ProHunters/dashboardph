@@ -1,5 +1,19 @@
 {
   "version": 2,
   "builds": [{ "src": "api/index.js", "use": "@vercel/node" }],
-  "routes": [{ "src": "/(.*)", "dest": "api/index.js" }]
+  "routes": [{ "src": "/(.*)", "dest": "api/index.js" }],
+  "crons": [
+    {
+      "path": "/api/bling/cron/sync",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/bling/cron/backfill-tick",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/crm/cron/vencimentos",
+      "schedule": "0 10 * * *"
+    }
+  ]
 }
