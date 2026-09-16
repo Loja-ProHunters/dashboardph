@@ -1,5 +1,12 @@
 [
   {
+    "ts": "2026-09-16T03:45:16.149Z",
+    "tipo": "backfill_concluido",
+    "pedidos_processados": 1946,
+    "accounts_criadas": 1479,
+    "orders_criadas": 1924
+  },
+  {
     "ts": "2026-09-15T21:03:42.272Z",
     "tipo": "backfill_iniciado",
     "meses": 12,
