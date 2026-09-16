@@ -62209,5 +62209,820 @@
     "criado_por": "bling-sync",
     "atualizado_em": "2026-09-16T03:43:38.741Z",
     "atualizado_por": "bling-sync"
+  },
+  "ord_b32da8b1fa5f9393": {
+    "id": "ord_b32da8b1fa5f9393",
+    "bling_pedido_id": "24247998685",
+    "bling_numero": "25249",
+    "account_id": "acc_2329d3f56981baac",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1044,
+    "itens": [
+      {
+        "sku": "HUNTERR-126170",
+        "descricao": "Espoleta Fiocchi 209 - Cx com 100 unidades",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 163.8,
+        "valor_total_item": 819
+      }
+    ],
+    "data_pedido": "2025-11-05",
+    "data_pagamento": null,
+    "data_envio": "2025-11-05",
+    "data_entrega": null,
+    "notas": "Ezequiel",
+    "sincronizado_bling_em": "2026-09-16T03:43:42.776Z",
+    "criado_em": "2026-09-16T03:43:42.776Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:42.776Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_486609e7a415702b": {
+    "id": "ord_486609e7a415702b",
+    "bling_pedido_id": "24247702136",
+    "bling_numero": "25248",
+    "account_id": "acc_4affad4630962a9e",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 754,
+    "itens": [
+      {
+        "sku": "6942870307602",
+        "descricao": "Lanterna Fenix E35 V3.0 Preta 3000 Lumens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 702,
+        "valor_total_item": 702
+      }
+    ],
+    "data_pedido": "2025-11-05",
+    "data_pagamento": null,
+    "data_envio": "2025-11-05",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T03:43:43.123Z",
+    "criado_em": "2026-09-16T03:43:43.123Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:43.123Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_57886a99ca4cedfe": {
+    "id": "ord_57886a99ca4cedfe",
+    "bling_pedido_id": "24246052014",
+    "bling_numero": "25247",
+    "account_id": "acc_5ab8b25fa8be0a60",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 631.3,
+    "itens": [
+      {
+        "sku": "Ruger-90643",
+        "descricao": "Carregador Ruger LCP, Calibre 380 auto, 6 tiros",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 592.329,
+        "valor_total_item": 592.329
+      }
+    ],
+    "data_pedido": "2025-11-05",
+    "data_pagamento": null,
+    "data_envio": "2025-11-05",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T03:43:43.457Z",
+    "criado_em": "2026-09-16T03:43:43.457Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:43.457Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b98d7288911f72d3": {
+    "id": "ord_b98d7288911f72d3",
+    "bling_pedido_id": "24245235704",
+    "bling_numero": "25246",
+    "account_id": "acc_d956deb52466c701",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1010,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-12II",
+        "descricao": "Red Dot Vector Optics Maverick SCRD-12IIQ Gen II 1x22",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 954,
+        "valor_total_item": 954
+      }
+    ],
+    "data_pedido": "2025-11-05",
+    "data_pagamento": null,
+    "data_envio": "2025-11-05",
+    "data_entrega": null,
+    "notas": "PROPOSTA PARA FATURAMENTO 15 dias\nAos cuidados de: Alexandre Souza\nTexto condições comerciais: FRETE SEDEX 6 dias uteis R$56,00",
+    "sincronizado_bling_em": "2026-09-16T03:43:43.793Z",
+    "criado_em": "2026-09-16T03:43:43.793Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:43.793Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_493ce4a35a4ea5bb": {
+    "id": "ord_493ce4a35a4ea5bb",
+    "bling_pedido_id": "24242797029",
+    "bling_numero": "25245",
+    "account_id": "acc_acd7b1ae21596ae3",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 89.26,
+    "itens": [
+      {
+        "sku": "VEC-SCOT-58",
+        "descricao": "Acessorio para afericao de calibre Vector Optics, Ref.: SCOT-58",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 50.3,
+        "valor_total_item": 50.3
+      }
+    ],
+    "data_pedido": "2025-11-05",
+    "data_pagamento": null,
+    "data_envio": "2025-11-05",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13932\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T03:43:44.134Z",
+    "criado_em": "2026-09-16T03:43:44.134Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:44.134Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_791efd0c53f60c88": {
+    "id": "ord_791efd0c53f60c88",
+    "bling_pedido_id": "24238254154",
+    "bling_numero": "25244",
+    "account_id": "acc_b4fd12c67780d7cd",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1124,
+    "itens": [
+      {
+        "sku": "6942870306995",
+        "descricao": "Lanterna de bicicleta Fenix BC30 V2.0 , 2200 Lumens, preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1064,
+        "valor_total_item": 1064
+      }
+    ],
+    "data_pedido": "2025-11-04",
+    "data_pagamento": null,
+    "data_envio": "2025-11-04",
+    "data_entrega": null,
+    "notas": "SEDEX",
+    "sincronizado_bling_em": "2026-09-16T03:43:44.473Z",
+    "criado_em": "2026-09-16T03:43:44.473Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:44.473Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_fabf824af7aa9a09": {
+    "id": "ord_fabf824af7aa9a09",
+    "bling_pedido_id": "24234090855",
+    "bling_numero": "25243",
+    "account_id": "acc_b789db4b594ef6ab",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 897.94,
+    "itens": [
+      {
+        "sku": "6942870369358",
+        "descricao": "Bateria 21700 Recarregável Fenix - ARB-L21-5000U",
+        "categoria": null,
+        "quantidade": 3,
+        "valor_unitario": 320,
+        "valor_total_item": 960
+      }
+    ],
+    "data_pedido": "2025-11-04",
+    "data_pagamento": null,
+    "data_envio": "2025-11-04",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 5795\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:43:44.826Z",
+    "criado_em": "2026-09-16T03:43:44.826Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:44.826Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_14be940f0c2698ea": {
+    "id": "ord_14be940f0c2698ea",
+    "bling_pedido_id": "24224223073",
+    "bling_numero": "25242",
+    "account_id": "acc_694d05e8de65442a",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 53.1,
+    "itens": [
+      {
+        "sku": "6942870307084",
+        "descricao": "Faixa de cabeça Fenix AFH-10 Cinza",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 42,
+        "valor_total_item": 42
+      }
+    ],
+    "data_pedido": "2025-11-03",
+    "data_pagamento": null,
+    "data_envio": "2025-11-03",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 5791\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T03:43:45.163Z",
+    "criado_em": "2026-09-16T03:43:45.163Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:45.163Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_95171269c9b60a02": {
+    "id": "ord_95171269c9b60a02",
+    "bling_pedido_id": "24223981630",
+    "bling_numero": "25241",
+    "account_id": "acc_a2f190c8e03ac130",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 2117.6,
+    "itens": [
+      {
+        "sku": "CBC-10022398",
+        "descricao": "Munição CBC Cal .308Win ETPT 180GR",
+        "categoria": null,
+        "quantidade": 100,
+        "valor_unitario": 21.176,
+        "valor_total_item": 2117.6
+      }
+    ],
+    "data_pedido": "2025-11-03",
+    "data_pagamento": null,
+    "data_envio": "2025-11-03",
+    "data_entrega": null,
+    "notas": "Aguardando CRAF",
+    "sincronizado_bling_em": "2026-09-16T03:43:45.504Z",
+    "criado_em": "2026-09-16T03:43:45.504Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:45.504Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_a3d7da9c44c140b3": {
+    "id": "ord_a3d7da9c44c140b3",
+    "bling_pedido_id": "24217240267",
+    "bling_numero": "25240",
+    "account_id": "acc_a1fac1303a4a5c51",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 67.66,
+    "itens": [
+      {
+        "sku": "1344.9622",
+        "descricao": "Chumbinho - FXR Speedy 5.5 (Latinha com 100 und.) - 7899387901788",
+        "categoria": null,
+        "quantidade": 3,
+        "valor_unitario": 15,
+        "valor_total_item": 45
+      }
+    ],
+    "data_pedido": "2025-11-02",
+    "data_pagamento": null,
+    "data_envio": "2025-11-02",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13930\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:43:45.872Z",
+    "criado_em": "2026-09-16T03:43:45.872Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:45.872Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_487e5c204025194c": {
+    "id": "ord_487e5c204025194c",
+    "bling_pedido_id": "24206573706",
+    "bling_numero": "25239",
+    "account_id": "acc_c7e5173a5de68c7a",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 30,
+    "itens": [
+      {
+        "sku": "1344.9622",
+        "descricao": "Chumbinho - FXR Speedy 5.5 (Latinha com 100 und.) - 7899387901788",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 15,
+        "valor_total_item": 30
+      }
+    ],
+    "data_pedido": "2025-10-31",
+    "data_pagamento": null,
+    "data_envio": "2025-10-31",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T03:43:46.207Z",
+    "criado_em": "2026-09-16T03:43:46.207Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:46.207Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_ce8e74d9e6f46beb": {
+    "id": "ord_ce8e74d9e6f46beb",
+    "bling_pedido_id": "24204029916",
+    "bling_numero": "25238",
+    "account_id": "acc_d5bf1297d9d49f7a",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 914,
+    "itens": [
+      {
+        "sku": "MAG579",
+        "descricao": "Carregador Pmag, 10 Municoes, Calibre 7,62X51 /308Win, Short Action, Preto",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 855,
+        "valor_total_item": 855
+      }
+    ],
+    "data_pedido": "2025-10-31",
+    "data_pagamento": null,
+    "data_envio": "2025-10-31",
+    "data_entrega": null,
+    "notas": "SEDEX",
+    "sincronizado_bling_em": "2026-09-16T03:43:46.562Z",
+    "criado_em": "2026-09-16T03:43:46.562Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:46.562Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_35bc60e5c9c58d90": {
+    "id": "ord_35bc60e5c9c58d90",
+    "bling_pedido_id": "24312910250",
+    "bling_numero": "25281",
+    "account_id": "acc_40c5287f743cd554",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 3464,
+    "itens": [
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna manual Fenix TK16 V2.0,  3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 866,
+        "valor_total_item": 1732
+      },
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna manual Fenix TK16 V2.0,  3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 866,
+        "valor_total_item": 1732
+      }
+    ],
+    "data_pedido": "2025-10-30",
+    "data_pagamento": null,
+    "data_envio": "2025-10-30",
+    "data_entrega": null,
+    "notas": "Nº de série: 0A526Q00117 0A526Q00116 0A526Q00115 0A526Q00119\n\n\nPedido de Compra 0906042758",
+    "sincronizado_bling_em": "2026-09-16T03:43:46.903Z",
+    "criado_em": "2026-09-16T03:43:46.903Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:46.903Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_a586aecc8195f525": {
+    "id": "ord_a586aecc8195f525",
+    "bling_pedido_id": "24200226754",
+    "bling_numero": "25237",
+    "account_id": "acc_4517788089bba2a2",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 501.34,
+    "itens": [
+      {
+        "sku": "6942870306391-ID",
+        "descricao": "Carregador de Baterias Fenix ARE-A4 (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 497,
+        "valor_total_item": 497
+      }
+    ],
+    "data_pedido": "2025-10-30",
+    "data_pagamento": null,
+    "data_envio": "2025-10-30",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 5787\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:43:47.285Z",
+    "criado_em": "2026-09-16T03:43:47.285Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:47.285Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_f9e185ef80731069": {
+    "id": "ord_f9e185ef80731069",
+    "bling_pedido_id": "24197441523",
+    "bling_numero": "25236",
+    "account_id": "acc_b9ca4d001ef0b06d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 2062.5,
+    "itens": [
+      {
+        "sku": "VEC-RSCFS-06",
+        "descricao": "Bipé de Fibra de Carbono 6-9\" Swivel Spring - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 543,
+        "valor_total_item": 543
+      },
+      {
+        "sku": "VEC-SCRAAM-52",
+        "descricao": "Trilho para acoplar Luneta/RedDot Vector Optics SCRAAM-52P 2\"",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 72,
+        "valor_total_item": 72
+      },
+      {
+        "sku": "PL-PRO",
+        "descricao": "Lanterna para armas Olight PL-Pro preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1447.5,
+        "valor_total_item": 1447.5
+      }
+    ],
+    "data_pedido": "2025-10-30",
+    "data_pagamento": null,
+    "data_envio": "2025-10-30",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T03:43:47.605Z",
+    "criado_em": "2026-09-16T03:43:47.605Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:47.605Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_c18b4c3cec7e53d8": {
+    "id": "ord_c18b4c3cec7e53d8",
+    "bling_pedido_id": "24187906078",
+    "bling_numero": "25235",
+    "account_id": "acc_3f10c9ed8624c8cf",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 186.77,
+    "itens": [
+      {
+        "sku": "6942870307435",
+        "descricao": "Coldre para Lanterna Fenix ALP-10L",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 132,
+        "valor_total_item": 132
+      }
+    ],
+    "data_pedido": "2025-10-29",
+    "data_pagamento": null,
+    "data_envio": "2025-10-29",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 5783\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:43:47.995Z",
+    "criado_em": "2026-09-16T03:43:47.995Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:47.995Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_992e5d8ad593f34d": {
+    "id": "ord_992e5d8ad593f34d",
+    "bling_pedido_id": "24187716265",
+    "bling_numero": "25234",
+    "account_id": "acc_0754d3cbfcbdf80c",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 320,
+    "itens": [
+      {
+        "sku": "6942870369358",
+        "descricao": "Bateria 21700 Recarregável Fenix - ARB-L21-5000U",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 320,
+        "valor_total_item": 320
+      }
+    ],
+    "data_pedido": "2025-10-29",
+    "data_pagamento": null,
+    "data_envio": "2025-10-29",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T03:43:48.333Z",
+    "criado_em": "2026-09-16T03:43:48.333Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:48.333Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_e36c88057bf74ed9": {
+    "id": "ord_e36c88057bf74ed9",
+    "bling_pedido_id": "24186902425",
+    "bling_numero": "25233",
+    "account_id": "acc_dfb0171bdf740f44",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 9202.6,
+    "itens": [
+      {
+        "sku": "FMGS-06400",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis - Weaver/Picatinny 20 MOA",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1300.9,
+        "valor_total_item": 1300.9
+      },
+      {
+        "sku": "TARI-03008",
+        "descricao": "Montagem Dentler Basis TAC com Anel de 30mm",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 3960.4,
+        "valor_total_item": 3960.4
+      },
+      {
+        "sku": "FMWE-S0000",
+        "descricao": "Montagem Dentler Basis para Anéis Weaver/Picatinny",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 3868.3,
+        "valor_total_item": 3868.3
+      }
+    ],
+    "data_pedido": "2025-10-29",
+    "data_pagamento": null,
+    "data_envio": "2025-10-29",
+    "data_entrega": null,
+    "notas": "Cliente devolveu o pedido 25192 para substituir por esse",
+    "sincronizado_bling_em": "2026-09-16T03:43:48.689Z",
+    "criado_em": "2026-09-16T03:43:48.689Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:48.689Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_d7fa97f099865185": {
+    "id": "ord_d7fa97f099865185",
+    "bling_pedido_id": "24047730575",
+    "bling_numero": "25176",
+    "account_id": "acc_40c5287f743cd554",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 3464,
+    "itens": [
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna manual Fenix TK16 V2.0,  3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 866,
+        "valor_total_item": 3464
+      }
+    ],
+    "data_pedido": "2025-10-29",
+    "data_pagamento": null,
+    "data_envio": "2025-10-29",
+    "data_entrega": null,
+    "notas": "Nº de série: 0A526Q00117 0A526Q00116 0A526Q00115 0A526Q00119\n\n\nPedido de Compra 0906042758",
+    "sincronizado_bling_em": "2026-09-16T03:43:49.023Z",
+    "criado_em": "2026-09-16T03:43:49.023Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:49.023Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_d7b923399185b8c7": {
+    "id": "ord_d7b923399185b8c7",
+    "bling_pedido_id": "24182507658",
+    "bling_numero": "25232",
+    "account_id": "acc_00201b0a23ce6d61",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 450.5,
+    "itens": [
+      {
+        "sku": "VEC-SCRA-69",
+        "descricao": "Trilho Vector Optics, Remington 700, Ref: SCRA-69",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 418.5,
+        "valor_total_item": 418.5
+      }
+    ],
+    "data_pedido": "2025-10-28",
+    "data_pagamento": null,
+    "data_envio": "2025-10-28",
+    "data_entrega": null,
+    "notas": "PAC",
+    "sincronizado_bling_em": "2026-09-16T03:43:49.366Z",
+    "criado_em": "2026-09-16T03:43:49.366Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:49.366Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_38657930a112bb6c": {
+    "id": "ord_38657930a112bb6c",
+    "bling_pedido_id": "24182108323",
+    "bling_numero": "25231",
+    "account_id": "acc_32064408a7b60e00",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 3426,
+    "itens": [
+      {
+        "sku": "HUNTERR-126170",
+        "descricao": "Espoleta Fiocchi 209 - Cx com 100 unidades",
+        "categoria": null,
+        "quantidade": 20,
+        "valor_unitario": 163.8,
+        "valor_total_item": 3276
+      }
+    ],
+    "data_pedido": "2025-10-28",
+    "data_pagamento": null,
+    "data_envio": "2025-10-28",
+    "data_entrega": null,
+    "notas": "ezequiel",
+    "sincronizado_bling_em": "2026-09-16T03:43:49.701Z",
+    "criado_em": "2026-09-16T03:43:49.701Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:49.701Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_96ceeb8d4f700565": {
+    "id": "ord_96ceeb8d4f700565",
+    "bling_pedido_id": "24180995164",
+    "bling_numero": "25230",
+    "account_id": "acc_b1b908c1068ec873",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 355.53,
+    "itens": [
+      {
+        "sku": "VEC-SCSC-05",
+        "descricao": "Protetor de Percursor (Snap Cap) Vector Optics, 7,62x51mm, Ref: SCSC-05",
+        "categoria": null,
+        "quantidade": 3,
+        "valor_unitario": 115,
+        "valor_total_item": 345
+      }
+    ],
+    "data_pedido": "2025-10-28",
+    "data_pagamento": null,
+    "data_envio": "2025-10-28",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13928\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T03:43:50.053Z",
+    "criado_em": "2026-09-16T03:43:50.053Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:50.053Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_87c2fe757cf4a2b9": {
+    "id": "ord_87c2fe757cf4a2b9",
+    "bling_pedido_id": "24179852888",
+    "bling_numero": "25229",
+    "account_id": "acc_8d2f886117b6f76c",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 235.8,
+    "itens": [
+      {
+        "sku": "",
+        "descricao": "MUNICAO CCI CAL.22 LR 40GR BLAZER LRN CX 50",
+        "categoria": null,
+        "quantidade": 100,
+        "valor_unitario": 2.358,
+        "valor_total_item": 235.8
+      }
+    ],
+    "data_pedido": "2025-10-28",
+    "data_pagamento": null,
+    "data_envio": "2025-10-28",
+    "data_entrega": null,
+    "notas": "Ezequiel",
+    "sincronizado_bling_em": "2026-09-16T03:43:50.400Z",
+    "criado_em": "2026-09-16T03:43:50.400Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:50.400Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_8cd80f08bff0555f": {
+    "id": "ord_8cd80f08bff0555f",
+    "bling_pedido_id": "24179455987",
+    "bling_numero": "25228",
+    "account_id": "acc_fe8634da503e53e6",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 638.64,
+    "itens": [
+      {
+        "sku": "VEC-GBPS-01P",
+        "descricao": "Kit colimador universal, Vector Optics, Ref.: GBPS-01P",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 638.64,
+        "valor_total_item": 638.64
+      }
+    ],
+    "data_pedido": "2025-10-28",
+    "data_pagamento": null,
+    "data_envio": "2025-10-28",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T03:43:50.736Z",
+    "criado_em": "2026-09-16T03:43:50.736Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:50.736Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b687c7fa932b0570": {
+    "id": "ord_b687c7fa932b0570",
+    "bling_pedido_id": "24177944350",
+    "bling_numero": "25227",
+    "account_id": "acc_765634ce9c65855f",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 488.93,
+    "itens": [
+      {
+        "sku": "VEC-XASR-3035",
+        "descricao": "Trilho com anéis para acoplar Luneta/RedDot Vector Optics XASR-3035 30mm Bronze",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 452,
+        "valor_total_item": 452
+      }
+    ],
+    "data_pedido": "2025-10-28",
+    "data_pagamento": null,
+    "data_envio": "2025-10-28",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13926\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T03:43:51.087Z",
+    "criado_em": "2026-09-16T03:43:51.087Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:43:51.087Z",
+    "atualizado_por": "bling-sync"
   }
 }
