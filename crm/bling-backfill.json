@@ -6,31 +6,6 @@
   "ate": "2026-09-15",
   "meses": 12,
   "ids_pendentes": [
-    "24408195908",
-    "24406913708",
-    "24406509927",
-    "24405083714",
-    "24401914172",
-    "24399042585",
-    "24412044843",
-    "24395931883",
-    "24394277693",
-    "24391805381",
-    "24391494919",
-    "24389600078",
-    "24388198096",
-    "24387426601",
-    "24379292991",
-    "24376699000",
-    "24375704585",
-    "24375016685",
-    "24374915525",
-    "24374598389",
-    "24374183224",
-    "24374031749",
-    "24368066107",
-    "24367388182",
-    "24367048678",
     "24364243002",
     "24364096521",
     "24363658731",
@@ -288,12 +263,13 @@
     "24994358453",
     "24632996787",
     "24422866891",
-    "24419887506"
+    "24419887506",
+    "24388198096"
   ],
   "total_original": 1946,
-  "processados": 1663,
-  "accounts_criadas": 1278,
-  "orders_criadas": 1642,
+  "processados": 1687,
+  "accounts_criadas": 1294,
+  "orders_criadas": 1666,
   "avisos": [
     "pedido 26694334654: Bling API 429 em GET /pedidos/vendas/26694334654: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 26588132464: sem CPF/CNPJ do contato — pulando",
@@ -311,8 +287,9 @@
     "pedido 24994358453: Bling API 429 em GET /pedidos/vendas/24994358453: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 24632996787: Bling API 429 em GET /pedidos/vendas/24632996787: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 24422866891: Bling API 429 em GET /pedidos/vendas/24422866891: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
-    "pedido 24419887506: Bling API 429 em GET /pedidos/vendas/24419887506: O limite de requisições por segundo foi atingido, tente novamente mais tarde."
+    "pedido 24419887506: Bling API 429 em GET /pedidos/vendas/24419887506: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
+    "pedido 24388198096: Bling API 429 em GET /pedidos/vendas/24388198096: O limite de requisições por segundo foi atingido, tente novamente mais tarde."
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-09-16T03:42:50.727Z"
+  "ultimo_lote_em": "2026-09-16T03:43:03.748Z"
 }
