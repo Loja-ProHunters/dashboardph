@@ -841,7 +841,8 @@ module.exports = async (req, res) => {
   if (req.method === 'GET' && url === '/api/crm/cron/vencimentos') {
     const sess = getSession(req);
     const cronToken = req.headers['x-cron-secret'];
-    const autorizado = (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
     if (!autorizado) {
       res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return;
     }
@@ -1133,11 +1134,13 @@ module.exports = async (req, res) => {
   }
 
   // GET /api/bling/cron/sync — pra Vercel Cron ou disparo externo
-  // Protegido por x-cron-secret ou sessão admin.
+  // Protegido por x-cron-secret OU sessão admin OU header do Vercel Cron.
+  // (Vercel Cron chama com header `x-vercel-cron: 1` — aceitamos.)
   if (req.method === 'GET' && url === '/api/bling/cron/sync') {
     const sess = getSession(req);
     const cronToken = req.headers['x-cron-secret'];
-    const autorizado = (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
     if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
     try {
       const usersJson = await _loadUsersMap();
@@ -1148,6 +1151,77 @@ module.exports = async (req, res) => {
     }
     return;
   }
+
+  // GET /api/bling/cron/backfill-tick — processa 1 lote do backfill em andamento
+  // e AUTO-ENCADEIA a próxima chamada em background (fire-and-forget), fazendo
+  // o backfill inteiro terminar sozinho sem UI aberta.
+  // Guarda anti-loop: se checkpoint não tá em_andamento ou tem 0 pendentes,
+  // apenas retorna. Salvaguarda extra: contador ticks_hoje pra parar em 500
+  // ticks/dia caso algo dê muito errado.
+  if (req.method === 'GET' && url === '/api/bling/cron/backfill-tick') {
+    const sess = getSession(req);
+    const cronToken = req.headers['x-cron-secret'];
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const chainToken = req.headers['x-bling-chain'] === config.sessionSecret; // self-invocation
+    const autorizado = vercelCron || chainToken || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+    try {
+      const cpAntes = await blingBackfill.lerCheckpoint();
+      if (!cpAntes || cpAntes.status !== 'em_andamento' || !cpAntes.ids_pendentes || cpAntes.ids_pendentes.length === 0) {
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ok: true, sem_backfill: true }));
+        return;
+      }
+      // Guarda anti-loop-runaway
+      const ticksHoje = (cpAntes.ticks_hoje_data === new Date().toISOString().slice(0,10))
+        ? (cpAntes.ticks_hoje_count || 0) : 0;
+      if (ticksHoje >= 500) {
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ok: true, limite_ticks_diario: true, ticks_hoje: ticksHoje }));
+        return;
+      }
+      const usersJson = await _loadUsersMap();
+      const r = await blingBackfill.continuar({ usersJson, ownerFallback: 'gerencia' });
+      // Atualiza contador de ticks (best-effort)
+      try {
+        const cpDepois = await blingBackfill.lerCheckpoint();
+        if (cpDepois && cpDepois.status === 'em_andamento') {
+          cpDepois.ticks_hoje_data = new Date().toISOString().slice(0,10);
+          cpDepois.ticks_hoje_count = ticksHoje + 1;
+          const { saveFile } = require('../lib/githubStore');
+          await saveFile('crm/bling-backfill.json', JSON.stringify(cpDepois, null, 2), 'Bling backfill: tick ' + (ticksHoje+1));
+        }
+      } catch (e) { /* silencia */ }
+      // AUTO-CHAIN: se ainda tem trabalho e não bateu limite, dispara próximo tick em background
+      if (!r.terminou && (ticksHoje + 1) < 500) {
+        const host = req.headers['x-forwarded-host'] || req.headers.host || 'dashboardph.vercel.app';
+        const url = 'https://' + host + '/api/bling/cron/backfill-tick';
+        // Fire-and-forget: dispara sem esperar resposta
+        try {
+          const https = require('https');
+          const u = new URL(url);
+          const chainReq = https.request({
+            hostname: u.hostname, path: u.pathname, method: 'GET',
+            headers: { 'x-bling-chain': config.sessionSecret, 'User-Agent': 'bling-chain' },
+            timeout: 3000,
+          }, () => {});
+          chainReq.on('error', () => {});
+          chainReq.on('timeout', () => chainReq.destroy());
+          chainReq.end();
+        } catch (e) { /* silencia */ }
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, ...r, chained: !r.terminou }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // Adiciona autorização por header Vercel Cron ao /api/crm/cron/vencimentos também
+  // (esse endpoint já existe acima; o header x-vercel-cron passa pela verificação de sess se
+  //  estiver logada, então o Vercel Cron precisa ser aceito explicitamente. Isso está tratado
+  //  no próprio handler dele — mas por segurança podemos ampliar depois se necessário.)
 
   // POST /api/chat
   if (req.method === 'POST' && url === '/api/chat') {
