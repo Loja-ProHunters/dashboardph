@@ -4649,8 +4649,147 @@ async function crmRenderPainel(){
       '</div>'
     : '';
 
-  view.innerHTML = welcome + kpisHtml + migrateBtn + blingCard;
+  // Card de consulta de compatibilidade Fenix (todos usuários — read-only)
+  var fenixCard = '<div id="fenix-card" style="margin-top:22px;padding:18px 20px;background:var(--wh);border:1px solid var(--bd);border-radius:12px;box-shadow:var(--sh-1)">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">' +
+        '<div><div style="font-weight:700;font-size:14px;color:var(--tx)">🔎 Compatibilidade Fenix</div>' +
+        '<div style="font-size:11.5px;color:var(--gy)">Consulta oficial: acessórios e baterias por modelo</div></div>' +
+        '<div id="fenix-badge" style="font-size:10.5px;font-weight:700;letter-spacing:.4px;padding:4px 10px;border-radius:99px;background:var(--bg);color:var(--gy);text-transform:uppercase">carregando…</div>' +
+      '</div>' +
+      '<div style="font-size:12px;color:var(--gy);margin-bottom:10px">Digite o modelo Fenix (ex: <code>PD36R PRO</code>, <code>TK20R V2.0</code>, <code>HT32</code>). Fonte: tabela oficial 2026.</div>' +
+      '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
+        '<input type="text" id="fenix-input" list="fenix-modelos-list" placeholder="Ex: PD36R PRO" autocomplete="off" spellcheck="false" style="flex:1;min-width:180px;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px" />' +
+        '<datalist id="fenix-modelos-list"></datalist>' +
+        '<button class="crm-btn" onclick="fenixConsultarModelo()">Consultar</button>' +
+        '<button class="crm-btn" style="background:var(--bg);color:var(--tx)" onclick="fenixLimpar()">Limpar</button>' +
+      '</div>' +
+      '<div id="fenix-resultado" style="margin-top:12px;font-size:13px" hidden></div>' +
+      '<details style="margin-top:12px">' +
+        '<summary style="cursor:pointer;color:var(--gd);font-size:12px;padding:4px 0">Consulta reversa: em quais modelos um acessório serve?</summary>' +
+        '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px">' +
+          '<input type="text" id="fenix-ac-input" list="fenix-ac-list" placeholder="Ex: ALG-15" autocomplete="off" spellcheck="false" style="flex:1;min-width:180px;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px" />' +
+          '<datalist id="fenix-ac-list"></datalist>' +
+          '<button class="crm-btn" onclick="fenixConsultarAcessorio()">Consultar</button>' +
+        '</div>' +
+        '<div id="fenix-ac-resultado" style="margin-top:12px;font-size:13px" hidden></div>' +
+      '</details>' +
+    '</div>';
+
+  view.innerHTML = welcome + kpisHtml + migrateBtn + blingCard + fenixCard;
   if (sess.isAdmin) crmBlingRefreshStatus();
+  crmFenixInit();
+}
+
+// ── Compatibilidade Fenix (card no painel — todos os perfis) ─────
+var _fenixDados = null;
+async function crmFenixInit(){
+  var badge = document.getElementById('fenix-badge');
+  if (!badge) return;
+  try {
+    if (!_fenixDados) {
+      var r = await fetch('/api/crm/fenix/lista');
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      _fenixDados = await r.json();
+    }
+    var dlM = document.getElementById('fenix-modelos-list');
+    if (dlM) dlM.innerHTML = _fenixDados.modelos.map(function(m){return '<option value="' + m + '">';}).join('');
+    var dlA = document.getElementById('fenix-ac-list');
+    if (dlA) dlA.innerHTML = _fenixDados.acessorios.map(function(a){return '<option value="' + a + '">';}).join('');
+    var s = _fenixDados.estatisticas || {};
+    badge.textContent = (s.total_modelos || _fenixDados.modelos.length) + ' modelos · ' +
+                        (s.total_acessorios_unicos || _fenixDados.acessorios.length) + ' acessórios · v' +
+                        (_fenixDados.versao_tabela || '?');
+    badge.style.background = '#e7f5ec'; badge.style.color = 'var(--gd)';
+  } catch (e) {
+    badge.textContent = 'erro ao carregar';
+    badge.style.background = '#fbe6e6'; badge.style.color = '#a01818';
+    console.error('[fenix] init falhou:', e);
+  }
+}
+function fenixEscape(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function fenixRenderModelo(r){
+  if (!r) return '<div style="color:#a01818;padding:8px;background:#fee;border-radius:4px">Modelo não encontrado na tabela Fenix.</div>';
+  function bloco(arr, titulo, emoji){
+    if (!arr || !arr.length) return '';
+    var html = '<div style="margin-top:8px"><div style="font-weight:600;font-size:12px;color:var(--tx);margin-bottom:4px">' + emoji + ' ' + titulo + '</div>';
+    arr.forEach(function(g){
+      html += '<div style="margin:6px 0 6px 8px"><div style="font-size:10.5px;color:var(--gy);text-transform:uppercase;letter-spacing:.3px;font-weight:600;margin-bottom:2px">' + fenixEscape(g.grupo_nome) + '</div>';
+      g.itens.forEach(function(it){
+        html += '<div style="padding:3px 0;border-bottom:1px dashed var(--bd)"><b>' + fenixEscape(it.sku) + '</b> — ' + fenixEscape(it.nome);
+        if (it.nota_descricao) html += ' <span style="color:#a15c00;font-size:11.5px;font-style:italic">' + fenixEscape(it.nota_simbolo) + ' ' + fenixEscape(it.nota_descricao) + '</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    return html;
+  }
+  var tag = '<span style="display:inline-block;background:var(--tx);color:var(--wh);padding:1px 6px;border-radius:3px;font-size:10px;margin-right:6px;vertical-align:middle">' + fenixEscape(r.serie || '?') + '</span>';
+  return '<div style="padding:12px;background:var(--bg);border:1px solid var(--bd);border-radius:6px">' +
+    '<div style="font-weight:700;font-size:14px;margin-bottom:2px">' + tag + fenixEscape(r.modelo) + '</div>' +
+    '<div style="color:var(--gy);font-size:11.5px;margin-bottom:8px">' + fenixEscape(r.serie_nome || '') + ' · ' +
+      r.total_compativel + ' acessórios · ' + r.total_baterias + ' opções de bateria</div>' +
+    bloco(r.baterias_agrupado, 'Baterias compatíveis', '🔋') +
+    bloco(r.compativel_agrupado, 'Acessórios oficiais', '🧩') +
+    (!r.compativel_agrupado.length && !r.baterias_agrupado.length
+      ? '<div style="color:var(--gy);font-size:12px;font-style:italic">Este modelo consta na tabela mas sem acessórios/baterias listados.</div>' : '') +
+  '</div>';
+}
+function fenixRenderAcessorio(r){
+  if (!r) return '<div style="color:#a01818;padding:8px;background:#fee;border-radius:4px">Acessório não encontrado.</div>';
+  var porSerie = {};
+  r.serve_em.forEach(function(s){ var k = s.serie || 'OUTROS'; (porSerie[k] = porSerie[k] || []).push(s); });
+  var series = Object.keys(porSerie).sort();
+  var html = '<div style="padding:12px;background:var(--bg);border:1px solid var(--bd);border-radius:6px">' +
+    '<div style="font-weight:700;font-size:14px">' + fenixEscape(r.sku) + ' — ' + fenixEscape(r.nome) + '</div>' +
+    '<div style="color:var(--gy);font-size:11.5px;margin-bottom:8px">' + fenixEscape(r.grupo_nome) + ' · serve em ' + r.total + ' modelos</div>';
+  series.forEach(function(serie){
+    html += '<div style="margin:6px 0"><div style="font-size:10.5px;color:var(--gy);text-transform:uppercase;letter-spacing:.3px;font-weight:600;margin-bottom:2px">Série ' + fenixEscape(serie) + '</div>';
+    porSerie[serie].forEach(function(s){
+      html += '<div style="padding:3px 0;border-bottom:1px dashed var(--bd)">' + fenixEscape(s.modelo);
+      if (s.nota_descricao) html += ' <span style="color:#a15c00;font-size:11.5px;font-style:italic">' + fenixEscape(s.nota_simbolo) + ' ' + fenixEscape(s.nota_descricao) + '</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+async function fenixConsultarModelo(){
+  var inp = document.getElementById('fenix-input');
+  var box = document.getElementById('fenix-resultado');
+  var modelo = (inp.value || '').trim();
+  if (!modelo) return;
+  box.hidden = false; box.innerHTML = 'Consultando…';
+  try {
+    var r = await fetch('/api/crm/fenix/consultar?modelo=' + encodeURIComponent(modelo));
+    if (r.status === 404) { box.innerHTML = fenixRenderModelo(null); return; }
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    box.innerHTML = fenixRenderModelo(await r.json());
+  } catch (e) {
+    box.innerHTML = '<div style="color:#a01818;padding:8px;background:#fee;border-radius:4px">Erro: ' + fenixEscape(e.message || e) + '</div>';
+  }
+}
+async function fenixConsultarAcessorio(){
+  var inp = document.getElementById('fenix-ac-input');
+  var box = document.getElementById('fenix-ac-resultado');
+  var sku = (inp.value || '').trim();
+  if (!sku) return;
+  box.hidden = false; box.innerHTML = 'Consultando…';
+  try {
+    var r = await fetch('/api/crm/fenix/acessorio?sku=' + encodeURIComponent(sku));
+    if (r.status === 404) { box.innerHTML = fenixRenderAcessorio(null); return; }
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    box.innerHTML = fenixRenderAcessorio(await r.json());
+  } catch (e) {
+    box.innerHTML = '<div style="color:#a01818;padding:8px;background:#fee;border-radius:4px">Erro: ' + fenixEscape(e.message || e) + '</div>';
+  }
+}
+function fenixLimpar(){
+  var inp = document.getElementById('fenix-input');
+  var box = document.getElementById('fenix-resultado');
+  if (inp) inp.value = '';
+  if (box) { box.hidden = true; box.innerHTML = ''; }
 }
 
 // ── Integração Bling (card no painel gerência) ───────────────────
