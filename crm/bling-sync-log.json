@@ -1,5 +1,12 @@
 [
   {
+    "ts": "2026-09-16T13:14:47.521Z",
+    "tipo": "backfill_iniciado",
+    "meses": 12,
+    "total_pedidos": 1948,
+    "iniciado_por": "gerencia"
+  },
+  {
     "ts": "2026-09-16T03:45:16.149Z",
     "tipo": "backfill_concluido",
     "pedidos_processados": 1946,
