@@ -6,31 +6,6 @@
   "ate": "2026-09-15",
   "meses": 12,
   "ids_pendentes": [
-    "26123109230",
-    "26094867854",
-    "26094858730",
-    "26088071689",
-    "26088052771",
-    "26087335325",
-    "26086226018",
-    "26085865616",
-    "26094858310",
-    "26075551103",
-    "26071980766",
-    "26070607994",
-    "26069500847",
-    "26066442555",
-    "26065187144",
-    "26061002226",
-    "26060083347",
-    "26058579775",
-    "26056144352",
-    "26055852860",
-    "26055262773",
-    "26050967516",
-    "26050392853",
-    "26049813537",
-    "26049266984",
     "26048102138",
     "26045729759",
     "26044916646",
@@ -1253,12 +1228,13 @@
     "23845380874",
     "23844937709",
     "26694334654",
-    "26235193031"
+    "26235193031",
+    "26094858310"
   ],
   "total_original": 1946,
-  "processados": 698,
-  "accounts_criadas": 560,
-  "orders_criadas": 677,
+  "processados": 722,
+  "accounts_criadas": 577,
+  "orders_criadas": 701,
   "avisos": [
     "pedido 26694334654: Bling API 429 em GET /pedidos/vendas/26694334654: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 26588132464: sem CPF/CNPJ do contato — pulando",
@@ -1266,8 +1242,9 @@
     "pedido 26439637409: sem CPF/CNPJ do contato — pulando",
     "pedido 26420611985: sem CPF/CNPJ do contato — pulando",
     "pedido 26235193031: Bling API 429 em GET /pedidos/vendas/26235193031: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
-    "pedido 26235186301: sem CPF/CNPJ do contato — pulando"
+    "pedido 26235186301: sem CPF/CNPJ do contato — pulando",
+    "pedido 26094858310: Bling API 429 em GET /pedidos/vendas/26094858310: O limite de requisições por segundo foi atingido, tente novamente mais tarde."
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-09-16T03:34:39.778Z"
+  "ultimo_lote_em": "2026-09-16T03:34:52.732Z"
 }
