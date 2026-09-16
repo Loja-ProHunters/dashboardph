@@ -24,6 +24,7 @@ const crmUtils    = require('../lib/crm/utils');
 const crmColl     = require('../lib/crm/collections');
 const crmOcr      = require('../lib/crm/docsOcr');
 const crmSchemas  = require('../lib/crm/docsSchemas');
+const fenixCompat = require('../lib/crm/fenixCompat');
 
 // Bling API v3
 const blingOauth      = require('../lib/bling/oauth');
@@ -832,6 +833,79 @@ module.exports = async (req, res) => {
       res.writeHead(status,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ error: e.message || String(e) }));
     }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // Fenix — Camada 1 do "cérebro" do CRM: consulta pura à tabela oficial
+  // de compatibilidade (crm/compatibility-fenix.json).
+  // Ver: claude/crm-inteligencia-compatibilidade.md
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /api/crm/fenix/lista — modelos, acessórios, séries, grupos, notas,
+  // estatísticas. Popular UI (autocomplete, filtros).
+  if (req.method === 'GET' && url === '/api/crm/fenix/lista') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sem_sessao'})); return; }
+    try {
+      const dados = await fenixCompat.listar();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(dados));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'fenix_lista_falhou', detalhe:(e.message||String(e)).slice(0,200)}));
+    }
+    return;
+  }
+
+  // GET /api/crm/fenix/consultar?modelo=PD36R+PRO — detalhe do modelo
+  // com acessórios e baterias, notas de rodapé já expandidas em PT.
+  if (req.method === 'GET' && url.startsWith('/api/crm/fenix/consultar')) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sem_sessao'})); return; }
+    try {
+      const u = new URL('http://x' + url);
+      const modelo = u.searchParams.get('modelo');
+      if (!modelo) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'modelo_obrigatorio'})); return; }
+      const r = await fenixCompat.consultarModelo(modelo);
+      if (!r) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'modelo_nao_encontrado', modelo})); return; }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'fenix_consulta_falhou', detalhe:(e.message||String(e)).slice(0,200)}));
+    }
+    return;
+  }
+
+  // GET /api/crm/fenix/acessorio?sku=ALG-15 — índice reverso: em quais
+  // modelos esse acessório serve.
+  if (req.method === 'GET' && url.startsWith('/api/crm/fenix/acessorio')) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sem_sessao'})); return; }
+    try {
+      const u = new URL('http://x' + url);
+      const sku = u.searchParams.get('sku');
+      if (!sku) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sku_obrigatorio'})); return; }
+      const r = await fenixCompat.consultarAcessorio(sku);
+      if (!r) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'acessorio_nao_encontrado', sku})); return; }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'fenix_acessorio_falhou', detalhe:(e.message||String(e)).slice(0,200)}));
+    }
+    return;
+  }
+
+  // POST /api/crm/fenix/invalidar-cache — força releitura do JSON do
+  // GitHub sem esperar o TTL de 5 min. Só gerência.
+  if (req.method === 'POST' && url === '/api/crm/fenix/invalidar-cache') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    fenixCompat.invalidarCache();
+    res.writeHead(200,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({ ok: true }));
     return;
   }
 
