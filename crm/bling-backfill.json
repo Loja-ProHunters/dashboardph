@@ -6,31 +6,6 @@
   "ate": "2026-09-15",
   "meses": 12,
   "ids_pendentes": [
-    "26392233924",
-    "26389501657",
-    "26388943564",
-    "26388580079",
-    "26388325777",
-    "26387162212",
-    "26396609140",
-    "26381242829",
-    "26380947148",
-    "26377509570",
-    "26371958382",
-    "26370887269",
-    "26369198385",
-    "26368857140",
-    "26368213385",
-    "26368199216",
-    "26368056202",
-    "26367932418",
-    "26367908770",
-    "26367658244",
-    "26367549063",
-    "26367426635",
-    "26367175675",
-    "26366967140",
-    "26366923017",
     "26366835250",
     "26366552976",
     "26366161791",
@@ -1505,9 +1480,9 @@
     "26694334654"
   ],
   "total_original": 1946,
-  "processados": 449,
-  "accounts_criadas": 374,
-  "orders_criadas": 429,
+  "processados": 474,
+  "accounts_criadas": 396,
+  "orders_criadas": 454,
   "avisos": [
     "pedido 26694334654: Bling API 429 em GET /pedidos/vendas/26694334654: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 26588132464: sem CPF/CNPJ do contato — pulando",
@@ -1516,5 +1491,5 @@
     "pedido 26420611985: sem CPF/CNPJ do contato — pulando"
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-09-16T03:32:26.887Z"
+  "ultimo_lote_em": "2026-09-16T03:32:39.967Z"
 }
