@@ -6,31 +6,6 @@
   "ate": "2026-09-16",
   "meses": 12,
   "ids_pendentes": [
-    "26235289198",
-    "26235278651",
-    "26235193031",
-    "26235186301",
-    "26235156604",
-    "26235141444",
-    "26235111986",
-    "26234909417",
-    "26230622134",
-    "26230302834",
-    "26230210603",
-    "26227681291",
-    "26226027127",
-    "26226012637",
-    "26225221818",
-    "26225183128",
-    "26224159938",
-    "26220425351",
-    "26219562636",
-    "26218895511",
-    "26218208629",
-    "26215716732",
-    "26214649650",
-    "26208845209",
-    "26208376464",
     "26207818599",
     "26207400307",
     "26206418248",
@@ -1356,15 +1331,16 @@
     "23854446297"
   ],
   "total_original": 1948,
-  "processados": 600,
-  "accounts_criadas": 506,
-  "orders_criadas": 596,
+  "processados": 625,
+  "accounts_criadas": 519,
+  "orders_criadas": 620,
   "avisos": [
     "pedido 26588132464: sem CPF/CNPJ do contato — pulando",
     "pedido 26472508948: sem CPF/CNPJ do contato — pulando",
     "pedido 26439637409: sem CPF/CNPJ do contato — pulando",
-    "pedido 26420611985: sem CPF/CNPJ do contato — pulando"
+    "pedido 26420611985: sem CPF/CNPJ do contato — pulando",
+    "pedido 26235186301: sem CPF/CNPJ do contato — pulando"
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-09-16T13:20:24.335Z"
+  "ultimo_lote_em": "2026-09-16T13:20:37.267Z"
 }
