@@ -17387,5 +17387,813 @@
     "criado_por": "bling-sync",
     "atualizado_em": "2026-09-16T13:32:28.127Z",
     "atualizado_por": "bling-sync"
+  },
+  "ord_04836262863d2c89": {
+    "id": "ord_04836262863d2c89",
+    "bling_pedido_id": "23944267651",
+    "bling_numero": "25129",
+    "account_id": "acc_6e1dfba1dc5b5444",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 444.89,
+    "itens": [
+      {
+        "sku": "VEC-SCRA-69",
+        "descricao": "Trilho Vector Optics, Remington 700, Ref: SCRA-69",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 465,
+        "valor_total_item": 465
+      }
+    ],
+    "data_pedido": "2025-09-29",
+    "data_pagamento": null,
+    "data_envio": "2025-09-29",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13856\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T13:32:32.175Z",
+    "criado_em": "2026-09-16T13:32:32.175Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:32.175Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_20d44236e72008c9": {
+    "id": "ord_20d44236e72008c9",
+    "bling_pedido_id": "23940532390",
+    "bling_numero": "25128",
+    "account_id": "acc_e23a12ac8eab4b02",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 553.07,
+    "itens": [
+      {
+        "sku": "VEC-SCRA-65",
+        "descricao": "Trilho Vector Optics, Remington 700, 20 MOA, Ref: SCRA-65",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 574,
+        "valor_total_item": 574
+      }
+    ],
+    "data_pedido": "2025-09-28",
+    "data_pagamento": null,
+    "data_envio": "2025-09-28",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13854\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T13:32:32.533Z",
+    "criado_em": "2026-09-16T13:32:32.533Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:32.533Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_5e5f057a6ae7a506": {
+    "id": "ord_5e5f057a6ae7a506",
+    "bling_pedido_id": "23940275521",
+    "bling_numero": "25127",
+    "account_id": "acc_cc40691310df8bde",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 58.37,
+    "itens": [
+      {
+        "sku": "VEC-SCOT-59",
+        "descricao": "Capa protetora de lentes para red dot Vector Optics, Ref: SCOT-59",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 41.4,
+        "valor_total_item": 41.4
+      }
+    ],
+    "data_pedido": "2025-09-28",
+    "data_pagamento": null,
+    "data_envio": "2025-09-28",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13852\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T13:32:32.917Z",
+    "criado_em": "2026-09-16T13:32:32.917Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:32.917Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_1423c26787893ea5": {
+    "id": "ord_1423c26787893ea5",
+    "bling_pedido_id": "23946761299",
+    "bling_numero": "25131",
+    "account_id": "acc_d00c6126e8e9b931",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 924.02,
+    "itens": [
+      {
+        "sku": "VEC-SCACD-18",
+        "descricao": "Nível Lateral para Trilho Dovetail e Picatinny - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 77,
+        "valor_total_item": 77
+      },
+      {
+        "sku": "VEC-SCACD-17",
+        "descricao": "Base com indicador de nivel Vector Optics SCACD-17P",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 77,
+        "valor_total_item": 77
+      },
+      {
+        "sku": "VEC-SCQD-09",
+        "descricao": "Trilho com anel, marca Vector Optics, picatinny, 30mm,  Ref:  SCQD-09",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 319,
+        "valor_total_item": 319
+      },
+      {
+        "sku": "VEC-SCRAAM-52",
+        "descricao": "Trilho para acoplar Luneta/RedDot Vector Optics SCRAAM-52P 2\"",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 72,
+        "valor_total_item": 72
+      },
+      {
+        "sku": "VEC-SCRA-59",
+        "descricao": "Trilho para acoplar Luneta/Red Dot  0,83\" - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 61,
+        "valor_total_item": 61
+      },
+      {
+        "sku": "VEC-SCACD-03",
+        "descricao": "Anel indicador de angulo Vector Optics SCACD-03Q 30mm",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 92,
+        "valor_total_item": 92
+      },
+      {
+        "sku": "RED-21022",
+        "descricao": "Lubrificante Redding Imperial para Recarga 1 oz",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 166,
+        "valor_total_item": 166
+      }
+    ],
+    "data_pedido": "2025-09-26",
+    "data_pagamento": null,
+    "data_envio": "2025-09-29",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13850\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T13:32:33.348Z",
+    "criado_em": "2026-09-16T13:32:33.348Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:33.348Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_21596b627ec75a90": {
+    "id": "ord_21596b627ec75a90",
+    "bling_pedido_id": "23929625801",
+    "bling_numero": "25125",
+    "account_id": "acc_cbbe2036ccd2197d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 695,
+    "itens": [
+      {
+        "sku": "6942870308289",
+        "descricao": "Lanterna Fenix C7 preta - 3000 Lúmens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 663,
+        "valor_total_item": 663
+      }
+    ],
+    "data_pedido": "2025-09-26",
+    "data_pagamento": null,
+    "data_envio": "2025-09-26",
+    "data_entrega": null,
+    "notas": "PAC\nNº de série 8UEEKT00737",
+    "sincronizado_bling_em": "2026-09-16T13:32:33.768Z",
+    "criado_em": "2026-09-16T13:32:33.768Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:33.768Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_3c99a5403dba6813": {
+    "id": "ord_3c99a5403dba6813",
+    "bling_pedido_id": "23929009236",
+    "bling_numero": "25124",
+    "account_id": "acc_4dfb5962c86a115d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 360.32,
+    "itens": [
+      {
+        "sku": "VEC-SCOT-47P",
+        "descricao": "Suporte para torre de luneta, Ref.: SCOT-47P",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 151.1,
+        "valor_total_item": 302.2
+      }
+    ],
+    "data_pedido": "2025-09-26",
+    "data_pagamento": null,
+    "data_envio": "2025-09-26",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13848\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T13:32:34.212Z",
+    "criado_em": "2026-09-16T13:32:34.212Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:34.212Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_ccbe41db2e7dbf34": {
+    "id": "ord_ccbe41db2e7dbf34",
+    "bling_pedido_id": "23928385867",
+    "bling_numero": "25123",
+    "account_id": "acc_28956fcbf0dda872",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 220.43,
+    "itens": [
+      {
+        "sku": "6942870304731",
+        "descricao": "Bateria 16340 Recarregável Fenix - ARB-L16-700U",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 77.4,
+        "valor_total_item": 154.8
+      }
+    ],
+    "data_pedido": "2025-09-26",
+    "data_pagamento": null,
+    "data_envio": "2025-09-26",
+    "data_entrega": null,
+    "notas": "SEDEX",
+    "sincronizado_bling_em": "2026-09-16T13:32:34.610Z",
+    "criado_em": "2026-09-16T13:32:34.610Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:34.610Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_c3d300d972e670e0": {
+    "id": "ord_c3d300d972e670e0",
+    "bling_pedido_id": "23928160036",
+    "bling_numero": "25122",
+    "account_id": "acc_fb699053d7d16e22",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 2487.57,
+    "itens": [
+      {
+        "sku": "6942870308289",
+        "descricao": "Lanterna Fenix C7 preta - 3000 Lúmens",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 663,
+        "valor_total_item": 2652
+      }
+    ],
+    "data_pedido": "2025-09-26",
+    "data_pagamento": null,
+    "data_envio": "2025-09-26",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 3605\nTransportador: SEDEX\n8UEEKT00802\n8UEEKT00744\n8UEEKT00789\n8UEEKT00791",
+    "sincronizado_bling_em": "2026-09-16T13:32:35.024Z",
+    "criado_em": "2026-09-16T13:32:35.024Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:35.024Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_413105a1bad08204": {
+    "id": "ord_413105a1bad08204",
+    "bling_pedido_id": "23927683317",
+    "bling_numero": "25121",
+    "account_id": "acc_27e05f20c6c157b8",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 280.8,
+    "itens": [
+      {
+        "sku": "6942870306452-ID",
+        "descricao": "Carregador para baterias Fenix ARE-A2 (USA Plug) (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 280.8,
+        "valor_total_item": 280.8
+      }
+    ],
+    "data_pedido": "2025-09-26",
+    "data_pagamento": null,
+    "data_envio": "2025-09-26",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T13:32:35.459Z",
+    "criado_em": "2026-09-16T13:32:35.459Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:35.459Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_8de759fb567db220": {
+    "id": "ord_8de759fb567db220",
+    "bling_pedido_id": "23929905841",
+    "bling_numero": "25126",
+    "account_id": "acc_6522d29639ffdd62",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 225.62,
+    "itens": [
+      {
+        "sku": "RED-07600",
+        "descricao": "Lubrificante Redding Imperial para Recarga 2 oz",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 225,
+        "valor_total_item": 225
+      }
+    ],
+    "data_pedido": "2025-09-25",
+    "data_pagamento": null,
+    "data_envio": "2025-09-26",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13846\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T13:32:35.830Z",
+    "criado_em": "2026-09-16T13:32:35.830Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:35.830Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_927461204b6ba9b7": {
+    "id": "ord_927461204b6ba9b7",
+    "bling_pedido_id": "23923432642",
+    "bling_numero": "25120",
+    "account_id": "acc_d139faddad3b62d8",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 280,
+    "itens": [
+      {
+        "sku": "RUIKE-P662-B",
+        "descricao": "Canivete Ruike P662B",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 280,
+        "valor_total_item": 280
+      }
+    ],
+    "data_pedido": "2025-09-25",
+    "data_pagamento": null,
+    "data_envio": "2025-09-25",
+    "data_entrega": null,
+    "notas": "E4PEKX00121",
+    "sincronizado_bling_em": "2026-09-16T13:32:36.218Z",
+    "criado_em": "2026-09-16T13:32:36.218Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:36.218Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_c0619aabd736ac4c": {
+    "id": "ord_c0619aabd736ac4c",
+    "bling_pedido_id": "23914977642",
+    "bling_numero": "25118",
+    "account_id": "acc_654e7965c9049a88",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 311.72,
+    "itens": [
+      {
+        "sku": "6942870369358",
+        "descricao": "Bateria 21700 Recarregável Fenix - ARB-L21-5000U",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 320,
+        "valor_total_item": 320
+      }
+    ],
+    "data_pedido": "2025-09-24",
+    "data_pagamento": null,
+    "data_envio": "2025-09-24",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13844\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T13:32:36.956Z",
+    "criado_em": "2026-09-16T13:32:36.956Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:36.956Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_367c02d45b37a184": {
+    "id": "ord_367c02d45b37a184",
+    "bling_pedido_id": "23914737402",
+    "bling_numero": "25117",
+    "account_id": "acc_5490b4de7359cb0b",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 995.2,
+    "itens": [
+      {
+        "sku": "6942870306995-ID",
+        "descricao": "Lanterna de bicicleta Fenix BC30 V2.0 , 2200 Lumens, preta (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1033,
+        "valor_total_item": 1033
+      }
+    ],
+    "data_pedido": "2025-09-24",
+    "data_pagamento": null,
+    "data_envio": "2025-09-24",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 3599\nTransportador: SEDEX\nNº de série 3FZ07300283\nLocal de Referência: Ao lado São José motores",
+    "sincronizado_bling_em": "2026-09-16T13:32:37.366Z",
+    "criado_em": "2026-09-16T13:32:37.366Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:37.366Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_ca6bbbf3f273177e": {
+    "id": "ord_ca6bbbf3f273177e",
+    "bling_pedido_id": "23914540755",
+    "bling_numero": "25116",
+    "account_id": "acc_5fadac7dd39e879c",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 397.55,
+    "itens": [
+      {
+        "sku": "CBC-10000428",
+        "descricao": "Munição CBC 9mm Luger ETOG 124Gr Caixa",
+        "categoria": null,
+        "quantidade": 50,
+        "valor_unitario": 7.551,
+        "valor_total_item": 377.55
+      }
+    ],
+    "data_pedido": "2025-09-24",
+    "data_pagamento": null,
+    "data_envio": "2025-09-24",
+    "data_entrega": null,
+    "notas": "R$20,00 Guia de transito",
+    "sincronizado_bling_em": "2026-09-16T13:32:37.753Z",
+    "criado_em": "2026-09-16T13:32:37.753Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:37.753Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_cdfa790c7fdd6836": {
+    "id": "ord_cdfa790c7fdd6836",
+    "bling_pedido_id": "23907746873",
+    "bling_numero": "25115",
+    "account_id": "acc_bb4e7cc644d31c04",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1235.99,
+    "itens": [
+      {
+        "sku": "6942870304199",
+        "descricao": "Lanterna Tática Fenix TK20R 1000 Lumens Preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1184,
+        "valor_total_item": 1184
+      }
+    ],
+    "data_pedido": "2025-09-23",
+    "data_pagamento": null,
+    "data_envio": "2025-09-23",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 3598\nTransportador: PAC\nNº de série EXFEZH00065",
+    "sincronizado_bling_em": "2026-09-16T13:32:38.210Z",
+    "criado_em": "2026-09-16T13:32:38.210Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:38.210Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_f96abc16cd6dee1a": {
+    "id": "ord_f96abc16cd6dee1a",
+    "bling_pedido_id": "23905461085",
+    "bling_numero": "25114",
+    "account_id": "acc_9fc5d75c83d31afc",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1291.25,
+    "itens": [
+      {
+        "sku": "SK-100083-02",
+        "descricao": "Carregador e analisador de baterias  Skyrc MC3000 Bluetooth 4 slots",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1247.37,
+        "valor_total_item": 1247.37
+      }
+    ],
+    "data_pedido": "2025-09-23",
+    "data_pagamento": null,
+    "data_envio": "2025-09-23",
+    "data_entrega": null,
+    "notas": "GARANTIA",
+    "sincronizado_bling_em": "2026-09-16T13:32:38.610Z",
+    "criado_em": "2026-09-16T13:32:38.610Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:38.610Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_7c540a0c993258ec": {
+    "id": "ord_7c540a0c993258ec",
+    "bling_pedido_id": "23905038953",
+    "bling_numero": "25113",
+    "account_id": "acc_a594bcd666be292a",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 24764.64,
+    "itens": [
+      {
+        "sku": "Ruger-40159",
+        "descricao": "Pistola Ruger Mark IV™ Target, Calibre 22LR, 10 tiros",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 24764.64,
+        "valor_total_item": 24764.64
+      }
+    ],
+    "data_pedido": "2025-09-23",
+    "data_pagamento": null,
+    "data_envio": "2025-09-23",
+    "data_entrega": null,
+    "notas": "NÚMERO DE SÉRIE - 500517033\n\nCLIENTE CONTATADO PELA GERÊNCIA NO DIA 20/03/2026 E COMBINADO QUITAÇÃO DO VALOR PENDENTE PARA OS DIAS 10/15 DE MAIO CASO NÃO HAJA O PAGAMENTO CANCELAR O PEDIDO E ESTORNAR A ENTRADA LIBERANDO A ARMA PARA COMERCIALIZAÇÃO",
+    "sincronizado_bling_em": "2026-09-16T13:32:39.048Z",
+    "criado_em": "2026-09-16T13:32:39.048Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:39.048Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_d474eb4f477d440b": {
+    "id": "ord_d474eb4f477d440b",
+    "bling_pedido_id": "23902306062",
+    "bling_numero": "25112",
+    "account_id": "acc_51a0db3d3b01445f",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 245,
+    "itens": [
+      {
+        "sku": "CBC-10001203",
+        "descricao": "Munição CBC Cal 12GA Câmara 70mm Knock Velox Ch-Sg",
+        "categoria": null,
+        "quantidade": 25,
+        "valor_unitario": 9.8,
+        "valor_total_item": 245.00000000000003
+      }
+    ],
+    "data_pedido": "2025-09-23",
+    "data_pagamento": null,
+    "data_envio": "2025-09-23",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T13:32:39.414Z",
+    "criado_em": "2026-09-16T13:32:39.414Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:39.414Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_fd82f369c94446f0": {
+    "id": "ord_fd82f369c94446f0",
+    "bling_pedido_id": "23902036934",
+    "bling_numero": "25111",
+    "account_id": "acc_9f37b993f43312fd",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 355,
+    "itens": [
+      {
+        "sku": "RUIKE-P801-SF",
+        "descricao": "Canivete Ruike P801-SF",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 324,
+        "valor_total_item": 324
+      }
+    ],
+    "data_pedido": "2025-09-23",
+    "data_pagamento": null,
+    "data_envio": "2025-09-23",
+    "data_entrega": null,
+    "notas": "PAC",
+    "sincronizado_bling_em": "2026-09-16T13:32:39.873Z",
+    "criado_em": "2026-09-16T13:32:39.873Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:39.873Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_c2ab3da9a793bd1f": {
+    "id": "ord_c2ab3da9a793bd1f",
+    "bling_pedido_id": "23900540152",
+    "bling_numero": "25110",
+    "account_id": "acc_32a47dddac46b2ff",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1157.55,
+    "itens": [
+      {
+        "sku": "6942870304755-ID",
+        "descricao": "Lanterna Fenix TK25 IR 1000 Lumens - ID",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1101,
+        "valor_total_item": 1101
+      }
+    ],
+    "data_pedido": "2025-09-23",
+    "data_pagamento": null,
+    "data_envio": "2025-09-23",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 3597\nTransportador: PAC\nNº de série WMFEZZ00043\nLocal de Referência: Próximo a antiga pavan",
+    "sincronizado_bling_em": "2026-09-16T13:32:40.294Z",
+    "criado_em": "2026-09-16T13:32:40.294Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:40.294Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_f08b134f6b234188": {
+    "id": "ord_f08b134f6b234188",
+    "bling_pedido_id": "23900411197",
+    "bling_numero": "25109",
+    "account_id": "acc_2bc4e71a6f20ee64",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 134.01,
+    "itens": [
+      {
+        "sku": "RED-01060",
+        "descricao": "Pacote com 10 Pinos Redding para Haste Desespoletadora",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 114,
+        "valor_total_item": 114
+      }
+    ],
+    "data_pedido": "2025-09-22",
+    "data_pagamento": null,
+    "data_envio": "2025-09-22",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13842\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T13:32:40.696Z",
+    "criado_em": "2026-09-16T13:32:40.696Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:40.696Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_d4234af9786af468": {
+    "id": "ord_d4234af9786af468",
+    "bling_pedido_id": "23899705083",
+    "bling_numero": "25108",
+    "account_id": "acc_37b8d6ea2584eea1",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 197.78,
+    "itens": [
+      {
+        "sku": "VEC-SCACD-03",
+        "descricao": "Anel indicador de angulo Vector Optics SCACD-03Q 30mm",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 92,
+        "valor_total_item": 184
+      }
+    ],
+    "data_pedido": "2025-09-22",
+    "data_pagamento": null,
+    "data_envio": "2025-09-22",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13840\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T13:32:41.074Z",
+    "criado_em": "2026-09-16T13:32:41.074Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:41.074Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_e79fca23a532e231": {
+    "id": "ord_e79fca23a532e231",
+    "bling_pedido_id": "23897805886",
+    "bling_numero": "25107",
+    "account_id": "acc_3646b2e53f9711d0",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1924.19,
+    "itens": [
+      {
+        "sku": "020300060289",
+        "descricao": "Kit Conversor Calibre 9MM / .38 SUPER / 9x21 Conv. - P/ Prensa Dillon 750/650",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 949.59,
+        "valor_total_item": 949.59
+      },
+      {
+        "sku": "VEC-XASR-3035",
+        "descricao": "Trilho com anéis para acoplar Luneta/RedDot Vector Optics XASR-3035 30mm Bronze",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 406.8,
+        "valor_total_item": 406.8
+      },
+      {
+        "sku": "VEC-SCBPS-05",
+        "descricao": "Bipe Vector Optics, 9\", com articulacao giratoria, Ref: SCBPS-05",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 567.8,
+        "valor_total_item": 567.8
+      }
+    ],
+    "data_pedido": "2025-09-22",
+    "data_pagamento": null,
+    "data_envio": "2025-09-22",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T13:32:41.461Z",
+    "criado_em": "2026-09-16T13:32:41.461Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:41.461Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_ab10c406c0ed8ca4": {
+    "id": "ord_ab10c406c0ed8ca4",
+    "bling_pedido_id": "23897457776",
+    "bling_numero": "25106",
+    "account_id": "acc_7f0b7d3482a414dc",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 574.22,
+    "itens": [
+      {
+        "sku": "MAG524B",
+        "descricao": "Empunhadura Para Pistola, Moe 1911, Plataforma 1911, Preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 548,
+        "valor_total_item": 548
+      }
+    ],
+    "data_pedido": "2025-09-22",
+    "data_pagamento": null,
+    "data_envio": "2025-09-22",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13838\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T13:32:41.883Z",
+    "criado_em": "2026-09-16T13:32:41.883Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:32:41.883Z",
+    "atualizado_por": "bling-sync"
   }
 }
