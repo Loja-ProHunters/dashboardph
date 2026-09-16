@@ -10210,5 +10210,868 @@
     "criado_por": "bling-sync",
     "atualizado_em": "2026-09-16T13:30:48.965Z",
     "atualizado_por": "bling-sync"
+  },
+  "ord_1f6f7d32c52bfdbb": {
+    "id": "ord_1f6f7d32c52bfdbb",
+    "bling_pedido_id": "24343532955",
+    "bling_numero": "25304",
+    "account_id": "acc_816b24ee54fa8910",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 598.37,
+    "itens": [
+      {
+        "sku": "6942870306902",
+        "descricao": "Acionador remoto para Lanterna Fenix AER-02 V2.0",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 266.795,
+        "valor_total_item": 266.795
+      },
+      {
+        "sku": "6942870304069",
+        "descricao": "Suporte de Lanterna para Arma Fenix - ALG-00",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 294.295,
+        "valor_total_item": 294.295
+      }
+    ],
+    "data_pedido": "2025-11-16",
+    "data_pagamento": null,
+    "data_envio": "2025-11-16",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 5807\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T13:30:53.516Z",
+    "criado_em": "2026-09-16T13:30:53.516Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:53.516Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_5a5a1b4dd204d980": {
+    "id": "ord_5a5a1b4dd204d980",
+    "bling_pedido_id": "24343157088",
+    "bling_numero": "25303",
+    "account_id": "acc_b6c351b9dfa30c72",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 129.94,
+    "itens": [
+      {
+        "sku": "7908412408038",
+        "descricao": "Lubrisint UP1 Armas, 60ml",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 55,
+        "valor_total_item": 110
+      }
+    ],
+    "data_pedido": "2025-11-16",
+    "data_pagamento": null,
+    "data_envio": "2025-11-16",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13980\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T13:30:53.916Z",
+    "criado_em": "2026-09-16T13:30:53.916Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:53.916Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_544ebd1d289abd46": {
+    "id": "ord_544ebd1d289abd46",
+    "bling_pedido_id": "24357257530",
+    "bling_numero": "25316",
+    "account_id": "acc_919417b6194cd518",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 121.06,
+    "itens": [
+      {
+        "sku": "VEC-SCSC-10",
+        "descricao": "Protetor de agulha Snap Cap .22 LR - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 103,
+        "valor_total_item": 103
+      }
+    ],
+    "data_pedido": "2025-11-15",
+    "data_pagamento": null,
+    "data_envio": "2025-11-17",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13978\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T13:30:54.302Z",
+    "criado_em": "2026-09-16T13:30:54.302Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:54.302Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_11021e367082c837": {
+    "id": "ord_11021e367082c837",
+    "bling_pedido_id": "24339113256",
+    "bling_numero": "25302",
+    "account_id": "acc_62ccb414f91ce8ae",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 410.46,
+    "itens": [
+      {
+        "sku": "MAG522B",
+        "descricao": "Empunhadura Moe-K2 Grip, Ar15/M4, Preto",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 397.1,
+        "valor_total_item": 397.1
+      }
+    ],
+    "data_pedido": "2025-11-15",
+    "data_pagamento": null,
+    "data_envio": "2025-11-15",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13974\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T13:30:54.720Z",
+    "criado_em": "2026-09-16T13:30:54.720Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:54.720Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_cfd380380608f8fd": {
+    "id": "ord_cfd380380608f8fd",
+    "bling_pedido_id": "24337753261",
+    "bling_numero": "25301",
+    "account_id": "acc_6ac5af68e3fd80bc",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 272.31,
+    "itens": [
+      {
+        "sku": "6942870306452-ID",
+        "descricao": "Carregador para baterias Fenix ARE-A2 (USA Plug) (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 249.9,
+        "valor_total_item": 249.9
+      }
+    ],
+    "data_pedido": "2025-11-14",
+    "data_pagamento": null,
+    "data_envio": "2025-11-14",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13972\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T13:30:55.118Z",
+    "criado_em": "2026-09-16T13:30:55.118Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:55.118Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_cf38195c64b89aa7": {
+    "id": "ord_cf38195c64b89aa7",
+    "bling_pedido_id": "24334457391",
+    "bling_numero": "25300",
+    "account_id": "acc_360d2be29dba4113",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 451.73,
+    "itens": [
+      {
+        "sku": "GF-KIG19ORDBP",
+        "descricao": "Coldre Velado Kydex 30-30 Outdoors para Glock 19/19X/25/44/45 c/ lanterna Olight Baldr PRO",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 451.73,
+        "valor_total_item": 451.73
+      }
+    ],
+    "data_pedido": "2025-11-14",
+    "data_pagamento": null,
+    "data_envio": "2025-11-14",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T13:30:55.509Z",
+    "criado_em": "2026-09-16T13:30:55.509Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:55.509Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_648a46cd425e8ef3": {
+    "id": "ord_648a46cd425e8ef3",
+    "bling_pedido_id": "24330798109",
+    "bling_numero": "25299",
+    "account_id": "acc_b075aa9957bdc7fc",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 678,
+    "itens": [
+      {
+        "sku": "6942870369358",
+        "descricao": "Bateria 21700 Recarregável Fenix - ARB-L21-5000U",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 320,
+        "valor_total_item": 640
+      }
+    ],
+    "data_pedido": "2025-11-14",
+    "data_pagamento": null,
+    "data_envio": "2025-11-14",
+    "data_entrega": null,
+    "notas": "O item do cliente não foi entregue por motivos de não ter ninguém no endereço, cliente solicitou um novo envio, pagou um novo frete, e o pedido dele está retornando para a empresa",
+    "sincronizado_bling_em": "2026-09-16T13:30:55.918Z",
+    "criado_em": "2026-09-16T13:30:55.918Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:55.918Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_47230c4cdda0e618": {
+    "id": "ord_47230c4cdda0e618",
+    "bling_pedido_id": "24330475963",
+    "bling_numero": "25298",
+    "account_id": "acc_eb97396c492fb3cf",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 715.93,
+    "itens": [
+      {
+        "sku": "6942870306209",
+        "descricao": "Lanterna Camping Fenix CL26R Verde 400 Lumens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 712,
+        "valor_total_item": 712
+      }
+    ],
+    "data_pedido": "2025-11-14",
+    "data_pagamento": null,
+    "data_envio": "2025-11-14",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 5805\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T13:30:56.282Z",
+    "criado_em": "2026-09-16T13:30:56.282Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:56.282Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_fa2a016f3f91b893": {
+    "id": "ord_fa2a016f3f91b893",
+    "bling_pedido_id": "24326699430",
+    "bling_numero": "25297",
+    "account_id": "acc_0985127ca6f3ec3e",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1195.05,
+    "itens": [
+      {
+        "sku": "RED-11900",
+        "descricao": "Jogo de Shellholder Redding E-Z Feed",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1101.05,
+        "valor_total_item": 1101.05
+      }
+    ],
+    "data_pedido": "2025-11-13",
+    "data_pagamento": null,
+    "data_envio": "2025-11-13",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T13:30:56.734Z",
+    "criado_em": "2026-09-16T13:30:56.734Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:56.734Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_051971d091ad0fd0": {
+    "id": "ord_051971d091ad0fd0",
+    "bling_pedido_id": "24326224595",
+    "bling_numero": "25296",
+    "account_id": "acc_85bcfcff42c7fcc8",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1040,
+    "itens": [
+      {
+        "sku": "6942870304724",
+        "descricao": "Bateria 18650 Recarregável Fenix - ARB-L18-3500U",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 208,
+        "valor_total_item": 1040
+      }
+    ],
+    "data_pedido": "2025-11-13",
+    "data_pagamento": null,
+    "data_envio": "2025-11-13",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T13:30:57.121Z",
+    "criado_em": "2026-09-16T13:30:57.121Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:57.121Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_769b68d5944601c9": {
+    "id": "ord_769b68d5944601c9",
+    "bling_pedido_id": "24324826984",
+    "bling_numero": "25295",
+    "account_id": "acc_37cfda4d58bee343",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1104.48,
+    "itens": [
+      {
+        "sku": "MAG556T",
+        "descricao": "Carregador Ar/M4, Pmag,  30 Municoes, Geracao M3,  Calibre 5.56X45/223 Rem, Tam, Com Janela De Visualizacao De Municoes",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 499.935,
+        "valor_total_item": 999.87
+      },
+      {
+        "sku": "WAR-391",
+        "descricao": "Porta Carregador Warfare 2X556 Coyote",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 54.61,
+        "valor_total_item": 54.61
+      }
+    ],
+    "data_pedido": "2025-11-13",
+    "data_pagamento": null,
+    "data_envio": "2025-11-13",
+    "data_entrega": null,
+    "notas": "SEDEX",
+    "sincronizado_bling_em": "2026-09-16T13:30:57.517Z",
+    "criado_em": "2026-09-16T13:30:57.517Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:57.517Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_adde433e83fd8af7": {
+    "id": "ord_adde433e83fd8af7",
+    "bling_pedido_id": "24324516698",
+    "bling_numero": "25294",
+    "account_id": "acc_2aa19915e8e35b33",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 241,
+    "itens": [
+      {
+        "sku": "VEC-RDSL15",
+        "descricao": "Mira Red Dot Z1 1x23x34 - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 210,
+        "valor_total_item": 210
+      }
+    ],
+    "data_pedido": "2025-11-13",
+    "data_pagamento": null,
+    "data_envio": "2025-11-13",
+    "data_entrega": null,
+    "notas": "PAC",
+    "sincronizado_bling_em": "2026-09-16T13:30:57.944Z",
+    "criado_em": "2026-09-16T13:30:57.944Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:57.944Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_56fc9c4faa9990a0": {
+    "id": "ord_56fc9c4faa9990a0",
+    "bling_pedido_id": "24322958820",
+    "bling_numero": "25293",
+    "account_id": "acc_429fcfabc2b0e461",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 43300,
+    "itens": [
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna Fenix TK16 V2.0 - 3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 30,
+        "valor_unitario": 866,
+        "valor_total_item": 25980
+      },
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna Fenix TK16 V2.0 - 3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 20,
+        "valor_unitario": 866,
+        "valor_total_item": 17320
+      }
+    ],
+    "data_pedido": "2025-11-13",
+    "data_pagamento": null,
+    "data_envio": "2025-11-13",
+    "data_entrega": null,
+    "notas": "0A526Q03701 0A526Q03705 0A526Q03585 0A526Q03686 0A526Q03697 0A526Q03687 0A526Q03681 0A526Q03696 0A526Q03684 0A526Q03683 0A526Q03682 0A526Q03693 0A526Q03690 0A526Q03700 0A526Q03704 0A526Q03703 0A526Q00138 0A526Q03573 0A526Q03713 0A526Q03719 0A526Q03579 0A526Q03695 0A526Q03691 0A526Q03688 0A526Q03582 0A526Q03722 0A526Q03716 0A526Q03685 0A526Q03727 0A526Q03689 0A526Q03694 0A526Q00132 0A526Q03671 0A526Q03728 0A526Q03706 0A526Q03698 0A526Q03702 0A526Q03725 0A526Q03712 0A526Q03721 0A526Q03724 0A526Q03729 0A526Q03707 0A526Q03717 0A526Q03711 0A526Q03570 0A526Q03699 0A526Q03692 0A526Q03679 0A526Q03708\n\nCódigo Embraer: 1345027",
+    "sincronizado_bling_em": "2026-09-16T13:30:58.357Z",
+    "criado_em": "2026-09-16T13:30:58.357Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:58.357Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b70c7d281a346bf6": {
+    "id": "ord_b70c7d281a346bf6",
+    "bling_pedido_id": "24322717271",
+    "bling_numero": "25292",
+    "account_id": "acc_d2095ae8a343b6c2",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1931.72,
+    "itens": [
+      {
+        "sku": "6942870306452-ID",
+        "descricao": "Carregador para baterias Fenix ARE-A2 (USA Plug) (ID)",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 248.405,
+        "valor_total_item": 993.62
+      },
+      {
+        "sku": "6942870311104-ID",
+        "descricao": "Bateria Fenix 18650 Recarregavel USB ARB-L18-3400U V3.0 (ID)",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 209.525,
+        "valor_total_item": 838.1
+      }
+    ],
+    "data_pedido": "2025-11-13",
+    "data_pagamento": null,
+    "data_envio": "2025-11-13",
+    "data_entrega": null,
+    "notas": "Aos cuidados de: Rafaela",
+    "sincronizado_bling_em": "2026-09-16T13:30:58.759Z",
+    "criado_em": "2026-09-16T13:30:58.759Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:58.759Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_5cea07a1f8139534": {
+    "id": "ord_5cea07a1f8139534",
+    "bling_pedido_id": "24322690677",
+    "bling_numero": "25291",
+    "account_id": "acc_052b36c96ebcb200",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 664.84,
+    "itens": [
+      {
+        "sku": "CBC-10008342",
+        "descricao": "Munição CBC Cal 36GA Câmara 63,5mm K.Steel - Balote Aço",
+        "categoria": null,
+        "quantidade": 22,
+        "valor_unitario": 17.72,
+        "valor_total_item": 389.84
+      }
+    ],
+    "data_pedido": "2025-11-13",
+    "data_pagamento": null,
+    "data_envio": "2025-11-13",
+    "data_entrega": null,
+    "notas": "Ezequiel 250 + 25 = 275$",
+    "sincronizado_bling_em": "2026-09-16T13:30:59.158Z",
+    "criado_em": "2026-09-16T13:30:59.158Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:59.158Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_5669c198e309c46a": {
+    "id": "ord_5669c198e309c46a",
+    "bling_pedido_id": "24322107074",
+    "bling_numero": "25290",
+    "account_id": "acc_429fcfabc2b0e461",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 43300,
+    "itens": [
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna Fenix TK16 V2.0 - 3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 30,
+        "valor_unitario": 866,
+        "valor_total_item": 25980
+      },
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna Fenix TK16 V2.0 - 3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 20,
+        "valor_unitario": 866,
+        "valor_total_item": 17320
+      }
+    ],
+    "data_pedido": "2025-11-13",
+    "data_pagamento": null,
+    "data_envio": "2025-11-13",
+    "data_entrega": null,
+    "notas": "0A526Q03701 0A526Q03705 0A526Q03585 0A526Q03686 0A526Q03697 0A526Q03687 0A526Q03681 0A526Q03696 0A526Q03684 0A526Q03683 0A526Q03682 0A526Q03693 0A526Q03690 0A526Q03700 0A526Q03704 0A526Q03703 0A526Q00138 0A526Q03573 0A526Q03713 0A526Q03719 0A526Q03579 0A526Q03695 0A526Q03691 0A526Q03688 0A526Q03582 0A526Q03722 0A526Q03716 0A526Q03685 0A526Q03727 0A526Q03689 0A526Q03694 0A526Q00132 0A526Q03671 0A526Q03728 0A526Q03706 0A526Q03698 0A526Q03702 0A526Q03725 0A526Q03712 0A526Q03721 0A526Q03724 0A526Q03729 0A526Q03707 0A526Q03717 0A526Q03711 0A526Q03570 0A526Q03699 0A526Q03692 0A526Q03679 0A526Q03708\n\nCodigo Embraer: 1345027",
+    "sincronizado_bling_em": "2026-09-16T13:30:59.563Z",
+    "criado_em": "2026-09-16T13:30:59.563Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:30:59.563Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_028d1839fa00261e": {
+    "id": "ord_028d1839fa00261e",
+    "bling_pedido_id": "24321470767",
+    "bling_numero": "25289",
+    "account_id": "acc_a5780378e1424ec1",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 899,
+    "itens": [
+      {
+        "sku": "MAG579",
+        "descricao": "Carregador Pmag, 10 Municoes, Calibre 7,62X51 /308Win, Short Action, Preto",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 855,
+        "valor_total_item": 855
+      }
+    ],
+    "data_pedido": "2025-11-13",
+    "data_pagamento": null,
+    "data_envio": "2025-11-13",
+    "data_entrega": null,
+    "notas": "PAC",
+    "sincronizado_bling_em": "2026-09-16T13:31:00.047Z",
+    "criado_em": "2026-09-16T13:31:00.047Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:31:00.047Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_08eead0dbd04b8a0": {
+    "id": "ord_08eead0dbd04b8a0",
+    "bling_pedido_id": "24317755691",
+    "bling_numero": "25288",
+    "account_id": "acc_28086b6b1e466087",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 3464,
+    "itens": [
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna Fenix TK16 V2.0 - 3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 866,
+        "valor_total_item": 1732
+      },
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna Fenix TK16 V2.0 - 3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 866,
+        "valor_total_item": 1732
+      }
+    ],
+    "data_pedido": "2025-11-12",
+    "data_pagamento": null,
+    "data_envio": "2025-11-12",
+    "data_entrega": null,
+    "notas": "Item 1 - Cód Embraer 1345027 - Nº de série: 0A526Q00117 e 0A526Q00116 \nItem 2 - Cód Embraer 1345027 - Nº de Série: 0A526Q00115 0A526Q00119\n\n\nPedido de Compra 0906042758",
+    "sincronizado_bling_em": "2026-09-16T13:31:00.414Z",
+    "criado_em": "2026-09-16T13:31:00.414Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:31:00.414Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_f12b2cef4eb2e5e3": {
+    "id": "ord_f12b2cef4eb2e5e3",
+    "bling_pedido_id": "24317402679",
+    "bling_numero": "25287",
+    "account_id": "acc_28086b6b1e466087",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 3464,
+    "itens": [
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna Fenix TK16 V2.0 - 3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 866,
+        "valor_total_item": 1732
+      },
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna Fenix TK16 V2.0 - 3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 866,
+        "valor_total_item": 1732
+      }
+    ],
+    "data_pedido": "2025-11-12",
+    "data_pagamento": null,
+    "data_envio": "2025-11-12",
+    "data_entrega": null,
+    "notas": "Nº de série: 0A526Q00117 0A526Q00116 0A526Q00115 0A526Q00119\n\n\nPedido de Compra 0906042758",
+    "sincronizado_bling_em": "2026-09-16T13:31:00.799Z",
+    "criado_em": "2026-09-16T13:31:00.799Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:31:00.799Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_834550cd4f336f6b": {
+    "id": "ord_834550cd4f336f6b",
+    "bling_pedido_id": "24316666774",
+    "bling_numero": "25286",
+    "account_id": "acc_d070f5bb4389c930",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 221.5,
+    "itens": [
+      {
+        "sku": "VEC-SCCK-10",
+        "descricao": "Kit de limpeza de armas,para airguns .177 & .22,  Ref: SCCK-10P",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 171.5,
+        "valor_total_item": 171.5
+      },
+      {
+        "sku": "7908412408038",
+        "descricao": "Lubrisint UP1 Armas, 60ml",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 50,
+        "valor_total_item": 50
+      }
+    ],
+    "data_pedido": "2025-11-12",
+    "data_pagamento": null,
+    "data_envio": "2025-11-12",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T13:31:01.403Z",
+    "criado_em": "2026-09-16T13:31:01.403Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:31:01.403Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_042b955640a4676b": {
+    "id": "ord_042b955640a4676b",
+    "bling_pedido_id": "24316431920",
+    "bling_numero": "25285",
+    "account_id": "acc_3af6dc443c94b404",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1239.62,
+    "itens": [
+      {
+        "sku": "MAG522DE",
+        "descricao": "Empunhadura Moe-K2 Grip, Ar15/M4, Dark Earth",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 474.36,
+        "valor_total_item": 474.36
+      },
+      {
+        "sku": "MAG626B",
+        "descricao": "Base Coronha Para Tube Stock, Moe Sl-K Carbine, Mil-Spec, Preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 765.26,
+        "valor_total_item": 765.26
+      }
+    ],
+    "data_pedido": "2025-11-12",
+    "data_pagamento": null,
+    "data_envio": "2025-11-12",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13970\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T13:31:01.795Z",
+    "criado_em": "2026-09-16T13:31:01.795Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:31:01.795Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_d10f0d63e842a505": {
+    "id": "ord_d10f0d63e842a505",
+    "bling_pedido_id": "24315198656",
+    "bling_numero": "25284",
+    "account_id": "acc_b7e3b0f429daf664",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 2107.2,
+    "itens": [
+      {
+        "sku": "VEC-SCOL-34",
+        "descricao": "Luneta Sentinel-X 10-40x50 Center Dot - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1999.2,
+        "valor_total_item": 1999.2
+      }
+    ],
+    "data_pedido": "2025-11-12",
+    "data_pagamento": null,
+    "data_envio": "2025-11-12",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T13:31:02.285Z",
+    "criado_em": "2026-09-16T13:31:02.285Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:31:02.285Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_ab4b330dc8442682": {
+    "id": "ord_ab4b330dc8442682",
+    "bling_pedido_id": "24314183514",
+    "bling_numero": "25283",
+    "account_id": "acc_48fdc966be45e41d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 119.26,
+    "itens": [
+      {
+        "sku": "VEC-GPCK-4P",
+        "descricao": "Kit 4 Hastes de Polimero para Limpeza",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 29.4,
+        "valor_total_item": 29.4
+      },
+      {
+        "sku": "VEC-GPGC-3B2P",
+        "descricao": "Kit de limpeza para armas Vector Optics GPGC-3B2PQ",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 67,
+        "valor_total_item": 67
+      }
+    ],
+    "data_pedido": "2025-11-12",
+    "data_pagamento": null,
+    "data_envio": "2025-11-12",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 13968\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T13:31:02.711Z",
+    "criado_em": "2026-09-16T13:31:02.711Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:31:02.711Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_4ad2980396fe5ddc": {
+    "id": "ord_4ad2980396fe5ddc",
+    "bling_pedido_id": "24313141808",
+    "bling_numero": "25282",
+    "account_id": "acc_2b180ced743c37f2",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 15.15,
+    "itens": [
+      {
+        "sku": "g-1212121212",
+        "descricao": "clip (Ref. g-1212121212)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 0.01,
+        "valor_total_item": 0.01
+      }
+    ],
+    "data_pedido": "2025-11-12",
+    "data_pagamento": null,
+    "data_envio": "2025-11-12",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 5803\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T13:31:03.121Z",
+    "criado_em": "2026-09-16T13:31:03.121Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:31:03.121Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_3f9f4a68293f7e41": {
+    "id": "ord_3f9f4a68293f7e41",
+    "bling_pedido_id": "24311406700",
+    "bling_numero": "25280",
+    "account_id": "acc_0410c003d7be7478",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 3507.5,
+    "itens": [
+      {
+        "sku": "MAG556B",
+        "descricao": "Carregador Ar/M4, Pmag,  30 Municoes, Geracao M3,  Calibre 5.56X45/223 Rem, Preto, Com Janela De Visualizacao De Municao",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 383,
+        "valor_total_item": 1915
+      },
+      {
+        "sku": "MAG557T",
+        "descricao": "Carregador Ar/M4, Pmag,  30 Municoes, Geracao M3,  Calibre 5.56X45/223 Rem, Tan",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 318.5,
+        "valor_total_item": 1592.5
+      }
+    ],
+    "data_pedido": "2025-11-12",
+    "data_pagamento": null,
+    "data_envio": "2025-11-12",
+    "data_entrega": null,
+    "notas": "FRETE GRATIS BLACK NOVEMBER",
+    "sincronizado_bling_em": "2026-09-16T13:31:03.579Z",
+    "criado_em": "2026-09-16T13:31:03.579Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T13:31:03.579Z",
+    "atualizado_por": "bling-sync"
   }
 }
