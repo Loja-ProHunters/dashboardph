@@ -6,31 +6,6 @@
   "ate": "2026-09-15",
   "meses": 12,
   "ids_pendentes": [
-    "25805629892",
-    "25805472011",
-    "25805448188",
-    "25805432290",
-    "25805403660",
-    "25805386714",
-    "25805368973",
-    "25805353002",
-    "25805324683",
-    "25804620538",
-    "25804511719",
-    "25804205842",
-    "25802173605",
-    "25799446383",
-    "25797006423",
-    "25796999353",
-    "25796568523",
-    "25796263864",
-    "25795842663",
-    "25791562924",
-    "25791094474",
-    "25789927667",
-    "25788904940",
-    "25788711313",
-    "25788343721",
     "25786739561",
     "25784855064",
     "25784190982",
@@ -1031,12 +1006,13 @@
     "26235193031",
     "26094858310",
     "25919070742",
-    "25820690308"
+    "25820690308",
+    "25791562924"
   ],
   "total_original": 1946,
-  "processados": 920,
-  "accounts_criadas": 728,
-  "orders_criadas": 899,
+  "processados": 944,
+  "accounts_criadas": 745,
+  "orders_criadas": 923,
   "avisos": [
     "pedido 26694334654: Bling API 429 em GET /pedidos/vendas/26694334654: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 26588132464: sem CPF/CNPJ do contato — pulando",
@@ -1047,8 +1023,9 @@
     "pedido 26235186301: sem CPF/CNPJ do contato — pulando",
     "pedido 26094858310: Bling API 429 em GET /pedidos/vendas/26094858310: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 25919070742: Bling API 429 em GET /pedidos/vendas/25919070742: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
-    "pedido 25820690308: Bling API 429 em GET /pedidos/vendas/25820690308: O limite de requisições por segundo foi atingido, tente novamente mais tarde."
+    "pedido 25820690308: Bling API 429 em GET /pedidos/vendas/25820690308: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
+    "pedido 25791562924: Bling API 429 em GET /pedidos/vendas/25791562924: O limite de requisições por segundo foi atingido, tente novamente mais tarde."
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-09-16T03:36:34.727Z"
+  "ultimo_lote_em": "2026-09-16T03:36:46.448Z"
 }
