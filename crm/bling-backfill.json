@@ -6,31 +6,6 @@
   "ate": "2026-09-15",
   "meses": 12,
   "ids_pendentes": [
-    "25938124533",
-    "25938075904",
-    "25937699538",
-    "25937478957",
-    "25937143334",
-    "25933002347",
-    "25932681699",
-    "25929485060",
-    "25928839984",
-    "25928395802",
-    "25928102263",
-    "25924492962",
-    "25924270463",
-    "25923560678",
-    "25923509246",
-    "25922080618",
-    "25921792403",
-    "25921446270",
-    "25920502011",
-    "25919070742",
-    "25918831041",
-    "25919798334",
-    "25914208971",
-    "25914065057",
-    "25914064828",
     "25913445940",
     "25911748763",
     "25910081688",
@@ -1154,12 +1129,13 @@
     "23844937709",
     "26694334654",
     "26235193031",
-    "26094858310"
+    "26094858310",
+    "25919070742"
   ],
   "total_original": 1946,
-  "processados": 797,
-  "accounts_criadas": 636,
-  "orders_criadas": 776,
+  "processados": 821,
+  "accounts_criadas": 654,
+  "orders_criadas": 800,
   "avisos": [
     "pedido 26694334654: Bling API 429 em GET /pedidos/vendas/26694334654: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 26588132464: sem CPF/CNPJ do contato — pulando",
@@ -1168,8 +1144,9 @@
     "pedido 26420611985: sem CPF/CNPJ do contato — pulando",
     "pedido 26235193031: Bling API 429 em GET /pedidos/vendas/26235193031: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 26235186301: sem CPF/CNPJ do contato — pulando",
-    "pedido 26094858310: Bling API 429 em GET /pedidos/vendas/26094858310: O limite de requisições por segundo foi atingido, tente novamente mais tarde."
+    "pedido 26094858310: Bling API 429 em GET /pedidos/vendas/26094858310: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
+    "pedido 25919070742: Bling API 429 em GET /pedidos/vendas/25919070742: O limite de requisições por segundo foi atingido, tente novamente mais tarde."
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-09-16T03:35:33.181Z"
+  "ultimo_lote_em": "2026-09-16T03:35:45.318Z"
 }
