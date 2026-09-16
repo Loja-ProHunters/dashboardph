@@ -1,0 +1,6759 @@
+{
+  "gerado_em": "2026-09-16",
+  "fabricante": "fenix",
+  "versao_tabela": "2026",
+  "fonte": "Fenix Accessory & Battery Compatibility Chart 2026 (PDF oficial)",
+  "notas_rodape": {
+    "*": "somente com o suporte de bateria ALF-18",
+    "**": "no power bank",
+    "°": "alguns níveis/modos não disponíveis",
+    "∞": "exceto edição SAR",
+    "^": "não funciona com ARB-L18-4000U",
+    "≈": "não funciona com ARB-L21-6000 e ARBL-21-6000U",
+    "~": "somente 3400 mAh ou maior"
+  },
+  "series": {
+    "BC": {
+      "nome": "Série BC — luz de bike"
+    },
+    "C": {
+      "nome": "Série C — profissional/serviço"
+    },
+    "CL": {
+      "nome": "Série CL — lampião"
+    },
+    "CP": {
+      "nome": "Série CP — power bank/lanterna"
+    },
+    "E": {
+      "nome": "Série E — EDC/lanterna do dia a dia"
+    },
+    "GL": {
+      "nome": "Série GL — para arma curta (pistola)"
+    },
+    "HL": {
+      "nome": "Série HL — farolete (headlamp)"
+    },
+    "HM": {
+      "nome": "Série HM — farolete outdoor"
+    },
+    "HP": {
+      "nome": "Série HP — farolete industrial"
+    },
+    "HT": {
+      "nome": "Série HT — caça (long throw)"
+    },
+    "LD": {
+      "nome": "Série LD — tática compacta"
+    },
+    "LR": {
+      "nome": "Série LR — busca e resgate (long range)"
+    },
+    "PD": {
+      "nome": "Série PD — tática EDC"
+    },
+    "SW": {
+      "nome": "Série SW — inspeção/laboratório"
+    },
+    "TK": {
+      "nome": "Série TK — tática pesada"
+    },
+    "WF": {
+      "nome": "Série WF — atmosfera explosiva"
+    },
+    "WH": {
+      "nome": "Série WH — farolete leve"
+    },
+    "WT": {
+      "nome": "Série WT — trabalho profissional"
+    }
+  },
+  "grupos": {
+    "bateria_cr123a": {
+      "nome": "Bateria CR123A (lítio)",
+      "tipo": "consumivel_energia"
+    },
+    "bateria_li_ion": {
+      "nome": "Bateria Li-Ion recarregável",
+      "tipo": "consumivel_energia"
+    },
+    "battery_holder": {
+      "nome": "Suporte de bateria",
+      "tipo": "acessorio_energia"
+    },
+    "belt_clip": {
+      "nome": "Clip de cinto",
+      "tipo": "acessorio_transporte"
+    },
+    "bike_mount": {
+      "nome": "Suporte de bike",
+      "tipo": "acessorio_fixacao"
+    },
+    "diffuser_tip": {
+      "nome": "Difusor",
+      "tipo": "acessorio_optico"
+    },
+    "filter_adapter": {
+      "nome": "Adaptador de filtro",
+      "tipo": "acessorio_optico"
+    },
+    "gear_bag": {
+      "nome": "Bolsa de equipamento",
+      "tipo": "acessorio_transporte"
+    },
+    "gopro_mount": {
+      "nome": "Suporte GoPro",
+      "tipo": "acessorio_fixacao"
+    },
+    "headband": {
+      "nome": "Faixa de cabeça",
+      "tipo": "peca_reposicao"
+    },
+    "helmet_clips": {
+      "nome": "Clips de capacete",
+      "tipo": "acessorio_fixacao"
+    },
+    "helmet_mount": {
+      "nome": "Suporte de capacete",
+      "tipo": "acessorio_fixacao"
+    },
+    "helmet_mount_hl": {
+      "nome": "Suporte de capacete (farolete)",
+      "tipo": "acessorio_fixacao"
+    },
+    "holster": {
+      "nome": "Coldre",
+      "tipo": "acessorio_transporte"
+    },
+    "rail_mount": {
+      "nome": "Suporte de trilho",
+      "tipo": "acessorio_fixacao"
+    },
+    "remote_switch": {
+      "nome": "Acionador remoto",
+      "tipo": "acessorio_eletronico"
+    },
+    "tac_ring": {
+      "nome": "Anel tático",
+      "tipo": "acessorio_ergonomico"
+    },
+    "traffic_wand": {
+      "nome": "Cone de sinalização",
+      "tipo": "acessorio_optico"
+    },
+    "wrist_mount": {
+      "nome": "Suporte de pulso",
+      "tipo": "acessorio_fixacao"
+    }
+  },
+  "modelos": {
+    "BC05R V2.0": {
+      "serie": "BC",
+      "tipo": "luz_bike",
+      "compativel": [
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": []
+    },
+    "BC06R": {
+      "serie": "BC",
+      "tipo": "luz_bike",
+      "compativel": [
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": []
+    },
+    "BC22R": {
+      "serie": "BC",
+      "tipo": "luz_bike",
+      "compativel": [
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        }
+      ]
+    },
+    "BC25R": {
+      "serie": "BC",
+      "tipo": "luz_bike",
+      "compativel": [
+        {
+          "sku": "ALD-08",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALD-08"
+        },
+        {
+          "sku": "ALD-10",
+          "grupo": "gopro_mount",
+          "nome": "Suporte GoPro ALD-10"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": []
+    },
+    "BC26R": {
+      "serie": "BC",
+      "tipo": "luz_bike",
+      "compativel": [
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        },
+        {
+          "sku": "ALD-08",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALD-08"
+        },
+        {
+          "sku": "ALD-10",
+          "grupo": "gopro_mount",
+          "nome": "Suporte GoPro ALD-10"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "BC28R": {
+      "serie": "BC",
+      "tipo": "luz_bike",
+      "compativel": [
+        {
+          "sku": "ALD-08",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALD-08"
+        },
+        {
+          "sku": "ALD-10",
+          "grupo": "gopro_mount",
+          "nome": "Suporte GoPro ALD-10"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "BC30 V2.0": {
+      "serie": "BC",
+      "tipo": "luz_bike",
+      "compativel": [
+        {
+          "sku": "ALD-08",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALD-08"
+        },
+        {
+          "sku": "ALD-10",
+          "grupo": "gopro_mount",
+          "nome": "Suporte GoPro ALD-10"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "^"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "BC45R": {
+      "serie": "BC",
+      "tipo": "luz_bike",
+      "compativel": [
+        {
+          "sku": "ALD-08",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALD-08"
+        },
+        {
+          "sku": "ALD-10",
+          "grupo": "gopro_mount",
+          "nome": "Suporte GoPro ALD-10"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        }
+      ]
+    },
+    "C7": {
+      "serie": "C",
+      "tipo": "lanterna_tatica_recarregavel",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOD-04",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-04"
+        },
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700",
+          "nota": "≈"
+        }
+      ]
+    },
+    "C7 PRO": {
+      "serie": "C",
+      "tipo": "lanterna_tatica_recarregavel",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOD-04",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-04"
+        },
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "C7 V2.0": {
+      "serie": "C",
+      "tipo": "lanterna_tatica_recarregavel",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOD-04",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-04"
+        },
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "CL20R V2.0": {
+      "serie": "CL",
+      "tipo": "lampiao",
+      "compativel": [
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": []
+    },
+    "CL22R": {
+      "serie": "CL",
+      "tipo": "lampiao",
+      "compativel": [
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": []
+    },
+    "CL26R PRO": {
+      "serie": "CL",
+      "tipo": "lampiao",
+      "compativel": [
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700",
+          "nota": "≈"
+        }
+      ]
+    },
+    "CL27R": {
+      "serie": "CL",
+      "tipo": "lampiao",
+      "compativel": [
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "CL28R": {
+      "serie": "CL",
+      "tipo": "lampiao",
+      "compativel": [
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": []
+    },
+    "CL30R": {
+      "serie": "CL",
+      "tipo": "lampiao",
+      "compativel": [],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "CP50R": {
+      "serie": "CP",
+      "tipo": "power_bank_lanterna",
+      "compativel": [],
+      "baterias": [
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "E01 V2.0": {
+      "serie": "E",
+      "tipo": "lanterna_edc",
+      "compativel": [],
+      "baterias": []
+    },
+    "E03R V2.0": {
+      "serie": "E",
+      "tipo": "lanterna_edc",
+      "compativel": [],
+      "baterias": []
+    },
+    "E05R": {
+      "serie": "E",
+      "tipo": "lanterna_edc",
+      "compativel": [],
+      "baterias": []
+    },
+    "E06R": {
+      "serie": "E",
+      "tipo": "lanterna_edc",
+      "compativel": [],
+      "baterias": []
+    },
+    "E06R PRO": {
+      "serie": "E",
+      "tipo": "lanterna_edc",
+      "compativel": [],
+      "baterias": []
+    },
+    "E06R PRO RG": {
+      "serie": "E",
+      "tipo": "lanterna_edc",
+      "compativel": [],
+      "baterias": []
+    },
+    "E08R UE": {
+      "serie": "E",
+      "tipo": "lanterna_edc",
+      "compativel": [],
+      "baterias": []
+    },
+    "E12 V3.0": {
+      "serie": "E",
+      "tipo": "lanterna_edc",
+      "compativel": [
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L14 14500",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L14 14500"
+        }
+      ]
+    },
+    "E18R V2.0": {
+      "serie": "E",
+      "tipo": "lanterna_edc",
+      "compativel": [
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L16 16340",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L16 16340"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "E20 V2.0": {
+      "serie": "E",
+      "tipo": "lanterna_edc",
+      "compativel": [
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": []
+    },
+    "E28R V2.0": {
+      "serie": "E",
+      "tipo": "lanterna_edc",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "E35R": {
+      "serie": "E",
+      "tipo": "lanterna_edc",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "GL06": {
+      "serie": "GL",
+      "tipo": "lanterna_pistola",
+      "compativel": [],
+      "baterias": [
+        {
+          "sku": "ARB-L16 16340",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L16 16340"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "GL07": {
+      "serie": "GL",
+      "tipo": "lanterna_pistola",
+      "compativel": [],
+      "baterias": [
+        {
+          "sku": "ARB-L16 16340",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L16 16340"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "GL19R V2.0": {
+      "serie": "GL",
+      "tipo": "lanterna_pistola",
+      "compativel": [
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18350",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18350"
+        }
+      ]
+    },
+    "GL22": {
+      "serie": "GL",
+      "tipo": "lanterna_pistola",
+      "compativel": [
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L16 16340",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L16 16340"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "GL23R": {
+      "serie": "GL",
+      "tipo": "lanterna_pistola",
+      "compativel": [
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18350",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18350"
+        }
+      ]
+    },
+    "GL30R": {
+      "serie": "GL",
+      "tipo": "lanterna_pistola",
+      "compativel": [],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "HL12R V2.0": {
+      "serie": "HL",
+      "tipo": "farolete",
+      "compativel": [
+        {
+          "sku": "AFH-02/AFH-03",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-02/AFH-03"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": []
+    },
+    "HL16": {
+      "serie": "HL",
+      "tipo": "farolete",
+      "compativel": [
+        {
+          "sku": "AFH-04/AFH-05",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-04/AFH-05"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": []
+    },
+    "HL18R-T V2.0": {
+      "serie": "HL",
+      "tipo": "farolete",
+      "compativel": [
+        {
+          "sku": "AFH-02/AFH-03",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-02/AFH-03"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": []
+    },
+    "HL32R-T": {
+      "serie": "HL",
+      "tipo": "farolete",
+      "compativel": [
+        {
+          "sku": "AFH-04/AFH-05",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-04/AFH-05"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": []
+    },
+    "HL45R": {
+      "serie": "HL",
+      "tipo": "farolete",
+      "compativel": [
+        {
+          "sku": "AFH-04/AFH-05",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-04/AFH-05"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": []
+    },
+    "HM23 V2.0": {
+      "serie": "HM",
+      "tipo": "farolete_outdoor",
+      "compativel": [
+        {
+          "sku": "ALD-02",
+          "grupo": "helmet_clips",
+          "nome": "Clips de capacete ALD-02"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L14 14500",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L14 14500"
+        }
+      ]
+    },
+    "HM50R V2.0": {
+      "serie": "HM",
+      "tipo": "farolete_outdoor",
+      "compativel": [
+        {
+          "sku": "ALD-02",
+          "grupo": "helmet_clips",
+          "nome": "Clips de capacete ALD-02"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L16 16340",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L16 16340"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "°"
+        }
+      ]
+    },
+    "HM53R": {
+      "serie": "HM",
+      "tipo": "farolete_outdoor",
+      "compativel": [
+        {
+          "sku": "ALD-02",
+          "grupo": "helmet_clips",
+          "nome": "Clips de capacete ALD-02"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L16 16340",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L16 16340"
+        },
+        {
+          "sku": "ARB-L18 18350",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18350"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "°"
+        }
+      ]
+    },
+    "HM55R": {
+      "serie": "HM",
+      "tipo": "farolete_outdoor",
+      "compativel": [
+        {
+          "sku": "AFH-04/AFH-05",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-04/AFH-05"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L16 16340",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L16 16340"
+        },
+        {
+          "sku": "ARB-L18 18350",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18350"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "°"
+        }
+      ]
+    },
+    "HM55R RENEGADE": {
+      "serie": "HM",
+      "tipo": "farolete_outdoor",
+      "compativel": [
+        {
+          "sku": "AFH-04/AFH-05",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-04/AFH-05"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L16 16340",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L16 16340"
+        },
+        {
+          "sku": "ARB-L18 18350",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18350"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "°"
+        }
+      ]
+    },
+    "HM60R V2.0": {
+      "serie": "HM",
+      "tipo": "farolete_outdoor",
+      "compativel": [
+        {
+          "sku": "ALG-03/ALG-04",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALG-03/ALG-04"
+        },
+        {
+          "sku": "AFH-02/AFH-03",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-02/AFH-03"
+        },
+        {
+          "sku": "ALD-02",
+          "grupo": "helmet_clips",
+          "nome": "Clips de capacete ALD-02"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "HM61R V3.0": {
+      "serie": "HM",
+      "tipo": "farolete_outdoor",
+      "compativel": [
+        {
+          "sku": "ALG-03/ALG-04",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALG-03/ALG-04"
+        },
+        {
+          "sku": "AFH-04/AFH-05",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-04/AFH-05"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "HM62-T": {
+      "serie": "HM",
+      "tipo": "farolete_outdoor",
+      "compativel": [
+        {
+          "sku": "ALD-02",
+          "grupo": "helmet_clips",
+          "nome": "Clips de capacete ALD-02"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "HM65R V2.0": {
+      "serie": "HM",
+      "tipo": "farolete_outdoor",
+      "compativel": [
+        {
+          "sku": "ALG-03/ALG-04",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALG-03/ALG-04"
+        },
+        {
+          "sku": "AFH-02/AFH-03",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-02/AFH-03"
+        },
+        {
+          "sku": "ALD-02",
+          "grupo": "helmet_clips",
+          "nome": "Clips de capacete ALD-02"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "°"
+        }
+      ]
+    },
+    "HM65R-T V2.0": {
+      "serie": "HM",
+      "tipo": "farolete_outdoor",
+      "compativel": [
+        {
+          "sku": "ALG-03/ALG-04",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALG-03/ALG-04"
+        },
+        {
+          "sku": "AFH-04/AFH-05",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-04/AFH-05"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "HM70R": {
+      "serie": "HM",
+      "tipo": "farolete_outdoor",
+      "compativel": [
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        },
+        {
+          "sku": "ALG-03/ALG-04",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALG-03/ALG-04"
+        },
+        {
+          "sku": "AFH-02/AFH-03",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-02/AFH-03"
+        },
+        {
+          "sku": "ALD-02",
+          "grupo": "helmet_clips",
+          "nome": "Clips de capacete ALD-02"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700",
+          "nota": "≈"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "HM71R": {
+      "serie": "HM",
+      "tipo": "farolete_outdoor",
+      "compativel": [
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        },
+        {
+          "sku": "ALG-03/ALG-04",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALG-03/ALG-04"
+        },
+        {
+          "sku": "ALD-02",
+          "grupo": "helmet_clips",
+          "nome": "Clips de capacete ALD-02"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700",
+          "nota": "≈"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "HM75R": {
+      "serie": "HM",
+      "tipo": "farolete_outdoor",
+      "compativel": [
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18",
+          "nota": "**"
+        },
+        {
+          "sku": "ALG-03/ALG-04",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALG-03/ALG-04"
+        },
+        {
+          "sku": "ALD-02",
+          "grupo": "helmet_clips",
+          "nome": "Clips de capacete ALD-02"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700",
+          "nota": "**"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "HP12R-T": {
+      "serie": "HP",
+      "tipo": "farolete_industrial",
+      "compativel": [
+        {
+          "sku": "AFH-02/AFH-03",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-02/AFH-03"
+        },
+        {
+          "sku": "ALD-02",
+          "grupo": "helmet_clips",
+          "nome": "Clips de capacete ALD-02"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "HP16R": {
+      "serie": "HP",
+      "tipo": "farolete_industrial",
+      "compativel": [
+        {
+          "sku": "ALD-02",
+          "grupo": "helmet_clips",
+          "nome": "Clips de capacete ALD-02"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L14 14500",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L14 14500"
+        }
+      ]
+    },
+    "HP25R V2.0": {
+      "serie": "HP",
+      "tipo": "farolete_industrial",
+      "compativel": [
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        },
+        {
+          "sku": "ALD-02",
+          "grupo": "helmet_clips",
+          "nome": "Clips de capacete ALD-02"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "HP35R": {
+      "serie": "HP",
+      "tipo": "farolete_industrial",
+      "compativel": [
+        {
+          "sku": "ALG-03/ALG-04",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALG-03/ALG-04",
+          "nota": "∞"
+        },
+        {
+          "sku": "AFH-04/AFH-05",
+          "grupo": "headband",
+          "nome": "Faixa de cabeça AFH-04/AFH-05"
+        }
+      ],
+      "baterias": []
+    },
+    "HT18R V2.0": {
+      "serie": "HT",
+      "tipo": "lanterna_caca",
+      "compativel": [
+        {
+          "sku": "AB02",
+          "grupo": "belt_clip",
+          "nome": "Clip de cinto AB02"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "HT32": {
+      "serie": "HT",
+      "tipo": "lanterna_caca",
+      "compativel": [
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-04",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-04",
+          "nota": "*"
+        },
+        {
+          "sku": "AER-05",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-05",
+          "nota": "*"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "LD12R": {
+      "serie": "LD",
+      "tipo": "lanterna_tatica_compacta",
+      "compativel": [],
+      "baterias": [
+        {
+          "sku": "ARB-L14 14500",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L14 14500"
+        }
+      ]
+    },
+    "LD22 V2.0": {
+      "serie": "LD",
+      "tipo": "lanterna_tatica_compacta",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": []
+    },
+    "LD30 RENEGADE": {
+      "serie": "LD",
+      "tipo": "lanterna_tatica_compacta",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        },
+        {
+          "sku": "AOT-S+",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-S+"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        }
+      ]
+    },
+    "LD30R": {
+      "serie": "LD",
+      "tipo": "lanterna_tatica_compacta",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        },
+        {
+          "sku": "AOT-S+",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-S+"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALP-10S",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10S"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "LD31 RENEGADE": {
+      "serie": "LD",
+      "tipo": "lanterna_tatica_compacta",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALP-10S",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10S"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700",
+          "nota": "~"
+        }
+      ]
+    },
+    "LD35R": {
+      "serie": "LD",
+      "tipo": "lanterna_tatica_compacta",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOT-M",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-M"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALP-10S",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10S"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "AB02",
+          "grupo": "belt_clip",
+          "nome": "Clip de cinto AB02"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "°"
+        }
+      ]
+    },
+    "LD36R": {
+      "serie": "LD",
+      "tipo": "lanterna_tatica_compacta",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOD-04",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-04"
+        },
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALP-10L",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10L"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "AB02",
+          "grupo": "belt_clip",
+          "nome": "Clip de cinto AB02"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "LD45R": {
+      "serie": "LD",
+      "tipo": "lanterna_tatica_compacta",
+      "compativel": [
+        {
+          "sku": "AB02",
+          "grupo": "belt_clip",
+          "nome": "Clip de cinto AB02"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "LR35R": {
+      "serie": "LR",
+      "tipo": "lanterna_busca_resgate",
+      "compativel": [
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700",
+          "nota": "≈"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "LR35R PRO": {
+      "serie": "LR",
+      "tipo": "lanterna_busca_resgate",
+      "compativel": [],
+      "baterias": [
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "LR36R": {
+      "serie": "LR",
+      "tipo": "lanterna_busca_resgate",
+      "compativel": [],
+      "baterias": [
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "LR40R V2.0": {
+      "serie": "LR",
+      "tipo": "lanterna_busca_resgate",
+      "compativel": [],
+      "baterias": []
+    },
+    "LR50R V2.0": {
+      "serie": "LR",
+      "tipo": "lanterna_busca_resgate",
+      "compativel": [],
+      "baterias": []
+    },
+    "LR60R": {
+      "serie": "LR",
+      "tipo": "lanterna_busca_resgate",
+      "compativel": [],
+      "baterias": []
+    },
+    "PD25R": {
+      "serie": "PD",
+      "tipo": "lanterna_tatica_edc",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L16 16340",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L16 16340"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "PD26R ACE": {
+      "serie": "PD",
+      "tipo": "lanterna_tatica_edc",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        },
+        {
+          "sku": "AOT-S+",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-S+"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "AB02",
+          "grupo": "belt_clip",
+          "nome": "Clip de cinto AB02"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18350",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18350"
+        }
+      ]
+    },
+    "PD32R": {
+      "serie": "PD",
+      "tipo": "lanterna_tatica_edc",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        },
+        {
+          "sku": "AOT-S+",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-S+"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-02 V2.0",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-02 V2.0"
+        },
+        {
+          "sku": "ALP-10S",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10S"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "°"
+        }
+      ]
+    },
+    "PD35 V3.0": {
+      "serie": "PD",
+      "tipo": "lanterna_tatica_edc",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        },
+        {
+          "sku": "AOT-S+",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-S+"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-02 V2.0",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-02 V2.0"
+        },
+        {
+          "sku": "ALP-10S",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10S"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "^"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "PD35R": {
+      "serie": "PD",
+      "tipo": "lanterna_tatica_edc",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        },
+        {
+          "sku": "AOT-S+",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-S+"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-02 V2.0",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-02 V2.0"
+        },
+        {
+          "sku": "ALP-10S",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10S"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "°"
+        }
+      ]
+    },
+    "PD35R ACE": {
+      "serie": "PD",
+      "tipo": "lanterna_tatica_edc",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        },
+        {
+          "sku": "AOT-S+",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-S+"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-02 V2.0",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-02 V2.0"
+        },
+        {
+          "sku": "ALP-10S",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10S"
+        },
+        {
+          "sku": "AB02",
+          "grupo": "belt_clip",
+          "nome": "Clip de cinto AB02"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALW-01",
+          "grupo": "wrist_mount",
+          "nome": "Suporte de pulso ALW-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "°"
+        }
+      ]
+    },
+    "PD36R ACE": {
+      "serie": "PD",
+      "tipo": "lanterna_tatica_edc",
+      "compativel": [
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALP-10L",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10L"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "AB02",
+          "grupo": "belt_clip",
+          "nome": "Clip de cinto AB02"
+        },
+        {
+          "sku": "ALR-01",
+          "grupo": "tac_ring",
+          "nome": "Anel tático ALR-01"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "PD36R PRO": {
+      "serie": "PD",
+      "tipo": "lanterna_tatica_edc",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        },
+        {
+          "sku": "AOT-S+",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-S+"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-04",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-04"
+        },
+        {
+          "sku": "AER-05",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-05"
+        },
+        {
+          "sku": "ALP-10L",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10L"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALR-01",
+          "grupo": "tac_ring",
+          "nome": "Anel tático ALR-01"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700",
+          "nota": "≈"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "PD36R V2.0": {
+      "serie": "PD",
+      "tipo": "lanterna_tatica_edc",
+      "compativel": [
+        {
+          "sku": "AOD-S V2.0",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-S V2.0"
+        },
+        {
+          "sku": "AOFS+ V2.0",
+          "grupo": "filter_adapter",
+          "nome": "Adaptador de filtro AOFS+ V2.0"
+        },
+        {
+          "sku": "AOT-S+",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-S+"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALP-10L",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10L"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "PD40R V3.0": {
+      "serie": "PD",
+      "tipo": "lanterna_tatica_edc",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALP-10L",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10L"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "PD45R ACE": {
+      "serie": "PD",
+      "tipo": "lanterna_tatica_edc",
+      "compativel": [
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-04",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-04"
+        },
+        {
+          "sku": "AER-05",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-05"
+        },
+        {
+          "sku": "ALR-01",
+          "grupo": "tac_ring",
+          "nome": "Anel tático ALR-01"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "SW05R-RED": {
+      "serie": "SW",
+      "tipo": "lanterna_inspecao",
+      "compativel": [],
+      "baterias": []
+    },
+    "SW05R-UV": {
+      "serie": "SW",
+      "tipo": "lanterna_inspecao",
+      "compativel": [],
+      "baterias": []
+    },
+    "TK05R": {
+      "serie": "TK",
+      "tipo": "lanterna_tatica_pesada",
+      "compativel": [
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18350",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18350"
+        }
+      ]
+    },
+    "TK11R": {
+      "serie": "TK",
+      "tipo": "lanterna_tatica_pesada",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOT-M",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-M"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-02 V2.0",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-02 V2.0"
+        },
+        {
+          "sku": "ALP-10L",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10L"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "TK15R": {
+      "serie": "TK",
+      "tipo": "lanterna_tatica_pesada",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOT-M",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-M"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALP-10L",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10L"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "TK16 V2.0": {
+      "serie": "TK",
+      "tipo": "lanterna_tatica_pesada",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOT-M",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-M"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-04",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-04"
+        },
+        {
+          "sku": "AER-05",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-05"
+        },
+        {
+          "sku": "ALP-10L",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10L"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALR-01",
+          "grupo": "tac_ring",
+          "nome": "Anel tático ALR-01"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700",
+          "nota": "≈"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "TK17": {
+      "serie": "TK",
+      "tipo": "lanterna_tatica_pesada",
+      "compativel": [
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-04",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-04"
+        },
+        {
+          "sku": "AER-05",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-05"
+        },
+        {
+          "sku": "ALP-10L",
+          "grupo": "holster",
+          "nome": "Coldre ALP-10L"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "AB02",
+          "grupo": "belt_clip",
+          "nome": "Clip de cinto AB02"
+        },
+        {
+          "sku": "ALR-01",
+          "grupo": "tac_ring",
+          "nome": "Anel tático ALR-01"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "TK20R V2.0": {
+      "serie": "TK",
+      "tipo": "lanterna_tatica_pesada",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOT-M",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-M"
+        },
+        {
+          "sku": "AOT-03",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-03"
+        },
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-04",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-04"
+        },
+        {
+          "sku": "AER-05",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-05"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALR-01",
+          "grupo": "tac_ring",
+          "nome": "Anel tático ALR-01"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700",
+          "nota": "≈"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "TK21R": {
+      "serie": "TK",
+      "tipo": "lanterna_tatica_pesada",
+      "compativel": [
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-04",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-04"
+        },
+        {
+          "sku": "AER-05",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-05"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALR-01",
+          "grupo": "tac_ring",
+          "nome": "Anel tático ALR-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "TK22R": {
+      "serie": "TK",
+      "tipo": "lanterna_tatica_pesada",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOD-04",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-04"
+        },
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-04",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-04"
+        },
+        {
+          "sku": "AER-05",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-05"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALR-01",
+          "grupo": "tac_ring",
+          "nome": "Anel tático ALR-01"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "TK25R": {
+      "serie": "TK",
+      "tipo": "lanterna_tatica_pesada",
+      "compativel": [
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AB02",
+          "grupo": "belt_clip",
+          "nome": "Clip de cinto AB02"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        }
+      ]
+    },
+    "TK26R": {
+      "serie": "TK",
+      "tipo": "lanterna_tatica_pesada",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOD-04",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-04"
+        },
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "TK30R": {
+      "serie": "TK",
+      "tipo": "lanterna_tatica_pesada",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOD-04",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-04"
+        },
+        {
+          "sku": "AOT-04",
+          "grupo": "traffic_wand",
+          "nome": "Cone de sinalização AOT-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "AER-04",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-04"
+        },
+        {
+          "sku": "AER-05",
+          "grupo": "remote_switch",
+          "nome": "Acionador remoto AER-05"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALR-01",
+          "grupo": "tac_ring",
+          "nome": "Anel tático ALR-01"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "TK35R": {
+      "serie": "TK",
+      "tipo": "lanterna_tatica_pesada",
+      "compativel": [],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "°"
+        }
+      ]
+    },
+    "TK35UE V2.0": {
+      "serie": "TK",
+      "tipo": "lanterna_tatica_pesada",
+      "compativel": [],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "^"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    },
+    "WF05E": {
+      "serie": "WF",
+      "tipo": "lanterna_areas_explosivas",
+      "compativel": [],
+      "baterias": []
+    },
+    "WF11E": {
+      "serie": "WF",
+      "tipo": "lanterna_areas_explosivas",
+      "compativel": [],
+      "baterias": []
+    },
+    "WF25RM": {
+      "serie": "WF",
+      "tipo": "lanterna_areas_explosivas",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOD-04",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALR-01",
+          "grupo": "tac_ring",
+          "nome": "Anel tático ALR-01"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700"
+        }
+      ]
+    },
+    "WF26R": {
+      "serie": "WF",
+      "tipo": "lanterna_areas_explosivas",
+      "compativel": [
+        {
+          "sku": "AOD-M",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-M"
+        },
+        {
+          "sku": "AOD-04",
+          "grupo": "diffuser_tip",
+          "nome": "Difusor AOD-04"
+        },
+        {
+          "sku": "ALG-00",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-00"
+        },
+        {
+          "sku": "ALG-15",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-15"
+        },
+        {
+          "sku": "ALG-16",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-16"
+        },
+        {
+          "sku": "ALG-18",
+          "grupo": "rail_mount",
+          "nome": "Suporte de trilho ALG-18"
+        },
+        {
+          "sku": "ALP-20",
+          "grupo": "holster",
+          "nome": "Coldre ALP-20"
+        },
+        {
+          "sku": "ALR-01",
+          "grupo": "tac_ring",
+          "nome": "Anel tático ALR-01"
+        },
+        {
+          "sku": "ALB-10",
+          "grupo": "bike_mount",
+          "nome": "Suporte de bike ALB-10"
+        },
+        {
+          "sku": "ALD-05",
+          "grupo": "helmet_mount",
+          "nome": "Suporte de capacete ALD-05"
+        },
+        {
+          "sku": "ALF-18",
+          "grupo": "battery_holder",
+          "nome": "Suporte de bateria ALF-18"
+        }
+      ],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650",
+          "nota": "*"
+        },
+        {
+          "sku": "ARB-L21 21700",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L21 21700",
+          "nota": "≈"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A",
+          "nota": "*"
+        }
+      ]
+    },
+    "WH23R": {
+      "serie": "WH",
+      "tipo": "farolete_leve",
+      "compativel": [
+        {
+          "sku": "ALG-03/ALG-04",
+          "grupo": "helmet_mount_hl",
+          "nome": "Suporte de capacete ALG-03/ALG-04"
+        },
+        {
+          "sku": "ALD-02",
+          "grupo": "helmet_clips",
+          "nome": "Clips de capacete ALD-02"
+        },
+        {
+          "sku": "APB-20",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-20"
+        },
+        {
+          "sku": "APB-30",
+          "grupo": "gear_bag",
+          "nome": "Bolsa APB-30"
+        }
+      ],
+      "baterias": []
+    },
+    "WT16R": {
+      "serie": "WT",
+      "tipo": "lanterna_trabalho",
+      "compativel": [],
+      "baterias": []
+    },
+    "WT25R": {
+      "serie": "WT",
+      "tipo": "lanterna_trabalho",
+      "compativel": [],
+      "baterias": [
+        {
+          "sku": "ARB-L18 18650",
+          "grupo": "bateria_li_ion",
+          "nome": "Bateria ARB-L18 18650"
+        },
+        {
+          "sku": "CR123A",
+          "grupo": "bateria_cr123a",
+          "nome": "Bateria CR123A"
+        }
+      ]
+    }
+  },
+  "acessorios": {
+    "AB02": {
+      "grupo": "belt_clip",
+      "nome": "Clip de cinto AB02",
+      "serve_em": [
+        {
+          "modelo": "HT18R V2.0"
+        },
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "LD45R"
+        },
+        {
+          "modelo": "PD26R ACE"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "TK17"
+        },
+        {
+          "modelo": "TK25R"
+        }
+      ]
+    },
+    "AER-02 V2.0": {
+      "grupo": "remote_switch",
+      "nome": "Acionador remoto AER-02 V2.0",
+      "serve_em": [
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        },
+        {
+          "modelo": "TK11R"
+        }
+      ]
+    },
+    "AER-04": {
+      "grupo": "remote_switch",
+      "nome": "Acionador remoto AER-04",
+      "serve_em": [
+        {
+          "modelo": "HT32",
+          "nota": "*"
+        },
+        {
+          "modelo": "PD36R PRO"
+        },
+        {
+          "modelo": "PD45R ACE"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK17"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        },
+        {
+          "modelo": "TK21R"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK30R"
+        }
+      ]
+    },
+    "AER-05": {
+      "grupo": "remote_switch",
+      "nome": "Acionador remoto AER-05",
+      "serve_em": [
+        {
+          "modelo": "HT32",
+          "nota": "*"
+        },
+        {
+          "modelo": "PD36R PRO"
+        },
+        {
+          "modelo": "PD45R ACE"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK17"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        },
+        {
+          "modelo": "TK21R"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK30R"
+        }
+      ]
+    },
+    "AFH-02/AFH-03": {
+      "grupo": "headband",
+      "nome": "Faixa de cabeça AFH-02/AFH-03",
+      "serve_em": [
+        {
+          "modelo": "HL12R V2.0"
+        },
+        {
+          "modelo": "HL18R-T V2.0"
+        },
+        {
+          "modelo": "HM60R V2.0"
+        },
+        {
+          "modelo": "HM65R V2.0"
+        },
+        {
+          "modelo": "HM70R"
+        },
+        {
+          "modelo": "HP12R-T"
+        }
+      ]
+    },
+    "AFH-04/AFH-05": {
+      "grupo": "headband",
+      "nome": "Faixa de cabeça AFH-04/AFH-05",
+      "serve_em": [
+        {
+          "modelo": "HL16"
+        },
+        {
+          "modelo": "HL32R-T"
+        },
+        {
+          "modelo": "HL45R"
+        },
+        {
+          "modelo": "HM55R"
+        },
+        {
+          "modelo": "HM55R RENEGADE"
+        },
+        {
+          "modelo": "HM61R V3.0"
+        },
+        {
+          "modelo": "HM65R-T V2.0"
+        },
+        {
+          "modelo": "HP35R"
+        }
+      ]
+    },
+    "ALB-10": {
+      "grupo": "bike_mount",
+      "nome": "Suporte de bike ALB-10",
+      "serve_em": [
+        {
+          "modelo": "C7"
+        },
+        {
+          "modelo": "C7 V2.0"
+        },
+        {
+          "modelo": "C7 PRO"
+        },
+        {
+          "modelo": "E12 V3.0"
+        },
+        {
+          "modelo": "E18R V2.0"
+        },
+        {
+          "modelo": "E20 V2.0"
+        },
+        {
+          "modelo": "E28R V2.0"
+        },
+        {
+          "modelo": "E35R"
+        },
+        {
+          "modelo": "HT18R V2.0"
+        },
+        {
+          "modelo": "HT32"
+        },
+        {
+          "modelo": "LD22 V2.0"
+        },
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD30 RENEGADE"
+        },
+        {
+          "modelo": "LD31 RENEGADE"
+        },
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "PD25R"
+        },
+        {
+          "modelo": "PD26R ACE"
+        },
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        },
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO"
+        },
+        {
+          "modelo": "PD40R V3.0"
+        },
+        {
+          "modelo": "PD45R ACE"
+        },
+        {
+          "modelo": "TK05R"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK15R"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK17"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK25R"
+        },
+        {
+          "modelo": "TK26R"
+        },
+        {
+          "modelo": "WF25RM"
+        },
+        {
+          "modelo": "WF26R"
+        }
+      ]
+    },
+    "ALD-02": {
+      "grupo": "helmet_clips",
+      "nome": "Clips de capacete ALD-02",
+      "serve_em": [
+        {
+          "modelo": "HM23 V2.0"
+        },
+        {
+          "modelo": "HM50R V2.0"
+        },
+        {
+          "modelo": "HM53R"
+        },
+        {
+          "modelo": "HM60R V2.0"
+        },
+        {
+          "modelo": "HM62-T"
+        },
+        {
+          "modelo": "HM65R V2.0"
+        },
+        {
+          "modelo": "HM70R"
+        },
+        {
+          "modelo": "HM71R"
+        },
+        {
+          "modelo": "HM75R"
+        },
+        {
+          "modelo": "HP12R-T"
+        },
+        {
+          "modelo": "HP16R"
+        },
+        {
+          "modelo": "HP25R V2.0"
+        },
+        {
+          "modelo": "WH23R"
+        }
+      ]
+    },
+    "ALD-05": {
+      "grupo": "helmet_mount",
+      "nome": "Suporte de capacete ALD-05",
+      "serve_em": [
+        {
+          "modelo": "C7"
+        },
+        {
+          "modelo": "C7 V2.0"
+        },
+        {
+          "modelo": "C7 PRO"
+        },
+        {
+          "modelo": "E12 V3.0"
+        },
+        {
+          "modelo": "E18R V2.0"
+        },
+        {
+          "modelo": "E20 V2.0"
+        },
+        {
+          "modelo": "E28R V2.0"
+        },
+        {
+          "modelo": "E35R"
+        },
+        {
+          "modelo": "HT32"
+        },
+        {
+          "modelo": "LD22 V2.0"
+        },
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD30 RENEGADE"
+        },
+        {
+          "modelo": "LD31 RENEGADE"
+        },
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "PD25R"
+        },
+        {
+          "modelo": "PD26R ACE"
+        },
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        },
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO"
+        },
+        {
+          "modelo": "PD40R V3.0"
+        },
+        {
+          "modelo": "PD45R ACE"
+        },
+        {
+          "modelo": "TK05R"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK15R"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK17"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        },
+        {
+          "modelo": "TK21R"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK25R"
+        },
+        {
+          "modelo": "TK26R"
+        },
+        {
+          "modelo": "TK30R"
+        },
+        {
+          "modelo": "WF25RM"
+        },
+        {
+          "modelo": "WF26R"
+        }
+      ]
+    },
+    "ALD-08": {
+      "grupo": "helmet_mount_hl",
+      "nome": "Suporte de capacete ALD-08",
+      "serve_em": [
+        {
+          "modelo": "BC25R"
+        },
+        {
+          "modelo": "BC26R"
+        },
+        {
+          "modelo": "BC28R"
+        },
+        {
+          "modelo": "BC30 V2.0"
+        },
+        {
+          "modelo": "BC45R"
+        }
+      ]
+    },
+    "ALD-10": {
+      "grupo": "gopro_mount",
+      "nome": "Suporte GoPro ALD-10",
+      "serve_em": [
+        {
+          "modelo": "BC25R"
+        },
+        {
+          "modelo": "BC26R"
+        },
+        {
+          "modelo": "BC28R"
+        },
+        {
+          "modelo": "BC30 V2.0"
+        },
+        {
+          "modelo": "BC45R"
+        }
+      ]
+    },
+    "ALF-18": {
+      "grupo": "battery_holder",
+      "nome": "Suporte de bateria ALF-18",
+      "serve_em": [
+        {
+          "modelo": "C7"
+        },
+        {
+          "modelo": "C7 V2.0"
+        },
+        {
+          "modelo": "C7 PRO"
+        },
+        {
+          "modelo": "E35R"
+        },
+        {
+          "modelo": "HT18R V2.0"
+        },
+        {
+          "modelo": "HT32"
+        },
+        {
+          "modelo": "LD31 RENEGADE"
+        },
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "LR35R"
+        },
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO"
+        },
+        {
+          "modelo": "PD40R V3.0"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        },
+        {
+          "modelo": "TK25R"
+        },
+        {
+          "modelo": "TK30R"
+        },
+        {
+          "modelo": "WF25RM"
+        },
+        {
+          "modelo": "WF26R"
+        },
+        {
+          "modelo": "HM70R"
+        },
+        {
+          "modelo": "HM71R"
+        },
+        {
+          "modelo": "HM75R",
+          "nota": "**"
+        },
+        {
+          "modelo": "HP25R V2.0"
+        },
+        {
+          "modelo": "CL26R PRO"
+        },
+        {
+          "modelo": "CL27R"
+        },
+        {
+          "modelo": "BC26R"
+        }
+      ]
+    },
+    "ALG-00": {
+      "grupo": "rail_mount",
+      "nome": "Suporte de trilho ALG-00",
+      "serve_em": [
+        {
+          "modelo": "C7"
+        },
+        {
+          "modelo": "C7 V2.0"
+        },
+        {
+          "modelo": "C7 PRO"
+        },
+        {
+          "modelo": "E28R V2.0"
+        },
+        {
+          "modelo": "E35R"
+        },
+        {
+          "modelo": "HT32"
+        },
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD30 RENEGADE"
+        },
+        {
+          "modelo": "LD31 RENEGADE"
+        },
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "PD25R"
+        },
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        },
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO"
+        },
+        {
+          "modelo": "PD40R V3.0"
+        },
+        {
+          "modelo": "PD45R ACE"
+        },
+        {
+          "modelo": "TK05R"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK17"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        },
+        {
+          "modelo": "TK21R"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK25R"
+        },
+        {
+          "modelo": "TK26R"
+        },
+        {
+          "modelo": "TK30R"
+        },
+        {
+          "modelo": "WF25RM"
+        },
+        {
+          "modelo": "WF26R"
+        }
+      ]
+    },
+    "ALG-03/ALG-04": {
+      "grupo": "helmet_mount_hl",
+      "nome": "Suporte de capacete ALG-03/ALG-04",
+      "serve_em": [
+        {
+          "modelo": "HM60R V2.0"
+        },
+        {
+          "modelo": "HM61R V3.0"
+        },
+        {
+          "modelo": "HM65R V2.0"
+        },
+        {
+          "modelo": "HM65R-T V2.0"
+        },
+        {
+          "modelo": "HM70R"
+        },
+        {
+          "modelo": "HM71R"
+        },
+        {
+          "modelo": "HM75R"
+        },
+        {
+          "modelo": "HP35R",
+          "nota": "∞"
+        },
+        {
+          "modelo": "WH23R"
+        }
+      ]
+    },
+    "ALG-15": {
+      "grupo": "rail_mount",
+      "nome": "Suporte de trilho ALG-15",
+      "serve_em": [
+        {
+          "modelo": "C7"
+        },
+        {
+          "modelo": "C7 V2.0"
+        },
+        {
+          "modelo": "C7 PRO"
+        },
+        {
+          "modelo": "E28R V2.0"
+        },
+        {
+          "modelo": "E35R"
+        },
+        {
+          "modelo": "HT32"
+        },
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD30 RENEGADE"
+        },
+        {
+          "modelo": "LD31 RENEGADE"
+        },
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "PD25R"
+        },
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        },
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO"
+        },
+        {
+          "modelo": "PD40R V3.0"
+        },
+        {
+          "modelo": "PD45R ACE"
+        },
+        {
+          "modelo": "TK05R"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK17"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        },
+        {
+          "modelo": "TK21R"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK26R"
+        },
+        {
+          "modelo": "TK30R"
+        },
+        {
+          "modelo": "WF25RM"
+        },
+        {
+          "modelo": "WF26R"
+        }
+      ]
+    },
+    "ALG-16": {
+      "grupo": "rail_mount",
+      "nome": "Suporte de trilho ALG-16",
+      "serve_em": [
+        {
+          "modelo": "C7"
+        },
+        {
+          "modelo": "C7 V2.0"
+        },
+        {
+          "modelo": "C7 PRO"
+        },
+        {
+          "modelo": "E28R V2.0"
+        },
+        {
+          "modelo": "E35R"
+        },
+        {
+          "modelo": "HT32"
+        },
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD30 RENEGADE"
+        },
+        {
+          "modelo": "LD31 RENEGADE"
+        },
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "PD25R"
+        },
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        },
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO"
+        },
+        {
+          "modelo": "PD40R V3.0"
+        },
+        {
+          "modelo": "PD45R ACE"
+        },
+        {
+          "modelo": "TK05R"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK17"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        },
+        {
+          "modelo": "TK21R"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK26R"
+        },
+        {
+          "modelo": "TK30R"
+        },
+        {
+          "modelo": "WF25RM"
+        },
+        {
+          "modelo": "WF26R"
+        }
+      ]
+    },
+    "ALG-18": {
+      "grupo": "rail_mount",
+      "nome": "Suporte de trilho ALG-18",
+      "serve_em": [
+        {
+          "modelo": "C7"
+        },
+        {
+          "modelo": "C7 V2.0"
+        },
+        {
+          "modelo": "C7 PRO"
+        },
+        {
+          "modelo": "E28R V2.0"
+        },
+        {
+          "modelo": "E35R"
+        },
+        {
+          "modelo": "HT32"
+        },
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD30 RENEGADE"
+        },
+        {
+          "modelo": "LD31 RENEGADE"
+        },
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "PD25R"
+        },
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        },
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO"
+        },
+        {
+          "modelo": "PD40R V3.0"
+        },
+        {
+          "modelo": "PD45R ACE"
+        },
+        {
+          "modelo": "TK05R"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK17"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        },
+        {
+          "modelo": "TK21R"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK25R"
+        },
+        {
+          "modelo": "TK26R"
+        },
+        {
+          "modelo": "TK30R"
+        },
+        {
+          "modelo": "WF25RM"
+        },
+        {
+          "modelo": "WF26R"
+        }
+      ]
+    },
+    "ALP-10L": {
+      "grupo": "holster",
+      "nome": "Coldre ALP-10L",
+      "serve_em": [
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO"
+        },
+        {
+          "modelo": "PD40R V3.0"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK15R"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK17"
+        }
+      ]
+    },
+    "ALP-10S": {
+      "grupo": "holster",
+      "nome": "Coldre ALP-10S",
+      "serve_em": [
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD31 RENEGADE"
+        },
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        }
+      ]
+    },
+    "ALP-20": {
+      "grupo": "holster",
+      "nome": "Coldre ALP-20",
+      "serve_em": [
+        {
+          "modelo": "C7"
+        },
+        {
+          "modelo": "C7 V2.0"
+        },
+        {
+          "modelo": "C7 PRO"
+        },
+        {
+          "modelo": "HT32"
+        },
+        {
+          "modelo": "LD31 RENEGADE"
+        },
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "PD26R ACE"
+        },
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO"
+        },
+        {
+          "modelo": "PD40R V3.0"
+        },
+        {
+          "modelo": "TK05R"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK15R"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK17"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        },
+        {
+          "modelo": "TK21R"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK30R"
+        },
+        {
+          "modelo": "WF26R"
+        }
+      ]
+    },
+    "ALR-01": {
+      "grupo": "tac_ring",
+      "nome": "Anel tático ALR-01",
+      "serve_em": [
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "PD36R PRO"
+        },
+        {
+          "modelo": "PD45R ACE"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK17"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        },
+        {
+          "modelo": "TK21R"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK30R"
+        },
+        {
+          "modelo": "WF25RM"
+        },
+        {
+          "modelo": "WF26R"
+        }
+      ]
+    },
+    "ALW-01": {
+      "grupo": "wrist_mount",
+      "nome": "Suporte de pulso ALW-01",
+      "serve_em": [
+        {
+          "modelo": "E12 V3.0"
+        },
+        {
+          "modelo": "E18R V2.0"
+        },
+        {
+          "modelo": "E20 V2.0"
+        },
+        {
+          "modelo": "E28R V2.0"
+        },
+        {
+          "modelo": "E35R"
+        },
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD30 RENEGADE"
+        },
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "PD25R"
+        },
+        {
+          "modelo": "PD26R ACE"
+        },
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        }
+      ]
+    },
+    "AOD-04": {
+      "grupo": "diffuser_tip",
+      "nome": "Difusor AOD-04",
+      "serve_em": [
+        {
+          "modelo": "C7"
+        },
+        {
+          "modelo": "C7 V2.0"
+        },
+        {
+          "modelo": "C7 PRO"
+        },
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK26R"
+        },
+        {
+          "modelo": "TK30R"
+        },
+        {
+          "modelo": "WF25RM"
+        },
+        {
+          "modelo": "WF26R"
+        }
+      ]
+    },
+    "AOD-M": {
+      "grupo": "diffuser_tip",
+      "nome": "Difusor AOD-M",
+      "serve_em": [
+        {
+          "modelo": "C7"
+        },
+        {
+          "modelo": "C7 V2.0"
+        },
+        {
+          "modelo": "C7 PRO"
+        },
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "PD40R V3.0"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK15R"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK26R"
+        },
+        {
+          "modelo": "TK30R"
+        },
+        {
+          "modelo": "WF25RM"
+        },
+        {
+          "modelo": "WF26R"
+        }
+      ]
+    },
+    "AOD-S V2.0": {
+      "grupo": "diffuser_tip",
+      "nome": "Difusor AOD-S V2.0",
+      "serve_em": [
+        {
+          "modelo": "E28R V2.0"
+        },
+        {
+          "modelo": "E35R"
+        },
+        {
+          "modelo": "LD22 V2.0"
+        },
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD30 RENEGADE"
+        },
+        {
+          "modelo": "LD31 RENEGADE"
+        },
+        {
+          "modelo": "PD25R"
+        },
+        {
+          "modelo": "PD26R ACE"
+        },
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO"
+        }
+      ]
+    },
+    "AOFS+ V2.0": {
+      "grupo": "filter_adapter",
+      "nome": "Adaptador de filtro AOFS+ V2.0",
+      "serve_em": [
+        {
+          "modelo": "E28R V2.0"
+        },
+        {
+          "modelo": "E35R"
+        },
+        {
+          "modelo": "GL19R V2.0"
+        },
+        {
+          "modelo": "GL22"
+        },
+        {
+          "modelo": "GL23R"
+        },
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD30 RENEGADE"
+        },
+        {
+          "modelo": "LD31 RENEGADE"
+        },
+        {
+          "modelo": "PD26R ACE"
+        },
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO"
+        }
+      ]
+    },
+    "AOT-03": {
+      "grupo": "traffic_wand",
+      "nome": "Cone de sinalização AOT-03",
+      "serve_em": [
+        {
+          "modelo": "E28R V2.0"
+        },
+        {
+          "modelo": "E35R"
+        },
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD30 RENEGADE"
+        },
+        {
+          "modelo": "LD31 RENEGADE"
+        },
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "PD25R"
+        },
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        },
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO"
+        },
+        {
+          "modelo": "TK05R"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK15R"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        }
+      ]
+    },
+    "AOT-04": {
+      "grupo": "traffic_wand",
+      "nome": "Cone de sinalização AOT-04",
+      "serve_em": [
+        {
+          "modelo": "C7"
+        },
+        {
+          "modelo": "C7 V2.0"
+        },
+        {
+          "modelo": "C7 PRO"
+        },
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "PD40R V3.0"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK15R"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK17"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        },
+        {
+          "modelo": "TK21R"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK25R"
+        },
+        {
+          "modelo": "TK26R"
+        },
+        {
+          "modelo": "TK30R"
+        }
+      ]
+    },
+    "AOT-M": {
+      "grupo": "traffic_wand",
+      "nome": "Cone de sinalização AOT-M",
+      "serve_em": [
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK15R"
+        },
+        {
+          "modelo": "TK16 V2.0"
+        },
+        {
+          "modelo": "TK20R V2.0"
+        }
+      ]
+    },
+    "AOT-S+": {
+      "grupo": "traffic_wand",
+      "nome": "Cone de sinalização AOT-S+",
+      "serve_em": [
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD30 RENEGADE"
+        },
+        {
+          "modelo": "PD26R ACE"
+        },
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO"
+        }
+      ]
+    },
+    "APB-20": {
+      "grupo": "gear_bag",
+      "nome": "Bolsa APB-20",
+      "serve_em": [
+        {
+          "modelo": "HL12R V2.0"
+        },
+        {
+          "modelo": "HL16"
+        },
+        {
+          "modelo": "HL18R-T V2.0"
+        },
+        {
+          "modelo": "HL32R-T"
+        },
+        {
+          "modelo": "HL45R"
+        },
+        {
+          "modelo": "HM23 V2.0"
+        },
+        {
+          "modelo": "HM50R V2.0"
+        },
+        {
+          "modelo": "HM53R"
+        },
+        {
+          "modelo": "HM55R"
+        },
+        {
+          "modelo": "HM55R RENEGADE"
+        },
+        {
+          "modelo": "HM60R V2.0"
+        },
+        {
+          "modelo": "HM62-T"
+        },
+        {
+          "modelo": "HM65R V2.0"
+        },
+        {
+          "modelo": "HM65R-T V2.0"
+        },
+        {
+          "modelo": "WH23R"
+        },
+        {
+          "modelo": "CL22R"
+        },
+        {
+          "modelo": "BC05R V2.0"
+        },
+        {
+          "modelo": "BC06R"
+        }
+      ]
+    },
+    "APB-30": {
+      "grupo": "gear_bag",
+      "nome": "Bolsa APB-30",
+      "serve_em": [
+        {
+          "modelo": "HL12R V2.0"
+        },
+        {
+          "modelo": "HL16"
+        },
+        {
+          "modelo": "HL18R-T V2.0"
+        },
+        {
+          "modelo": "HL32R-T"
+        },
+        {
+          "modelo": "HL45R"
+        },
+        {
+          "modelo": "HM23 V2.0"
+        },
+        {
+          "modelo": "HM50R V2.0"
+        },
+        {
+          "modelo": "HM53R"
+        },
+        {
+          "modelo": "HM55R"
+        },
+        {
+          "modelo": "HM55R RENEGADE"
+        },
+        {
+          "modelo": "HM60R V2.0"
+        },
+        {
+          "modelo": "HM61R V3.0"
+        },
+        {
+          "modelo": "HM62-T"
+        },
+        {
+          "modelo": "HM65R V2.0"
+        },
+        {
+          "modelo": "HM65R-T V2.0"
+        },
+        {
+          "modelo": "HM70R"
+        },
+        {
+          "modelo": "HM71R"
+        },
+        {
+          "modelo": "HM75R"
+        },
+        {
+          "modelo": "HP12R-T"
+        },
+        {
+          "modelo": "HP16R"
+        },
+        {
+          "modelo": "HP25R V2.0"
+        },
+        {
+          "modelo": "WH23R"
+        },
+        {
+          "modelo": "CL20R V2.0"
+        },
+        {
+          "modelo": "CL22R"
+        },
+        {
+          "modelo": "CL26R PRO"
+        },
+        {
+          "modelo": "CL27R"
+        },
+        {
+          "modelo": "CL28R"
+        },
+        {
+          "modelo": "BC05R V2.0"
+        },
+        {
+          "modelo": "BC06R"
+        },
+        {
+          "modelo": "BC22R"
+        },
+        {
+          "modelo": "BC25R"
+        },
+        {
+          "modelo": "BC26R"
+        },
+        {
+          "modelo": "BC28R"
+        },
+        {
+          "modelo": "BC30 V2.0"
+        },
+        {
+          "modelo": "BC45R"
+        }
+      ]
+    },
+    "ARB-L14 14500": {
+      "grupo": "bateria_li_ion",
+      "nome": "Bateria ARB-L14 14500",
+      "serve_em": [
+        {
+          "modelo": "E12 V3.0"
+        },
+        {
+          "modelo": "HM23 V2.0"
+        },
+        {
+          "modelo": "LD12R"
+        },
+        {
+          "modelo": "HP16R"
+        }
+      ]
+    },
+    "ARB-L16 16340": {
+      "grupo": "bateria_li_ion",
+      "nome": "Bateria ARB-L16 16340",
+      "serve_em": [
+        {
+          "modelo": "E18R V2.0"
+        },
+        {
+          "modelo": "GL07"
+        },
+        {
+          "modelo": "GL22"
+        },
+        {
+          "modelo": "PD25R"
+        },
+        {
+          "modelo": "HM50R V2.0"
+        },
+        {
+          "modelo": "HM53R"
+        },
+        {
+          "modelo": "HM55R"
+        },
+        {
+          "modelo": "HM55R RENEGADE"
+        },
+        {
+          "modelo": "GL06"
+        }
+      ]
+    },
+    "ARB-L18 18350": {
+      "grupo": "bateria_li_ion",
+      "nome": "Bateria ARB-L18 18350",
+      "serve_em": [
+        {
+          "modelo": "GL19R V2.0"
+        },
+        {
+          "modelo": "GL23R"
+        },
+        {
+          "modelo": "PD26R ACE"
+        },
+        {
+          "modelo": "TK05R"
+        },
+        {
+          "modelo": "HM53R"
+        },
+        {
+          "modelo": "HM55R"
+        },
+        {
+          "modelo": "HM55R RENEGADE"
+        }
+      ]
+    },
+    "ARB-L18 18650": {
+      "grupo": "bateria_li_ion",
+      "nome": "Bateria ARB-L18 18650",
+      "serve_em": [
+        {
+          "modelo": "C7",
+          "nota": "*"
+        },
+        {
+          "modelo": "C7 V2.0",
+          "nota": "*"
+        },
+        {
+          "modelo": "C7 PRO",
+          "nota": "*"
+        },
+        {
+          "modelo": "E28R V2.0"
+        },
+        {
+          "modelo": "E35R",
+          "nota": "*"
+        },
+        {
+          "modelo": "GL30R"
+        },
+        {
+          "modelo": "HT18R V2.0"
+        },
+        {
+          "modelo": "HT32",
+          "nota": "*"
+        },
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD30 RENEGADE"
+        },
+        {
+          "modelo": "LD35R"
+        },
+        {
+          "modelo": "LD36R",
+          "nota": "*"
+        },
+        {
+          "modelo": "LR35R",
+          "nota": "*"
+        },
+        {
+          "modelo": "PD32R"
+        },
+        {
+          "modelo": "PD35 V3.0",
+          "nota": "^"
+        },
+        {
+          "modelo": "PD35R ACE"
+        },
+        {
+          "modelo": "PD35R"
+        },
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "PD36R V2.0",
+          "nota": "*"
+        },
+        {
+          "modelo": "PD36R PRO",
+          "nota": "*"
+        },
+        {
+          "modelo": "PD40R V3.0",
+          "nota": "*"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK16 V2.0",
+          "nota": "*"
+        },
+        {
+          "modelo": "TK20R V2.0",
+          "nota": "*"
+        },
+        {
+          "modelo": "TK25R"
+        },
+        {
+          "modelo": "TK26R"
+        },
+        {
+          "modelo": "TK30R",
+          "nota": "*"
+        },
+        {
+          "modelo": "TK35R"
+        },
+        {
+          "modelo": "TK35UE V2.0",
+          "nota": "^"
+        },
+        {
+          "modelo": "WF25RM",
+          "nota": "*"
+        },
+        {
+          "modelo": "WF26R",
+          "nota": "*"
+        },
+        {
+          "modelo": "WT25R"
+        },
+        {
+          "modelo": "HM60R V2.0"
+        },
+        {
+          "modelo": "HM61R V3.0"
+        },
+        {
+          "modelo": "HM62-T"
+        },
+        {
+          "modelo": "HM65R V2.0"
+        },
+        {
+          "modelo": "HM65R-T V2.0"
+        },
+        {
+          "modelo": "HM70R",
+          "nota": "*"
+        },
+        {
+          "modelo": "HM71R",
+          "nota": "*"
+        },
+        {
+          "modelo": "HM75R"
+        },
+        {
+          "modelo": "HP12R-T"
+        },
+        {
+          "modelo": "HP25R V2.0",
+          "nota": "*"
+        },
+        {
+          "modelo": "CL26R PRO",
+          "nota": "*"
+        },
+        {
+          "modelo": "CL27R",
+          "nota": "*"
+        },
+        {
+          "modelo": "CL30R"
+        },
+        {
+          "modelo": "BC22R"
+        },
+        {
+          "modelo": "BC26R",
+          "nota": "*"
+        },
+        {
+          "modelo": "BC30 V2.0",
+          "nota": "^"
+        },
+        {
+          "modelo": "BC45R"
+        }
+      ]
+    },
+    "ARB-L21 21700": {
+      "grupo": "bateria_li_ion",
+      "nome": "Bateria ARB-L21 21700",
+      "serve_em": [
+        {
+          "modelo": "C7",
+          "nota": "≈"
+        },
+        {
+          "modelo": "C7 V2.0"
+        },
+        {
+          "modelo": "C7 PRO"
+        },
+        {
+          "modelo": "E35R"
+        },
+        {
+          "modelo": "HT18R V2.0"
+        },
+        {
+          "modelo": "HT32"
+        },
+        {
+          "modelo": "LD31 RENEGADE",
+          "nota": "~"
+        },
+        {
+          "modelo": "LD36R"
+        },
+        {
+          "modelo": "LD45R"
+        },
+        {
+          "modelo": "LR35R",
+          "nota": "≈"
+        },
+        {
+          "modelo": "LR35R PRO"
+        },
+        {
+          "modelo": "LR36R"
+        },
+        {
+          "modelo": "PD36R ACE"
+        },
+        {
+          "modelo": "PD36R V2.0"
+        },
+        {
+          "modelo": "PD36R PRO",
+          "nota": "≈"
+        },
+        {
+          "modelo": "PD40R V3.0"
+        },
+        {
+          "modelo": "PD45R ACE"
+        },
+        {
+          "modelo": "TK15R"
+        },
+        {
+          "modelo": "TK16 V2.0",
+          "nota": "≈"
+        },
+        {
+          "modelo": "TK17"
+        },
+        {
+          "modelo": "TK20R V2.0",
+          "nota": "≈"
+        },
+        {
+          "modelo": "TK21R"
+        },
+        {
+          "modelo": "TK22R"
+        },
+        {
+          "modelo": "TK30R"
+        },
+        {
+          "modelo": "WF25RM"
+        },
+        {
+          "modelo": "WF26R",
+          "nota": "≈"
+        },
+        {
+          "modelo": "HM70R",
+          "nota": "≈"
+        },
+        {
+          "modelo": "HM71R",
+          "nota": "≈"
+        },
+        {
+          "modelo": "HM75R",
+          "nota": "**"
+        },
+        {
+          "modelo": "HP25R V2.0"
+        },
+        {
+          "modelo": "CL26R PRO",
+          "nota": "≈"
+        },
+        {
+          "modelo": "CL27R"
+        },
+        {
+          "modelo": "CP50R"
+        },
+        {
+          "modelo": "BC26R"
+        },
+        {
+          "modelo": "BC28R"
+        }
+      ]
+    },
+    "CR123A": {
+      "grupo": "bateria_cr123a",
+      "nome": "Bateria CR123A",
+      "serve_em": [
+        {
+          "modelo": "E18R V2.0"
+        },
+        {
+          "modelo": "E28R V2.0"
+        },
+        {
+          "modelo": "E35R",
+          "nota": "*"
+        },
+        {
+          "modelo": "GL07"
+        },
+        {
+          "modelo": "GL22"
+        },
+        {
+          "modelo": "GL30R"
+        },
+        {
+          "modelo": "HT18R V2.0",
+          "nota": "*"
+        },
+        {
+          "modelo": "HT32",
+          "nota": "*"
+        },
+        {
+          "modelo": "LD30R"
+        },
+        {
+          "modelo": "LD35R",
+          "nota": "°"
+        },
+        {
+          "modelo": "LD36R",
+          "nota": "*"
+        },
+        {
+          "modelo": "LR35R",
+          "nota": "*"
+        },
+        {
+          "modelo": "PD25R"
+        },
+        {
+          "modelo": "PD32R",
+          "nota": "°"
+        },
+        {
+          "modelo": "PD35 V3.0"
+        },
+        {
+          "modelo": "PD35R ACE",
+          "nota": "°"
+        },
+        {
+          "modelo": "PD35R",
+          "nota": "°"
+        },
+        {
+          "modelo": "PD36R V2.0",
+          "nota": "*"
+        },
+        {
+          "modelo": "PD36R PRO",
+          "nota": "*"
+        },
+        {
+          "modelo": "PD40R V3.0",
+          "nota": "*"
+        },
+        {
+          "modelo": "TK11R"
+        },
+        {
+          "modelo": "TK16 V2.0",
+          "nota": "*"
+        },
+        {
+          "modelo": "TK20R V2.0",
+          "nota": "*"
+        },
+        {
+          "modelo": "TK26R"
+        },
+        {
+          "modelo": "TK30R",
+          "nota": "*"
+        },
+        {
+          "modelo": "TK35R",
+          "nota": "°"
+        },
+        {
+          "modelo": "TK35UE V2.0"
+        },
+        {
+          "modelo": "WF26R",
+          "nota": "*"
+        },
+        {
+          "modelo": "WT25R"
+        },
+        {
+          "modelo": "HM50R V2.0",
+          "nota": "°"
+        },
+        {
+          "modelo": "HM53R",
+          "nota": "°"
+        },
+        {
+          "modelo": "HM55R",
+          "nota": "°"
+        },
+        {
+          "modelo": "HM55R RENEGADE",
+          "nota": "°"
+        },
+        {
+          "modelo": "HM60R V2.0"
+        },
+        {
+          "modelo": "GL06"
+        },
+        {
+          "modelo": "HM61R V3.0"
+        },
+        {
+          "modelo": "HM62-T"
+        },
+        {
+          "modelo": "HM65R V2.0",
+          "nota": "°"
+        },
+        {
+          "modelo": "HM65R-T V2.0"
+        },
+        {
+          "modelo": "HM70R",
+          "nota": "*"
+        },
+        {
+          "modelo": "HM71R",
+          "nota": "*"
+        },
+        {
+          "modelo": "HM75R"
+        },
+        {
+          "modelo": "HP12R-T"
+        },
+        {
+          "modelo": "HP25R V2.0",
+          "nota": "*"
+        },
+        {
+          "modelo": "CL27R",
+          "nota": "*"
+        },
+        {
+          "modelo": "CL30R"
+        },
+        {
+          "modelo": "BC26R",
+          "nota": "*"
+        },
+        {
+          "modelo": "BC30 V2.0"
+        }
+      ]
+    }
+  },
+  "estatisticas": {
+    "total_modelos": 107,
+    "total_acessorios_unicos": 38,
+    "total_relacoes_compativel": 528,
+    "total_relacoes_bateria": 152
+  }
+}
