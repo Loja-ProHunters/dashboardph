@@ -1,39 +1,15 @@
 {
-  "status": "em_andamento",
+  "status": "concluido",
   "iniciado_em": "2026-09-16T13:14:46.552Z",
   "iniciado_por": "gerencia",
   "desde": "2025-09-16",
   "ate": "2026-09-16",
   "meses": 12,
-  "ids_pendentes": [
-    "23897420713",
-    "23896710138",
-    "23896614560",
-    "23892415572",
-    "23889837625",
-    "23887601907",
-    "23886121566",
-    "23886103263",
-    "23885744803",
-    "23884469531",
-    "23882401015",
-    "23882360864",
-    "23881116543",
-    "23881095494",
-    "23880893350",
-    "23873051618",
-    "23872876608",
-    "23871757167",
-    "23869224533",
-    "23871909700",
-    "23871707190",
-    "23871707132",
-    "23854446297"
-  ],
+  "ids_pendentes": [],
   "total_original": 1948,
-  "processados": 1925,
-  "accounts_criadas": 1479,
-  "orders_criadas": 1894,
+  "processados": 1948,
+  "accounts_criadas": 1499,
+  "orders_criadas": 1917,
   "avisos": [
     "pedido 26588132464: sem CPF/CNPJ do contato — pulando",
     "pedido 26472508948: sem CPF/CNPJ do contato — pulando",
@@ -43,5 +19,6 @@
     "pedido 23923114912: sem CPF/CNPJ do contato — pulando"
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-09-16T13:32:44.422Z"
+  "ultimo_lote_em": "2026-09-16T13:32:58.172Z",
+  "concluido_em": "2026-09-16T13:32:58.172Z"
 }
