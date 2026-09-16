@@ -8094,5 +8094,1116 @@
     "criado_por": "bling-sync",
     "atualizado_em": "2026-09-16T03:30:24.656Z",
     "atualizado_por": "bling-sync"
+  },
+  "ord_f3fb6179d1f3bce9": {
+    "id": "ord_f3fb6179d1f3bce9",
+    "bling_pedido_id": "26628020611",
+    "bling_numero": "26798",
+    "account_id": "acc_fa6602be359c76c4",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1502.27,
+    "itens": [
+      {
+        "sku": "6942870307343",
+        "descricao": "Lanterna Fenix PD40R V2.0 3000 Lúmens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1533,
+        "valor_total_item": 1533
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6423\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\nch_xX30xV8sJtR926BO |  | 17/08/2026 19:45:34 |  |  | ch_xX30xV8sJtR926BO",
+    "sincronizado_bling_em": "2026-09-16T03:30:31.331Z",
+    "criado_em": "2026-09-16T03:30:31.331Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:31.331Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_5d83951ca2316b4f": {
+    "id": "ord_5d83951ca2316b4f",
+    "bling_pedido_id": "26627701134",
+    "bling_numero": "26797",
+    "account_id": "acc_aac870039c45c55d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 68048.16,
+    "itens": [
+      {
+        "sku": "FMGS-00160",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para CZ 550",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 643.69,
+        "valor_total_item": 1287.38
+      },
+      {
+        "sku": "FMGS-00200",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para Browning Bar",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 643.69,
+        "valor_total_item": 643.69
+      },
+      {
+        "sku": "FMGS-00320",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis paraTikka T3",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 643.69,
+        "valor_total_item": 1287.38
+      },
+      {
+        "sku": "FMGS-00580",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para Browning X-Bolt long",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 643.69,
+        "valor_total_item": 643.69
+      },
+      {
+        "sku": "FMGS-00630",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para Sauer 303/404",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 643.69,
+        "valor_total_item": 643.69
+      },
+      {
+        "sku": "FMGS-00640",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para Marlin 1895",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 643.69,
+        "valor_total_item": 643.69
+      },
+      {
+        "sku": "FMGS-00840",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis Prism 60° 11mm",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 643.69,
+        "valor_total_item": 1287.38
+      },
+      {
+        "sku": "FMGS-00870",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis Prism 60° 16mm",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 643.69,
+        "valor_total_item": 643.69
+      },
+      {
+        "sku": "FMGS-00910",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para CZ557 .308 Win.",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 643.69,
+        "valor_total_item": 643.69
+      },
+      {
+        "sku": "FMGS-06300",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis  Weaver/Picatinny 0 MOA",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 643.69,
+        "valor_total_item": 1287.38
+      },
+      {
+        "sku": "FMWE-00000",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis  Weaver/Picatinny 0 MOA",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1170.35,
+        "valor_total_item": 1170.35
+      },
+      {
+        "sku": "TARI-03008",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis  Weaver/Picatinny (Alumínio)",
+        "categoria": null,
+        "quantidade": 3,
+        "valor_unitario": 1994.45,
+        "valor_total_item": 5983.35
+      },
+      {
+        "sku": "TARI-03408",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para Ring Ø30mm BH8mm (Alumínio)",
+        "categoria": null,
+        "quantidade": 3,
+        "valor_unitario": 1994.45,
+        "valor_total_item": 5983.35
+      },
+      {
+        "sku": "TAWE-AOZL0",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para Ring Ø34mm BH8mm (Alumínio)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 319.42,
+        "valor_total_item": 638.84
+      },
+      {
+        "sku": "FMWE-00010",
+        "descricao": "Montagem Dentler Basis, Base de Weaver/Picatinny 230mm (aço)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 1170.35,
+        "valor_total_item": 2340.7
+      },
+      {
+        "sku": "FMGS-00310",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para CZ 557",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 643.69,
+        "valor_total_item": 643.69
+      },
+      {
+        "sku": "TARI-02608",
+        "descricao": "Montagem Dentler Basis, Base TAC - Ring Ø-26mm BH8mm",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 1994.45,
+        "valor_total_item": 3988.9
+      },
+      {
+        "sku": "FM00-S3095",
+        "descricao": "Anel para luneta Ø30,0mm, altura9,5mm",
+        "categoria": null,
+        "quantidade": 6,
+        "valor_unitario": 253.58,
+        "valor_total_item": 1521.48
+      },
+      {
+        "sku": "FM00-S3435",
+        "descricao": "Anel para luneta Ø34,0mm, altura 3,5mm",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 343.78,
+        "valor_total_item": 1375.12
+      },
+      {
+        "sku": "FM00-S3465",
+        "descricao": "Anel para luneta Ø34,0mm, altura 6,5mm",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 343.78,
+        "valor_total_item": 1375.12
+      },
+      {
+        "sku": "FM00-S3495",
+        "descricao": "Anel para luneta Ø34,0mm, altura 9,5mm",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 343.78,
+        "valor_total_item": 1375.12
+      },
+      {
+        "sku": "FMRI-00000",
+        "descricao": "Montagem Dentler Basis, Base de montagem dos anéis",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 1111.83,
+        "valor_total_item": 4447.32
+      },
+      {
+        "sku": "FM00-S2635",
+        "descricao": "Montagem Dentler Ø25,4mm altura 3,5mm (Alumínio)",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 253.58,
+        "valor_total_item": 1014.32
+      },
+      {
+        "sku": "FM00-S3035",
+        "descricao": "Montagem Dentler Ø30 mm altura 3,5mm (Alumínio)",
+        "categoria": null,
+        "quantidade": 10,
+        "valor_unitario": 253.58,
+        "valor_total_item": 2535.8
+      },
+      {
+        "sku": "FM00-S3065",
+        "descricao": "Montagem Dentler Ø30 mm altura 6,5mm (Alumínio)",
+        "categoria": null,
+        "quantidade": 10,
+        "valor_unitario": 253.58,
+        "valor_total_item": 2535.8
+      },
+      {
+        "sku": "FMGS-00160-ID",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para CZ 550",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 1469,
+        "valor_total_item": 2938
+      },
+      {
+        "sku": "FMGS-00200-ID",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para Browning Bar",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1469,
+        "valor_total_item": 1469
+      },
+      {
+        "sku": "FMGS-00320-ID",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis paraTikka T3",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 1469,
+        "valor_total_item": 2938
+      },
+      {
+        "sku": "FMGS-00580-ID",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para Browning X-Bolt long",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1469,
+        "valor_total_item": 1469
+      },
+      {
+        "sku": "FMGS-00630-ID",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para Sauer 303/404",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1469,
+        "valor_total_item": 1469
+      },
+      {
+        "sku": "FMGS-00640-ID",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para Marlin 1895",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1469,
+        "valor_total_item": 1469
+      },
+      {
+        "sku": "FMGS-00840-ID",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis Prism 60° 11mm",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 1469,
+        "valor_total_item": 2938
+      },
+      {
+        "sku": "FMGS-00870-ID",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis Prism 60° 16mm",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1469,
+        "valor_total_item": 1469
+      },
+      {
+        "sku": "FMGS-00910-ID",
+        "descricao": "Base para Engate Rápido de Luneta - Dentler Basis para CZ557 .308 Win.",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1469,
+        "valor_total_item": 1469
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "23/07 - BB - 15.338,00\n23/07 - BB - 10.000,00\n17/08 - C6 - 6.000,00\n17/08 - C6 - 9.604,04\nTotal = 40.942,04",
+    "sincronizado_bling_em": "2026-09-16T03:30:31.681Z",
+    "criado_em": "2026-09-16T03:30:31.681Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:31.681Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_e5eddee5834b156b": {
+    "id": "ord_e5eddee5834b156b",
+    "bling_pedido_id": "26626710175",
+    "bling_numero": "26796",
+    "account_id": "acc_b620546978079f87",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 276.94,
+    "itens": [
+      {
+        "sku": "6942870304809",
+        "descricao": "Lanterna Camping Fenix CL09 Preta 200 Lúmens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 154.98,
+        "valor_total_item": 154.98
+      },
+      {
+        "sku": "6942870304731",
+        "descricao": "Bateria Fenix Recarregável 16340 700mAh 3.6V 2.52Wh De Íon de Lítio ARB-L16-700U",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 86,
+        "valor_total_item": 86
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6419\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:30:32.054Z",
+    "criado_em": "2026-09-16T03:30:32.054Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:32.054Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_a86a6fa232ef45e8": {
+    "id": "ord_a86a6fa232ef45e8",
+    "bling_pedido_id": "26625694413",
+    "bling_numero": "26795",
+    "account_id": "acc_242c86c8e352e83a",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 5001.89,
+    "itens": [
+      {
+        "sku": "HORN-30395-ID",
+        "descricao": "Projétil Hornady Calibre .308 160 GR FTX® (30-30 WIN)",
+        "categoria": null,
+        "quantidade": 400,
+        "valor_unitario": 12.504725,
+        "valor_total_item": 5001.89
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "DIFAL DE: R$602,69",
+    "sincronizado_bling_em": "2026-09-16T03:30:32.404Z",
+    "criado_em": "2026-09-16T03:30:32.404Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:32.404Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_19086e653b303455": {
+    "id": "ord_19086e653b303455",
+    "bling_pedido_id": "26624901864",
+    "bling_numero": "26794",
+    "account_id": "acc_7e61d0c54bc2a135",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 807.5,
+    "itens": [
+      {
+        "sku": "3H-50",
+        "descricao": "Caixa para munição, marca J&J, capacidade 50 calibres .38Spl e .357 Magnun",
+        "categoria": null,
+        "quantidade": 25,
+        "valor_unitario": 9.5,
+        "valor_total_item": 237.5
+      },
+      {
+        "sku": "9H-50",
+        "descricao": "Caixa para munição, marca J&J, capacidade 50 calibres 9mm e .380 ACP",
+        "categoria": null,
+        "quantidade": 60,
+        "valor_unitario": 9.5,
+        "valor_total_item": 570
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15214\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:30:32.769Z",
+    "criado_em": "2026-09-16T03:30:32.769Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:32.769Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_4944cb422ade2381": {
+    "id": "ord_4944cb422ade2381",
+    "bling_pedido_id": "26623929523",
+    "bling_numero": "26793",
+    "account_id": "acc_ef203e96f7cbe941",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 924.9,
+    "itens": [
+      {
+        "sku": "MAG579",
+        "descricao": "Carregador Pmag, 10 Municoes, Calibre 7,62X51 /308Win, Short Action, Preto",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 855,
+        "valor_total_item": 855
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-16T03:30:33.117Z",
+    "criado_em": "2026-09-16T03:30:33.117Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:33.117Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_2fd3b51809e1a702": {
+    "id": "ord_2fd3b51809e1a702",
+    "bling_pedido_id": "26621250610",
+    "bling_numero": "26792",
+    "account_id": "acc_497238f009eb73c4",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 514.05,
+    "itens": [
+      {
+        "sku": "6942870305868",
+        "descricao": "Carregador de Bateria Fenix ARE-X11 SET",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 140.99,
+        "valor_total_item": 140.99
+      },
+      {
+        "sku": "6942870304021",
+        "descricao": "Lanterna Fenix LD12 (2017)  320 Lumens Preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 328.21,
+        "valor_total_item": 328.21
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6417\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\n4519233246 | 550209******7729 | 17/08/2026 11:28:54 |  | 4519233246 | ch_ApqgGjVPCkfVGOzX",
+    "sincronizado_bling_em": "2026-09-16T03:30:33.469Z",
+    "criado_em": "2026-09-16T03:30:33.469Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:33.469Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b873ae683c18992d": {
+    "id": "ord_b873ae683c18992d",
+    "bling_pedido_id": "26621093878",
+    "bling_numero": "26790",
+    "account_id": "acc_b99a41b8d6716456",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 6800,
+    "itens": [
+      {
+        "sku": "BALDR RL MINI",
+        "descricao": "Lanterna para armas Olight Baldr RL Mini preta",
+        "categoria": null,
+        "quantidade": 10,
+        "valor_unitario": 680,
+        "valor_total_item": 6800
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "Aos cuidados de: Sandro",
+    "sincronizado_bling_em": "2026-09-16T03:30:33.823Z",
+    "criado_em": "2026-09-16T03:30:33.823Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:33.823Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_d6b9a7aff09ea2e4": {
+    "id": "ord_d6b9a7aff09ea2e4",
+    "bling_pedido_id": "26615907052",
+    "bling_numero": "26789",
+    "account_id": "acc_9884cf4d59308882",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1679.6,
+    "itens": [
+      {
+        "sku": "VEC-SCOC-03II",
+        "descricao": "Luneta Vector Optics  Forester Gen II, amplitude de 1-5x, objetiva de 24mm",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1679.6,
+        "valor_total_item": 1679.6
+      }
+    ],
+    "data_pedido": "2026-08-16",
+    "data_pagamento": null,
+    "data_envio": "2026-08-16",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15212\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\n\nVENDA CONVERTIDA VENDEDOR AUTORIZADO: LUIS",
+    "sincronizado_bling_em": "2026-09-16T03:30:34.164Z",
+    "criado_em": "2026-09-16T03:30:34.164Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:34.164Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_7bc6e2f90b40316a": {
+    "id": "ord_7bc6e2f90b40316a",
+    "bling_pedido_id": "26615344234",
+    "bling_numero": "26788",
+    "account_id": "acc_d4f94add4f82a8c0",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1453.28,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-43",
+        "descricao": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1503.45,
+        "valor_total_item": 1503.45
+      }
+    ],
+    "data_pedido": "2026-08-16",
+    "data_pagamento": null,
+    "data_envio": "2026-08-16",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15210\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:30:34.540Z",
+    "criado_em": "2026-09-16T03:30:34.540Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:34.540Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_5f2ed6c8dac3bcba": {
+    "id": "ord_5f2ed6c8dac3bcba",
+    "bling_pedido_id": "26614481921",
+    "bling_numero": "26787",
+    "account_id": "acc_886dc9a7ea5be8f5",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 946.8,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-19II",
+        "descricao": "Red Dot Frenzy 1x17x24 - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 911.95,
+        "valor_total_item": 911.95
+      }
+    ],
+    "data_pedido": "2026-08-16",
+    "data_pagamento": null,
+    "data_envio": "2026-08-16",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15208\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\n4517894643 | 234076******9025 | 16/08/2026 03:39:51 |  | 4517894643 | ch_GkAE0b7c4BsrDR2q",
+    "sincronizado_bling_em": "2026-09-16T03:30:34.906Z",
+    "criado_em": "2026-09-16T03:30:34.906Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:34.906Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_2b128f8a76a6ff68": {
+    "id": "ord_2b128f8a76a6ff68",
+    "bling_pedido_id": "26614360561",
+    "bling_numero": "26786",
+    "account_id": "acc_944de4839d4f620a",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 936,
+    "itens": [
+      {
+        "sku": "6942870312651-ID",
+        "descricao": "Lanterna Tática Fenix PD35R ACE + CL01 - 2000 Lúmens (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 944.44,
+        "valor_total_item": 944.44
+      }
+    ],
+    "data_pedido": "2026-08-15",
+    "data_pagamento": null,
+    "data_envio": "2026-08-15",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6415\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:30:35.249Z",
+    "criado_em": "2026-09-16T03:30:35.249Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:35.249Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_8422e40aa75800d1": {
+    "id": "ord_8422e40aa75800d1",
+    "bling_pedido_id": "26613923248",
+    "bling_numero": "26785",
+    "account_id": "acc_ad90f57af903ce6d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 617.4,
+    "itens": [
+      {
+        "sku": "VEC-SCRA-63",
+        "descricao": "Trilho, marca Vector Optics, Remington 700, 20 MOA, Ref:  SCRA-63",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 597,
+        "valor_total_item": 597
+      }
+    ],
+    "data_pedido": "2026-08-15",
+    "data_pagamento": null,
+    "data_envio": "2026-08-15",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15206\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\n4517716463 | 522590******0137 | 16/08/2026 00:13:34 |  | 4517716463 | ch_KBP03pQU4fyRrYoW",
+    "sincronizado_bling_em": "2026-09-16T03:30:35.593Z",
+    "criado_em": "2026-09-16T03:30:35.593Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:35.593Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_708fa174707a0839": {
+    "id": "ord_708fa174707a0839",
+    "bling_pedido_id": "26612629241",
+    "bling_numero": "26784",
+    "account_id": "acc_94dc2abf4cf7e057",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1643.2,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-47",
+        "descricao": "Red Dot Vector Optics Scrapper 1-29x SCRD-47",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1643.2,
+        "valor_total_item": 1643.2
+      }
+    ],
+    "data_pedido": "2026-08-15",
+    "data_pagamento": null,
+    "data_envio": "2026-08-15",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15204\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:30:35.943Z",
+    "criado_em": "2026-09-16T03:30:35.943Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:35.943Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_fed47de9b7f0d145": {
+    "id": "ord_fed47de9b7f0d145",
+    "bling_pedido_id": "26611018831",
+    "bling_numero": "26783",
+    "account_id": "acc_a51dd933d016d9ec",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 4816.12,
+    "itens": [
+      {
+        "sku": "VEC-SCOL-40",
+        "descricao": "Luneta Vector Optics Minotaur 12-60x60mm GNII MFL SFP SCOL-40",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 4770.35,
+        "valor_total_item": 4770.35
+      }
+    ],
+    "data_pedido": "2026-08-15",
+    "data_pagamento": null,
+    "data_envio": "2026-08-15",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15202\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T03:30:36.326Z",
+    "criado_em": "2026-09-16T03:30:36.326Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:36.326Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b82168448036d41c": {
+    "id": "ord_b82168448036d41c",
+    "bling_pedido_id": "26610785547",
+    "bling_numero": "26782",
+    "account_id": "acc_03660bc3f1e77813",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 312.52,
+    "itens": [
+      {
+        "sku": "VEC-RDSL01",
+        "descricao": "Red Dot Vector Optics  VictOptics, 1x18, Ref: RDSL01",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 289.9,
+        "valor_total_item": 289.9
+      }
+    ],
+    "data_pedido": "2026-08-15",
+    "data_pagamento": null,
+    "data_envio": "2026-08-15",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15198\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:30:36.666Z",
+    "criado_em": "2026-09-16T03:30:36.666Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:36.666Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_509cbfb026963d30": {
+    "id": "ord_509cbfb026963d30",
+    "bling_pedido_id": "26610651216",
+    "bling_numero": "26781",
+    "account_id": "acc_ecac61fdf2cb9b31",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 664.66,
+    "itens": [
+      {
+        "sku": "6942870307602",
+        "descricao": "Lanterna Fenix E35 V3.0 Preta 3000 Lumens",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 309.72,
+        "valor_total_item": 619.44
+      }
+    ],
+    "data_pedido": "2026-08-15",
+    "data_pagamento": null,
+    "data_envio": "2026-08-15",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6411\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:30:37.040Z",
+    "criado_em": "2026-09-16T03:30:37.040Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:37.040Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_92589e2f028ce5cd": {
+    "id": "ord_92589e2f028ce5cd",
+    "bling_pedido_id": "26603785199",
+    "bling_numero": "26780",
+    "account_id": "acc_f42b812b7d78e205",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 623.26,
+    "itens": [
+      {
+        "sku": "RED-76289",
+        "descricao": "Bucha (Bushing) Redding Titanium Nitride .289\" (cal 6,5mm)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 637,
+        "valor_total_item": 637
+      }
+    ],
+    "data_pedido": "2026-08-14",
+    "data_pagamento": null,
+    "data_envio": "2026-08-14",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15196\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:30:37.391Z",
+    "criado_em": "2026-09-16T03:30:37.391Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:37.391Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_d690db6508ffa7ee": {
+    "id": "ord_d690db6508ffa7ee",
+    "bling_pedido_id": "26621134410",
+    "bling_numero": "26791",
+    "account_id": "acc_640dc1a808e138dc",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1562.79,
+    "itens": [
+      {
+        "sku": "Horn-50095-ID",
+        "descricao": "Removedor universal de projéteis Cam Lock Hornady",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 888.89,
+        "valor_total_item": 888.89
+      },
+      {
+        "sku": "Horn-392160-ID",
+        "descricao": "Coletor Hornady para Projéteis (Collet #7) .308/.312",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 251,
+        "valor_total_item": 251
+      },
+      {
+        "sku": "Horn-392155-ID",
+        "descricao": "Coletor Hornady para Projéteis (Collet #2) .223",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 251,
+        "valor_total_item": 251
+      },
+      {
+        "sku": "Horn-392157-ID",
+        "descricao": "Coletor Hornady para Projéteis (Collet #4 ) .257/.264",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 251,
+        "valor_total_item": 251
+      }
+    ],
+    "data_pedido": "2026-08-13",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15194\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:30:37.737Z",
+    "criado_em": "2026-09-16T03:30:37.737Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:37.737Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_1e191cd40fb69723": {
+    "id": "ord_1e191cd40fb69723",
+    "bling_pedido_id": "26595674935",
+    "bling_numero": "26779",
+    "account_id": "acc_5d16590c5e9ecda4",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1503.45,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-43",
+        "descricao": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1503.45,
+        "valor_total_item": 1503.45
+      }
+    ],
+    "data_pedido": "2026-08-13",
+    "data_pagamento": null,
+    "data_envio": "2026-08-13",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15192\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:30:38.089Z",
+    "criado_em": "2026-09-16T03:30:38.089Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:38.089Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_edcf2596fe3d1b4d": {
+    "id": "ord_edcf2596fe3d1b4d",
+    "bling_pedido_id": "26595119494",
+    "bling_numero": "26778",
+    "account_id": "acc_2fba39c8961af8e6",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1358.02,
+    "itens": [
+      {
+        "sku": "VEC-SCOC-32",
+        "descricao": "Luneta Forester 1-5x24SFP GenII Bronze - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1309.1,
+        "valor_total_item": 1309.1
+      }
+    ],
+    "data_pedido": "2026-08-13",
+    "data_pagamento": null,
+    "data_envio": "2026-08-13",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15190\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\n4514260420 | 550209******8929 | 13/08/2026 16:08:32 |  | 4514260420 | ch_v3qoJ3ZcbOcaLd5K\n\nCONVERTIDO VENDEDOR: AUTORIZADO LUIS",
+    "sincronizado_bling_em": "2026-09-16T03:30:38.474Z",
+    "criado_em": "2026-09-16T03:30:38.474Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:38.474Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_0c9addbc9edc3376": {
+    "id": "ord_0c9addbc9edc3376",
+    "bling_pedido_id": "26591162516",
+    "bling_numero": "26777",
+    "account_id": "acc_9c311e422ff7223e",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 120.68,
+    "itens": [
+      {
+        "sku": "VEC-SCSC-07",
+        "descricao": "Protetor de Percursor (Snap Cap) Vector Optics, 12 GA, Ref: SCSC-07P",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 102,
+        "valor_total_item": 102
+      }
+    ],
+    "data_pedido": "2026-08-13",
+    "data_pagamento": null,
+    "data_envio": "2026-08-13",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15188\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:30:38.826Z",
+    "criado_em": "2026-09-16T03:30:38.826Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:38.826Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_2c3078140c9df930": {
+    "id": "ord_2c3078140c9df930",
+    "bling_pedido_id": "26637868995",
+    "bling_numero": "26808",
+    "account_id": "acc_518349300f362346",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 0.95,
+    "itens": [
+      {
+        "sku": "Teste-001",
+        "descricao": "Lanterna Fenix (Teste Sistema - Nacional)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 0.5,
+        "valor_total_item": 0.5
+      },
+      {
+        "sku": "Teste-002",
+        "descricao": "Lanterna Fenix (Teste Sistema - Importada)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 0.5,
+        "valor_total_item": 0.5
+      }
+    ],
+    "data_pedido": "2026-08-12",
+    "data_pagamento": null,
+    "data_envio": "2026-08-18",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15184\nLocal de venda: PARTICULAR\nTransportadora: FRETE GRÁTIS",
+    "sincronizado_bling_em": "2026-09-16T03:30:39.176Z",
+    "criado_em": "2026-09-16T03:30:39.176Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:39.176Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_ebe1e5dd74d977aa": {
+    "id": "ord_ebe1e5dd74d977aa",
+    "bling_pedido_id": "26590078057",
+    "bling_numero": "26776",
+    "account_id": "acc_79c8c2c34d7e0788",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 754.21,
+    "itens": [
+      {
+        "sku": "6942870305295",
+        "descricao": "Lanterna de Cabeça Fenix HL40R Cinza 600 Lúmens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 327,
+        "valor_total_item": 327
+      },
+      {
+        "sku": "6942870305516",
+        "descricao": "Lanterna de Cabeça Fenix HL32R Azul 600 Lúmens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 243.85,
+        "valor_total_item": 243.85
+      },
+      {
+        "sku": "6942870305011",
+        "descricao": "Lanterna de Cabeça Fenix HL16 70 Lúmens Rosa",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 164.1,
+        "valor_total_item": 164.1
+      }
+    ],
+    "data_pedido": "2026-08-12",
+    "data_pagamento": null,
+    "data_envio": "2026-08-12",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6409\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-16T03:30:39.514Z",
+    "criado_em": "2026-09-16T03:30:39.514Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:39.514Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_1d79aaccfa2d91c7": {
+    "id": "ord_1d79aaccfa2d91c7",
+    "bling_pedido_id": "26589790217",
+    "bling_numero": "26775",
+    "account_id": "acc_2e4401e2cfd0d978",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 93.72,
+    "itens": [
+      {
+        "sku": "6942870303277",
+        "descricao": "Lanterna de cabeça Fenix HL05 Vermelha 8 Lúmens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 75.12,
+        "valor_total_item": 75.12
+      }
+    ],
+    "data_pedido": "2026-08-12",
+    "data_pagamento": null,
+    "data_envio": "2026-08-12",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6407\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-16T03:30:39.888Z",
+    "criado_em": "2026-09-16T03:30:39.888Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-16T03:30:39.888Z",
+    "atualizado_por": "bling-sync"
   }
 }
