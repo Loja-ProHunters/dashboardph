@@ -1,0 +1,138 @@
+// ═══════════════════════════════════════════════════════════════════
+// PATCH — api/index.js
+// ═══════════════════════════════════════════════════════════════════
+// Trechos pra colar em api/index.js. Se preferir, me manda o arquivo
+// atual (o mesmo que você já tinha subido antes) que eu aplico e devolvo.
+
+// ───────────────────────────────────────────────────────────────────
+// PASSO 1: Adicione ao lado dos outros requires de lib/crm (~linha 27)
+// ───────────────────────────────────────────────────────────────────
+
+const blingFenixMap     = require('../lib/crm/blingFenixMap');
+const blingFenixGerador = require('../lib/crm/blingFenixGerador');
+
+// ───────────────────────────────────────────────────────────────────
+// PASSO 2: Adicione 'mapa' e 'ordersJson' na whitelist do roteador
+// genérico (linha 539). A linha DEVE ficar assim:
+// ───────────────────────────────────────────────────────────────────
+
+/*
+  if (crmMatch && crmMatch[1] !== 'session-info' && crmMatch[1] !== 'migrate-parceiros' && crmMatch[1] !== 'docs' && crmMatch[1] !== 'cron' && crmMatch[1] !== 'fenix') {
+*/
+
+// (não muda nada, 'fenix' já está na lista — só confirme)
+
+
+// ───────────────────────────────────────────────────────────────────
+// PASSO 3: Adicione essas 6 rotas JUNTO com as outras /api/crm/fenix/*
+// que já existem. Um bom lugar é logo depois de
+// /api/crm/fenix/invalidar-cache.
+// ───────────────────────────────────────────────────────────────────
+
+// ── POST /api/crm/fenix/mapa/gerar-iniciar ─────────────────────
+// Extrai SKUs Fenix únicos do orders.json e cria o checkpoint.
+// Não roda nenhuma chamada Claude ainda — só prepara.
+if (req.method === 'POST' && url === '/api/crm/fenix/mapa/gerar-iniciar') {
+  const sess = getSession(req);
+  if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+  try {
+    const body = await readBody(req);
+    const { forcarRegerarRevisados = false } = JSON.parse(body || '{}');
+    const r = await blingFenixGerador.iniciar({ iniciado_por: sess.usuario, forcarRegerarRevisados });
+    res.writeHead(200,{'Content-Type':'application/json'});
+    res.end(JSON.stringify(r));
+  } catch (e) {
+    res.writeHead(500,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({error:e.message||String(e)}));
+  }
+  return;
+}
+
+// ── POST /api/crm/fenix/mapa/gerar-tick ────────────────────────
+// Roda 1 lote (1 chamada Claude, ~10 SKUs). UI chama em loop até terminar.
+if (req.method === 'POST' && url === '/api/crm/fenix/mapa/gerar-tick') {
+  const sess = getSession(req);
+  if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+  try {
+    const r = await blingFenixGerador.tick();
+    res.writeHead(200,{'Content-Type':'application/json'});
+    res.end(JSON.stringify(r));
+  } catch (e) {
+    res.writeHead(500,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({error:e.message||String(e)}));
+  }
+  return;
+}
+
+// ── GET /api/crm/fenix/mapa/gerar-status ───────────────────────
+if (req.method === 'GET' && url === '/api/crm/fenix/mapa/gerar-status') {
+  const sess = getSession(req);
+  if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+  try {
+    const cp = await blingFenixGerador.lerCheckpoint();
+    const stats = await blingFenixMap.estatisticas();
+    res.writeHead(200,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({ checkpoint: cp, estatisticas: stats }));
+  } catch (e) {
+    res.writeHead(500,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({error:e.message||String(e)}));
+  }
+  return;
+}
+
+// ── GET /api/crm/fenix/mapa/lista?filtro=pendentes|revisados|fenix|nao_fenix|baixa_confianca|todos ──
+if (req.method === 'GET' && url.startsWith('/api/crm/fenix/mapa/lista')) {
+  const sess = getSession(req);
+  if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+  try {
+    const u = new URL('http://x' + (req.url || ''));
+    const filtro = u.searchParams.get('filtro') || 'pendentes';
+    const limite = Math.min(500, Number(u.searchParams.get('limite') || 200));
+    const items = await blingFenixMap.listar({ filtro, limite });
+    const stats = await blingFenixMap.estatisticas();
+    res.writeHead(200,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({ items, estatisticas: stats, filtro, limite }));
+  } catch (e) {
+    res.writeHead(500,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({error:e.message||String(e)}));
+  }
+  return;
+}
+
+// ── POST /api/crm/fenix/mapa/aprovar ───────────────────────────
+// Body: { sku_bling, fenix_codes?, categoria?, marca?, eh_kit? }
+if (req.method === 'POST' && url === '/api/crm/fenix/mapa/aprovar') {
+  const sess = getSession(req);
+  if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+  try {
+    const body = await readBody(req);
+    const { sku_bling, ...patch } = JSON.parse(body || '{}');
+    if (!sku_bling) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sku_bling obrigatório'})); return; }
+    const m = await blingFenixMap.aprovar(sku_bling, { por: sess.usuario, patch });
+    res.writeHead(200,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({ ok: true, mapeamento: m }));
+  } catch (e) {
+    res.writeHead(500,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({error:e.message||String(e)}));
+  }
+  return;
+}
+
+// ── POST /api/crm/fenix/mapa/rejeitar ──────────────────────────
+// Body: { sku_bling, motivo? }
+if (req.method === 'POST' && url === '/api/crm/fenix/mapa/rejeitar') {
+  const sess = getSession(req);
+  if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+  try {
+    const body = await readBody(req);
+    const { sku_bling, motivo } = JSON.parse(body || '{}');
+    if (!sku_bling) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sku_bling obrigatório'})); return; }
+    const m = await blingFenixMap.rejeitar(sku_bling, { por: sess.usuario, motivo });
+    res.writeHead(200,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({ ok: true, mapeamento: m }));
+  } catch (e) {
+    res.writeHead(500,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({error:e.message||String(e)}));
+  }
+  return;
+}
