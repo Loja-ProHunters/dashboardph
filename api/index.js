@@ -7,7 +7,7 @@ const { gerarContrato } = require('../lib/contracts');
 const { gerarGT } = require('../lib/gt');
 const { extrairNF } = require('../lib/nfExtract');
 const { extrairPedido } = require('../lib/pedidoExtract');
-const { getComercialData, saveComercialData, resetMonth, registrarVenda } = require('../lib/comercialStore');
+const { getComercialData, saveComercialData, resetMonth, registrarVenda, registrarVendaSite } = require('../lib/comercialStore');
 const { getContatos, saveContatos } = require('../lib/contatosStore');
 const { getEditorial, saveEditorial } = require('../lib/editorialStore');
 const { getTarifas, saveTarifas } = require('../lib/tarifasStore');
@@ -1698,6 +1698,32 @@ module.exports = async (req, res) => {
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Erro ao registrar venda: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/comercial/registrar-venda-site — lançamento do bucket SITE.
+  // Só quem pode editar o comercial (gerência/luis) — vendedor comum nem vê a
+  // opção na UI. Site não é vendedor: soma pro Total Geral do mês, mas fica
+  // fora do rank/score/comissão/consultor-do-mês.
+  if (req.method === 'POST' && url === '/api/comercial/registrar-venda-site') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para lançar venda do site.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { valor } = JSON.parse(body || '{}');
+      const valorNum = Number(valor);
+      if (!valorNum || valorNum <= 0) throw new Error('Informe um valor de venda maior que zero.');
+      const data = await registrarVendaSite(valorNum);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, siteFat: data.siteFat }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao registrar venda do site: ' + e.message }));
     }
     return;
   }
