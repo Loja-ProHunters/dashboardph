@@ -678,6 +678,14 @@ tbody td {
   background:rgba(45,106,79,.08);border:1px solid rgba(45,106,79,.3);
   border-radius:14px;padding:20px 24px;text-align:center;
 }
+
+/* ── Linha discreta com Site + Total do mês (abaixo do subtítulo) ── */
+.podium-extras{
+  margin-top:8px;font-size:11px;color:var(--gray4);letter-spacing:.4px;
+  display:flex;justify-content:center;gap:14px;flex-wrap:wrap;
+}
+.podium-extras b{color:var(--white);font-weight:600;}
+.podium-extras .pe-sep{opacity:.35;}
 .rv-title{font-size:13px;font-weight:700;color:var(--brand2);margin-bottom:14px;letter-spacing:.3px}
 .rv-row{display:flex;gap:10px}
 .rv-row select, .rv-row input{
@@ -1065,6 +1073,11 @@ tbody td {
  <div class="podium-live-dot"></div>
  <h2 class="podium-title">Corrida do Consultor do Mês</h2>
  <p class="podium-sub">Ranking em tempo real por Score</p>
+ <div class="podium-extras">
+   <span>🌐 Site: <b id="site-fat-value">R$ 0</b></span>
+   <span class="pe-sep">·</span>
+   <span>Total do mês: <b id="tg-value">R$ 0</b></span>
+ </div>
  </div>
  <div class="podium-stand" id="podium-stand"></div>
  <div class="podium-race" id="podium-race"></div>
@@ -1614,6 +1627,7 @@ function pontoStep(sellerId, campo, delta) {
 }
 
 function renderAll() {
+ renderSiteAndTotal();
  const { corridos, mes } = getDias();
  const totalFat = sellers.reduce((a, s) => a + s.fat, 0);
  const totalComissao = sellers.reduce((a, s) => {
@@ -1934,7 +1948,11 @@ function renderPodium() {
  const sellerLockedName = document.getElementById('rvSellerLockedName');
  if (sellerSel) {
  const prevVal = sellerSel.value;
- sellerSel.innerHTML = sellers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+ // Opções: 3 vendedores + Site (só quem pode editar vê o Site — vendedor
+ // comum fica travado no próprio nome pelo bloco de baixo).
+ const opts = sellers.map(s => `<option value="${s.id}">${s.name}</option>`);
+ if (window.CAN_EDIT_COMERCIAL) opts.push('<option value="site">🌐 Site (canal)</option>');
+ sellerSel.innerHTML = opts.join('');
  if (prevVal) sellerSel.value = prevVal;
 
  // Se o usuário logado é vendedor, trava no próprio nome (impede lançar pro colega).
@@ -2440,15 +2458,46 @@ async function registrarVenda() {
  const sel = document.getElementById('rvSeller');
  const valEl = document.getElementById('rvValor');
  const statusEl = document.getElementById('rvStatus');
- const sellerId = parseInt(sel?.value, 10);
+ const selValue = sel?.value;
  const valor = parseFloat(valEl?.value);
 
- if (!sellerId || !valor || valor <= 0) {
+ if (!selValue || !valor || valor <= 0) {
  statusEl.className = 'rv-status err';
- statusEl.textContent = 'Escolha seu nome e informe um valor de venda valido.';
+ statusEl.textContent = 'Escolha o canal/vendedor e informe um valor de venda válido.';
  return;
  }
 
+ // ── Caso especial: SITE (bucket separado, não é vendedor) ──
+ if (selValue === 'site') {
+  try {
+    const resp = await fetch('/api/comercial/registrar-venda-site', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ valor }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      statusEl.className = 'rv-status err';
+      statusEl.textContent = data.error || 'Erro ao registrar venda do site.';
+      return;
+    }
+    window.siteFat = Number(data.siteFat) || 0;
+    valEl.value = '';
+    statusEl.className = 'rv-status ok';
+    statusEl.textContent = `Venda do Site de ${fmtBRL(valor)} registrada!`;
+    playSaleSound();
+    renderSiteAndTotal();
+    renderAll();
+    loadPistaMeta();
+  } catch (e) {
+    statusEl.className = 'rv-status err';
+    statusEl.textContent = 'Falha de conexão.';
+  }
+  return;
+ }
+
+ // ── Vendedor normal ──
+ const sellerId = parseInt(selValue, 10);
  try {
  const resp = await fetch('/api/comercial/registrar-venda', {
  method: 'POST',
@@ -2474,12 +2523,24 @@ async function registrarVenda() {
  statusEl.className = 'rv-status ok';
  statusEl.textContent = `Venda de ${fmtBRL(valor)} registrada para ${nome}!`;
  playSaleSound();
+ renderSiteAndTotal();
  renderAll();
  loadPistaMeta(); // atualiza a régua imediatamente
  } catch (e) {
  statusEl.className = 'rv-status err';
  statusEl.textContent = 'Falha de conexao.';
  }
+}
+
+// ── Atualiza a linha discreta abaixo do subtítulo do pódio ──
+function renderSiteAndTotal() {
+  const siteFat = Number(window.siteFat) || 0;
+  const totalSellers = sellers.reduce((sum, s) => sum + (Number(s.fat) || 0), 0);
+  const totalGeral = totalSellers + siteFat;
+  const el1 = document.getElementById('site-fat-value');
+  if (el1) el1.textContent = fmtBRL(siteFat);
+  const el2 = document.getElementById('tg-value');
+  if (el2) el2.textContent = fmtBRL(totalGeral);
 }
 
 // A cada 30s, busca dados atualizados no servidor (ex: vendas registradas por
@@ -2501,6 +2562,12 @@ async function pollComercialData() {
  if (fatDisplay && document.activeElement !== fatDisplay) fatDisplay.value = fmtBRL(saved.fat);
  }
  });
+ // Site: pega o valor mais recente do servidor (outras pessoas podem lançar)
+ const novoSite = Number(payload.siteFat) || 0;
+ if (novoSite !== (Number(window.siteFat) || 0)) {
+   window.siteFat = novoSite;
+ }
+ renderSiteAndTotal();
  renderAll();
  loadPistaMeta(); // mantém a régua em sincronia com vendas de outras pessoas
  } catch (e) { /* silencioso — tenta de novo no proximo ciclo */ }
@@ -2577,6 +2644,7 @@ async function loadData() {
  window.CAN_EDIT_COMERCIAL = !!payload.canEdit;
  currentMesReferencia = payload.mesReferencia || null;
  historyData = payload.history || [];
+ window.siteFat = Number(payload.siteFat) || 0;
 
  // Restaurar vendedores
  if (payload.sellers && Array.isArray(payload.sellers)) {
