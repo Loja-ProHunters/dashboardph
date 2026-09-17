@@ -864,7 +864,8 @@ module.exports = async (req, res) => {
     const sess = getSession(req);
     if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sem_sessao'})); return; }
     try {
-      const u = new URL('http://x' + url);
+      // req.url preserva a query string (a variável `url` já foi split-ada em '?')
+      const u = new URL('http://x' + (req.url || ''));
       const modelo = u.searchParams.get('modelo');
       if (!modelo) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'modelo_obrigatorio'})); return; }
       const r = await fenixCompat.consultarModelo(modelo);
@@ -884,7 +885,7 @@ module.exports = async (req, res) => {
     const sess = getSession(req);
     if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sem_sessao'})); return; }
     try {
-      const u = new URL('http://x' + url);
+      const u = new URL('http://x' + (req.url || ''));
       const sku = u.searchParams.get('sku');
       if (!sku) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sku_obrigatorio'})); return; }
       const r = await fenixCompat.consultarAcessorio(sku);
