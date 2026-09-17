@@ -1574,6 +1574,30 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // GET /api/gollog/aeroporto-por-cep?cep=XXXXXXXX — devolve os 3 aeroportos
+  // da rede Gol mais próximos do CEP + o melhor. Consulta BrasilAPI + Haversine.
+  if (req.method === 'GET' && url.startsWith('/api/gollog/aeroporto-por-cep')) {
+    const sess = getSession(req);
+    if (!canUseDocumentos(sess)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const cep = u.searchParams.get('cep');
+      if (!cep) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'cep obrigatório'})); return; }
+      const { sugerirPorCEP } = require('../lib/gollog/aeroportos');
+      const r = await sugerirPorCEP(cep);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message || String(e) }));
+    }
+    return;
+  }
+
   // GET /api/comercial — le os dados (luis e vendas podem ver; auxiliar nao)
   if (req.method === 'GET' && url === '/api/comercial') {
     const sess = getSession(req);
