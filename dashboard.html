@@ -616,14 +616,27 @@ tbody tr:hover td{background:var(--gl)}
         <div id="gtGollogBox" style="display:none">
           <div class="ct-sec">Verso GT + Minuta Gollog</div>
           <div class="ct-row">
-            <div class="ct-field"><label>Aeroporto de retirada (código)</label><input id="gtGAeroporto" placeholder="Ex: MOC, GRU, CNF"></div>
-            <div class="ct-field"><label>Trecho (nome do aeroporto)</label><input id="gtGTrecho" placeholder="Ex: Aeroporto de Montes Claros - Mário Ribeiro"></div>
+            <div class="ct-field"><label>Aeroporto de retirada (código IATA — sugerido pelo CEP)</label><input id="gtGAeroporto" placeholder="Ex: MOC, GRU, CNF"></div>
+            <div class="ct-field" style="justify-content:flex-end"><label>&nbsp;</label><button type="button" class="ct-add" onclick="gtGSugerirAeroporto()">🔍 Sugerir pelo CEP</button></div>
           </div>
+          <div id="gtGAeroportoInfo" style="font-size:12px;color:#666;margin:-4px 0 8px 0"></div>
           <div class="ct-row">
-            <div class="ct-field"><label>Peso total</label><input id="gtGPesoTotal" placeholder="Ex: 3Kg"></div>
-            <div class="ct-field"><label>Medidas da embalagem</label><input id="gtGMedidas" placeholder="Ex: 40x20x10"></div>
+            <div class="ct-field"><label>Peso total *</label><input id="gtGPesoTotal" placeholder="Ex: 3Kg"></div>
+            <div class="ct-field"><label>Medidas da embalagem *</label><input id="gtGMedidas" placeholder="Ex: 40x20x10"></div>
           </div>
-          <div class="ct-field"><label>Tipo de embalagem</label><input id="gtGTipoEmbalagem" placeholder="Ex: Caixa de Papelão"></div>
+          <div class="ct-field"><label>Tipo de embalagem *</label>
+            <select id="gtGTipoEmbalagem">
+              <option value="">— selecione —</option>
+              <option value="CAIXA DE PAPELÃO">Caixa de Papelão</option>
+              <option value="CAIXA DE ISOPOR">Caixa de Isopor</option>
+              <option value="CAIXA DE MADEIRA">Caixa de Madeira</option>
+              <option value="SACO">Saco</option>
+              <option value="ENVELOPE">Envelope</option>
+              <option value="PALETE">Palete</option>
+              <option value="BOMBONA">Bombona</option>
+            </select>
+          </div>
+          <div style="font-size:11.5px;color:#666;margin-top:6px">* preenchimento manual. O restante (empresa, destinatário, produto, notas fiscais, valor, fixos: Entrega=Retira Aeroporto, Pagto=Frete a Cobrar, Seguro=Próprio, Responsável=Luis Henrique Gonçalves) é automático.</div>
         </div>
 
         <button class="btn-save" id="gtBtnGerar" onclick="gtGerar()" style="margin-top:8px">Gerar GT (PDF)</button>
@@ -4031,6 +4044,8 @@ function gtUpdateSfpc() {
 function gtOnVarianteChange() {
   var v = document.getElementById('gtVariante').value;
   document.getElementById('gtGollogBox').style.display = (v === 'ezequiel_gollog') ? 'block' : 'none';
+  // Se acabou de escolher Gollog e já tem endereço extraído, sugere aeroporto
+  if (v === 'ezequiel_gollog') setTimeout(gtGTentarSugerirAuto, 50);
 }
 
 var gtProdSeq = 0;
@@ -4137,6 +4152,8 @@ function gtExtrairNF() {
         : total + ' NFs extraidas e mescladas! Revise TODOS os campos antes de gerar.';
       if (todosAvisos.length) msg += ' Avisos: ' + todosAvisos.join(' | ');
       gtSetStatus('gtNfStatus', true, msg);
+      // Se variante = Gollog e endereço tem CEP, já sugere aeroporto sozinho
+      setTimeout(gtGTentarSugerirAuto, 50);
       return;
     }
 
@@ -4171,6 +4188,66 @@ function gtExtrairNF() {
   }
 
   processarProxima(0);
+}
+
+// ── Sugestão automática de aeroporto pela CEP do destinatário ─
+// Roda com botão ou automaticamente após extração de NF, quando a variante
+// é ezequiel_gollog (que exige aeroporto de retirada).
+window.__gtGAeroportoNome = window.__gtGAeroportoNome || {};
+
+function gtGExtrairCEP(str) {
+  if (!str) return null;
+  var m = String(str).match(/(\d{2})[.\s]?(\d{3})[-\s]?(\d{3})/);
+  return m ? m[1] + m[2] + m[3] : null;
+}
+
+function gtGSugerirAeroporto() {
+  var info = document.getElementById('gtGAeroportoInfo');
+  info.style.color = '#666';
+  info.textContent = 'Buscando aeroporto…';
+  var endereco = document.getElementById('gtDestEndereco').value.trim();
+  var cep = gtGExtrairCEP(endereco);
+  if (!cep) {
+    info.style.color = '#a01818';
+    info.textContent = 'CEP não encontrado no endereço do destinatário. Ajuste o endereço ou preencha o aeroporto manualmente.';
+    return;
+  }
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', '/api/gollog/aeroporto-por-cep?cep=' + encodeURIComponent(cep), true);
+  xhr.onload = function() {
+    try {
+      var r = JSON.parse(xhr.responseText);
+      if (xhr.status !== 200) throw new Error(r.error || 'HTTP ' + xhr.status);
+      var m = r.melhor;
+      document.getElementById('gtGAeroporto').value = m.iata;
+      window.__gtGAeroportoNome[m.iata] = m.nome;
+      // Cacheia também os alternativos pra caso o usuário troque
+      (r.top3 || []).forEach(function(t) { window.__gtGAeroportoNome[t.iata] = t.nome; });
+      var alts = (r.top3 || []).slice(1).map(function(t) {
+        return t.iata + ' (' + t.cidade + ', ' + t.distancia_km + 'km)';
+      }).join(' · ');
+      info.style.color = 'green';
+      info.innerHTML = '✓ Sugerido: <b>' + m.iata + '</b> — ' + m.nome + ' (' + m.distancia_km + 'km de ' + (r.origem.cidade || 'CEP') + '/' + (r.origem.uf || '?') + ')' +
+                       (alts ? '<br><span style="color:#666">Alternativos: ' + alts + '</span>' : '');
+    } catch (e) {
+      info.style.color = '#a01818';
+      info.textContent = 'Erro: ' + (e.message || e);
+    }
+  };
+  xhr.onerror = function() { info.style.color = '#a01818'; info.textContent = 'Falha de conexão.'; };
+  xhr.send();
+}
+
+// Hook: quando muda a variante pra ezequiel_gollog E já tem endereço extraído,
+// dispara sugestão automática de aeroporto.
+function gtGTentarSugerirAuto() {
+  var variante = document.getElementById('gtVariante').value;
+  if (variante !== 'ezequiel_gollog') return;
+  var endereco = document.getElementById('gtDestEndereco').value.trim();
+  var aeroAtual = document.getElementById('gtGAeroporto').value.trim();
+  if (endereco && !aeroAtual && gtGExtrairCEP(endereco)) {
+    gtGSugerirAeroporto();
+  }
 }
 
 function gtGerar() {
@@ -4219,9 +4296,13 @@ function gtGerar() {
   };
 
   if (variante === 'ezequiel_gollog') {
+    var aeroportoIata = document.getElementById('gtGAeroporto').value.trim().toUpperCase();
+    // Trecho (nome completo do aeroporto) é resolvido no cache local
+    // populado por gtGSugerirAeroporto() — se não tiver, envia só o código.
+    var trechoAuto = (window.__gtGAeroportoNome && window.__gtGAeroportoNome[aeroportoIata]) || aeroportoIata;
     payload.gollog = {
-      aeroporto: document.getElementById('gtGAeroporto').value.trim(),
-      trecho: document.getElementById('gtGTrecho').value.trim(),
+      aeroporto: aeroportoIata,
+      trecho: trechoAuto,
       pesoTotal: document.getElementById('gtGPesoTotal').value.trim(),
       tipoEmbalagem: document.getElementById('gtGTipoEmbalagem').value.trim(),
       medidasEmbalagens: document.getElementById('gtGMedidas').value.trim(),
