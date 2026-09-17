@@ -25,6 +25,8 @@ const crmColl     = require('../lib/crm/collections');
 const crmOcr      = require('../lib/crm/docsOcr');
 const crmSchemas  = require('../lib/crm/docsSchemas');
 const fenixCompat = require('../lib/crm/fenixCompat');
+const blingFenixMap     = require('../lib/crm/blingFenixMap');
+const blingFenixGerador = require('../lib/crm/blingFenixGerador');
 
 // Bling API v3
 const blingOauth      = require('../lib/bling/oauth');
@@ -907,6 +909,117 @@ module.exports = async (req, res) => {
     fenixCompat.invalidarCache();
     res.writeHead(200,{'Content-Type':'application/json'});
     res.end(JSON.stringify({ ok: true }));
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // Mapa Bling ⇄ Fenix — dicionário que traduz produtos do Bling
+  // nos códigos oficiais da tabela Fenix. Alimenta a Camada 4
+  // (automação de upsell). Ver claude/crm-inteligencia-compatibilidade.md
+  // ═════════════════════════════════════════════════════════════
+
+  // POST /api/crm/fenix/mapa/gerar-iniciar — extrai SKUs Fenix únicos dos
+  // pedidos e cria o checkpoint. Não chama Claude ainda — só prepara.
+  if (req.method === 'POST' && url === '/api/crm/fenix/mapa/gerar-iniciar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const body = await readBody(req);
+      const { forcarRegerarRevisados = false } = JSON.parse(body || '{}');
+      const r = await blingFenixGerador.iniciar({ iniciado_por: sess.usuario, forcarRegerarRevisados });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
+    return;
+  }
+
+  // POST /api/crm/fenix/mapa/gerar-tick — roda 1 lote (~10 SKUs pra Claude).
+  // A UI chama em loop até checkpoint.pendentes == 0.
+  if (req.method === 'POST' && url === '/api/crm/fenix/mapa/gerar-tick') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const r = await blingFenixGerador.tick();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
+    return;
+  }
+
+  // GET /api/crm/fenix/mapa/gerar-status — situação do checkpoint + stats do mapa
+  if (req.method === 'GET' && url === '/api/crm/fenix/mapa/gerar-status') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const cp = await blingFenixGerador.lerCheckpoint();
+      const stats = await blingFenixMap.estatisticas();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ checkpoint: cp, estatisticas: stats }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
+    return;
+  }
+
+  // GET /api/crm/fenix/mapa/lista?filtro=pendentes|revisados|fenix|nao_fenix|baixa_confianca|todos&limite=200
+  if (req.method === 'GET' && url.startsWith('/api/crm/fenix/mapa/lista')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const filtro = u.searchParams.get('filtro') || 'pendentes';
+      const limite = Math.min(500, Number(u.searchParams.get('limite') || 200));
+      const items = await blingFenixMap.listar({ filtro, limite });
+      const stats = await blingFenixMap.estatisticas();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ items, estatisticas: stats, filtro, limite }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
+    return;
+  }
+
+  // POST /api/crm/fenix/mapa/aprovar — body: {sku_bling, fenix_codes?, categoria?, marca?, eh_kit?}
+  if (req.method === 'POST' && url === '/api/crm/fenix/mapa/aprovar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const body = await readBody(req);
+      const { sku_bling, ...patch } = JSON.parse(body || '{}');
+      if (!sku_bling) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sku_bling obrigatório'})); return; }
+      const m = await blingFenixMap.aprovar(sku_bling, { por: sess.usuario, patch });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, mapeamento: m }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
+    return;
+  }
+
+  // POST /api/crm/fenix/mapa/rejeitar — body: {sku_bling, motivo?}
+  if (req.method === 'POST' && url === '/api/crm/fenix/mapa/rejeitar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const body = await readBody(req);
+      const { sku_bling, motivo } = JSON.parse(body || '{}');
+      if (!sku_bling) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sku_bling obrigatório'})); return; }
+      const m = await blingFenixMap.rejeitar(sku_bling, { por: sess.usuario, motivo });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, mapeamento: m }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
     return;
   }
 
