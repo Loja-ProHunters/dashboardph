@@ -1954,6 +1954,21 @@ function renderPodium() {
  if (window.CAN_EDIT_COMERCIAL) opts.push('<option value="site">🌐 Site (canal)</option>');
  sellerSel.innerHTML = opts.join('');
  if (prevVal) sellerSel.value = prevVal;
+ // Atualiza placeholder + min do input quando muda pra "site" (aceita negativo
+ // pra correção; vendedor normal continua com min=1)
+ sellerSel.onchange = function() {
+   const inp = document.getElementById('rvValor');
+   if (!inp) return;
+   if (this.value === 'site') {
+     inp.placeholder = 'Valor (R$) — use negativo pra corrigir';
+     inp.min = ''; // libera negativos
+   } else {
+     inp.placeholder = 'Valor da venda (R$)';
+     inp.min = '1';
+   }
+ };
+ // dispara pra alinhar no init
+ setTimeout(() => sellerSel.onchange && sellerSel.onchange(), 0);
 
  // Se o usuário logado é vendedor, trava no próprio nome (impede lançar pro colega).
  // Gerência/auxiliar continuam podendo escolher qualquer vendedor.
@@ -2461,14 +2476,21 @@ async function registrarVenda() {
  const selValue = sel?.value;
  const valor = parseFloat(valEl?.value);
 
- if (!selValue || !valor || valor <= 0) {
+ // Regra: Site aceita negativo pra correção; vendedor precisa ser > 0
+ const ehSite = (selValue === 'site');
+ const valorValido = ehSite ? (Number.isFinite(valor) && valor !== 0) : (valor > 0);
+ if (!selValue || !valorValido) {
  statusEl.className = 'rv-status err';
- statusEl.textContent = 'Escolha o canal/vendedor e informe um valor de venda válido.';
+ statusEl.textContent = ehSite
+   ? 'Informe um valor diferente de zero (use negativo pra corrigir).'
+   : 'Escolha o canal/vendedor e informe um valor de venda válido.';
  return;
  }
 
  // ── Caso especial: SITE (bucket separado, não é vendedor) ──
- if (selValue === 'site') {
+ if (ehSite) {
+  const remocao = valor < 0;
+  if (remocao && !confirm(`Remover ${fmtBRL(Math.abs(valor))} do faturamento do Site?`)) return;
   try {
     const resp = await fetch('/api/comercial/registrar-venda-site', {
       method: 'POST',
@@ -2484,8 +2506,10 @@ async function registrarVenda() {
     window.siteFat = Number(data.siteFat) || 0;
     valEl.value = '';
     statusEl.className = 'rv-status ok';
-    statusEl.textContent = `Venda do Site de ${fmtBRL(valor)} registrada!`;
-    playSaleSound();
+    statusEl.textContent = remocao
+      ? `Ajuste de -${fmtBRL(Math.abs(valor))} aplicado no Site. Novo total: ${fmtBRL(window.siteFat)}.`
+      : `Venda do Site de ${fmtBRL(valor)} registrada!`;
+    if (!remocao) playSaleSound();
     renderSiteAndTotal();
     renderAll();
     loadPistaMeta();
