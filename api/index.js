@@ -1717,10 +1717,13 @@ module.exports = async (req, res) => {
     try {
       const { valor } = JSON.parse(body || '{}');
       const valorNum = Number(valor);
-      if (!valorNum || valorNum <= 0) throw new Error('Informe um valor de venda maior que zero.');
+      // Aceita negativo (correção). Rejeita só zero, NaN ou vazio.
+      if (!Number.isFinite(valorNum) || valorNum === 0) {
+        throw new Error('Informe um valor diferente de zero (use negativo pra corrigir).');
+      }
       const data = await registrarVendaSite(valorNum);
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ok: true, siteFat: data.siteFat }));
+      res.end(JSON.stringify({ ok: true, siteFat: data.siteFat, ajuste: valorNum }));
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Erro ao registrar venda do site: ' + e.message }));
