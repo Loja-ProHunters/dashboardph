@@ -4675,9 +4675,190 @@ async function crmRenderPainel(){
       '</details>' +
     '</div>';
 
-  view.innerHTML = welcome + kpisHtml + migrateBtn + blingCard + fenixCard;
+  // Card do Mapa Bling ⇄ Fenix — dicionário que traduz produtos do Bling
+  // nos códigos oficiais Fenix. Base pra automação de upsell. Só gerência.
+  var fenixMapCard = sess.isAdmin
+    ? '<div id="fenixmap-card" style="margin-top:22px;padding:18px 20px;background:var(--wh);border:1px solid var(--bd);border-radius:12px;box-shadow:var(--sh-1)">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">' +
+          '<div><div style="font-weight:700;font-size:14px;color:var(--tx)">🧠 Mapa Bling ⇄ Fenix</div>' +
+          '<div style="font-size:11.5px;color:var(--gy)">Dicionário que traduz produtos do Bling em códigos Fenix (base da automação de upsell)</div></div>' +
+          '<div id="fenixmap-badge" style="font-size:10.5px;font-weight:700;letter-spacing:.4px;padding:4px 10px;border-radius:99px;background:var(--bg);color:var(--gy);text-transform:uppercase">carregando…</div>' +
+        '</div>' +
+        '<div id="fenixmap-stats" style="font-size:12px;color:var(--gy);margin:8px 0"></div>' +
+        '<div id="fenixmap-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">' +
+          '<button class="crm-btn" onclick="fenixmapGerarIniciar()">🤖 Gerar automático (IA)</button>' +
+          '<button class="crm-btn" style="background:var(--bg);color:var(--tx)" onclick="fenixmapMostrar(\'pendentes\')">Ver pendentes</button>' +
+          '<button class="crm-btn" style="background:var(--bg);color:var(--tx)" onclick="fenixmapMostrar(\'baixa_confianca\')">Baixa confiança</button>' +
+          '<button class="crm-btn" style="background:var(--bg);color:var(--tx)" onclick="fenixmapMostrar(\'revisados\')">Revisados</button>' +
+        '</div>' +
+        '<div id="fenixmap-progresso" style="font-size:12px;color:var(--gd);margin:8px 0" hidden></div>' +
+        '<div id="fenixmap-lista" style="margin-top:12px" hidden></div>' +
+      '</div>'
+    : '';
+
+  view.innerHTML = welcome + kpisHtml + migrateBtn + blingCard + fenixCard + fenixMapCard;
   if (sess.isAdmin) crmBlingRefreshStatus();
   crmFenixInit();
+  if (sess.isAdmin) fenixmapRefreshStats();
+}
+
+// ── Mapa Bling ⇄ Fenix — funções da UI (só gerência) ─────────────
+async function fenixmapRefreshStats(){
+  var badge = document.getElementById('fenixmap-badge');
+  var box = document.getElementById('fenixmap-stats');
+  if (!badge) return;
+  try {
+    var r = await fetch('/api/crm/fenix/mapa/gerar-status');
+    var s = await r.json();
+    if (!r.ok) throw new Error(s.error || 'Erro');
+    var st = s.estatisticas || {};
+    var tot = st.total || 0;
+    var rev = st.revisados || 0;
+    badge.textContent = rev + ' de ' + tot + ' revisados';
+    if (tot > 0 && rev === tot) { badge.style.background = '#e7f5ec'; badge.style.color = 'var(--gd)'; }
+    else if (tot > 0)           { badge.style.background = '#fef4e7'; badge.style.color = '#a06210'; }
+    else                        { badge.style.background = 'var(--bg)'; badge.style.color = 'var(--gy)'; }
+    var stHtml = 'Total: <b>' + tot + '</b> · Fenix: <b>' + (st.fenix||0) + '</b> · Kits: <b>' + (st.kits||0) +
+                 '</b> · Baixa confiança: <b style="color:#a06210">' + (st.baixa_confianca_pendentes||0) + '</b>';
+    if (s.checkpoint && s.checkpoint.status === 'em_andamento') {
+      stHtml += ' · <span style="color:var(--gd)">Gerando: ' + s.checkpoint.processados + '/' + s.checkpoint.total_original + '</span>';
+    }
+    box.innerHTML = stHtml;
+  } catch (e) {
+    badge.textContent = 'erro'; badge.style.background = '#fbe6e6'; badge.style.color = '#a01818';
+    console.error('[fenixmap] stats:', e);
+  }
+}
+
+async function fenixmapGerarIniciar(){
+  if (!confirm('Iniciar geração automática do mapa via IA?\n\nIsso vai:\n1. Extrair todos os SKUs Fenix únicos dos seus pedidos\n2. Chamar a Claude API pra propor o mapeamento de cada um\n3. Salvar propostas em crm/bling-fenix-map.json\n\nCusto estimado: US$ 0,30-0,50\nTempo: alguns minutos (roda em lotes de 10)\n\nDepois você revisa cada mapeamento antes de virar produção.\n\nContinuar?')) return;
+  var prog = document.getElementById('fenixmap-progresso');
+  prog.hidden = false;
+  prog.innerHTML = 'Iniciando…';
+  try {
+    var r = await fetch('/api/crm/fenix/mapa/gerar-iniciar', { method: 'POST', headers:{'Content-Type':'application/json'}, body: '{}' });
+    var s = await r.json();
+    if (!r.ok) throw new Error(s.error || 'HTTP ' + r.status);
+    prog.innerHTML = 'Encontrados <b>' + s.pendentes + '</b> SKUs pra mapear. Processando lotes de 10…';
+    await fenixmapLoopTicks();
+  } catch (e) {
+    prog.innerHTML = '<span style="color:#a01818">Erro: ' + (e.message||e) + '</span>';
+  }
+}
+
+async function fenixmapLoopTicks(){
+  var prog = document.getElementById('fenixmap-progresso');
+  var lotes = 0, maxLotes = 50;
+  while (lotes < maxLotes) {
+    lotes++;
+    try {
+      var r = await fetch('/api/crm/fenix/mapa/gerar-tick', { method: 'POST', headers:{'Content-Type':'application/json'}, body: '{}' });
+      var s = await r.json();
+      if (!r.ok) throw new Error(s.error || 'HTTP ' + r.status);
+      if (s.terminou) {
+        prog.innerHTML = '✓ Concluído. Total processados: <b>' + (s.checkpoint.processados || '?') + '</b>. Clique em "Ver pendentes" pra revisar.';
+        await fenixmapRefreshStats();
+        return;
+      }
+      var cp = s.checkpoint || {};
+      prog.innerHTML = 'Lote ' + lotes + ' processado. Progresso: <b>' + cp.processados + '/' + cp.total_original + '</b>. Continuando…';
+      await fenixmapRefreshStats();
+    } catch (e) {
+      prog.innerHTML = '<span style="color:#a01818">Erro no lote ' + lotes + ': ' + (e.message||e) + '</span>';
+      return;
+    }
+  }
+  prog.innerHTML = 'Atingi limite de segurança (' + maxLotes + ' lotes). Clique de novo em "Gerar automático" pra continuar.';
+}
+
+async function fenixmapMostrar(filtro){
+  var box = document.getElementById('fenixmap-lista');
+  box.hidden = false;
+  box.dataset.filtro = filtro;
+  box.innerHTML = 'Carregando ' + filtro + '…';
+  try {
+    var r = await fetch('/api/crm/fenix/mapa/lista?filtro=' + encodeURIComponent(filtro) + '&limite=200');
+    var s = await r.json();
+    if (!r.ok) throw new Error(s.error || 'HTTP ' + r.status);
+    box.innerHTML = fenixmapRender(s.items, filtro);
+  } catch (e) {
+    box.innerHTML = '<span style="color:#a01818">Erro: ' + (e.message||e) + '</span>';
+  }
+}
+
+function fenixmapEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+function fenixmapRender(items, filtro){
+  if (!items || !items.length) return '<div style="padding:10px;color:var(--gy);font-size:12px">Nenhum item nesta lista.</div>';
+  var titulo = '<div style="font-weight:600;font-size:13px;margin-bottom:8px">' + items.length + ' item(ns) — filtro: ' + fenixmapEsc(filtro) + '</div>';
+  var lista = items.map(function(m){
+    var codes = (m.fenix_codes || []).join(', ') || '<i>(nenhum — não é Fenix)</i>';
+    var conf = Math.round((m.confianca || 0) * 100) + '%';
+    var confColor = m.confianca >= 0.8 ? 'var(--gd)' : (m.confianca >= 0.5 ? '#a06210' : '#a01818');
+    var revChip = m.revisado_por_humano
+      ? '<span style="background:#e7f5ec;color:var(--gd);padding:1px 6px;border-radius:3px;font-size:10px">✓ REVISADO</span>'
+      : '<span style="background:#fef4e7;color:#a06210;padding:1px 6px;border-radius:3px;font-size:10px">PENDENTE</span>';
+    var vendas = m.vezes_vendido ? '<span style="color:var(--gy);font-size:11px">' + m.vezes_vendido + ' vendas · R$ ' + Number(m.valor_total_vendido||0).toFixed(0) + '</span>' : '';
+    var skuEsc = fenixmapEsc(m.sku_bling);
+    var skuJs = String(m.sku_bling).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var acoes = !m.revisado_por_humano
+      ? '<button class="crm-btn" style="padding:3px 10px;font-size:11px" onclick="fenixmapAprovar(\'' + skuJs + '\')">✓ Aprovar</button>' +
+        ' <button class="crm-btn" style="padding:3px 10px;font-size:11px;background:var(--bg);color:var(--tx)" onclick="fenixmapEditar(\'' + skuJs + '\')">✎ Editar</button>' +
+        ' <button class="crm-btn" style="padding:3px 10px;font-size:11px;background:#fbe6e6;color:#a01818" onclick="fenixmapRejeitar(\'' + skuJs + '\')">✗ Não é Fenix</button>'
+      : '<span style="color:var(--gy);font-size:11px">por ' + fenixmapEsc(m.revisado_por||'') + '</span>';
+    return '<div style="padding:10px;border:1px solid var(--bd);border-radius:6px;margin-bottom:8px;background:var(--wh)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:start;gap:8px;margin-bottom:4px">' +
+        '<div style="flex:1"><b>' + fenixmapEsc(m.descricao_bling) + '</b><br>' +
+          '<span style="color:var(--gy);font-size:11px">SKU: ' + skuEsc + '</span></div>' +
+        '<div style="text-align:right">' + revChip + '<br>' + vendas + '</div>' +
+      '</div>' +
+      '<div style="font-size:12px;margin:6px 0"><b>Códigos Fenix:</b> ' + codes +
+        ' · <b>Marca:</b> ' + fenixmapEsc(m.marca||'?') +
+        ' · <b>Categoria:</b> ' + fenixmapEsc(m.categoria||'?') +
+        (m.eh_kit ? ' · <span style="background:#e0e7ff;color:#3730a3;padding:1px 5px;border-radius:3px;font-size:10px">KIT</span>' : '') +
+        ' · Confiança: <span style="color:' + confColor + ';font-weight:600">' + conf + '</span></div>' +
+      (m.motivo ? '<div style="font-size:11.5px;color:var(--gy);font-style:italic;margin:4px 0">💭 ' + fenixmapEsc(m.motivo) + '</div>' : '') +
+      '<div style="margin-top:6px">' + acoes + '</div>' +
+    '</div>';
+  }).join('');
+  return titulo + lista;
+}
+
+async function fenixmapAprovar(sku){
+  try {
+    var r = await fetch('/api/crm/fenix/mapa/aprovar', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ sku_bling: sku }) });
+    var s = await r.json();
+    if (!r.ok) throw new Error(s.error || 'HTTP ' + r.status);
+    var box = document.getElementById('fenixmap-lista');
+    fenixmapMostrar((box && box.dataset.filtro) || 'pendentes');
+    fenixmapRefreshStats();
+  } catch (e) { alert('Erro: ' + (e.message||e)); }
+}
+
+async function fenixmapEditar(sku){
+  var novo = prompt('Digite os códigos Fenix separados por vírgula (ex: PD36R PRO, ALG-15).\nVazio = não é Fenix.', '');
+  if (novo === null) return;
+  var codes = novo.split(',').map(function(c){return c.trim();}).filter(Boolean);
+  try {
+    var r = await fetch('/api/crm/fenix/mapa/aprovar', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ sku_bling: sku, fenix_codes: codes, marca: codes.length ? 'fenix' : 'nao_fenix' }) });
+    var s = await r.json();
+    if (!r.ok) throw new Error(s.error || 'HTTP ' + r.status);
+    var box = document.getElementById('fenixmap-lista');
+    fenixmapMostrar((box && box.dataset.filtro) || 'pendentes');
+    fenixmapRefreshStats();
+  } catch (e) { alert('Erro: ' + (e.message||e)); }
+}
+
+async function fenixmapRejeitar(sku){
+  if (!confirm('Marcar este SKU como "não é Fenix"?')) return;
+  try {
+    var r = await fetch('/api/crm/fenix/mapa/rejeitar', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ sku_bling: sku }) });
+    var s = await r.json();
+    if (!r.ok) throw new Error(s.error || 'HTTP ' + r.status);
+    var box = document.getElementById('fenixmap-lista');
+    fenixmapMostrar((box && box.dataset.filtro) || 'pendentes');
+    fenixmapRefreshStats();
+  } catch (e) { alert('Erro: ' + (e.message||e)); }
 }
 
 // ── Compatibilidade Fenix (card no painel — todos os perfis) ─────
