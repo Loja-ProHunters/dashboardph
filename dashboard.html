@@ -4568,6 +4568,62 @@ async function gerarContratoParceiro() {
   #tab-crm .crm-field-grid{grid-template-columns:1fr}
   #tab-crm .crm-row{grid-template-columns:1fr}
 }
+/* Badge de contador de tarefas nas sub-abas */
+#tab-crm .crm-sub-badge{display:inline-block;background:var(--gm);color:#fff;border-radius:99px;padding:1px 7px;font-size:10.5px;font-weight:700;margin-left:4px;line-height:1.4;vertical-align:middle}
+#tab-crm .crm-sub-badge.overdue{background:var(--r);animation:pulseBadge 2s ease-in-out infinite}
+@keyframes pulseBadge{0%,100%{opacity:1}50%{opacity:.7}}
+/* Cards de tarefas (Minhas Tarefas) */
+#tab-crm .tar-list{display:flex;flex-direction:column;gap:10px}
+#tab-crm .tar-card{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;box-shadow:var(--sh-1);transition:border-color .15s}
+#tab-crm .tar-card:hover{border-color:var(--gm)}
+#tab-crm .tar-card.overdue{border-left:4px solid var(--r)}
+#tab-crm .tar-card.upcoming{border-left:4px solid #a06210}
+#tab-crm .tar-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
+#tab-crm .tar-tit{font-weight:700;font-size:14px;color:var(--tx);flex:1}
+#tab-crm .tar-prazo{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--bg);color:var(--gy);white-space:nowrap}
+#tab-crm .tar-prazo.overdue{background:#fbe6e6;color:#a01818}
+#tab-crm .tar-prazo.hoje{background:#fef4e7;color:#a06210}
+#tab-crm .tar-desc{font-size:12.5px;color:var(--gy);margin:6px 0 10px;line-height:1.45;white-space:pre-wrap}
+#tab-crm .tar-pitch{background:var(--bg);border:1px dashed var(--bd);border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--tx);margin:8px 0;white-space:pre-wrap;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+#tab-crm .tar-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+#tab-crm .tar-actions button{background:transparent;border:1px solid var(--bd);color:var(--tx);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600}
+#tab-crm .tar-actions button:hover{border-color:var(--gm);color:var(--gd)}
+#tab-crm .tar-actions button.primary{background:var(--gd);color:#fff;border-color:var(--gd)}
+#tab-crm .tar-actions button.primary:hover{opacity:.9;color:#fff}
+/* Ficha do cliente */
+#tab-crm .fic-search-wrap{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:14px}
+#tab-crm .fic-search-inp{width:100%;padding:11px 14px;border:1px solid var(--bd);border-radius:8px;font-size:14px;background:var(--wh);color:var(--tx);outline:none;box-sizing:border-box}
+#tab-crm .fic-search-inp:focus{border-color:var(--gm)}
+#tab-crm .fic-results{margin-top:10px;background:var(--wh);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+#tab-crm .fic-results-row{padding:12px 14px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s;display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:center}
+#tab-crm .fic-results-row:hover{background:var(--bg)}
+#tab-crm .fic-results-row:last-child{border-bottom:none}
+#tab-crm .fic-panel{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:18px;box-shadow:var(--sh-1)}
+#tab-crm .fic-panel h3{margin:0 0 4px;font-size:16px;color:var(--tx)}
+#tab-crm .fic-panel .fic-meta{font-size:12px;color:var(--gy);margin-bottom:14px}
+#tab-crm .fic-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:14px}
+#tab-crm .fic-kpi{background:var(--bg);border-radius:8px;padding:10px}
+#tab-crm .fic-kpi-lbl{font-size:10px;font-weight:700;color:var(--gy);letter-spacing:.6px;text-transform:uppercase;margin-bottom:2px}
+#tab-crm .fic-kpi-val{font-size:15px;font-weight:700;color:var(--tx)}
+#tab-crm .fic-section{margin-top:14px;padding-top:12px;border-top:1px solid var(--bd)}
+#tab-crm .fic-section h4{font-size:13px;color:var(--tx);margin:0 0 8px;font-weight:700}
+#tab-crm .fic-hist-row{font-size:12.5px;padding:6px 0;border-bottom:1px dotted var(--bd);display:grid;grid-template-columns:100px 1fr auto;gap:10px;align-items:center}
+#tab-crm .fic-hist-row:last-child{border-bottom:none}
+#tab-crm .fic-sugestoes{background:linear-gradient(135deg,#f0f9f2,#e8f5ec);border:1px solid #c3e5cc;border-radius:10px;padding:14px;margin-top:12px}
+#tab-crm .fic-sug-item{background:var(--wh);border-radius:8px;padding:10px 12px;margin-top:8px;border:1px solid #d5ead9}
+#tab-crm .fic-sug-nome{font-weight:700;font-size:13px;color:var(--tx)}
+#tab-crm .fic-sug-motivo{font-size:11.5px;color:var(--gy);margin-top:2px}
+#tab-crm .fic-sug-pitch{background:var(--bg);border-radius:6px;padding:8px 10px;margin-top:8px;font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;white-space:pre-wrap;line-height:1.4}
+#tab-crm .fic-conf{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:6px;background:var(--gd);color:#fff}
+/* Tooltip / balão de primeiro uso */
+.crm-tip-ovl{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9998;display:none}
+.crm-tip-ovl.on{display:block}
+.crm-tip-balao{position:fixed;background:var(--wh);border-radius:12px;padding:20px 22px;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.35);z-index:9999;border:2px solid var(--gd)}
+.crm-tip-balao h4{margin:0 0 8px;font-size:15px;color:var(--gd)}
+.crm-tip-balao p{margin:0 0 12px;font-size:13px;color:var(--tx);line-height:1.5}
+.crm-tip-balao .crm-tip-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.crm-tip-balao button{background:var(--gd);color:#fff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;font-size:12px;cursor:pointer}
+.crm-tip-balao button.ghost{background:transparent;color:var(--gy);border:1px solid var(--bd)}
 </style>
 
 <!-- Modal genérico de form -->
@@ -4598,6 +4654,8 @@ window.CRM = {
   editing: null,        // { col, doc? } quando o modal está aberto
   labels: {
     painel:       { tit: 'Painel',        subtit: 'Visão geral' },
+    tarefas:      { tit: '🎯 Minhas Tarefas', subtit: 'Fila de trabalho gerada pelo CRM' },
+    ficha:        { tit: '🔍 Buscar Cliente', subtit: 'Ficha completa por nome ou CPF/CNPJ' },
     accounts:     { tit: 'Contas',        subtit: 'Empresas e pessoas',   coll: 'accounts',     singular: 'Conta' },
     contacts:     { tit: 'Contatos',      subtit: 'Pessoas nas contas',   coll: 'contacts',     singular: 'Contato' },
     leads:        { tit: 'Leads',         subtit: 'Prospecção',            coll: 'leads',        singular: 'Lead' },
@@ -4640,11 +4698,17 @@ async function crmInit(){
 }
 
 function crmRenderSubTabs(){
-  var subs = ['painel','accounts','documentos','armas','leads','opportunities','activities','referrals','orders','onboardings','contacts'];
+  var subs = ['painel','tarefas','ficha','accounts','documentos','armas','leads','opportunities','activities','referrals','orders','onboardings','contacts'];
   var L = window.CRM.labels;
   var html = subs.map(function(k){
     var cls = k === window.CRM.currentSub ? 'on' : '';
-    return '<button class="'+cls+'" onclick="crmGoSub(\''+k+'\')">'+crmEsc(L[k].tit)+'</button>';
+    var label = crmEsc(L[k].tit);
+    // Badge de contador de tarefas
+    if (k === 'tarefas' && typeof window.CRM.tarefasCount === 'number' && window.CRM.tarefasCount > 0) {
+      var badgeCls = window.CRM.tarefasOverdue > 0 ? 'crm-sub-badge overdue' : 'crm-sub-badge';
+      label += ' <span class="'+badgeCls+'">'+window.CRM.tarefasCount+'</span>';
+    }
+    return '<button class="'+cls+'" onclick="crmGoSub(\''+k+'\')">'+label+'</button>';
   }).join('');
   document.getElementById('crm-sub').innerHTML = html;
 }
@@ -4663,6 +4727,19 @@ async function crmRenderCurrent(){
     acts.innerHTML = '';
     view.innerHTML = '<div class="crm-loading">Carregando painel…</div>';
     await crmRenderPainel();
+    crmAtualizaContadorTarefas(); // atualiza badge do menu em segundo plano
+    return;
+  }
+  if (k === 'tarefas') {
+    acts.innerHTML = '<button class="crm-btn ghost" onclick="crmRenderCurrent()">↻ Atualizar</button>';
+    view.innerHTML = '<div class="crm-loading">Carregando fila…</div>';
+    await crmRenderTarefas();
+    return;
+  }
+  if (k === 'ficha') {
+    acts.innerHTML = '';
+    view.innerHTML = '<div class="crm-loading">Carregando busca…</div>';
+    crmRenderBuscaFicha();
     return;
   }
   // Lista de coleção
@@ -4768,7 +4845,6 @@ async function crmRenderPainel(){
         '<div id="fenixmap-stats" style="font-size:12px;color:var(--gy);margin:8px 0"></div>' +
         '<div id="fenixmap-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">' +
           '<button class="crm-btn" onclick="fenixmapGerarIniciar()">🤖 Gerar automático (IA)</button>' +
-          '<button class="crm-btn" style="background:#0e7c3f" onclick="fenixmapAprovarMassa()" title="Aprova de uma vez todos os SKUs pendentes com confiança da IA ≥ 90%. Você foca só nos duvidosos.">⚡ Aprovar em massa (≥90%)</button>' +
           '<button class="crm-btn" style="background:var(--bg);color:var(--tx)" onclick="fenixmapMostrar(\'pendentes\')">Ver pendentes</button>' +
           '<button class="crm-btn" style="background:var(--bg);color:var(--tx)" onclick="fenixmapMostrar(\'baixa_confianca\')">Baixa confiança</button>' +
           '<button class="crm-btn" style="background:var(--bg);color:var(--tx)" onclick="fenixmapMostrar(\'revisados\')">Revisados</button>' +
@@ -4915,43 +4991,6 @@ async function fenixmapAprovar(sku){
     fenixmapMostrar((box && box.dataset.filtro) || 'pendentes');
     fenixmapRefreshStats();
   } catch (e) { alert('Erro: ' + (e.message||e)); }
-}
-
-// Aprova em MASSA todos os pendentes com confiança IA >= 90%.
-// Puxa a lista completa de pendentes, filtra os >=90%, dispara /aprovar em
-// sequência (com pequeno atraso pra não sobrecarregar). Mostra progresso.
-async function fenixmapAprovarMassa(){
-  var box = document.getElementById('fenixmap-lista');
-  box.hidden = false;
-  box.innerHTML = 'Carregando pendentes…';
-  try {
-    var rL = await fetch('/api/crm/fenix/mapa/lista?filtro=pendentes&limite=500');
-    var payload = await rL.json();
-    if (!rL.ok) throw new Error(payload.error || 'HTTP ' + rL.status);
-    var todos = payload.items || [];
-    var alvos = todos.filter(function(m){ return !m.revisado_por_humano && (m.confianca || 0) >= 0.9; });
-    if (!alvos.length) { box.innerHTML = '<div style="padding:10px;color:var(--gy)">Nenhum pendente com confiança ≥ 90%. Revise manualmente os ' + todos.length + ' pendentes.</div>'; return; }
-    if (!confirm('Aprovar em massa ' + alvos.length + ' SKUs (de ' + todos.length + ' pendentes) com confiança ≥ 90%?\n\nSKUs com confiança < 90% ficam pra revisão manual.')) return;
-    box.innerHTML = 'Aprovando 0 de ' + alvos.length + '…';
-    var ok = 0, erros = 0;
-    for (var i = 0; i < alvos.length; i++){
-      var m = alvos[i];
-      try {
-        var r = await fetch('/api/crm/fenix/mapa/aprovar', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ sku_bling: m.sku_bling }) });
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        ok++;
-      } catch (e) { erros++; }
-      if ((i + 1) % 5 === 0 || i === alvos.length - 1) {
-        box.innerHTML = 'Aprovando <b>' + (i + 1) + '</b> de <b>' + alvos.length + '</b> · ' + ok + ' OK · ' + erros + ' erros';
-      }
-      // pequena pausa pra não sobrecarregar (githubStore serializa writes)
-      await new Promise(function(res){ setTimeout(res, 60); });
-    }
-    fenixmapRefreshStats();
-    box.innerHTML = '<div style="padding:12px;background:#e7f5ec;border:1px solid #c3e5cc;border-radius:6px;color:var(--gd);font-weight:600">✓ Aprovados ' + ok + ' de ' + alvos.length + (erros ? ' (' + erros + ' erros)' : '') + '. Clique em "Ver pendentes" pra revisar os que sobraram.</div>';
-  } catch (e) {
-    box.innerHTML = '<span style="color:#a01818">Erro: ' + (e.message||e) + '</span>';
-  }
 }
 
 async function fenixmapEditar(sku){
@@ -5875,6 +5914,326 @@ async function crmDeleteDoc(col, id){
   } catch (e) {
     alert('Erro: ' + e.message);
   }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Camada 4 — Minhas Tarefas (fila do vendedor)
+// ═══════════════════════════════════════════════════════════════
+async function crmAtualizaContadorTarefas(){
+  try {
+    var r = await fetch('/api/crm/tarefas/minhas');
+    if (!r.ok) return;
+    var d = await r.json();
+    var hoje = new Date().toISOString().slice(0,10);
+    var overdue = (d.tarefas||[]).filter(function(t){ return t.prazo && t.prazo < hoje; }).length;
+    window.CRM.tarefasCount = d.total || 0;
+    window.CRM.tarefasOverdue = overdue;
+    crmRenderSubTabs();
+  } catch(e){}
+}
+
+async function crmRenderTarefas(){
+  var view = document.getElementById('crm-view');
+  try {
+    var r = await fetch('/api/crm/tarefas/minhas');
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro ao carregar tarefas.');
+    var tarefas = d.tarefas || [];
+    window.CRM.tarefasCount = tarefas.length;
+    var hoje = new Date().toISOString().slice(0,10);
+    var overdue = tarefas.filter(function(t){ return t.prazo && t.prazo < hoje; }).length;
+    window.CRM.tarefasOverdue = overdue;
+    crmRenderSubTabs();
+
+    if (!tarefas.length) {
+      view.innerHTML =
+        '<div class="crm-empty">' +
+        '<div style="font-size:36px;margin-bottom:8px">🎯</div>' +
+        '<div style="font-weight:700;color:var(--tx);margin-bottom:4px">Sem tarefas pendentes.</div>' +
+        '<div style="font-size:12px">O CRM cria tarefas automáticas quando um cliente compra algo com boas chances de upsell, ou quando fica muito tempo parado. Volte aqui depois — ou dispare manualmente uma sugestão em "🔍 Buscar Cliente".</div>' +
+        '</div>';
+      // Tooltip primeiro uso
+      crmMostraTooltipUmaVez('tarefas_vazias',
+        '🎯 Minhas Tarefas',
+        'Esta é sua fila de trabalho. O CRM analisa vendas do Bling e histórico dos clientes, e cria tarefas prontas com o pitch de WhatsApp já escrito. Você só precisa contatar o cliente e marcar como concluída.');
+      return;
+    }
+
+    var html = '<div class="tar-list">';
+    tarefas.forEach(function(t){
+      var cls = 'tar-card';
+      var prazoCls = '';
+      var prazoTxt = t.prazo ? crmFmtDate(t.prazo) : 'sem prazo';
+      if (t.prazo && t.prazo < hoje) { cls += ' overdue'; prazoCls = 'overdue'; prazoTxt = '⚠ Atrasada'; }
+      else if (t.prazo === hoje) { cls += ' upcoming'; prazoCls = 'hoje'; prazoTxt = 'Hoje'; }
+      else if (t.prazo) {
+        var diasAte = Math.round((new Date(t.prazo)-new Date(hoje))/86400000);
+        if (diasAte <= 3) cls += ' upcoming';
+        prazoTxt = 'D+' + diasAte + ' (' + crmFmtDate(t.prazo) + ')';
+      }
+      var pitch = t.pitch_pronto || '';
+      var pitchBlock = pitch ? '<div class="tar-pitch">' + crmEsc(pitch) + '</div>' : '';
+      var descBlock = t.descricao ? '<div class="tar-desc">' + crmEsc(t.descricao) + '</div>' : '';
+      var accId = t.entidade_id || t.account_id || '';
+      html += '<div class="'+cls+'" id="tar-'+crmEsc(t.id)+'">' +
+        '<div class="tar-hd">' +
+          '<div class="tar-tit">'+crmEsc(t.titulo || '(sem título)')+'</div>' +
+          '<div class="tar-prazo '+prazoCls+'">'+crmEsc(prazoTxt)+'</div>' +
+        '</div>' +
+        descBlock +
+        pitchBlock +
+        '<div class="tar-actions">' +
+          (pitch ? '<button class="primary" onclick="crmCopiarPitch(\''+crmEsc(t.id)+'\', this)">📋 Copiar pitch</button>' : '') +
+          (accId ? '<button onclick="crmAbrirFicha(\''+crmEsc(accId)+'\')">👤 Ver ficha</button>' : '') +
+          '<button onclick="crmConcluirTarefa(\''+crmEsc(t.id)+'\', \'convertida\')">✓ Convertida</button>' +
+          '<button onclick="crmConcluirTarefa(\''+crmEsc(t.id)+'\', \'nao_convertida\')">✗ Não convertida</button>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+    view.innerHTML = html;
+
+    // Tooltip primeiro uso (só quando há tarefas)
+    crmMostraTooltipUmaVez('tarefas_primeira_vez',
+      '🎯 Minhas Tarefas',
+      'Cada card é uma sugestão pronta. O botão "📋 Copiar pitch" copia a mensagem de WhatsApp pra você colar no cliente. Depois de falar com ele, marque como "Convertida" (virou venda) ou "Não convertida" (falou, mas não fechou). Isso ajuda o CRM a aprender.');
+  } catch (e) {
+    view.innerHTML = '<div class="crm-empty">Erro: '+crmEsc(e.message)+'</div>';
+  }
+}
+
+async function crmConcluirTarefa(id, resultado){
+  try {
+    var r = await fetch('/api/crm/tarefas/'+encodeURIComponent(id)+'/concluir', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ resultado: resultado })
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro ao concluir.');
+    // Remove card com animação
+    var el = document.getElementById('tar-'+id);
+    if (el) { el.style.transition='opacity .3s, transform .3s'; el.style.opacity='0'; el.style.transform='translateX(20px)'; setTimeout(function(){ crmRenderTarefas(); }, 300); }
+    else crmRenderTarefas();
+  } catch (e) { alert('Erro: ' + e.message); }
+}
+
+function crmCopiarPitch(tarefaId, btn){
+  var card = document.getElementById('tar-'+tarefaId);
+  if (!card) return;
+  var pitch = card.querySelector('.tar-pitch');
+  if (!pitch) return;
+  var texto = pitch.innerText;
+  try {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(texto).then(function(){
+        var orig = btn.innerHTML; btn.innerHTML = '✓ Copiado!';
+        setTimeout(function(){ btn.innerHTML = orig; }, 1500);
+      });
+    } else {
+      // Fallback antigo
+      var ta = document.createElement('textarea'); ta.value = texto; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      var orig = btn.innerHTML; btn.innerHTML = '✓ Copiado!'; setTimeout(function(){ btn.innerHTML = orig; }, 1500);
+    }
+  } catch (e) { alert('Não deu pra copiar: ' + e.message); }
+}
+
+function crmAbrirFicha(accountId){
+  window.CRM.currentSub = 'ficha';
+  window.CRM.fichaPreSelect = accountId;
+  crmRenderSubTabs();
+  crmRenderCurrent();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Camada 3.2 — Buscar Cliente + Ficha completa + Sugerir
+// ═══════════════════════════════════════════════════════════════
+function crmRenderBuscaFicha(){
+  var view = document.getElementById('crm-view');
+  view.innerHTML =
+    '<div class="fic-search-wrap">' +
+      '<input type="text" class="fic-search-inp" id="fic-inp" placeholder="Buscar cliente por nome ou CPF/CNPJ (mínimo 2 letras)…" autocomplete="off">' +
+      '<div id="fic-results"></div>' +
+    '</div>' +
+    '<div id="fic-panel-wrap"></div>';
+
+  var inp = document.getElementById('fic-inp');
+  var t;
+  inp.addEventListener('input', function(){
+    clearTimeout(t);
+    t = setTimeout(function(){ crmBuscaClientes(inp.value); }, 300);
+  });
+
+  // Tooltip primeiro uso
+  crmMostraTooltipUmaVez('ficha_primeira_vez',
+    '🔍 Buscar Cliente',
+    'Digite o nome ou CPF do cliente pra abrir a ficha completa: dados, todos os pedidos que ele já fez, tarefas em aberto, e um botão "🤖 Sugerir próxima venda" que roda a IA na hora usando o histórico dele + compatibilidade Fenix + coocorrência.');
+
+  // Se veio de "Ver ficha" em Tarefas, abre direto
+  if (window.CRM.fichaPreSelect) {
+    var accId = window.CRM.fichaPreSelect;
+    window.CRM.fichaPreSelect = null;
+    crmAbreFicha(accId);
+  } else {
+    inp.focus();
+  }
+}
+
+async function crmBuscaClientes(q){
+  var box = document.getElementById('fic-results');
+  if (!q || q.trim().length < 2) { box.innerHTML = ''; return; }
+  box.innerHTML = '<div class="crm-loading" style="padding:16px">Buscando…</div>';
+  try {
+    var r = await fetch('/api/crm/ficha/buscar?q='+encodeURIComponent(q));
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro na busca.');
+    if (!d.resultados || !d.resultados.length) {
+      box.innerHTML = '<div class="crm-empty" style="padding:20px;margin-top:10px">Nenhum cliente encontrado.</div>';
+      return;
+    }
+    box.innerHTML = '<div class="fic-results">' + d.resultados.map(function(a){
+      return '<div class="fic-results-row" onclick="crmAbreFicha(\''+crmEsc(a.id)+'\')">' +
+        '<div><div style="font-weight:600;font-size:13.5px">'+crmEsc(a.nome||'(sem nome)')+'</div>' +
+          '<div style="font-size:11.5px;color:var(--gy)">'+crmEsc(a.cpf_cnpj||'—')+(a.cidade?' · '+crmEsc(a.cidade):'')+'</div></div>' +
+        '<div style="font-size:11.5px;color:var(--gy);text-align:right">'+ (a.pedidos_count||0) +' pedidos · '+crmFmtBRL(a.valor_total)+'</div>' +
+        '<button class="crm-btn ghost" onclick="event.stopPropagation();crmAbreFicha(\''+crmEsc(a.id)+'\')">Abrir</button>' +
+      '</div>';
+    }).join('') + '</div>';
+  } catch (e) {
+    box.innerHTML = '<div class="crm-empty" style="padding:20px;margin-top:10px">Erro: '+crmEsc(e.message)+'</div>';
+  }
+}
+
+async function crmAbreFicha(accId){
+  var wrap = document.getElementById('fic-panel-wrap');
+  if (!wrap) {
+    // Se veio de outra sub-aba, garante que estamos em ficha
+    window.CRM.currentSub = 'ficha';
+    window.CRM.fichaPreSelect = accId;
+    crmRenderSubTabs();
+    await crmRenderCurrent();
+    return;
+  }
+  wrap.innerHTML = '<div class="crm-loading">Carregando ficha…</div>';
+  try {
+    var r = await fetch('/api/crm/ficha/'+encodeURIComponent(accId));
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro ao carregar ficha.');
+    var a = d.account, orders = d.orders || [], activities = d.activities || [];
+    var pendentes = activities.filter(function(x){ return x.status === 'pendente'; });
+    var html =
+      '<div class="fic-panel">' +
+        '<h3>'+crmEsc(a.nome||'(sem nome)')+'</h3>' +
+        '<div class="fic-meta">'+crmEsc(a.cpf_cnpj||'—')+ (a.email?' · '+crmEsc(a.email):'') + (a.telefone?' · '+crmEsc(a.telefone):'') + (a.cidade?' · '+crmEsc(a.cidade):'') +'</div>' +
+        '<div class="fic-kpis">' +
+          '<div class="fic-kpi"><div class="fic-kpi-lbl">Pedidos</div><div class="fic-kpi-val">'+(a.pedidos_count||0)+'</div></div>' +
+          '<div class="fic-kpi"><div class="fic-kpi-lbl">Total comprado</div><div class="fic-kpi-val">'+crmFmtBRL(a.valor_total_compras||0)+'</div></div>' +
+          '<div class="fic-kpi"><div class="fic-kpi-lbl">Última compra</div><div class="fic-kpi-val" style="font-size:13px">'+(a.ultima_compra_em?crmFmtDate(a.ultima_compra_em):'—')+'</div></div>' +
+          '<div class="fic-kpi"><div class="fic-kpi-lbl">Owner</div><div class="fic-kpi-val" style="font-size:13px">'+crmEsc(a.owner_id||'—')+'</div></div>' +
+        '</div>' +
+        '<div style="text-align:right;margin-top:10px">' +
+          '<button class="crm-btn" onclick="crmSugerirManual(\''+crmEsc(accId)+'\')">🤖 Sugerir próxima venda</button>' +
+        '</div>' +
+        '<div id="fic-sugestoes"></div>' +
+        '<div class="fic-section">' +
+          '<h4>📦 Histórico de pedidos ('+orders.length+')</h4>' +
+          (orders.length ? orders.slice(0,20).map(function(o){
+            var itensTxt = (o.itens||[]).slice(0,3).map(function(i){ return i.sku||i.descricao||''; }).filter(Boolean).join(', ');
+            if ((o.itens||[]).length > 3) itensTxt += ' (+'+((o.itens||[]).length-3)+')';
+            return '<div class="fic-hist-row"><div>'+crmEsc(o.data_pedido||'—')+'</div><div style="font-size:12px" title="'+crmEsc(itensTxt)+'">'+crmEsc(itensTxt||'(sem itens)')+'</div><div style="font-weight:600">'+crmFmtBRL(o.valor_total)+'</div></div>';
+          }).join('') + (orders.length > 20 ? '<div style="font-size:11px;color:var(--gy);text-align:center;padding-top:6px">+'+(orders.length-20)+' pedidos mais antigos</div>' : '')
+          : '<div style="font-size:12px;color:var(--gy)">Sem pedidos registrados.</div>') +
+        '</div>' +
+        '<div class="fic-section">' +
+          '<h4>📋 Tarefas pendentes ('+pendentes.length+')</h4>' +
+          (pendentes.length ? pendentes.slice(0,10).map(function(t){
+            return '<div class="fic-hist-row"><div>'+(t.prazo?crmFmtDate(t.prazo):'—')+'</div><div style="font-size:12px">'+crmEsc(t.titulo||'')+'</div><div style="font-size:11px;color:var(--gy)">'+crmEsc(t.owner_id||'')+'</div></div>';
+          }).join('')
+          : '<div style="font-size:12px;color:var(--gy)">Nenhuma tarefa aberta.</div>') +
+        '</div>' +
+      '</div>';
+    wrap.innerHTML = html;
+  } catch (e) {
+    wrap.innerHTML = '<div class="crm-empty">Erro: '+crmEsc(e.message)+'</div>';
+  }
+}
+
+async function crmSugerirManual(accId){
+  var box = document.getElementById('fic-sugestoes');
+  if (!box) return;
+  box.innerHTML = '<div class="fic-sugestoes"><div style="text-align:center;padding:20px;color:var(--gd)">🤖 Analisando histórico + compatibilidade Fenix + coocorrência…</div></div>';
+  try {
+    var r = await fetch('/api/crm/sugerir?account_id='+encodeURIComponent(accId));
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro ao sugerir.');
+    var sugs = d.sugestoes || [];
+    if (!sugs.length) {
+      box.innerHTML = '<div class="fic-sugestoes"><div style="text-align:center;padding:16px;color:var(--gy);font-size:12.5px">Nenhuma sugestão de alta confiança pra este cliente agora. Motivo: '+crmEsc(d.motivo||'histórico insuficiente')+'.</div></div>';
+      return;
+    }
+    // Guarda pitches num cache global pra evitar problemas de escaping em onclick
+    window.CRM.sugPitches = window.CRM.sugPitches || {};
+    var html = '<div class="fic-sugestoes"><div style="font-weight:700;color:var(--gd);margin-bottom:4px">🤖 '+sugs.length+' sugestão(ões) da IA</div>' +
+      '<div style="font-size:11.5px;color:var(--gy);margin-bottom:8px">Baseado em histórico, compatibilidade Fenix e o que outros clientes compraram junto.</div>';
+    sugs.forEach(function(s, idx){
+      var conf = Math.round((s.confianca||0)*100);
+      var key = 'sug_' + Date.now() + '_' + idx;
+      if (s.pitch) window.CRM.sugPitches[key] = s.pitch;
+      html += '<div class="fic-sug-item">' +
+        '<div class="fic-sug-nome">'+(idx+1)+'. '+crmEsc(s.nome||s.sku_bling||'')+'<span class="fic-conf">'+conf+'%</span></div>' +
+        '<div class="fic-sug-motivo">'+crmEsc(s.motivo||'')+' · SKU: '+crmEsc(s.sku_bling||s.sku_fenix||'—')+'</div>' +
+        (s.pitch ? '<div class="fic-sug-pitch">'+crmEsc(s.pitch)+'</div>' +
+          '<div style="margin-top:6px;text-align:right"><button class="crm-btn ghost" style="padding:5px 10px;font-size:11px" onclick="crmCopiaPitchKey(this,\''+key+'\')">📋 Copiar pitch</button></div>' : '') +
+      '</div>';
+    });
+    html += '</div>';
+    box.innerHTML = html;
+  } catch (e) {
+    box.innerHTML = '<div class="fic-sugestoes"><div style="color:var(--r);text-align:center;padding:16px;font-size:12.5px">Erro: '+crmEsc(e.message)+'</div></div>';
+  }
+}
+
+function crmCopiaPitchKey(btn, key){
+  var t = (window.CRM.sugPitches || {})[key] || '';
+  try {
+    if (navigator.clipboard) navigator.clipboard.writeText(t);
+    else { var ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }
+    var orig = btn.innerHTML; btn.innerHTML = '✓ Copiado!'; setTimeout(function(){ btn.innerHTML = orig; }, 1500);
+  } catch(e) { alert('Erro: '+e.message); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Tooltips de primeiro uso (guarda em localStorage)
+// ═══════════════════════════════════════════════════════════════
+function crmMostraTooltipUmaVez(chave, titulo, texto){
+  try {
+    var k = 'crm_tip_' + chave;
+    if (localStorage.getItem(k) === '1') return;
+    // Overlay + balão centralizado
+    var ovl = document.createElement('div');
+    ovl.className = 'crm-tip-ovl on';
+    ovl.id = 'crm-tip-ovl';
+    var balao = document.createElement('div');
+    balao.className = 'crm-tip-balao';
+    balao.style.top = '50%'; balao.style.left = '50%'; balao.style.transform = 'translate(-50%,-50%)';
+    balao.innerHTML =
+      '<h4>💡 '+titulo+'</h4>' +
+      '<p>'+texto+'</p>' +
+      '<div class="crm-tip-actions">' +
+        '<button onclick="crmFechaTip(\''+chave+'\')">Entendi</button>' +
+      '</div>';
+    document.body.appendChild(ovl);
+    document.body.appendChild(balao);
+    balao.id = 'crm-tip-balao';
+    ovl.addEventListener('click', function(){ crmFechaTip(chave); });
+  } catch(e){}
+}
+function crmFechaTip(chave){
+  try { localStorage.setItem('crm_tip_'+chave, '1'); } catch(e){}
+  var ovl = document.getElementById('crm-tip-ovl');
+  var b = document.getElementById('crm-tip-balao');
+  if (ovl) ovl.remove();
+  if (b) b.remove();
 }
 </script>
 
