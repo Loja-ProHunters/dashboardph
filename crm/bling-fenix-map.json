@@ -756,9 +756,9 @@
       "eh_kit": false,
       "confianca": 0.7,
       "motivo": "Filtro Fenix AOF-L não está na tabela oficial (só consta AOFS+ V2.0); produto existe mas código específico não listado",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:50:43.723Z",
       "gerado_em": "2026-09-18T12:33:03.363Z",
       "primeira_venda_em": "2026-01-03",
       "vezes_vendido": 1,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:50:39.897Z"
+  "atualizado_em": "2026-09-18T12:50:43.723Z"
 }
