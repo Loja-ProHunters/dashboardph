@@ -4624,6 +4624,30 @@ async function gerarContratoParceiro() {
 .crm-tip-balao .crm-tip-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
 .crm-tip-balao button{background:var(--gd);color:#fff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;font-size:12px;cursor:pointer}
 .crm-tip-balao button.ghost{background:transparent;color:var(--gy);border:1px solid var(--bd)}
+/* ═══ Prospecção ═══ */
+#tab-crm .prosp-filtros{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:14px;box-shadow:var(--sh-1)}
+#tab-crm .prosp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+#tab-crm .prosp-fld{display:flex;flex-direction:column;gap:4px}
+#tab-crm .prosp-fld label{font-size:10.5px;font-weight:700;color:var(--gy);letter-spacing:.5px;text-transform:uppercase}
+#tab-crm .prosp-fld select,#tab-crm .prosp-fld input{padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12.5px;background:var(--wh);color:var(--tx);outline:none;font-family:inherit}
+#tab-crm .prosp-fld select:focus,#tab-crm .prosp-fld input:focus{border-color:var(--gm)}
+#tab-crm .prosp-actions{display:flex;gap:8px;justify-content:flex-end;padding-top:10px;border-top:1px solid var(--bd);flex-wrap:wrap;align-items:center}
+#tab-crm .prosp-count{margin-right:auto;font-size:12px;color:var(--gy)}
+#tab-crm .prosp-resultado{background:var(--wh);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+#tab-crm .prosp-tab{width:100%;border-collapse:collapse;font-size:12.5px}
+#tab-crm .prosp-tab th{background:var(--bg);text-align:left;padding:10px 12px;font-size:10.5px;font-weight:700;color:var(--gy);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bd);position:sticky;top:0}
+#tab-crm .prosp-tab td{padding:10px 12px;border-bottom:1px solid var(--bd);vertical-align:top}
+#tab-crm .prosp-tab tr:hover{background:var(--bg)}
+#tab-crm .prosp-tab tr:last-child td{border-bottom:none}
+#tab-crm .prosp-nome{font-weight:600;color:var(--tx)}
+#tab-crm .prosp-tel{font-size:11px;color:var(--gy)}
+#tab-crm .prosp-tag{display:inline-block;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+#tab-crm .prosp-tag.ativo{background:#e7f5ec;color:var(--gd)}
+#tab-crm .prosp-tag.parado{background:#fef4e7;color:#a06210}
+#tab-crm .prosp-tag.novo{background:#e7f0fb;color:#1454a5}
+#tab-crm .prosp-matches{font-size:11px;color:var(--gy);margin-top:3px}
+#tab-crm .prosp-btn-abrir{background:var(--gd);color:#fff;border:none;padding:5px 10px;border-radius:5px;font-size:11px;cursor:pointer;font-weight:600}
+#tab-crm .prosp-btn-abrir:hover{opacity:.9}
 </style>
 
 <!-- Modal genérico de form -->
@@ -4656,6 +4680,7 @@ window.CRM = {
     painel:       { tit: 'Painel',        subtit: 'Visão geral' },
     tarefas:      { tit: '🎯 Minhas Tarefas', subtit: 'Fila de trabalho gerada pelo CRM' },
     ficha:        { tit: '🔍 Buscar Cliente', subtit: 'Ficha completa por nome ou CPF/CNPJ' },
+    prospeccao:   { tit: '🎯 Prospecção',  subtit: 'Filtrar clientes por categoria, marca, período e valor' },
     accounts:     { tit: 'Contas',        subtit: 'Empresas e pessoas',   coll: 'accounts',     singular: 'Conta' },
     contacts:     { tit: 'Contatos',      subtit: 'Pessoas nas contas',   coll: 'contacts',     singular: 'Contato' },
     leads:        { tit: 'Leads',         subtit: 'Prospecção',            coll: 'leads',        singular: 'Lead' },
@@ -4698,7 +4723,7 @@ async function crmInit(){
 }
 
 function crmRenderSubTabs(){
-  var subs = ['painel','tarefas','ficha','accounts','documentos','armas','leads','opportunities','activities','referrals','orders','onboardings','contacts'];
+  var subs = ['painel','tarefas','ficha','prospeccao','accounts','documentos','armas','leads','opportunities','activities','referrals','orders','onboardings','contacts'];
   var L = window.CRM.labels;
   var html = subs.map(function(k){
     var cls = k === window.CRM.currentSub ? 'on' : '';
@@ -4740,6 +4765,12 @@ async function crmRenderCurrent(){
     acts.innerHTML = '';
     view.innerHTML = '<div class="crm-loading">Carregando busca…</div>';
     crmRenderBuscaFicha();
+    return;
+  }
+  if (k === 'prospeccao') {
+    acts.innerHTML = '';
+    view.innerHTML = '<div class="crm-loading">Carregando prospecção…</div>';
+    crmRenderProspeccao();
     return;
   }
   // Lista de coleção
@@ -6234,6 +6265,208 @@ function crmFechaTip(chave){
   var b = document.getElementById('crm-tip-balao');
   if (ovl) ovl.remove();
   if (b) b.remove();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Prospecção — filtra clientes por categoria/marca/período/valor
+// ═══════════════════════════════════════════════════════════════
+function crmRenderProspeccao(){
+  var view = document.getElementById('crm-view');
+  view.innerHTML =
+    '<div class="prosp-filtros">' +
+      '<div class="prosp-grid">' +
+        '<div class="prosp-fld"><label>Categoria comprada</label>' +
+          '<select id="prosp-categoria">' +
+            '<option value="">Qualquer</option>' +
+            '<option value="arma_curta">Arma curta (pistola/revólver)</option>' +
+            '<option value="arma_longa">Arma longa (carabina/rifle/espingarda)</option>' +
+            '<option value="arma_ar_comprimido">Arma de ar comprimido (PCP)</option>' +
+            '<option value="arma">TODAS as armas (curta + longa + PCP)</option>' +
+            '<option value="municao">Munição</option>' +
+            '<option value="optica">Óptica (luneta/red dot/mira)</option>' +
+            '<option value="acessorio">Acessórios</option>' +
+            '<option value="iluminacao">Iluminação (lanterna)</option>' +
+            '<option value="faca">Faca / canivete</option>' +
+            '<option value="recarga">Recarga</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="prosp-fld"><label>Marca (opcional)</label>' +
+          '<select id="prosp-marca">' +
+            '<option value="">Qualquer</option>' +
+            '<optgroup label="Armas premium">' +
+              '<option>Glock</option><option>Ruger</option><option>Colt</option>' +
+              '<option>Weatherby</option><option>Bergara</option><option>Anschutz</option>' +
+              '<option>CZ</option><option>Tanfoglio</option><option>Huglu</option>' +
+              '<option>Akar</option><option>Aselkon</option>' +
+            '</optgroup>' +
+            '<optgroup label="Armas mainstream">' +
+              '<option>Taurus</option>' +
+            '</optgroup>' +
+            '<optgroup label="Óptica">' +
+              '<option>Vector Optics</option><option>GPO</option><option>Fire Eagle</option>' +
+              '<option>Bélica</option><option>Warfare</option>' +
+            '</optgroup>' +
+            '<optgroup label="Munição">' +
+              '<option>CBC</option><option>CCI</option><option>Hornady</option>' +
+              '<option>Federal</option><option>Remington</option><option>Fiocchi</option>' +
+            '</optgroup>' +
+            '<optgroup label="Acessórios">' +
+              '<option>Magpul</option><option>NTK</option><option>Eternal</option>' +
+              '<option>Extreme Hunter</option><option>Atta</option><option>Revint</option>' +
+            '</optgroup>' +
+            '<optgroup label="Facas">' +
+              '<option>Ruike</option>' +
+            '</optgroup>' +
+            '<optgroup label="Iluminação">' +
+              '<option>Fenix</option>' +
+            '</optgroup>' +
+          '</select>' +
+        '</div>' +
+        '<div class="prosp-fld"><label>Período de compra</label>' +
+          '<select id="prosp-dias">' +
+            '<option value="30">Últimos 30 dias</option>' +
+            '<option value="90">Últimos 90 dias</option>' +
+            '<option value="180">Últimos 180 dias</option>' +
+            '<option value="365" selected>Últimos 12 meses</option>' +
+            '<option value="730">Últimos 24 meses</option>' +
+            '<option value="0">Sempre (todo histórico)</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="prosp-fld"><label>Status do cliente</label>' +
+          '<select id="prosp-status">' +
+            '<option value="">Qualquer</option>' +
+            '<option value="ativo">Ativo (comprou nos últimos 90d)</option>' +
+            '<option value="parado">Parado (+90d sem comprar)</option>' +
+            '<option value="novo">Novo (só 1 pedido)</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="prosp-fld"><label>Valor mínimo do cliente (R$)</label>' +
+          '<input type="number" id="prosp-valor-min" placeholder="0" step="100">' +
+        '</div>' +
+      '</div>' +
+      '<div class="prosp-actions">' +
+        '<span class="prosp-count" id="prosp-count"></span>' +
+        '<button class="crm-btn ghost" onclick="crmProspLimpar()">Limpar</button>' +
+        '<button class="crm-btn ghost" id="prosp-btn-csv" onclick="crmProspCSV()" disabled>⬇ Exportar CSV</button>' +
+        '<button class="crm-btn" onclick="crmProspBuscar()">🔍 Buscar</button>' +
+      '</div>' +
+    '</div>' +
+    '<div id="prosp-wrap"></div>';
+
+  crmMostraTooltipUmaVez('prospeccao_primeira_vez',
+    '🎯 Prospecção',
+    'Aqui você filtra clientes pelo que compraram. Ex: quem comprou "Arma" nos últimos 12 meses → lista dos que podem precisar de acessório/munição. Depois exporta em CSV pra fazer campanha, ou abre a ficha e usa "🤖 Sugerir venda". Baseado no catálogo Bling que roda todo dia.');
+}
+
+function crmProspLimpar(){
+  document.getElementById('prosp-categoria').value = '';
+  document.getElementById('prosp-marca').value = '';
+  document.getElementById('prosp-dias').value = '365';
+  document.getElementById('prosp-status').value = '';
+  document.getElementById('prosp-valor-min').value = '';
+  document.getElementById('prosp-wrap').innerHTML = '';
+  document.getElementById('prosp-count').textContent = '';
+  var btn = document.getElementById('prosp-btn-csv'); if (btn) btn.disabled = true;
+}
+
+async function crmProspBuscar(){
+  var wrap = document.getElementById('prosp-wrap');
+  var count = document.getElementById('prosp-count');
+  wrap.innerHTML = '<div class="crm-loading">Filtrando clientes…</div>';
+  count.textContent = '';
+  var filtros = {
+    categoria: document.getElementById('prosp-categoria').value || null,
+    marca: document.getElementById('prosp-marca').value || null,
+    dias: Number(document.getElementById('prosp-dias').value || 0),
+    status: document.getElementById('prosp-status').value || null,
+    valor_minimo: Number(document.getElementById('prosp-valor-min').value || 0),
+    limite: 200,
+  };
+  try {
+    var r = await fetch('/api/crm/prospeccao', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(filtros)
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro na busca.');
+    window.CRM.prospResultado = d.clientes || [];
+    var btn = document.getElementById('prosp-btn-csv');
+    if (btn) btn.disabled = !(window.CRM.prospResultado.length);
+    count.textContent = d.total + ' cliente(s) encontrado(s)' + (d.total > (d.clientes||[]).length ? ' (mostrando os '+ (d.clientes||[]).length +' de maior valor)' : '');
+
+    if (!d.clientes || !d.clientes.length) {
+      wrap.innerHTML = '<div class="crm-empty">Nenhum cliente com esses filtros. Tente afrouxar (ex: aumentar o período, tirar a marca).</div>';
+      return;
+    }
+    var linhas = d.clientes.map(function(c){
+      var stCls = 'ativo';
+      if (c.status_cliente === 'parado') stCls = 'parado';
+      else if (c.status_cliente === 'novo') stCls = 'novo';
+      var stTxt = c.status_cliente === 'parado' ? 'Parado' : (c.status_cliente === 'novo' ? 'Novo' : 'Ativo');
+      var matchesTxt = (c.matches||[]).slice(0,2).map(function(m){ return crmEsc(m.nome||m.sku||''); }).join(' · ');
+      if ((c.matches_total||0) > 2) matchesTxt += ' (+' + ((c.matches_total||0)-2) + ')';
+      return '<tr>' +
+        '<td><div class="prosp-nome">'+crmEsc(c.nome||'(sem nome)')+'</div>' +
+          '<div class="prosp-tel">'+crmEsc(c.cpf_cnpj||'—')+(c.telefone?' · '+crmEsc(c.telefone):'')+(c.cidade?' · '+crmEsc(c.cidade):'')+'</div>' +
+          (matchesTxt ? '<div class="prosp-matches">→ '+matchesTxt+'</div>' : '') +
+        '</td>' +
+        '<td><span class="prosp-tag '+stCls+'">'+stTxt+'</span></td>' +
+        '<td>'+(c.pedidos_total||0)+'</td>' +
+        '<td>'+crmFmtBRL(c.valor_total||0)+'</td>' +
+        '<td>'+(c.ultima_compra?crmFmtDate(c.ultima_compra):'—')+'</td>' +
+        '<td>'+crmEsc(c.owner||'—')+'</td>' +
+        '<td><button class="prosp-btn-abrir" onclick="crmAbreFichaProsp(\''+crmEsc(c.account_id)+'\')">Abrir</button></td>' +
+      '</tr>';
+    }).join('');
+    wrap.innerHTML =
+      '<div class="prosp-resultado">' +
+        '<table class="prosp-tab">' +
+          '<thead><tr>' +
+            '<th>Cliente</th><th>Status</th><th>Pedidos</th><th>Total comprado</th>' +
+            '<th>Última compra</th><th>Vendedor</th><th></th>' +
+          '</tr></thead>' +
+          '<tbody>'+linhas+'</tbody>' +
+        '</table>' +
+      '</div>';
+  } catch (e) {
+    wrap.innerHTML = '<div class="crm-empty">Erro: '+crmEsc(e.message)+'</div>';
+  }
+}
+
+function crmAbreFichaProsp(accId){
+  window.CRM.currentSub = 'ficha';
+  window.CRM.fichaPreSelect = accId;
+  crmRenderSubTabs();
+  crmRenderCurrent();
+}
+
+function crmProspCSV(){
+  var rows = window.CRM.prospResultado || [];
+  if (!rows.length) { alert('Nada pra exportar.'); return; }
+  var headers = ['Nome','CPF/CNPJ','Telefone','Email','Cidade','Vendedor','Status','Pedidos','Total comprado (R$)','Última compra','Pedidos no período','Valor no período (R$)','Itens que bateram'];
+  function esc(v){
+    if (v === null || v === undefined) return '';
+    var s = String(v).replace(/"/g, '""');
+    return '"' + s + '"';
+  }
+  var linhas = [headers.map(esc).join(',')];
+  for (var i = 0; i < rows.length; i++) {
+    var c = rows[i];
+    var matchesTxt = (c.matches||[]).map(function(m){ return m.nome || m.sku; }).join(' | ');
+    linhas.push([
+      c.nome, c.cpf_cnpj, c.telefone, c.email, c.cidade, c.owner, c.status_cliente,
+      c.pedidos_total, (c.valor_total||0).toFixed(2), c.ultima_compra,
+      c.pedidos_periodo, (c.valor_periodo||0).toFixed(2), matchesTxt,
+    ].map(esc).join(','));
+  }
+  var csv = '﻿' + linhas.join('\n'); // BOM pra Excel abrir com acentos certos
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'prospeccao-' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 </script>
 
