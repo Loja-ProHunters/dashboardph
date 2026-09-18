@@ -442,9 +442,9 @@
       "eh_kit": true,
       "confianca": 0.95,
       "motivo": "Kit combo com HT18R V2.0, suporte trilho ALG-18 e acionador remoto AER-05",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:47:01.009Z",
       "gerado_em": "2026-09-18T12:32:29.333Z",
       "primeira_venda_em": "2025-10-10",
       "vezes_vendido": 6,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:46:59.707Z"
+  "atualizado_em": "2026-09-18T12:47:01.009Z"
 }
