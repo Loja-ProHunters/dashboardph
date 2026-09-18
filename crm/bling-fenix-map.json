@@ -739,9 +739,9 @@
       "eh_kit": false,
       "confianca": 1,
       "motivo": "Variante ARB-L21-6000 mapeada para código canônico ARB-L21 21700",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:47:03.732Z",
       "gerado_em": "2026-09-18T12:32:45.715Z",
       "primeira_venda_em": "2025-10-17",
       "vezes_vendido": 4,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:47:02.312Z"
+  "atualizado_em": "2026-09-18T12:47:03.732Z"
 }
