@@ -421,9 +421,9 @@
       "eh_kit": false,
       "confianca": 0.85,
       "motivo": "Produto menciona HM61R V2.0 mas tabela possui apenas HM61R V3.0, mapeado para versão mais recente",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:50:48.087Z",
       "gerado_em": "2026-09-18T12:32:29.333Z",
       "primeira_venda_em": "2026-01-21",
       "vezes_vendido": 1,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:50:45.918Z"
+  "atualizado_em": "2026-09-18T12:50:48.088Z"
 }
