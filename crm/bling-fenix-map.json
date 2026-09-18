@@ -1012,9 +1012,9 @@
       "eh_kit": false,
       "confianca": 1,
       "motivo": "Carregador não está listado na tabela de compatibilidade Fenix",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:46:50.767Z",
       "gerado_em": "2026-09-18T12:33:21.588Z",
       "primeira_venda_em": "2025-09-26",
       "vezes_vendido": 11,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:46:49.349Z"
+  "atualizado_em": "2026-09-18T12:46:50.767Z"
 }
