@@ -1,17 +1,13 @@
 {
-  "status": "em_andamento",
+  "status": "concluido",
   "iniciado_em": "2026-09-18T12:31:36.944Z",
   "iniciado_por": "gerencia",
   "total_skus_candidatos": 94,
-  "pendentes": [
-    "6942870309989-ID",
-    "E05RG2BK",
-    "6942870320267",
-    "6942870303246"
-  ],
+  "pendentes": [],
   "total_original": 94,
-  "processados": 90,
-  "lotes_rodados": 9,
-  "ultimo_lote_em": "2026-09-18T12:34:18.294Z",
-  "avisos": []
+  "processados": 94,
+  "lotes_rodados": 10,
+  "ultimo_lote_em": "2026-09-18T12:34:28.277Z",
+  "avisos": [],
+  "concluido_em": "2026-09-18T12:34:28.277Z"
 }
