@@ -371,7 +371,198 @@
       "primeira_venda_em": "2026-01-28",
       "vezes_vendido": 1,
       "valor_total_vendido": 5000
+    },
+    "6942870307671": {
+      "sku_bling": "6942870307671",
+      "descricao_bling": "Acionador remoto para lanterna,  Fenix AER-04",
+      "fenix_codes": [
+        "AER-04"
+      ],
+      "categoria": "acionador_remoto",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Código AER-04 identificado exatamente na tabela de acionadores remotos",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:29.333Z",
+      "primeira_venda_em": "2026-01-06",
+      "vezes_vendido": 2,
+      "valor_total_vendido": 625.7
+    },
+    "6942870310893-ID": {
+      "sku_bling": "6942870310893-ID",
+      "descricao_bling": "Lanterna Fenix PD32R, preta, 1400 Lumens (ID)",
+      "fenix_codes": [
+        "PD32R"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Modelo PD32R encontrado exatamente na tabela série PD",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:29.333Z",
+      "primeira_venda_em": "2026-01-26",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 689
+    },
+    "6942870309446-ID": {
+      "sku_bling": "6942870309446-ID",
+      "descricao_bling": "Lanterna de cabeca Fenix HM61R V2.0, 1600 Lumens, Preta  (ID)",
+      "fenix_codes": [
+        "HM61R V3.0"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.85,
+      "motivo": "Produto menciona HM61R V2.0 mas tabela possui apenas HM61R V3.0, mapeado para versão mais recente",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:29.333Z",
+      "primeira_venda_em": "2026-01-21",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 1187.93
+    },
+    "6942870310541K-ID": {
+      "sku_bling": "6942870310541K-ID",
+      "descricao_bling": "Lanterna Fenix HT18R Preta 2800 lumens + ALG-18 + AER-05",
+      "fenix_codes": [
+        "HT18R V2.0",
+        "ALG-18",
+        "AER-05"
+      ],
+      "categoria": "kit_lanterna",
+      "marca": "fenix",
+      "eh_kit": true,
+      "confianca": 0.95,
+      "motivo": "Kit combo com HT18R V2.0, suporte trilho ALG-18 e acionador remoto AER-05",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:29.333Z",
+      "primeira_venda_em": "2025-10-10",
+      "vezes_vendido": 6,
+      "valor_total_vendido": 13097.779999999999
+    },
+    "6942870307824-ID": {
+      "sku_bling": "6942870307824-ID",
+      "descricao_bling": "Lanterna Tatica Fenix TK22 TAC 2800 Lúmens Preto (ID)",
+      "fenix_codes": [
+        "TK22R"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.9,
+      "motivo": "TK22 TAC mapeado para TK22R, modelo mais próximo na série TK",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:29.333Z",
+      "primeira_venda_em": "2025-10-26",
+      "vezes_vendido": 2,
+      "valor_total_vendido": 2869.19
+    },
+    "6942870308616": {
+      "sku_bling": "6942870308616",
+      "descricao_bling": "Lanterna para Armas Fenix GL22",
+      "fenix_codes": [
+        "GL22"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Modelo GL22 encontrado exatamente na tabela série GL",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:29.333Z",
+      "primeira_venda_em": "2026-01-21",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 1424.54
+    },
+    "6942870305127": {
+      "sku_bling": "6942870305127",
+      "descricao_bling": "Lanterna de bicicleta Fenix BC30R , 1800 Lumens, preta",
+      "fenix_codes": [],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.8,
+      "motivo": "BC30R mencionado mas tabela possui apenas BC30 V2.0, sem correspondência exata",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:29.333Z",
+      "primeira_venda_em": "2026-01-19",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 1320.39
+    },
+    "6942870303178": {
+      "sku_bling": "6942870303178",
+      "descricao_bling": "Lanterna Tática Fenix PD35 TAC 1000 Lumens Preta",
+      "fenix_codes": [
+        "PD35 V3.0"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.9,
+      "motivo": "PD35 TAC mapeado para PD35 V3.0, versão mais recente disponível na tabela",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:29.333Z",
+      "primeira_venda_em": "2026-01-19",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 876.98
+    },
+    "6942870309118": {
+      "sku_bling": "6942870309118",
+      "descricao_bling": "Kit Lanternas para Bike Fenix BC26R 1600 Lúmens + BC05R V2.0 15 Lúmens",
+      "fenix_codes": [
+        "BC26R",
+        "BC05R V2.0"
+      ],
+      "categoria": "kit_lanterna",
+      "marca": "fenix",
+      "eh_kit": true,
+      "confianca": 1,
+      "motivo": "Kit com dois modelos BC26R e BC05R V2.0 ambos encontrados na tabela série BC",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:29.333Z",
+      "primeira_venda_em": "2025-10-18",
+      "vezes_vendido": 2,
+      "valor_total_vendido": 2017.8
+    },
+    "6942870307176": {
+      "sku_bling": "6942870307176",
+      "descricao_bling": "Lanterna de cabeca Fenix HM61R, 1200 Lumens, Preta",
+      "fenix_codes": [
+        "HM61R V3.0"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.9,
+      "motivo": "HM61R sem versão mapeado para HM61R V3.0, única versão disponível na tabela",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:29.333Z",
+      "primeira_venda_em": "2026-01-13",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 756.8
     }
   },
-  "atualizado_em": "2026-09-18T12:32:10.682Z"
+  "atualizado_em": "2026-09-18T12:32:29.333Z"
 }
