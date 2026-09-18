@@ -1103,9 +1103,9 @@
       "eh_kit": false,
       "confianca": 0.85,
       "motivo": "PD32 V2.0 mapeado para PD32R (versão mais próxima disponível na tabela)",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:50:19.573Z",
       "gerado_em": "2026-09-18T12:33:21.588Z",
       "primeira_venda_em": "2025-11-30",
       "vezes_vendido": 1,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:50:16.949Z"
+  "atualizado_em": "2026-09-18T12:50:19.573Z"
 }
