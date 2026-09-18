@@ -1160,9 +1160,9 @@
       "eh_kit": false,
       "confianca": 1,
       "motivo": "TK16 V2.0 encontrado exatamente na tabela série TK",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:46:43.295Z",
       "gerado_em": "2026-09-18T12:33:41.720Z",
       "primeira_venda_em": "2025-10-10",
       "vezes_vendido": 282,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:34:27.431Z"
+  "atualizado_em": "2026-09-18T12:46:43.295Z"
 }
