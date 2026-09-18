@@ -30,6 +30,7 @@ const blingFenixGerador = require('../lib/crm/blingFenixGerador');
 const coocorrencia      = require('../lib/crm/coocorrencia');
 const { sugerirParaCliente } = require('../lib/crm/sugerir');
 const automacaoUpsell   = require('../lib/crm/automacaoUpsell');
+const catalogoBling     = require('../lib/crm/catalogoBling');
 
 // Bling API v3
 const blingOauth      = require('../lib/bling/oauth');
@@ -542,7 +543,8 @@ module.exports = async (req, res) => {
   // Formato: /api/crm/<colecao>[/<id>]
   const crmMatch = url.match(/^\/api\/crm\/([a-z_]+)(?:\/([A-Za-z0-9\-_.]+))?$/);
   if (crmMatch && crmMatch[1] !== 'session-info' && crmMatch[1] !== 'migrate-parceiros' && crmMatch[1] !== 'docs' && crmMatch[1] !== 'cron' && crmMatch[1] !== 'fenix'
-      && crmMatch[1] !== 'coocorrencia' && crmMatch[1] !== 'sugerir' && crmMatch[1] !== 'tarefas' && crmMatch[1] !== 'ficha') {
+      && crmMatch[1] !== 'coocorrencia' && crmMatch[1] !== 'sugerir' && crmMatch[1] !== 'tarefas' && crmMatch[1] !== 'ficha'
+      && crmMatch[1] !== 'catalogo') {
     const colName = crmMatch[1];
     const docId = crmMatch[2] || null;
     const reg = crmColl.REGISTRY[colName];
@@ -1215,6 +1217,37 @@ module.exports = async (req, res) => {
         ultima_compra: a.ultima_compra_em, owner: a.owner_id,
       }));
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ resultados, total: resultados.length }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/catalogo/rebuild — puxa /produtos do Bling e salva no GitHub
+  //    Aceita via x-vercel-cron (cron diário) OU sessão gerência.
+  if (req.method === 'GET' && url === '/api/crm/catalogo/rebuild') {
+    const sess = getSession(req);
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const cronToken = req.headers['x-cron-secret'];
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+    try {
+      const r = await catalogoBling.sincronizar();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ error: e.message || String(e) }));
+    }
+    return;
+  }
+
+  // ── GET /api/crm/catalogo/stats — estatísticas do catálogo (marcas, categorias, etc.)
+  if (req.method === 'GET' && url === '/api/crm/catalogo/stats') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const s = await catalogoBling.estatisticas();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(s));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
   }
