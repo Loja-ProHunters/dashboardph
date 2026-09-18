@@ -383,9 +383,9 @@
       "eh_kit": false,
       "confianca": 1,
       "motivo": "Código AER-04 identificado exatamente na tabela de acionadores remotos",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:47:13.951Z",
       "gerado_em": "2026-09-18T12:32:29.333Z",
       "primeira_venda_em": "2026-01-06",
       "vezes_vendido": 2,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:47:12.712Z"
+  "atualizado_em": "2026-09-18T12:47:13.951Z"
 }
