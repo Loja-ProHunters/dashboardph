@@ -4768,6 +4768,7 @@ async function crmRenderPainel(){
         '<div id="fenixmap-stats" style="font-size:12px;color:var(--gy);margin:8px 0"></div>' +
         '<div id="fenixmap-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">' +
           '<button class="crm-btn" onclick="fenixmapGerarIniciar()">🤖 Gerar automático (IA)</button>' +
+          '<button class="crm-btn" style="background:#0e7c3f" onclick="fenixmapAprovarMassa()" title="Aprova de uma vez todos os SKUs pendentes com confiança da IA ≥ 90%. Você foca só nos duvidosos.">⚡ Aprovar em massa (≥90%)</button>' +
           '<button class="crm-btn" style="background:var(--bg);color:var(--tx)" onclick="fenixmapMostrar(\'pendentes\')">Ver pendentes</button>' +
           '<button class="crm-btn" style="background:var(--bg);color:var(--tx)" onclick="fenixmapMostrar(\'baixa_confianca\')">Baixa confiança</button>' +
           '<button class="crm-btn" style="background:var(--bg);color:var(--tx)" onclick="fenixmapMostrar(\'revisados\')">Revisados</button>' +
@@ -4914,6 +4915,43 @@ async function fenixmapAprovar(sku){
     fenixmapMostrar((box && box.dataset.filtro) || 'pendentes');
     fenixmapRefreshStats();
   } catch (e) { alert('Erro: ' + (e.message||e)); }
+}
+
+// Aprova em MASSA todos os pendentes com confiança IA >= 90%.
+// Puxa a lista completa de pendentes, filtra os >=90%, dispara /aprovar em
+// sequência (com pequeno atraso pra não sobrecarregar). Mostra progresso.
+async function fenixmapAprovarMassa(){
+  var box = document.getElementById('fenixmap-lista');
+  box.hidden = false;
+  box.innerHTML = 'Carregando pendentes…';
+  try {
+    var rL = await fetch('/api/crm/fenix/mapa/lista?filtro=pendentes&limite=500');
+    var payload = await rL.json();
+    if (!rL.ok) throw new Error(payload.error || 'HTTP ' + rL.status);
+    var todos = payload.items || [];
+    var alvos = todos.filter(function(m){ return !m.revisado_por_humano && (m.confianca || 0) >= 0.9; });
+    if (!alvos.length) { box.innerHTML = '<div style="padding:10px;color:var(--gy)">Nenhum pendente com confiança ≥ 90%. Revise manualmente os ' + todos.length + ' pendentes.</div>'; return; }
+    if (!confirm('Aprovar em massa ' + alvos.length + ' SKUs (de ' + todos.length + ' pendentes) com confiança ≥ 90%?\n\nSKUs com confiança < 90% ficam pra revisão manual.')) return;
+    box.innerHTML = 'Aprovando 0 de ' + alvos.length + '…';
+    var ok = 0, erros = 0;
+    for (var i = 0; i < alvos.length; i++){
+      var m = alvos[i];
+      try {
+        var r = await fetch('/api/crm/fenix/mapa/aprovar', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ sku_bling: m.sku_bling }) });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        ok++;
+      } catch (e) { erros++; }
+      if ((i + 1) % 5 === 0 || i === alvos.length - 1) {
+        box.innerHTML = 'Aprovando <b>' + (i + 1) + '</b> de <b>' + alvos.length + '</b> · ' + ok + ' OK · ' + erros + ' erros';
+      }
+      // pequena pausa pra não sobrecarregar (githubStore serializa writes)
+      await new Promise(function(res){ setTimeout(res, 60); });
+    }
+    fenixmapRefreshStats();
+    box.innerHTML = '<div style="padding:12px;background:#e7f5ec;border:1px solid #c3e5cc;border-radius:6px;color:var(--gd);font-weight:600">✓ Aprovados ' + ok + ' de ' + alvos.length + (erros ? ' (' + erros + ' erros)' : '') + '. Clique em "Ver pendentes" pra revisar os que sobraram.</div>';
+  } catch (e) {
+    box.innerHTML = '<span style="color:#a01818">Erro: ' + (e.message||e) + '</span>';
+  }
 }
 
 async function fenixmapEditar(sku){
