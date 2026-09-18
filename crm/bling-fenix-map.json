@@ -347,9 +347,9 @@
       "eh_kit": false,
       "confianca": 1,
       "motivo": "Variante ARB-L18-3400U V3.0 mapeada para linha canônica ARB-L18 18650 conforme regra",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:46:44.445Z",
       "gerado_em": "2026-09-18T12:32:10.682Z",
       "primeira_venda_em": "2025-11-13",
       "vezes_vendido": 51,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:46:43.295Z"
+  "atualizado_em": "2026-09-18T12:46:44.445Z"
 }
