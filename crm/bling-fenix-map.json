@@ -1494,9 +1494,9 @@
       "eh_kit": false,
       "confianca": 1,
       "motivo": "WH23R está listado explicitamente na tabela oficial Fenix série WH",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:48:11.580Z",
       "gerado_em": "2026-09-18T12:34:17.388Z",
       "primeira_venda_em": "2025-10-12",
       "vezes_vendido": 1,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:48:10.363Z"
+  "atualizado_em": "2026-09-18T12:48:11.580Z"
 }
