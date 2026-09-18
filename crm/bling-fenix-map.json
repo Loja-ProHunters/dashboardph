@@ -562,7 +562,191 @@
       "primeira_venda_em": "2026-01-13",
       "vezes_vendido": 1,
       "valor_total_vendido": 756.8
+    },
+    "6942870304236": {
+      "sku_bling": "6942870304236",
+      "descricao_bling": "Carregador de Bateria Fenix ARE-X1 SET",
+      "fenix_codes": [],
+      "categoria": "outro",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Carregador ARE-X1 SET não consta na tabela oficial de compatibilidade Fenix",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:45.715Z",
+      "primeira_venda_em": "2026-01-12",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 223.09
+    },
+    "6942870311005-ID": {
+      "sku_bling": "6942870311005-ID",
+      "descricao_bling": "Lanterna Fenix TK05R, preta 1000 Lumens (ID)",
+      "fenix_codes": [
+        "TK05R"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "TK05R encontrado exatamente na série TK da tabela",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:45.715Z",
+      "primeira_venda_em": "2025-12-16",
+      "vezes_vendido": 2,
+      "valor_total_vendido": 2093.633
+    },
+    "6942870311098-ID": {
+      "sku_bling": "6942870311098-ID",
+      "descricao_bling": "Bateria Fenix Recarregavel 18650 ARB-L18-4000 (ID)",
+      "fenix_codes": [
+        "ARB-L18 18650"
+      ],
+      "categoria": "bateria",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Variante ARB-L18-4000 mapeada para código canônico ARB-L18 18650",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:45.715Z",
+      "primeira_venda_em": "2025-10-17",
+      "vezes_vendido": 8,
+      "valor_total_vendido": 2037.6879999999996
+    },
+    "6942870305868": {
+      "sku_bling": "6942870305868",
+      "descricao_bling": "Carregador de Bateria Fenix ARE-X11 SET",
+      "fenix_codes": [],
+      "categoria": "outro",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Carregador ARE-X11 SET não consta na tabela oficial de compatibilidade Fenix",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:45.715Z",
+      "primeira_venda_em": "2026-01-11",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 377.633
+    },
+    "6942870307800": {
+      "sku_bling": "6942870307800",
+      "descricao_bling": "Acionador remoto para lanterna,  Fenix AER-05",
+      "fenix_codes": [
+        "AER-05"
+      ],
+      "categoria": "acionador_remoto",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "AER-05 encontrado exatamente no grupo remote_switch",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:45.715Z",
+      "primeira_venda_em": "2025-11-18",
+      "vezes_vendido": 2,
+      "valor_total_vendido": 543.2
+    },
+    "6942870320472": {
+      "sku_bling": "6942870320472",
+      "descricao_bling": "Filtro para Lanterna Fenix AOF-L Verde",
+      "fenix_codes": [],
+      "categoria": "filtro",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "AOF-L Verde não consta na tabela; apenas AOFS+ V2.0 está listado",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:45.715Z",
+      "primeira_venda_em": "2026-01-09",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 77
+    },
+    "6942870307206": {
+      "sku_bling": "6942870307206",
+      "descricao_bling": "Lanterna Tática Fenix TK30 Preta 500 Lumens",
+      "fenix_codes": [
+        "TK30R"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.9,
+      "motivo": "TK30 mapeado para TK30R, modelo mais próximo disponível na série TK",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:45.715Z",
+      "primeira_venda_em": "2026-01-08",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 2398.5
+    },
+    "6942870304939": {
+      "sku_bling": "6942870304939",
+      "descricao_bling": "Lanterna de Cabeça Fenix HM50R Preta 500 Lúmens",
+      "fenix_codes": [
+        "HM50R V2.0"
+      ],
+      "categoria": "farolete",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "HM50R V2.0 encontrado exatamente na série HM da tabela",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:45.715Z",
+      "primeira_venda_em": "2026-01-08",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 612.47
+    },
+    "6942870306322": {
+      "sku_bling": "6942870306322",
+      "descricao_bling": "Lanterna de cabeça Fenix HL18R 400 Lumens - Preto",
+      "fenix_codes": [
+        "HL18R-T V2.0"
+      ],
+      "categoria": "farolete",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.9,
+      "motivo": "HL18R mapeado para HL18R-T V2.0, modelo mais próximo da série HL",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:45.715Z",
+      "primeira_venda_em": "2026-01-08",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 561.8
+    },
+    "6942870311159-ID": {
+      "sku_bling": "6942870311159-ID",
+      "descricao_bling": "Bateria Fenix 21700 Recarregável ARB-L21-6000 (ID)",
+      "fenix_codes": [
+        "ARB-L21 21700"
+      ],
+      "categoria": "bateria",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Variante ARB-L21-6000 mapeada para código canônico ARB-L21 21700",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:32:45.715Z",
+      "primeira_venda_em": "2025-10-17",
+      "vezes_vendido": 4,
+      "valor_total_vendido": 1438.75
     }
   },
-  "atualizado_em": "2026-09-18T12:32:29.333Z"
+  "atualizado_em": "2026-09-18T12:32:45.715Z"
 }
