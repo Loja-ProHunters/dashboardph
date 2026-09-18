@@ -921,9 +921,9 @@
       "eh_kit": false,
       "confianca": 0.9,
       "motivo": "HL18R-T mapeado para HL18R-T V2.0 (versão disponível na tabela série HL)",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:47:56.623Z",
       "gerado_em": "2026-09-18T12:33:03.363Z",
       "primeira_venda_em": "2025-12-15",
       "vezes_vendido": 1,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:47:55.169Z"
+  "atualizado_em": "2026-09-18T12:47:56.623Z"
 }
