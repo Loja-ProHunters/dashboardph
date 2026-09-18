@@ -1296,7 +1296,193 @@
       "primeira_venda_em": "2025-09-29",
       "vezes_vendido": 8,
       "valor_total_vendido": 732.2
+    },
+    "6942870306209": {
+      "sku_bling": "6942870306209",
+      "descricao_bling": "Lanterna Camping Fenix CL26R Verde 400 Lumens",
+      "fenix_codes": [
+        "CL26R PRO"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.85,
+      "motivo": "Mapeado para CL26R PRO (único modelo CL26 na tabela); pode ser variante de cor",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:59.706Z",
+      "primeira_venda_em": "2025-11-14",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 712
+    },
+    "6942870304731": {
+      "sku_bling": "6942870304731",
+      "descricao_bling": "Bateria 16340 Recarregável Fenix - ARB-L16-700U",
+      "fenix_codes": [
+        "ARB-L16 16340"
+      ],
+      "categoria": "bateria",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Variante ARB-L16-700U mapeada para linha canônica ARB-L16 16340",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:59.706Z",
+      "primeira_venda_em": "2025-09-19",
+      "vezes_vendido": 7,
+      "valor_total_vendido": 536.8
+    },
+    "6942870307602": {
+      "sku_bling": "6942870307602",
+      "descricao_bling": "Lanterna Fenix E35 V3.0 Preta 3000 Lumens",
+      "fenix_codes": [
+        "E35R"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.8,
+      "motivo": "E35 V3.0 não existe na tabela; mapeado para E35R (modelo mais próximo da série E)",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:59.706Z",
+      "primeira_venda_em": "2025-11-05",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 702
+    },
+    "6942870306995": {
+      "sku_bling": "6942870306995",
+      "descricao_bling": "Lanterna de bicicleta Fenix BC30 V2.0 , 2200 Lumens, preta",
+      "fenix_codes": [
+        "BC30 V2.0"
+      ],
+      "categoria": "farolete",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Modelo BC30 V2.0 encontrado exatamente na tabela (série BC)",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:59.706Z",
+      "primeira_venda_em": "2025-11-04",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 1064
+    },
+    "6942870306391-ID": {
+      "sku_bling": "6942870306391-ID",
+      "descricao_bling": "Carregador de Baterias Fenix ARE-A4 (ID)",
+      "fenix_codes": [],
+      "categoria": "outro",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Carregador ARE-A4 não está listado na tabela de compatibilidade Fenix",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:59.706Z",
+      "primeira_venda_em": "2025-10-30",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 497
+    },
+    "6942870307435": {
+      "sku_bling": "6942870307435",
+      "descricao_bling": "Coldre para Lanterna Fenix ALP-10L",
+      "fenix_codes": [
+        "ALP-10L"
+      ],
+      "categoria": "coldre",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Coldre ALP-10L encontrado exatamente na tabela (grupo holster)",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:59.706Z",
+      "primeira_venda_em": "2025-10-29",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 132
+    },
+    "6942870310541-ID": {
+      "sku_bling": "6942870310541-ID",
+      "descricao_bling": "Lanterna Fenix HT18R Preta 2800 Lumens (ID)",
+      "fenix_codes": [
+        "HT18R V2.0"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Modelo HT18R V2.0 encontrado exatamente na tabela (série HT)",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:59.706Z",
+      "primeira_venda_em": "2025-10-17",
+      "vezes_vendido": 2,
+      "valor_total_vendido": 3452.3
+    },
+    "6942870305301": {
+      "sku_bling": "6942870305301",
+      "descricao_bling": "Lanterna de Cabeça Fenix HL40R Azul 600 Lúmens",
+      "fenix_codes": [],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Modelo HL40R não existe na tabela (série HL não inclui HL40R)",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:59.706Z",
+      "primeira_venda_em": "2025-10-17",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 640.8
+    },
+    "6942870306902-ID": {
+      "sku_bling": "6942870306902-ID",
+      "descricao_bling": "Interruptor Tático Fenix  AER-02 V2.0 (ID)",
+      "fenix_codes": [
+        "AER-02 V2.0"
+      ],
+      "categoria": "acionador_remoto",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Acionador remoto AER-02 V2.0 encontrado exatamente na tabela",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:59.706Z",
+      "primeira_venda_em": "2025-09-18",
+      "vezes_vendido": 2,
+      "valor_total_vendido": 513
+    },
+    "6942870304069-ID": {
+      "sku_bling": "6942870304069-ID",
+      "descricao_bling": "Suporte de Lanterna para Arma Fenix - ALG-00 (ID)",
+      "fenix_codes": [
+        "ALG-00"
+      ],
+      "categoria": "trilho",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Suporte para trilho ALG-00 encontrado exatamente na tabela (grupo rail_mount)",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:59.706Z",
+      "primeira_venda_em": "2025-10-12",
+      "vezes_vendido": 2,
+      "valor_total_vendido": 488.3
     }
   },
-  "atualizado_em": "2026-09-18T12:33:41.720Z"
+  "atualizado_em": "2026-09-18T12:33:59.706Z"
 }
