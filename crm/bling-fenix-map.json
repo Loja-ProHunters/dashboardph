@@ -497,9 +497,9 @@
       "eh_kit": false,
       "confianca": 0.8,
       "motivo": "BC30R mencionado mas tabela possui apenas BC30 V2.0, sem correspondência exata",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:50:45.918Z",
       "gerado_em": "2026-09-18T12:32:29.333Z",
       "primeira_venda_em": "2026-01-19",
       "vezes_vendido": 1,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:50:43.723Z"
+  "atualizado_em": "2026-09-18T12:50:45.918Z"
 }
