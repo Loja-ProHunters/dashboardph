@@ -1213,9 +1213,9 @@
       "eh_kit": false,
       "confianca": 0.95,
       "motivo": "HT30R não existe na tabela série HT (apenas HT18R V2.0 e HT32 listados), produto Fenix não catalogado",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:48:01.757Z",
       "gerado_em": "2026-09-18T12:33:41.720Z",
       "primeira_venda_em": "2025-11-24",
       "vezes_vendido": 1,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:48:00.469Z"
+  "atualizado_em": "2026-09-18T12:48:01.757Z"
 }
