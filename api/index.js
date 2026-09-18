@@ -544,7 +544,7 @@ module.exports = async (req, res) => {
   const crmMatch = url.match(/^\/api\/crm\/([a-z_]+)(?:\/([A-Za-z0-9\-_.]+))?$/);
   if (crmMatch && crmMatch[1] !== 'session-info' && crmMatch[1] !== 'migrate-parceiros' && crmMatch[1] !== 'docs' && crmMatch[1] !== 'cron' && crmMatch[1] !== 'fenix'
       && crmMatch[1] !== 'coocorrencia' && crmMatch[1] !== 'sugerir' && crmMatch[1] !== 'tarefas' && crmMatch[1] !== 'ficha'
-      && crmMatch[1] !== 'catalogo') {
+      && crmMatch[1] !== 'catalogo' && crmMatch[1] !== 'prospeccao') {
     const colName = crmMatch[1];
     const docId = crmMatch[2] || null;
     const reg = crmColl.REGISTRY[colName];
@@ -1236,6 +1236,138 @@ module.exports = async (req, res) => {
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ error: e.message || String(e) }));
+    }
+    return;
+  }
+
+  // ── POST /api/crm/prospeccao — filtra clientes por categoria/marca comprada + período + valor
+  //    body: { categoria?, marca?, dias?, valor_minimo?, status?, owner?, limite? }
+  //    Retorna: { clientes: [...], total, filtros_aplicados }
+  if (req.method === 'POST' && url === '/api/crm/prospeccao') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      let f = {};
+      try { f = JSON.parse(body || '{}'); } catch(e) {}
+      const dias = Number(f.dias || 0);
+      const categoria = String(f.categoria || '').toLowerCase().trim();
+      const marca = String(f.marca || '').toLowerCase().trim();
+      const valorMinimo = Number(f.valor_minimo || 0);
+      const status = String(f.status || '').toLowerCase().trim(); // '' | 'ativo' | 'parado' | 'novo'
+      const ownerFiltro = String(f.owner || '').toLowerCase().trim();
+      const limite = Math.min(500, Number(f.limite || 200));
+
+      // Data de corte pelo período
+      const hoje = new Date();
+      const corteData = dias > 0 ? new Date(hoje.getTime() - dias * 86400000).toISOString().slice(0,10) : null;
+
+      // Carrega catálogo pra saber categoria/marca de cada SKU
+      const catalogo = await catalogoBling.carregar();
+      const prodMap = catalogo.produtos || {};
+
+      // Escopo de owner: vendedor só vê os dele; admin vê todos (a não ser que filtre)
+      const scopeAll = crmUtils.canSeeAll(sess);
+      const login = String(sess.usuario || '').toLowerCase();
+
+      // 1) Filtra Orders por período + itens que casam com categoria/marca
+      const orders = await crmStore.listDocs('orders', o => {
+        if (o.status === 'cancelado') return false;
+        if (corteData && o.data_pedido && o.data_pedido < corteData) return false;
+        return true;
+      });
+
+      // 2) Agrega por account_id: soma valor, conta pedidos, guarda match
+      const agregado = {}; // accId → { pedidos_periodo, valor_periodo, matches:[{sku,nome,data,marca,cat}] }
+      for (const o of orders) {
+        const accId = o.account_id;
+        if (!accId) continue;
+        const itensMatch = [];
+        for (const it of (o.itens || [])) {
+          const sku = String(it.sku || '');
+          if (!sku) continue;
+          const prod = prodMap[sku];
+          const catProd = (prod && prod.categoria) ? String(prod.categoria).toLowerCase() : '';
+          const marcaProd = (prod && prod.marca) ? String(prod.marca).toLowerCase() : '';
+          // Fallback: se produto não está no catálogo, tenta detectar pelo descricao do item
+          const descItem = String(it.descricao || '').toLowerCase();
+          const catCasa = !categoria || catProd.includes(categoria) || (
+            categoria === 'arma' && (catProd.startsWith('arma_') || descItem.match(/pistola|revolver|revólver|carabina|rifle|espingarda|pcp/))
+          ) || descItem.includes(categoria);
+          const marcaCasa = !marca || marcaProd.includes(marca) || descItem.includes(marca);
+          if (catCasa && marcaCasa) {
+            itensMatch.push({
+              sku, nome: it.descricao || (prod && prod.nome) || sku,
+              data: o.data_pedido, valor: it.valor_total_item || 0,
+              marca: marcaProd || null, categoria: catProd || null,
+            });
+          }
+        }
+        if (!itensMatch.length && (categoria || marca)) continue; // pediu filtro e nada bateu
+
+        if (!agregado[accId]) agregado[accId] = { pedidos_periodo: 0, valor_periodo: 0, matches: [] };
+        agregado[accId].pedidos_periodo++;
+        agregado[accId].valor_periodo += Number(o.valor_total || 0);
+        for (const m of itensMatch) agregado[accId].matches.push(m);
+      }
+
+      // 3) Junta com accounts, aplica filtros restantes (valor, owner, status)
+      const accIds = Object.keys(agregado);
+      const accounts = await crmStore.listDocs('accounts', a => accIds.includes(a.id));
+      const accMap = {}; accounts.forEach(a => accMap[a.id] = a);
+
+      let resultado = [];
+      for (const accId of accIds) {
+        const a = accMap[accId];
+        if (!a) continue;
+        if (!scopeAll && String(a.owner_id || '').toLowerCase() !== login) continue;
+        if (ownerFiltro && String(a.owner_id || '').toLowerCase() !== ownerFiltro) continue;
+        const ag = agregado[accId];
+        // Status derivado
+        let stCliente = 'ativo';
+        const ultima = a.ultima_compra_em;
+        if (ultima) {
+          const diasDesdeUltima = Math.round((hoje - new Date(ultima)) / 86400000);
+          if (diasDesdeUltima > 90) stCliente = 'parado';
+        }
+        if ((a.pedidos_count || 0) === 1) stCliente = 'novo';
+        if (status && stCliente !== status) continue;
+        if (valorMinimo > 0 && (a.valor_total_compras || 0) < valorMinimo) continue;
+
+        resultado.push({
+          account_id: a.id,
+          nome: a.nome,
+          cpf_cnpj: a.cpf_cnpj,
+          telefone: a.telefone || null,
+          email: a.email || null,
+          cidade: a.cidade || null,
+          owner: a.owner_id,
+          status_cliente: stCliente,
+          pedidos_total: a.pedidos_count || 0,
+          valor_total: a.valor_total_compras || 0,
+          ultima_compra: a.ultima_compra_em,
+          pedidos_periodo: ag.pedidos_periodo,
+          valor_periodo: ag.valor_periodo,
+          matches: ag.matches.slice(0, 5), // amostra dos primeiros 5 itens que bateram
+          matches_total: ag.matches.length,
+        });
+      }
+
+      // 4) Ordena por valor_total desc, corta pelo limite
+      resultado.sort((a, b) => (b.valor_total || 0) - (a.valor_total || 0));
+      const total = resultado.length;
+      resultado = resultado.slice(0, limite);
+
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({
+        clientes: resultado,
+        total,
+        limitado: total > limite,
+        filtros_aplicados: { categoria: categoria || null, marca: marca || null, dias: dias || null, valor_minimo: valorMinimo || null, status: status || null, owner: ownerFiltro || null },
+      }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error: e.message || String(e)}));
     }
     return;
   }
