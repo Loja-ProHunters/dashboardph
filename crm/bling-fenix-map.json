@@ -928,7 +928,189 @@
       "primeira_venda_em": "2025-12-15",
       "vezes_vendido": 1,
       "valor_total_vendido": 651
+    },
+    "6942870306926": {
+      "sku_bling": "6942870306926",
+      "descricao_bling": "Lanterna Fenix PD36R - 1600 Lúmens preto",
+      "fenix_codes": [
+        "PD36R V2.0"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.9,
+      "motivo": "PD36R sem versão explícita mapeado para PD36R V2.0 da tabela (versão mais comum)",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:21.588Z",
+      "primeira_venda_em": "2025-11-29",
+      "vezes_vendido": 2,
+      "valor_total_vendido": 1785
+    },
+    "6942870308647-ID": {
+      "sku_bling": "6942870308647-ID",
+      "descricao_bling": "Lanterna Tática Fenix TK20R V2.0 - 3000 Lúmens Preto (ID)",
+      "fenix_codes": [
+        "TK20R V2.0"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Correspondência exata com modelo TK20R V2.0 da tabela Fenix",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:21.588Z",
+      "primeira_venda_em": "2025-10-17",
+      "vezes_vendido": 16,
+      "valor_total_vendido": 20714.5
+    },
+    "6942870303505": {
+      "sku_bling": "6942870303505",
+      "descricao_bling": "Bateria 18650 Recarregável Fenix - ARB-L18-3500",
+      "fenix_codes": [
+        "ARB-L18 18650"
+      ],
+      "categoria": "bateria",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Variante ARB-L18-3500 mapeada para código canônico ARB-L18 18650",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:21.588Z",
+      "primeira_venda_em": "2025-09-21",
+      "vezes_vendido": 4,
+      "valor_total_vendido": 1171
+    },
+    "6942870308012": {
+      "sku_bling": "6942870308012",
+      "descricao_bling": "Lanterna EDC Fenix E09R - 600 Lúmens",
+      "fenix_codes": [],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.95,
+      "motivo": "Modelo E09R não consta na tabela oficial Fenix (apenas E01-E35R listados)",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:21.588Z",
+      "primeira_venda_em": "2025-12-03",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 418.5
+    },
+    "6942870306452-ID": {
+      "sku_bling": "6942870306452-ID",
+      "descricao_bling": "Carregador para baterias Fenix ARE-A2 (USA Plug) (ID)",
+      "fenix_codes": [],
+      "categoria": "outro",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Carregador não está listado na tabela de compatibilidade Fenix",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:21.588Z",
+      "primeira_venda_em": "2025-09-26",
+      "vezes_vendido": 11,
+      "valor_total_vendido": 2741.48
+    },
+    "6942870307084": {
+      "sku_bling": "6942870307084",
+      "descricao_bling": "Faixa de cabeça Fenix AFH-10 Cinza",
+      "fenix_codes": [],
+      "categoria": "faixa_cabeca",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.95,
+      "motivo": "AFH-10 não consta na tabela (apenas AFH-02/03 e AFH-04/05 listados)",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:21.588Z",
+      "primeira_venda_em": "2025-11-03",
+      "vezes_vendido": 2,
+      "valor_total_vendido": 84
+    },
+    "6942870305998-ID": {
+      "sku_bling": "6942870305998-ID",
+      "descricao_bling": "Porta Lanterna de Cabeça Fenix APB-20 (ID)",
+      "fenix_codes": [
+        "APB-20"
+      ],
+      "categoria": "bolsa",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Correspondência exata com APB-20 da categoria gear_bag na tabela",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:21.588Z",
+      "primeira_venda_em": "2025-12-02",
+      "vezes_vendido": 2,
+      "valor_total_vendido": 136
+    },
+    "6942870305714": {
+      "sku_bling": "6942870305714",
+      "descricao_bling": "Suporte para Lanterna Fenix ALB-20",
+      "fenix_codes": [],
+      "categoria": "suporte_bike",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.85,
+      "motivo": "ALB-20 não consta na tabela (apenas ALB-10 listado como bike_mount)",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:21.588Z",
+      "primeira_venda_em": "2025-10-01",
+      "vezes_vendido": 2,
+      "valor_total_vendido": 296
+    },
+    "6942870309033-ID": {
+      "sku_bling": "6942870309033-ID",
+      "descricao_bling": "Lanterna Fenix PD36R Pro, preta, 2800 lúmens (ID)",
+      "fenix_codes": [
+        "PD36R PRO"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "Correspondência exata com modelo PD36R PRO da tabela Fenix",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:21.588Z",
+      "primeira_venda_em": "2025-10-12",
+      "vezes_vendido": 2,
+      "valor_total_vendido": 1618
+    },
+    "6942870307770-ID": {
+      "sku_bling": "6942870307770-ID",
+      "descricao_bling": "Lanterna manual Fenix PD32 V2.0, 1200 Lumens, preta (ID)",
+      "fenix_codes": [
+        "PD32R"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.85,
+      "motivo": "PD32 V2.0 mapeado para PD32R (versão mais próxima disponível na tabela)",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:21.588Z",
+      "primeira_venda_em": "2025-11-30",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 792.71
     }
   },
-  "atualizado_em": "2026-09-18T12:33:03.363Z"
+  "atualizado_em": "2026-09-18T12:33:21.588Z"
 }
