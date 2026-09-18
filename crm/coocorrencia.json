@@ -1,0 +1,1021 @@
+{
+  "gerado_em": "2026-09-18T14:32:24.935Z",
+  "total_pedidos_analisados": 522,
+  "total_clientes_analisados": 444,
+  "total_skus_analisados": 511,
+  "total_skus_com_padroes": 40,
+  "total_pares_juntos": 6586,
+  "total_pares_depois": 310,
+  "parametros": {
+    "DIAS_MAX_RECOMPRA": 180,
+    "TOP_N_POR_SKU": 5,
+    "MIN_VEZES": 2
+  },
+  "duracao_ms": 2786,
+  "produtos": {
+    "RED-11001": {
+      "sku_bling": "RED-11001",
+      "descricao": "Shellholder Redding #1",
+      "vezes_vendido": 6,
+      "compraram_junto": [
+        {
+          "sku": "RED-84155",
+          "descricao": "Jogo de 3 Matrizes (Die) Redding Deluxe Cal 308/307 Win",
+          "vezes": 3,
+          "confianca": 0.5
+        }
+      ],
+      "compraram_depois": []
+    },
+    "6942870369358": {
+      "sku_bling": "6942870369358",
+      "descricao": "Bateria 21700 Recarregável Fenix - ARB-L21-5000U",
+      "vezes_vendido": 45,
+      "compraram_junto": [
+        {
+          "sku": "6942870310541K-ID",
+          "descricao": "Lanterna Fenix HT18R Preta 2800 lumens + ALG-18 + AER-05 (ID)",
+          "vezes": 3,
+          "confianca": 0.067
+        },
+        {
+          "sku": "6942870307954",
+          "descricao": "Suporte de lanterna,  Fenix, ALG-18",
+          "vezes": 2,
+          "confianca": 0.044
+        }
+      ],
+      "compraram_depois": [
+        {
+          "sku": "6942870306452-ID",
+          "descricao": "Carregador para baterias Fenix ARE-A2 (USA Plug) (ID)",
+          "vezes": 2,
+          "dias_medios": 16,
+          "confianca": 0.044
+        }
+      ]
+    },
+    "HORN-546228-ID": {
+      "sku_bling": "HORN-546228-ID",
+      "descricao": "Conjunto de Matrizes, Hornady, Calibre  223 Remington",
+      "vezes_vendido": 34,
+      "compraram_junto": [
+        {
+          "sku": "HORN-546358-ID",
+          "descricao": "Jogo de Matrizes, Hornady, Calibre  308 Winchester",
+          "vezes": 2,
+          "confianca": 0.059
+        },
+        {
+          "sku": "HORN-546352-ID",
+          "descricao": "Jogo de Matrizes, Hornady, Calibre  300 Winchester Magnun",
+          "vezes": 2,
+          "confianca": 0.059
+        }
+      ],
+      "compraram_depois": []
+    },
+    "6942870311104-ID": {
+      "sku_bling": "6942870311104-ID",
+      "descricao": "Bateria Fenix 18650 Recarregavel USB ARB-L18-3400U V3.0 (ID)",
+      "vezes_vendido": 51,
+      "compraram_junto": [
+        {
+          "sku": "6942870306452-ID",
+          "descricao": "Carregador para baterias Fenix ARE-A2 (USA Plug) (ID)",
+          "vezes": 2,
+          "confianca": 0.039
+        }
+      ],
+      "compraram_depois": [
+        {
+          "sku": "6942870309736-ID",
+          "descricao": "Lanterna Tática Fenix LR40R V2.0 15000 Lumens Preto  (ID)",
+          "vezes": 2,
+          "dias_medios": 71,
+          "confianca": 0.039
+        }
+      ]
+    },
+    "RED-07700": {
+      "sku_bling": "RED-07700",
+      "descricao": "Lubrificante Redding Imperial Dry Neck para Recarga",
+      "vezes_vendido": 7,
+      "compraram_junto": [],
+      "compraram_depois": [
+        {
+          "sku": "RED-07900",
+          "descricao": "Lubrificante Redding Imperial Application Media para Recarga",
+          "vezes": 2,
+          "dias_medios": 7,
+          "confianca": 0.286
+        }
+      ]
+    },
+    "MAG557T": {
+      "sku_bling": "MAG557T",
+      "descricao": "Carregador Ar/M4, Pmag,  30 Municoes, Geracao M3,  Calibre 5.56X45/223 Rem, Tan",
+      "vezes_vendido": 48,
+      "compraram_junto": [
+        {
+          "sku": "MAG556B",
+          "descricao": "Carregador Ar/M4, Pmag,  30 Municoes, Geracao M3,  Calibre 5.56X45/223 Rem, Preto, Com Janela De Visualizacao De Municao",
+          "vezes": 2,
+          "confianca": 0.042
+        }
+      ],
+      "compraram_depois": []
+    },
+    "6942870310541K-ID": {
+      "sku_bling": "6942870310541K-ID",
+      "descricao": "Lanterna Fenix HT18R Preta 2800 lumens + ALG-18 + AER-05 (ID)",
+      "vezes_vendido": 6,
+      "compraram_junto": [
+        {
+          "sku": "6942870369358",
+          "descricao": "Bateria 21700 Recarregável Fenix - ARB-L21-5000U",
+          "vezes": 3,
+          "confianca": 0.5
+        }
+      ],
+      "compraram_depois": []
+    },
+    "Horn-392155-ID": {
+      "sku_bling": "Horn-392155-ID",
+      "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #2) - projeteis .22",
+      "vezes_vendido": 21,
+      "compraram_junto": [
+        {
+          "sku": "Horn-392156-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #3) - projeteis .243",
+          "vezes": 2,
+          "confianca": 0.095
+        },
+        {
+          "sku": "Horn-392158-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #5) - projeteis .277",
+          "vezes": 2,
+          "confianca": 0.095
+        },
+        {
+          "sku": "Horn-392163-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #10) - projeteis .375",
+          "vezes": 2,
+          "confianca": 0.095
+        },
+        {
+          "sku": "Horn-392165-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #12) - projeteis .430",
+          "vezes": 2,
+          "confianca": 0.095
+        },
+        {
+          "sku": "Horn-392157-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #4) - projeteis .257 a .264",
+          "vezes": 2,
+          "confianca": 0.095
+        }
+      ],
+      "compraram_depois": []
+    },
+    "Horn-392156-ID": {
+      "sku_bling": "Horn-392156-ID",
+      "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #3) - projeteis .243",
+      "vezes_vendido": 11,
+      "compraram_junto": [
+        {
+          "sku": "Horn-392155-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #2) - projeteis .22",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392158-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #5) - projeteis .277",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392163-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #10) - projeteis .375",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392165-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #12) - projeteis .430",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392157-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #4) - projeteis .257 a .264",
+          "vezes": 2,
+          "confianca": 0.182
+        }
+      ],
+      "compraram_depois": []
+    },
+    "Horn-392158-ID": {
+      "sku_bling": "Horn-392158-ID",
+      "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #5) - projeteis .277",
+      "vezes_vendido": 11,
+      "compraram_junto": [
+        {
+          "sku": "Horn-392155-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #2) - projeteis .22",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392156-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #3) - projeteis .243",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392163-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #10) - projeteis .375",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392165-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #12) - projeteis .430",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392157-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #4) - projeteis .257 a .264",
+          "vezes": 2,
+          "confianca": 0.182
+        }
+      ],
+      "compraram_depois": []
+    },
+    "Horn-392163-ID": {
+      "sku_bling": "Horn-392163-ID",
+      "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #10) - projeteis .375",
+      "vezes_vendido": 11,
+      "compraram_junto": [
+        {
+          "sku": "Horn-392155-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #2) - projeteis .22",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392156-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #3) - projeteis .243",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392158-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #5) - projeteis .277",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392165-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #12) - projeteis .430",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392157-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #4) - projeteis .257 a .264",
+          "vezes": 2,
+          "confianca": 0.182
+        }
+      ],
+      "compraram_depois": []
+    },
+    "Horn-392165-ID": {
+      "sku_bling": "Horn-392165-ID",
+      "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #12) - projeteis .430",
+      "vezes_vendido": 11,
+      "compraram_junto": [
+        {
+          "sku": "Horn-392155-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #2) - projeteis .22",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392156-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #3) - projeteis .243",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392158-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #5) - projeteis .277",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392163-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #10) - projeteis .375",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392157-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #4) - projeteis .257 a .264",
+          "vezes": 2,
+          "confianca": 0.182
+        }
+      ],
+      "compraram_depois": []
+    },
+    "Horn-392157-ID": {
+      "sku_bling": "Horn-392157-ID",
+      "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #4) - projeteis .257 a .264",
+      "vezes_vendido": 11,
+      "compraram_junto": [
+        {
+          "sku": "Horn-392155-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #2) - projeteis .22",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392156-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #3) - projeteis .243",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392158-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #5) - projeteis .277",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392163-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #10) - projeteis .375",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392165-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #12) - projeteis .430",
+          "vezes": 2,
+          "confianca": 0.182
+        }
+      ],
+      "compraram_depois": []
+    },
+    "Horn-392160-ID": {
+      "sku_bling": "Horn-392160-ID",
+      "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #7) - projeteis .308 a .312",
+      "vezes_vendido": 22,
+      "compraram_junto": [
+        {
+          "sku": "Horn-392155-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #2) - projeteis .22",
+          "vezes": 2,
+          "confianca": 0.091
+        },
+        {
+          "sku": "Horn-392156-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #3) - projeteis .243",
+          "vezes": 2,
+          "confianca": 0.091
+        },
+        {
+          "sku": "Horn-392158-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #5) - projeteis .277",
+          "vezes": 2,
+          "confianca": 0.091
+        },
+        {
+          "sku": "Horn-392163-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #10) - projeteis .375",
+          "vezes": 2,
+          "confianca": 0.091
+        },
+        {
+          "sku": "Horn-392165-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #12) - projeteis .430",
+          "vezes": 2,
+          "confianca": 0.091
+        }
+      ],
+      "compraram_depois": []
+    },
+    "Horn-392166-ID": {
+      "sku_bling": "Horn-392166-ID",
+      "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #13) - projeteis .451 a .458",
+      "vezes_vendido": 11,
+      "compraram_junto": [
+        {
+          "sku": "Horn-392155-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #2) - projeteis .22",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392156-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #3) - projeteis .243",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392158-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #5) - projeteis .277",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392163-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #10) - projeteis .375",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392165-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #12) - projeteis .430",
+          "vezes": 2,
+          "confianca": 0.182
+        }
+      ],
+      "compraram_depois": []
+    },
+    "Horn-392162-ID": {
+      "sku_bling": "Horn-392162-ID",
+      "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #9) - projeteis .338 a .358",
+      "vezes_vendido": 11,
+      "compraram_junto": [
+        {
+          "sku": "Horn-392155-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #2) - projeteis .22",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392156-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #3) - projeteis .243",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392158-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #5) - projeteis .277",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392163-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #10) - projeteis .375",
+          "vezes": 2,
+          "confianca": 0.182
+        },
+        {
+          "sku": "Horn-392165-ID",
+          "descricao": "Pinça para extrator de projéteis (Hornady Bullet Puller Collet #12) - projeteis .430",
+          "vezes": 2,
+          "confianca": 0.182
+        }
+      ],
+      "compraram_depois": []
+    },
+    "RUIKE-P865-B": {
+      "sku_bling": "RUIKE-P865-B",
+      "descricao": "Canivete Ruike P865-B",
+      "vezes_vendido": 6,
+      "compraram_junto": [
+        {
+          "sku": "RUIKE-P662-B",
+          "descricao": "Canivete Ruike P662B",
+          "vezes": 2,
+          "confianca": 0.333
+        }
+      ],
+      "compraram_depois": []
+    },
+    "RUIKE-P662-B": {
+      "sku_bling": "RUIKE-P662-B",
+      "descricao": "Canivete Ruike P662B",
+      "vezes_vendido": 7,
+      "compraram_junto": [
+        {
+          "sku": "RUIKE-P865-B",
+          "descricao": "Canivete Ruike P865-B",
+          "vezes": 2,
+          "confianca": 0.286
+        }
+      ],
+      "compraram_depois": []
+    },
+    "VEC-SCRD-F19II": {
+      "sku_bling": "VEC-SCRD-F19II",
+      "descricao": "Red Dot Frenzy 1x17x24 Bronze - Vector Optics",
+      "vezes_vendido": 3,
+      "compraram_junto": [],
+      "compraram_depois": [
+        {
+          "sku": "VEC-SCRD-43",
+          "descricao": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+          "vezes": 2,
+          "dias_medios": 37,
+          "confianca": 0.667
+        }
+      ]
+    },
+    "RED-80446": {
+      "sku_bling": "RED-80446",
+      "descricao": "Jogo de 2 Matrizes (Die) Redding Cal 6.5 Creedmoor",
+      "vezes_vendido": 3,
+      "compraram_junto": [
+        {
+          "sku": "RED-80155",
+          "descricao": "Jogo de 2 Matrizes (Die) Redding cal 308/307 Win",
+          "vezes": 2,
+          "confianca": 0.667
+        },
+        {
+          "sku": "RED-80111",
+          "descricao": "Jogo de 2 Matrizes (Die) Redding Cal 223 Rem",
+          "vezes": 2,
+          "confianca": 0.667
+        }
+      ],
+      "compraram_depois": [
+        {
+          "sku": "RED-38155",
+          "descricao": "Jogo de 3 Matrizes (Die) Redding Type S-Match Neck(Bushing) cal 308 Win",
+          "vezes": 2,
+          "dias_medios": 69,
+          "confianca": 0.667
+        },
+        {
+          "sku": "RED-76334",
+          "descricao": "Bucha (Bushing) Redding Titanium Nitride .334\" (cal 308)",
+          "vezes": 2,
+          "dias_medios": 69,
+          "confianca": 0.667
+        },
+        {
+          "sku": "RED-76335",
+          "descricao": "Bucha (Bushing) Redding Titanium Nitride .335\" (cal 308)",
+          "vezes": 2,
+          "dias_medios": 69,
+          "confianca": 0.667
+        },
+        {
+          "sku": "RED-11001",
+          "descricao": "Shellholder Redding #1",
+          "vezes": 2,
+          "dias_medios": 69,
+          "confianca": 0.667
+        }
+      ]
+    },
+    "RED-80155": {
+      "sku_bling": "RED-80155",
+      "descricao": "Jogo de 2 Matrizes (Die) Redding cal 308/307 Win",
+      "vezes_vendido": 7,
+      "compraram_junto": [
+        {
+          "sku": "RED-80446",
+          "descricao": "Jogo de 2 Matrizes (Die) Redding Cal 6.5 Creedmoor",
+          "vezes": 2,
+          "confianca": 0.286
+        },
+        {
+          "sku": "RED-80111",
+          "descricao": "Jogo de 2 Matrizes (Die) Redding Cal 223 Rem",
+          "vezes": 2,
+          "confianca": 0.286
+        }
+      ],
+      "compraram_depois": [
+        {
+          "sku": "RED-38155",
+          "descricao": "Jogo de 3 Matrizes (Die) Redding Type S-Match Neck(Bushing) cal 308 Win",
+          "vezes": 2,
+          "dias_medios": 69,
+          "confianca": 0.286
+        },
+        {
+          "sku": "RED-76334",
+          "descricao": "Bucha (Bushing) Redding Titanium Nitride .334\" (cal 308)",
+          "vezes": 2,
+          "dias_medios": 69,
+          "confianca": 0.286
+        },
+        {
+          "sku": "RED-76335",
+          "descricao": "Bucha (Bushing) Redding Titanium Nitride .335\" (cal 308)",
+          "vezes": 2,
+          "dias_medios": 69,
+          "confianca": 0.286
+        },
+        {
+          "sku": "RED-11001",
+          "descricao": "Shellholder Redding #1",
+          "vezes": 2,
+          "dias_medios": 69,
+          "confianca": 0.286
+        }
+      ]
+    },
+    "RED-80111": {
+      "sku_bling": "RED-80111",
+      "descricao": "Jogo de 2 Matrizes (Die) Redding Cal 223 Rem",
+      "vezes_vendido": 4,
+      "compraram_junto": [
+        {
+          "sku": "RED-80446",
+          "descricao": "Jogo de 2 Matrizes (Die) Redding Cal 6.5 Creedmoor",
+          "vezes": 2,
+          "confianca": 0.5
+        },
+        {
+          "sku": "RED-80155",
+          "descricao": "Jogo de 2 Matrizes (Die) Redding cal 308/307 Win",
+          "vezes": 2,
+          "confianca": 0.5
+        }
+      ],
+      "compraram_depois": [
+        {
+          "sku": "RED-38155",
+          "descricao": "Jogo de 3 Matrizes (Die) Redding Type S-Match Neck(Bushing) cal 308 Win",
+          "vezes": 2,
+          "dias_medios": 69,
+          "confianca": 0.5
+        },
+        {
+          "sku": "RED-76334",
+          "descricao": "Bucha (Bushing) Redding Titanium Nitride .334\" (cal 308)",
+          "vezes": 2,
+          "dias_medios": 69,
+          "confianca": 0.5
+        },
+        {
+          "sku": "RED-76335",
+          "descricao": "Bucha (Bushing) Redding Titanium Nitride .335\" (cal 308)",
+          "vezes": 2,
+          "dias_medios": 69,
+          "confianca": 0.5
+        },
+        {
+          "sku": "RED-11001",
+          "descricao": "Shellholder Redding #1",
+          "vezes": 2,
+          "dias_medios": 69,
+          "confianca": 0.5
+        }
+      ]
+    },
+    "HORN-546358-ID": {
+      "sku_bling": "HORN-546358-ID",
+      "descricao": "Jogo de Matrizes, Hornady, Calibre  308 Winchester",
+      "vezes_vendido": 35,
+      "compraram_junto": [
+        {
+          "sku": "HORN-546228-ID",
+          "descricao": "Conjunto de Matrizes, Hornady, Calibre  223 Remington",
+          "vezes": 2,
+          "confianca": 0.057
+        },
+        {
+          "sku": "HORN-546352-ID",
+          "descricao": "Jogo de Matrizes, Hornady, Calibre  300 Winchester Magnun",
+          "vezes": 2,
+          "confianca": 0.057
+        }
+      ],
+      "compraram_depois": []
+    },
+    "HORN-546352-ID": {
+      "sku_bling": "HORN-546352-ID",
+      "descricao": "Jogo de Matrizes, Hornady, Calibre  300 Winchester Magnun",
+      "vezes_vendido": 22,
+      "compraram_junto": [
+        {
+          "sku": "HORN-546358-ID",
+          "descricao": "Jogo de Matrizes, Hornady, Calibre  308 Winchester",
+          "vezes": 2,
+          "confianca": 0.091
+        },
+        {
+          "sku": "HORN-546228-ID",
+          "descricao": "Conjunto de Matrizes, Hornady, Calibre  223 Remington",
+          "vezes": 2,
+          "confianca": 0.091
+        }
+      ],
+      "compraram_depois": []
+    },
+    "RED-84155": {
+      "sku_bling": "RED-84155",
+      "descricao": "Jogo de 3 Matrizes (Die) Redding Deluxe Cal 308/307 Win",
+      "vezes_vendido": 4,
+      "compraram_junto": [
+        {
+          "sku": "RED-11001",
+          "descricao": "Shellholder Redding #1",
+          "vezes": 3,
+          "confianca": 0.75
+        }
+      ],
+      "compraram_depois": []
+    },
+    "VEC-OPSL17": {
+      "sku_bling": "VEC-OPSL17",
+      "descricao": "Luneta Vector Optics Victoroptics OPSL17P 6-24x50mm",
+      "vezes_vendido": 2,
+      "compraram_junto": [],
+      "compraram_depois": [
+        {
+          "sku": "VEC-SCBPS-04",
+          "descricao": "Bipe Vector Optics, 6\", com articulacao giratoria, Ref: SCBPS-04",
+          "vezes": 2,
+          "dias_medios": 17,
+          "confianca": 1
+        }
+      ]
+    },
+    "6942870306452-ID": {
+      "sku_bling": "6942870306452-ID",
+      "descricao": "Carregador para baterias Fenix ARE-A2 (USA Plug) (ID)",
+      "vezes_vendido": 11,
+      "compraram_junto": [
+        {
+          "sku": "6942870311104-ID",
+          "descricao": "Bateria Fenix 18650 Recarregavel USB ARB-L18-3400U V3.0 (ID)",
+          "vezes": 2,
+          "confianca": 0.182
+        }
+      ],
+      "compraram_depois": [
+        {
+          "sku": "6942870309736-ID",
+          "descricao": "Lanterna Tática Fenix LR40R V2.0 15000 Lumens Preto  (ID)",
+          "vezes": 2,
+          "dias_medios": 71,
+          "confianca": 0.182
+        }
+      ]
+    },
+    "VEC-SCTM-56": {
+      "sku_bling": "VEC-SCTM-56",
+      "descricao": "Aneis para acoplar lunetas/red dot Vector Optics SCTM-56Q 25.4mm 1\"",
+      "vezes_vendido": 6,
+      "compraram_junto": [],
+      "compraram_depois": [
+        {
+          "sku": "VEC-SCBPS-04",
+          "descricao": "Bipe Vector Optics, 6\", com articulacao giratoria, Ref: SCBPS-04",
+          "vezes": 2,
+          "dias_medios": 9,
+          "confianca": 0.333
+        }
+      ]
+    },
+    "MAG347DE": {
+      "sku_bling": "MAG347DE",
+      "descricao": "Base Coronha Para Tube Stock, Moe Sl Carbine, Mil-Spec, Dark Earth",
+      "vezes_vendido": 4,
+      "compraram_junto": [
+        {
+          "sku": "MAG347B",
+          "descricao": "Base Coronha Para Tube Stock, Moe Sl Carbine, Mil-Spec, Preta",
+          "vezes": 2,
+          "confianca": 0.5
+        },
+        {
+          "sku": "MAG522DE",
+          "descricao": "Empunhadura Moe-K2 Grip, Ar15/M4, Dark Earth",
+          "vezes": 2,
+          "confianca": 0.5
+        }
+      ],
+      "compraram_depois": []
+    },
+    "6942870307084": {
+      "sku_bling": "6942870307084",
+      "descricao": "Faixa de cabeça Fenix AFH-10 Cinza",
+      "vezes_vendido": 2,
+      "compraram_junto": [],
+      "compraram_depois": [
+        {
+          "sku": "RED-80155",
+          "descricao": "Jogo de 2 Matrizes (Die) Redding cal 308/307 Win",
+          "vezes": 2,
+          "dias_medios": 29,
+          "confianca": 1
+        },
+        {
+          "sku": "RED-80111",
+          "descricao": "Jogo de 2 Matrizes (Die) Redding Cal 223 Rem",
+          "vezes": 2,
+          "dias_medios": 29,
+          "confianca": 1
+        },
+        {
+          "sku": "RED-80446",
+          "descricao": "Jogo de 2 Matrizes (Die) Redding Cal 6.5 Creedmoor",
+          "vezes": 2,
+          "dias_medios": 29,
+          "confianca": 1
+        }
+      ]
+    },
+    "MAG522DE": {
+      "sku_bling": "MAG522DE",
+      "descricao": "Empunhadura Moe-K2 Grip, Ar15/M4, Dark Earth",
+      "vezes_vendido": 7,
+      "compraram_junto": [
+        {
+          "sku": "MAG400DE",
+          "descricao": "Base Coronha Para Tube Stock, Moe Carbine, Mil-Spec, Dark  Earth",
+          "vezes": 2,
+          "confianca": 0.286
+        },
+        {
+          "sku": "MAG347DE",
+          "descricao": "Base Coronha Para Tube Stock, Moe Sl Carbine, Mil-Spec, Dark Earth",
+          "vezes": 2,
+          "confianca": 0.286
+        },
+        {
+          "sku": "MAG347B",
+          "descricao": "Base Coronha Para Tube Stock, Moe Sl Carbine, Mil-Spec, Preta",
+          "vezes": 2,
+          "confianca": 0.286
+        }
+      ],
+      "compraram_depois": [
+        {
+          "sku": "MAG557T",
+          "descricao": "Carregador Ar/M4, Pmag,  30 Municoes, Geracao M3,  Calibre 5.56X45/223 Rem, Tan",
+          "vezes": 2,
+          "dias_medios": 26,
+          "confianca": 0.286
+        }
+      ]
+    },
+    "MAG400DE": {
+      "sku_bling": "MAG400DE",
+      "descricao": "Base Coronha Para Tube Stock, Moe Carbine, Mil-Spec, Dark  Earth",
+      "vezes_vendido": 3,
+      "compraram_junto": [
+        {
+          "sku": "MAG522DE",
+          "descricao": "Empunhadura Moe-K2 Grip, Ar15/M4, Dark Earth",
+          "vezes": 2,
+          "confianca": 0.667
+        }
+      ],
+      "compraram_depois": []
+    },
+    "MAG347B": {
+      "sku_bling": "MAG347B",
+      "descricao": "Base Coronha Para Tube Stock, Moe Sl Carbine, Mil-Spec, Preta",
+      "vezes_vendido": 3,
+      "compraram_junto": [
+        {
+          "sku": "MAG347DE",
+          "descricao": "Base Coronha Para Tube Stock, Moe Sl Carbine, Mil-Spec, Dark Earth",
+          "vezes": 2,
+          "confianca": 0.667
+        },
+        {
+          "sku": "MAG522DE",
+          "descricao": "Empunhadura Moe-K2 Grip, Ar15/M4, Dark Earth",
+          "vezes": 2,
+          "confianca": 0.667
+        },
+        {
+          "sku": "MAG522B",
+          "descricao": "Empunhadura Moe-K2 Grip, Ar15/M4, Preto",
+          "vezes": 2,
+          "confianca": 0.667
+        }
+      ],
+      "compraram_depois": []
+    },
+    "Dillon-14398": {
+      "sku_bling": "Dillon-14398",
+      "descricao": "Conjunto de matrizes Dillon Carbide Die Set para calibres 10mm Automatico/40 Smith & Wesson",
+      "vezes_vendido": 2,
+      "compraram_junto": [],
+      "compraram_depois": [
+        {
+          "sku": "HUNTERR-126170",
+          "descricao": "Espoleta Fiocchi 209",
+          "vezes": 2,
+          "dias_medios": 24,
+          "confianca": 1
+        }
+      ]
+    },
+    "MAG556B": {
+      "sku_bling": "MAG556B",
+      "descricao": "Carregador Ar/M4, Pmag,  30 Municoes, Geracao M3,  Calibre 5.56X45/223 Rem, Preto, Com Janela De Visualizacao De Municao",
+      "vezes_vendido": 15,
+      "compraram_junto": [
+        {
+          "sku": "MAG557T",
+          "descricao": "Carregador Ar/M4, Pmag,  30 Municoes, Geracao M3,  Calibre 5.56X45/223 Rem, Tan",
+          "vezes": 2,
+          "confianca": 0.133
+        }
+      ],
+      "compraram_depois": []
+    },
+    "6942870307954": {
+      "sku_bling": "6942870307954",
+      "descricao": "Suporte de lanterna,  Fenix, ALG-18",
+      "vezes_vendido": 3,
+      "compraram_junto": [
+        {
+          "sku": "6942870369358",
+          "descricao": "Bateria 21700 Recarregável Fenix - ARB-L21-5000U",
+          "vezes": 2,
+          "confianca": 0.667
+        }
+      ],
+      "compraram_depois": []
+    },
+    "MAG522B": {
+      "sku_bling": "MAG522B",
+      "descricao": "Empunhadura Moe-K2 Grip, Ar15/M4, Preto",
+      "vezes_vendido": 27,
+      "compraram_junto": [
+        {
+          "sku": "MAG347B",
+          "descricao": "Base Coronha Para Tube Stock, Moe Sl Carbine, Mil-Spec, Preta",
+          "vezes": 2,
+          "confianca": 0.074
+        }
+      ],
+      "compraram_depois": []
+    },
+    "HORN-86281": {
+      "sku_bling": "HORN-86281",
+      "descricao": "Estojo Hornady Calibre 6.5 Creedmoor sem espoleta",
+      "vezes_vendido": 200,
+      "compraram_junto": [],
+      "compraram_depois": [
+        {
+          "sku": "RED-80155",
+          "descricao": "Jogo de 2 Matrizes (Die) Redding cal 308/307 Win",
+          "vezes": 2,
+          "dias_medios": 41,
+          "confianca": 0.01
+        },
+        {
+          "sku": "RED-80111",
+          "descricao": "Jogo de 2 Matrizes (Die) Redding Cal 223 Rem",
+          "vezes": 2,
+          "dias_medios": 41,
+          "confianca": 0.01
+        },
+        {
+          "sku": "RED-80446",
+          "descricao": "Jogo de 2 Matrizes (Die) Redding Cal 6.5 Creedmoor",
+          "vezes": 2,
+          "dias_medios": 41,
+          "confianca": 0.01
+        }
+      ]
+    },
+    "BALDR Mini (Desert Tan)": {
+      "sku_bling": "BALDR Mini (Desert Tan)",
+      "descricao": "Lanterna para armas Olight Baldr Mini Desert Tan",
+      "vezes_vendido": 1,
+      "compraram_junto": [],
+      "compraram_depois": [
+        {
+          "sku": "VEC-SCRD-43",
+          "descricao": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+          "vezes": 2,
+          "dias_medios": 37,
+          "confianca": 2
+        }
+      ]
+    },
+    "6942870303246": {
+      "sku_bling": "6942870303246",
+      "descricao": "Carregador de Bateria Fenix ARE-X1",
+      "vezes_vendido": 1,
+      "compraram_junto": [],
+      "compraram_depois": [
+        {
+          "sku": "6942870306452-ID",
+          "descricao": "Carregador para baterias Fenix ARE-A2 (USA Plug) (ID)",
+          "vezes": 2,
+          "dias_medios": 16,
+          "confianca": 2
+        }
+      ]
+    }
+  }
+}
