@@ -828,9 +828,9 @@
       "eh_kit": false,
       "confianca": 0.8,
       "motivo": "Modelo E02R não consta na tabela série E (só E01 V2.0, E03R V2.0, E05R e superiores)",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:50:30.291Z",
       "gerado_em": "2026-09-18T12:33:03.363Z",
       "primeira_venda_em": "2025-12-23",
       "vezes_vendido": 1,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:50:24.868Z"
+  "atualizado_em": "2026-09-18T12:50:30.291Z"
 }
