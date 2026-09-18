@@ -1456,9 +1456,9 @@
       "eh_kit": false,
       "confianca": 1,
       "motivo": "Acionador remoto AER-02 V2.0 encontrado exatamente na tabela",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:49:54.538Z",
       "gerado_em": "2026-09-18T12:33:59.706Z",
       "primeira_venda_em": "2025-09-18",
       "vezes_vendido": 2,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:49:51.339Z"
+  "atualizado_em": "2026-09-18T12:49:54.538Z"
 }
