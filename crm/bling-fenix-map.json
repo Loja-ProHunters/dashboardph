@@ -1122,9 +1122,9 @@
       "eh_kit": true,
       "confianca": 0.85,
       "motivo": "Kit com PD35R ACE (tabela) + CL01 (modelo não listado na tabela), incluído apenas PD35R ACE",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:50:16.949Z",
       "gerado_em": "2026-09-18T12:33:41.720Z",
       "primeira_venda_em": "2025-11-28",
       "vezes_vendido": 1,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:50:14.156Z"
+  "atualizado_em": "2026-09-18T12:50:16.949Z"
 }
