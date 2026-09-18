@@ -773,9 +773,9 @@
       "eh_kit": false,
       "confianca": 0.8,
       "motivo": "Modelo LD15R não consta na tabela oficial da série LD (só LD12R, LD22 V2.0, LD30/31/35/36/45R)",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:50:36.285Z",
       "gerado_em": "2026-09-18T12:33:03.363Z",
       "primeira_venda_em": "2026-01-01",
       "vezes_vendido": 1,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:50:33.418Z"
+  "atualizado_em": "2026-09-18T12:50:36.285Z"
 }
