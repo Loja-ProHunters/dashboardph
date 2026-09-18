@@ -1110,7 +1110,193 @@
       "primeira_venda_em": "2025-11-30",
       "vezes_vendido": 1,
       "valor_total_vendido": 792.71
+    },
+    "6942870312651-ID": {
+      "sku_bling": "6942870312651-ID",
+      "descricao_bling": "Lanterna Tática Fenix PD35R ACE + CL01 - 2000 Lúmens (ID)",
+      "fenix_codes": [
+        "PD35R ACE"
+      ],
+      "categoria": "kit_lanterna",
+      "marca": "fenix",
+      "eh_kit": true,
+      "confianca": 0.85,
+      "motivo": "Kit com PD35R ACE (tabela) + CL01 (modelo não listado na tabela), incluído apenas PD35R ACE",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:41.720Z",
+      "primeira_venda_em": "2025-11-28",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 944.44
+    },
+    "6942870307213": {
+      "sku_bling": "6942870307213",
+      "descricao_bling": "Lanterna Fenix HT18 Preta 1500 Lumens",
+      "fenix_codes": [
+        "HT18R V2.0"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.9,
+      "motivo": "HT18 mapeado para HT18R V2.0, modelo mais próximo disponível na tabela HT",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:41.720Z",
+      "primeira_venda_em": "2025-11-27",
+      "vezes_vendido": 3,
+      "valor_total_vendido": 3734.91
+    },
+    "6942870307749-ID": {
+      "sku_bling": "6942870307749-ID",
+      "descricao_bling": "Lanterna manual Fenix TK16 V2.0,  3100 Lumens preta (ID)",
+      "fenix_codes": [
+        "TK16 V2.0"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "TK16 V2.0 encontrado exatamente na tabela série TK",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:41.720Z",
+      "primeira_venda_em": "2025-10-10",
+      "vezes_vendido": 282,
+      "valor_total_vendido": 235287.856
+    },
+    "6942870305998": {
+      "sku_bling": "6942870305998",
+      "descricao_bling": "Porta Lanterna de Cabeça Fenix APB-20",
+      "fenix_codes": [
+        "APB-20"
+      ],
+      "categoria": "bolsa",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "APB-20 encontrado exatamente na tabela de acessórios gear_bag",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:41.720Z",
+      "primeira_venda_em": "2025-11-25",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 68
+    },
+    "6942870303598": {
+      "sku_bling": "6942870303598",
+      "descricao_bling": "Lanterna Fenix E15 450 Lumens Preta",
+      "fenix_codes": [],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.95,
+      "motivo": "E15 não existe na tabela série E (apenas E01-E35R listados), produto Fenix não catalogado",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:41.720Z",
+      "primeira_venda_em": "2025-11-25",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 259.5
+    },
+    "6942870309002-ID": {
+      "sku_bling": "6942870309002-ID",
+      "descricao_bling": "Lanterna Fenix HT30R - 500 Lúmens  (ID)",
+      "fenix_codes": [],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 0.95,
+      "motivo": "HT30R não existe na tabela série HT (apenas HT18R V2.0 e HT32 listados), produto Fenix não catalogado",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:41.720Z",
+      "primeira_venda_em": "2025-11-24",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 3294
+    },
+    "6942870307954": {
+      "sku_bling": "6942870307954",
+      "descricao_bling": "Suporte de lanterna,  Fenix, ALG-18",
+      "fenix_codes": [
+        "ALG-18"
+      ],
+      "categoria": "trilho",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "ALG-18 encontrado exatamente na tabela de acessórios rail_mount",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:41.720Z",
+      "primeira_venda_em": "2025-10-17",
+      "vezes_vendido": 3,
+      "valor_total_vendido": 844
+    },
+    "6942870307671-ID": {
+      "sku_bling": "6942870307671-ID",
+      "descricao_bling": "Acionador remoto para lanterna,  Fenix AER-04 (ID)",
+      "fenix_codes": [
+        "AER-04"
+      ],
+      "categoria": "acionador_remoto",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "AER-04 encontrado exatamente na tabela de acessórios remote_switch",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:41.720Z",
+      "primeira_venda_em": "2025-11-24",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 270
+    },
+    "6942870308005": {
+      "sku_bling": "6942870308005",
+      "descricao_bling": "Lanterna Fenix E05R - 400 Lúmens (Black)",
+      "fenix_codes": [
+        "E05R"
+      ],
+      "categoria": "lanterna",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "E05R encontrado exatamente na tabela série E",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:41.720Z",
+      "primeira_venda_em": "2025-11-19",
+      "vezes_vendido": 1,
+      "valor_total_vendido": 314.1
+    },
+    "6942870305905": {
+      "sku_bling": "6942870305905",
+      "descricao_bling": "Bateria 16340 Recarregável Fenix - ARB-L16-700UP",
+      "fenix_codes": [
+        "ARB-L16 16340"
+      ],
+      "categoria": "bateria",
+      "marca": "fenix",
+      "eh_kit": false,
+      "confianca": 1,
+      "motivo": "ARB-L16-700UP mapeado para linha canônica ARB-L16 16340 conforme regra de variantes",
+      "revisado_por_humano": false,
+      "revisado_por": null,
+      "revisado_em": null,
+      "gerado_em": "2026-09-18T12:33:41.720Z",
+      "primeira_venda_em": "2025-09-29",
+      "vezes_vendido": 8,
+      "valor_total_vendido": 732.2
     }
   },
-  "atualizado_em": "2026-09-18T12:33:21.588Z"
+  "atualizado_em": "2026-09-18T12:33:41.720Z"
 }
