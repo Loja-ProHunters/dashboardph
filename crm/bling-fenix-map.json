@@ -1065,9 +1065,9 @@
       "eh_kit": false,
       "confianca": 0.85,
       "motivo": "ALB-20 não consta na tabela (apenas ALB-10 listado como bike_mount)",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:50:00.038Z",
       "gerado_em": "2026-09-18T12:33:21.588Z",
       "primeira_venda_em": "2025-10-01",
       "vezes_vendido": 2,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:49:54.538Z"
+  "atualizado_em": "2026-09-18T12:50:00.038Z"
 }
