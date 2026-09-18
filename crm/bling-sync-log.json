@@ -1,5 +1,15 @@
 [
   {
+    "ts": "2026-09-18T16:37:39.158Z",
+    "tipo": "sync_incremental",
+    "dias": 1,
+    "pedidos_vistos": 7,
+    "novos_orders": 7,
+    "novas_accounts": 7,
+    "ja_existentes": 0,
+    "avisos": 0
+  },
+  {
     "ts": "2026-09-16T13:32:58.349Z",
     "tipo": "backfill_concluido",
     "pedidos_processados": 1948,
