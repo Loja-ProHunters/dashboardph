@@ -197,9 +197,9 @@
       "eh_kit": false,
       "confianca": 1,
       "motivo": "Modelo CL26R PRO encontrado exatamente na tabela oficial série CL",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:47:36.441Z",
       "gerado_em": "2026-09-18T12:32:10.681Z",
       "primeira_venda_em": "2026-02-04",
       "vezes_vendido": 1,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:47:35.195Z"
+  "atualizado_em": "2026-09-18T12:47:36.441Z"
 }
