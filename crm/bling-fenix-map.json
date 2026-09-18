@@ -1623,9 +1623,9 @@
       "eh_kit": false,
       "confianca": 1,
       "motivo": "BC30 V2.0 está listado explicitamente na tabela oficial Fenix série BC",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:48:18.218Z",
       "gerado_em": "2026-09-18T12:34:17.388Z",
       "primeira_venda_em": "2025-09-24",
       "vezes_vendido": 1,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:48:16.850Z"
+  "atualizado_em": "2026-09-18T12:48:18.218Z"
 }
