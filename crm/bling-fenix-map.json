@@ -1475,9 +1475,9 @@
       "eh_kit": false,
       "confianca": 1,
       "motivo": "Suporte para trilho ALG-00 encontrado exatamente na tabela (grupo rail_mount)",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:47:30.527Z",
       "gerado_em": "2026-09-18T12:33:59.706Z",
       "primeira_venda_em": "2025-10-12",
       "vezes_vendido": 2,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:47:28.575Z"
+  "atualizado_em": "2026-09-18T12:47:30.527Z"
 }
