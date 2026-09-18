@@ -85,9 +85,9 @@
       "eh_kit": false,
       "confianca": 0.9,
       "motivo": "Modelo C6 V3.0 não existe na tabela oficial (série C tem apenas C7 e variantes)",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:46:52.020Z",
       "gerado_em": "2026-09-18T12:31:53.579Z",
       "primeira_venda_em": "2025-10-04",
       "vezes_vendido": 10,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:46:50.767Z"
+  "atualizado_em": "2026-09-18T12:46:52.020Z"
 }
