@@ -627,9 +627,9 @@
       "eh_kit": false,
       "confianca": 1,
       "motivo": "Carregador ARE-X11 SET não consta na tabela oficial de compatibilidade Fenix",
-      "revisado_por_humano": false,
-      "revisado_por": null,
-      "revisado_em": null,
+      "revisado_por_humano": true,
+      "revisado_por": "gerencia",
+      "revisado_em": "2026-09-18T12:47:46.378Z",
       "gerado_em": "2026-09-18T12:32:45.715Z",
       "primeira_venda_em": "2026-01-11",
       "vezes_vendido": 1,
@@ -1740,5 +1740,5 @@
       "valor_total_vendido": 128
     }
   },
-  "atualizado_em": "2026-09-18T12:47:45.109Z"
+  "atualizado_em": "2026-09-18T12:47:46.378Z"
 }
