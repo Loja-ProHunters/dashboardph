@@ -27,6 +27,9 @@ const crmSchemas  = require('../lib/crm/docsSchemas');
 const fenixCompat = require('../lib/crm/fenixCompat');
 const blingFenixMap     = require('../lib/crm/blingFenixMap');
 const blingFenixGerador = require('../lib/crm/blingFenixGerador');
+const coocorrencia      = require('../lib/crm/coocorrencia');
+const { sugerirParaCliente } = require('../lib/crm/sugerir');
+const automacaoUpsell   = require('../lib/crm/automacaoUpsell');
 
 // Bling API v3
 const blingOauth      = require('../lib/bling/oauth');
@@ -538,7 +541,8 @@ module.exports = async (req, res) => {
   // Roteador genérico das coleções CRM
   // Formato: /api/crm/<colecao>[/<id>]
   const crmMatch = url.match(/^\/api\/crm\/([a-z_]+)(?:\/([A-Za-z0-9\-_.]+))?$/);
-  if (crmMatch && crmMatch[1] !== 'session-info' && crmMatch[1] !== 'migrate-parceiros' && crmMatch[1] !== 'docs' && crmMatch[1] !== 'cron' && crmMatch[1] !== 'fenix') {
+  if (crmMatch && crmMatch[1] !== 'session-info' && crmMatch[1] !== 'migrate-parceiros' && crmMatch[1] !== 'docs' && crmMatch[1] !== 'cron' && crmMatch[1] !== 'fenix'
+      && crmMatch[1] !== 'coocorrencia' && crmMatch[1] !== 'sugerir' && crmMatch[1] !== 'tarefas' && crmMatch[1] !== 'ficha') {
     const colName = crmMatch[1];
     const docId = crmMatch[2] || null;
     const reg = crmColl.REGISTRY[colName];
@@ -1076,6 +1080,160 @@ module.exports = async (req, res) => {
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error: e.message}));
     }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // CRM Camada 2/3.2/4 — Coocorrência, Sugestões, Automação, Vendedor
+  // ═════════════════════════════════════════════════════════════
+
+  // ── GET /api/crm/coocorrencia/rebuild — analisa orders.json e gera JSON.
+  //    Aceita via x-vercel-cron (cron semanal) OU sessão gerência.
+  if (req.method === 'GET' && url === '/api/crm/coocorrencia/rebuild') {
+    const sess = getSession(req);
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const cronToken = req.headers['x-cron-secret'];
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+    try {
+      const r = await coocorrencia.analisar();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
+    return;
+  }
+
+  // ── GET /api/crm/coocorrencia/stats
+  if (req.method === 'GET' && url === '/api/crm/coocorrencia/stats') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const s = await coocorrencia.estatisticas();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(s));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/sugerir?account_id=X&order_id=Y (Y opcional)
+  if (req.method === 'GET' && url.startsWith('/api/crm/sugerir')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const accountId = u.searchParams.get('account_id');
+      const orderId = u.searchParams.get('order_id') || null;
+      if (!accountId) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'account_id obrigatório'})); return; }
+      const r = await sugerirParaCliente({ accountId, orderId });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/cron/reativacao — cron semanal (protegida por Vercel Cron)
+  if (req.method === 'GET' && url === '/api/crm/cron/reativacao') {
+    const sess = getSession(req);
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const cronToken = req.headers['x-cron-secret'];
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+    try {
+      const r = await automacaoUpsell.disparaReativacao();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/tarefas/minhas — fila do vendedor (ou de todos, pra admin)
+  if (req.method === 'GET' && url.startsWith('/api/crm/tarefas/minhas')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const login = String(sess.usuario || '').toLowerCase();
+      const scopeAll = crmUtils.canSeeAll(sess);
+      const tarefas = await crmStore.listDocs('activities', a =>
+        a.status === 'pendente' && (scopeAll || String(a.owner_id || a.dono || '').toLowerCase() === login));
+      // Ordena: overdue primeiro, depois por prazo
+      const hoje = new Date().toISOString().slice(0, 10);
+      tarefas.sort((a, b) => {
+        const aOver = (a.prazo && a.prazo < hoje) ? 0 : 1;
+        const bOver = (b.prazo && b.prazo < hoje) ? 0 : 1;
+        if (aOver !== bOver) return aOver - bOver;
+        return String(a.prazo || '').localeCompare(String(b.prazo || ''));
+      });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ tarefas, total: tarefas.length }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── POST /api/crm/tarefas/:id/concluir  body: { resultado: 'convertida'|'nao_convertida' }
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/tarefas\/[a-zA-Z0-9_\-]+\/concluir$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const id = url.split('/')[4];
+      const body = await readBody(req);
+      let payload = {};
+      try { payload = JSON.parse(body || '{}'); } catch(e){}
+      const resultado = payload.resultado;
+      const t = await crmStore.getDoc('activities', id);
+      if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
+      await crmStore.updateDoc('activities', id, {
+        ...t, status: 'concluida', resultado: resultado || 'concluida',
+        concluida_em: new Date().toISOString(), concluida_por: sess.usuario,
+      }, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/ficha/buscar?q=X — busca cliente por nome ou CPF/CNPJ
+  if (req.method === 'GET' && url.startsWith('/api/crm/ficha/buscar')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const q = String(u.searchParams.get('q') || '').toLowerCase().trim();
+      if (!q || q.length < 2) { res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ resultados: [] })); return; }
+      const qDigits = q.replace(/\D/g, '');
+      const accounts = await crmStore.listDocs('accounts', a => {
+        const nome = String(a.nome || '').toLowerCase();
+        const doc = String(a.cpf_cnpj || '').replace(/\D/g, '');
+        if (nome.includes(q)) return true;
+        if (qDigits && doc.includes(qDigits)) return true;
+        return false;
+      });
+      const resultados = accounts.slice(0, 20).map(a => ({
+        id: a.id, nome: a.nome, cpf_cnpj: a.cpf_cnpj, cidade: a.cidade,
+        pedidos_count: a.pedidos_count || 0, valor_total: a.valor_total_compras || 0,
+        ultima_compra: a.ultima_compra_em, owner: a.owner_id,
+      }));
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ resultados, total: resultados.length }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/ficha/:accountId — ficha completa com histórico
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/ficha\/[a-zA-Z0-9_\-]+$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const accId = url.split('/')[4];
+      const account = await crmStore.getDoc('accounts', accId);
+      if (!account) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Cliente não encontrado'})); return; }
+      const orders = await crmStore.listDocs('orders', o => o.account_id === accId);
+      orders.sort((a, b) => String(b.data_pedido || '').localeCompare(String(a.data_pedido || '')));
+      const activities = await crmStore.listDocs('activities', a => a.account_id === accId || (a.entidade_tipo === 'account' && a.entidade_id === accId));
+      activities.sort((a, b) => String(b.criado_em || '').localeCompare(String(a.criado_em || '')));
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ account, orders, activities }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
   }
 
