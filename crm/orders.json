@@ -21620,5 +21620,761 @@
     "criado_por": "bling-sync",
     "atualizado_em": "2026-09-21T18:39:45.977Z",
     "atualizado_por": "bling-sync"
+  },
+  "ord_bdcaf98f65cb20d1": {
+    "id": "ord_bdcaf98f65cb20d1",
+    "bling_pedido_id": "26828101085",
+    "bling_numero": "26981",
+    "account_id": "acc_43ebaef0f0509769",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 3546.3,
+    "itens": [
+      {
+        "sku": "HORN-30501-ID",
+        "descricao": "Projétil Hornady Calibre .308 168 GR BTHP MATCH™",
+        "categoria": null,
+        "quantidade": 300,
+        "valor_unitario": 11.821,
+        "valor_total_item": 3546.2999999999997
+      }
+    ],
+    "data_pedido": "2026-09-09",
+    "data_pagamento": null,
+    "data_envio": "2026-09-09",
+    "data_entrega": null,
+    "notas": "VALOR DO DIFAL:R$ 213,31",
+    "sincronizado_bling_em": "2026-09-21T18:40:25.158Z",
+    "criado_em": "2026-09-21T18:40:25.158Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:25.158Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b059bee19aa672eb": {
+    "id": "ord_b059bee19aa672eb",
+    "bling_pedido_id": "26828093845",
+    "bling_numero": "26980",
+    "account_id": "acc_43ebaef0f0509769",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 2364.22,
+    "itens": [
+      {
+        "sku": "HORN-30501-ID",
+        "descricao": "Projétil Hornady Calibre .308 168 GR BTHP MATCH™",
+        "categoria": null,
+        "quantidade": 200,
+        "valor_unitario": 11.8211,
+        "valor_total_item": 2364.22
+      }
+    ],
+    "data_pedido": "2026-09-09",
+    "data_pagamento": null,
+    "data_envio": "2026-09-09",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-21T18:40:25.942Z",
+    "criado_em": "2026-09-21T18:40:25.942Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:25.942Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_49629530366cefc2": {
+    "id": "ord_49629530366cefc2",
+    "bling_pedido_id": "26827985688",
+    "bling_numero": "26979",
+    "account_id": "acc_020343b1be67eb06",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 1438.36,
+    "itens": [
+      {
+        "sku": "VEC-SCACD-16",
+        "descricao": "Trilho com anel para acoplar Luneta/RedDot 30mm - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 293,
+        "valor_total_item": 293
+      },
+      {
+        "sku": "VEC-SCRD-37",
+        "descricao": "Red Dot Vector Optics  Frenzy 1x22x26, Ref: SCRD-37",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1145.36,
+        "valor_total_item": 1145.36
+      }
+    ],
+    "data_pedido": "2026-09-09",
+    "data_pagamento": null,
+    "data_envio": "2026-09-09",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-21T18:40:26.713Z",
+    "criado_em": "2026-09-21T18:40:26.713Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:26.713Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_304632508c882ee4": {
+    "id": "ord_304632508c882ee4",
+    "bling_pedido_id": "26826754003",
+    "bling_numero": "26978",
+    "account_id": "acc_4a8f6fdca29db689",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "mathias",
+    "status": "rascunho",
+    "valor_total": 2041.53,
+    "itens": [
+      {
+        "sku": "VEC-SCOL-31",
+        "descricao": "Luneta Vector Optics  Hugo, amplitude de 6-24x, objetiva de 50mm, Ref: SCOL-31",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1308.45,
+        "valor_total_item": 1308.45
+      },
+      {
+        "sku": "VEC-SCRD-12II",
+        "descricao": "Red Dot Vector Optics Maverick SCRD-12IIQ Gen II 1x22",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 689,
+        "valor_total_item": 689
+      }
+    ],
+    "data_pedido": "2026-09-09",
+    "data_pagamento": null,
+    "data_envio": "2026-09-09",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-21T18:40:27.497Z",
+    "criado_em": "2026-09-21T18:40:27.497Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:27.497Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_e4e22b7f06086c6d": {
+    "id": "ord_e4e22b7f06086c6d",
+    "bling_pedido_id": "26825681508",
+    "bling_numero": "26977",
+    "account_id": "acc_1f361dabaa066255",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 118.97,
+    "itens": [
+      {
+        "sku": "VEC-SCBCR-14",
+        "descricao": "Colimador para calibre .40 S&W - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 112,
+        "valor_total_item": 112
+      }
+    ],
+    "data_pedido": "2026-09-09",
+    "data_pagamento": null,
+    "data_envio": "2026-09-09",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15352\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\nch_R9onp3oTBC07pqWw |  | 09/09/2026 16:49:07 |  |  | ch_R9onp3oTBC07pqWw",
+    "sincronizado_bling_em": "2026-09-21T18:40:28.292Z",
+    "criado_em": "2026-09-21T18:40:28.292Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:28.292Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_e9cb0145b959f79d": {
+    "id": "ord_e9cb0145b959f79d",
+    "bling_pedido_id": "26824526342",
+    "bling_numero": "26976",
+    "account_id": "acc_c2956fb55131ae55",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 1266.55,
+    "itens": [
+      {
+        "sku": "HORN-8665B-ID",
+        "descricao": "Estojo Hornady  Calibre 30-06 Springfield  Sem Espoleta - Caixa com 50 unidades",
+        "categoria": null,
+        "quantidade": 100,
+        "valor_unitario": 12.6655,
+        "valor_total_item": 1266.55
+      }
+    ],
+    "data_pedido": "2026-09-09",
+    "data_pagamento": null,
+    "data_envio": "2026-09-09",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-21T18:40:29.067Z",
+    "criado_em": "2026-09-21T18:40:29.067Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:29.067Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_bafab3355c748c5e": {
+    "id": "ord_bafab3355c748c5e",
+    "bling_pedido_id": "26822951694",
+    "bling_numero": "26975",
+    "account_id": "acc_40aa73bec5530ac4",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "mathias",
+    "status": "rascunho",
+    "valor_total": 1353.1,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-43",
+        "descricao": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1353.1,
+        "valor_total_item": 1353.1
+      }
+    ],
+    "data_pedido": "2026-09-09",
+    "data_pagamento": null,
+    "data_envio": "2026-09-09",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-21T18:40:29.841Z",
+    "criado_em": "2026-09-21T18:40:29.841Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:29.841Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_4a47ebafda686efe": {
+    "id": "ord_4a47ebafda686efe",
+    "bling_pedido_id": "26822485356",
+    "bling_numero": "26974",
+    "account_id": "acc_d85ba7c37342e307",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 101705.31,
+    "itens": [
+      {
+        "sku": "RCX451-ID",
+        "descricao": "Luneta GPO CENTURI 4X 4-16x44i Compact HS(i)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 3284.62,
+        "valor_total_item": 6569.24
+      },
+      {
+        "sku": "RC630-ID",
+        "descricao": "Luneta Centuri 6X 2.5-15x44I Retículo iluminado MOAi SFP - GPO",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 3284.62,
+        "valor_total_item": 6569.24
+      },
+      {
+        "sku": "RCX651-ID",
+        "descricao": "Luneta GPO CENTURI 6x 3-18x50i SFP ZS MOAI",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 3558.79,
+        "valor_total_item": 7117.58
+      },
+      {
+        "sku": "RSX442-ID",
+        "descricao": "Luneta GPO SPECTRA 4x 4-16x50i G4i Drop",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 3558.79,
+        "valor_total_item": 7117.58
+      },
+      {
+        "sku": "RSX801-ID",
+        "descricao": "Luneta GPO SPECTRA 8x 1-8x24i G4i Fiber",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 5478.02,
+        "valor_total_item": 10956.04
+      },
+      {
+        "sku": "RSX810-ID",
+        "descricao": "Luneta GPO SPECTRA 8x 1.6-13X44i G4i Fiber",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 6026.37,
+        "valor_total_item": 12052.74
+      },
+      {
+        "sku": "RSX822-ID",
+        "descricao": "Luneta GPO SPECTRA 8x 2-16x50i G4i Fiber SFP",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 6574.72,
+        "valor_total_item": 13149.44
+      },
+      {
+        "sku": "A320-ID",
+        "descricao": "Torre De Ajuste De Altura Luneta Spectra 8X - GPO",
+        "categoria": null,
+        "quantidade": 8,
+        "valor_unitario": 488.03,
+        "valor_total_item": 3904.24
+      },
+      {
+        "sku": "RT610-ID",
+        "descricao": "Luneta GPO GPOTAC 1-6x24i FFP HS(i) (FFP)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 6981.2,
+        "valor_total_item": 13962.4
+      },
+      {
+        "sku": "BX701-ID",
+        "descricao": "Rangefinde GPO 3000 8x32 Black",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 5452.01,
+        "valor_total_item": 10904.02
+      },
+      {
+        "sku": "A843-ID",
+        "descricao": "Camisa Polo GPO Verde",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 54.57,
+        "valor_total_item": 54.57
+      },
+      {
+        "sku": "A833-ID",
+        "descricao": "Camisa Polo GPO Preta",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 54.57,
+        "valor_total_item": 109.14
+      },
+      {
+        "sku": "B240-ID",
+        "descricao": "Binólculo GPO PASSION 8x42 SD Black",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 218.3,
+        "valor_total_item": 218.3
+      }
+    ],
+    "data_pedido": "2026-09-09",
+    "data_pagamento": null,
+    "data_envio": "2026-09-09",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-21T18:40:30.602Z",
+    "criado_em": "2026-09-21T18:40:30.602Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:30.602Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_a817012d9c6114f7": {
+    "id": "ord_a817012d9c6114f7",
+    "bling_pedido_id": "26821567187",
+    "bling_numero": "26973",
+    "account_id": "acc_43d624cac8182c6b",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 423.44,
+    "itens": [
+      {
+        "sku": "RUIKE-M31-B",
+        "descricao": "Canivete Ruike M31-B",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 435,
+        "valor_total_item": 435
+      }
+    ],
+    "data_pedido": "2026-09-09",
+    "data_pagamento": null,
+    "data_envio": "2026-09-09",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15350\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\nch_2xyJByMVCqc9Bdln |  | 09/09/2026 12:21:10 |  |  | ch_2xyJByMVCqc9Bdln",
+    "sincronizado_bling_em": "2026-09-21T18:40:31.377Z",
+    "criado_em": "2026-09-21T18:40:31.377Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:31.377Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_a86fa373deb7e7b1": {
+    "id": "ord_a86fa373deb7e7b1",
+    "bling_pedido_id": "26821373902",
+    "bling_numero": "26972",
+    "account_id": "acc_d9de3e0d4421ff49",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "mathias",
+    "status": "rascunho",
+    "valor_total": 1689.1,
+    "itens": [
+      {
+        "sku": "HORN-33210-ID",
+        "descricao": "Projétil Hornady  Calibre .338 230 GR ELD-X",
+        "categoria": null,
+        "quantidade": 100,
+        "valor_unitario": 16.891,
+        "valor_total_item": 1689.1
+      }
+    ],
+    "data_pedido": "2026-09-09",
+    "data_pagamento": null,
+    "data_envio": "2026-09-09",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-21T18:40:32.156Z",
+    "criado_em": "2026-09-21T18:40:32.156Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:32.156Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_5d57b5712cfc3d31": {
+    "id": "ord_5d57b5712cfc3d31",
+    "bling_pedido_id": "26821056341",
+    "bling_numero": "26971",
+    "account_id": "acc_1ab47cf96a5d293d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 125.49,
+    "itens": [
+      {
+        "sku": "RUIKE-P662-B",
+        "descricao": "Canivete Ruike P662B",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 125.49,
+        "valor_total_item": 125.49
+      }
+    ],
+    "data_pedido": "2026-09-09",
+    "data_pagamento": null,
+    "data_envio": "2026-09-09",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-21T18:40:32.942Z",
+    "criado_em": "2026-09-21T18:40:32.942Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:32.942Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_2d24069a603ab1ac": {
+    "id": "ord_2d24069a603ab1ac",
+    "bling_pedido_id": "26820733324",
+    "bling_numero": "26970",
+    "account_id": "acc_435ea146649f25c3",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 177.82,
+    "itens": [
+      {
+        "sku": "6942870304809",
+        "descricao": "Lanterna Camping Fenix CL09 Preta 200 Lúmens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 154.98,
+        "valor_total_item": 154.98
+      }
+    ],
+    "data_pedido": "2026-09-09",
+    "data_pagamento": null,
+    "data_envio": "2026-09-09",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6467\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\nch_d7Q9AdWfjfpeywvq |  | 09/09/2026 11:27:40 |  |  | ch_d7Q9AdWfjfpeywvq",
+    "sincronizado_bling_em": "2026-09-21T18:40:33.722Z",
+    "criado_em": "2026-09-21T18:40:33.722Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:33.722Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_dc6672eb0e47db55": {
+    "id": "ord_dc6672eb0e47db55",
+    "bling_pedido_id": "26818250139",
+    "bling_numero": "26969",
+    "account_id": "acc_e0bb1784f7ffc7a6",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "mathias",
+    "status": "rascunho",
+    "valor_total": 655.84,
+    "itens": [
+      {
+        "sku": "PL-MINI2 Valkyrie (Desert Tan)",
+        "descricao": "Lanterna para armas Olight PL-Mini 2 Valkyrie Desert Tan",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 624.99,
+        "valor_total_item": 624.99
+      }
+    ],
+    "data_pedido": "2026-09-08",
+    "data_pagamento": null,
+    "data_envio": "2026-09-08",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15348\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\n4551507820 | 415274******2216 | 09/09/2026 01:29:41 |  | 4551507820 | ch_VnQ9lQZuavuZLGgW",
+    "sincronizado_bling_em": "2026-09-21T18:40:34.496Z",
+    "criado_em": "2026-09-21T18:40:34.496Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:34.496Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_0fe1b66eef55c57c": {
+    "id": "ord_0fe1b66eef55c57c",
+    "bling_pedido_id": "26816659328",
+    "bling_numero": "26968",
+    "account_id": "acc_209dc7679b812621",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 208.25,
+    "itens": [
+      {
+        "sku": "6942870305905",
+        "descricao": "Bateria Fenix Recarregável 16340 700mAh 3.6V 2.52Wh De Íon de Lítio ARB-L16-700UP",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 97,
+        "valor_total_item": 194
+      }
+    ],
+    "data_pedido": "2026-09-08",
+    "data_pagamento": null,
+    "data_envio": "2026-09-08",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6465\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\n4551185404 | 523421******3829 | 08/09/2026 21:23:43 |  | 4551185404 | ch_EKVRqnPINOSDMgGw",
+    "sincronizado_bling_em": "2026-09-21T18:40:35.312Z",
+    "criado_em": "2026-09-21T18:40:35.312Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:35.312Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_ba87a69d49336625": {
+    "id": "ord_ba87a69d49336625",
+    "bling_pedido_id": "26816542998",
+    "bling_numero": "26967",
+    "account_id": "acc_f0b6e7db4e0ba3ba",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 146.86,
+    "itens": [
+      {
+        "sku": "6942870307428",
+        "descricao": "Coldre para Lanterna Fenix ALP-10S",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 132,
+        "valor_total_item": 132
+      }
+    ],
+    "data_pedido": "2026-09-08",
+    "data_pagamento": null,
+    "data_envio": "2026-09-08",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6463\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\nch_z4Zme41iZHqvWpLa |  | 08/09/2026 21:09:02 |  |  | ch_z4Zme41iZHqvWpLa",
+    "sincronizado_bling_em": "2026-09-21T18:40:36.126Z",
+    "criado_em": "2026-09-21T18:40:36.126Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:36.126Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_702b4fad4457cb7f": {
+    "id": "ord_702b4fad4457cb7f",
+    "bling_pedido_id": "26816223887",
+    "bling_numero": "26966",
+    "account_id": "acc_0c2894157e1ca864",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 291,
+    "itens": [
+      {
+        "sku": "VEC-RDSL17",
+        "descricao": "Red Dot Vector Optics VictOptics RDSL17Q 1x22",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 291,
+        "valor_total_item": 291
+      }
+    ],
+    "data_pedido": "2026-09-08",
+    "data_pagamento": null,
+    "data_envio": "2026-09-08",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-21T18:40:36.867Z",
+    "criado_em": "2026-09-21T18:40:36.867Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:36.867Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_f7711d8c5dcc63f9": {
+    "id": "ord_f7711d8c5dcc63f9",
+    "bling_pedido_id": "26814979868",
+    "bling_numero": "26965",
+    "account_id": "acc_4fdb6c64f4f226e6",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 502.16,
+    "itens": [
+      {
+        "sku": "VEC-SCBPB-02",
+        "descricao": "Bipe Vector Optics, Estilo Sling Stud, 9-13.5\", Ref: SCBPB-02",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 470.1,
+        "valor_total_item": 470.1
+      }
+    ],
+    "data_pedido": "2026-09-08",
+    "data_pagamento": null,
+    "data_envio": "2026-09-08",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15344\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\n4550948315 | 406669******7254 | 08/09/2026 18:47:25 |  | 4550948315 | ch_jYyavpcPETllJQRp",
+    "sincronizado_bling_em": "2026-09-21T18:40:37.636Z",
+    "criado_em": "2026-09-21T18:40:37.636Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:37.636Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_260884874e638782": {
+    "id": "ord_260884874e638782",
+    "bling_pedido_id": "26814737296",
+    "bling_numero": "26964",
+    "account_id": "acc_4f37021eaf1dca78",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "mathias",
+    "status": "rascunho",
+    "valor_total": 2211.55,
+    "itens": [
+      {
+        "sku": "Dillon-80036",
+        "descricao": "Caixa para Munição Dillon 44 Mag 100 Round #52158",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 73.15,
+        "valor_total_item": 73.15
+      },
+      {
+        "sku": "Horn-50095-ID",
+        "descricao": "Removedor universal de projéteis Cam Lock Hornady",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 844.45,
+        "valor_total_item": 844.45
+      },
+      {
+        "sku": "Horn-392160-ID",
+        "descricao": "Coletor Hornady para Projéteis (Collet #7) .308/.312",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 238.45,
+        "valor_total_item": 238.45
+      },
+      {
+        "sku": "HORN-30501-ID",
+        "descricao": "Projétil Hornady Calibre .308 168 GR BTHP MATCH™",
+        "categoria": null,
+        "quantidade": 100,
+        "valor_unitario": 10.555,
+        "valor_total_item": 1055.5
+      }
+    ],
+    "data_pedido": "2026-09-08",
+    "data_pagamento": null,
+    "data_envio": "2026-09-08",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-21T18:40:38.415Z",
+    "criado_em": "2026-09-21T18:40:38.415Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:38.415Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_218a8c8d8a8264e0": {
+    "id": "ord_218a8c8d8a8264e0",
+    "bling_pedido_id": "26813293962",
+    "bling_numero": "26963",
+    "account_id": "acc_5822964874865957",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 646,
+    "itens": [
+      {
+        "sku": "6942870369358",
+        "descricao": "Bateria Fenix Recarregável 21700 5000mAh 3.6V 18Wh De Íon de Lítio ARB-L21-5000U",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 288,
+        "valor_total_item": 576
+      }
+    ],
+    "data_pedido": "2026-09-08",
+    "data_pagamento": null,
+    "data_envio": "2026-09-08",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-21T18:40:39.185Z",
+    "criado_em": "2026-09-21T18:40:39.185Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:39.185Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_448d5ddfdfc63b1e": {
+    "id": "ord_448d5ddfdfc63b1e",
+    "bling_pedido_id": "26812482432",
+    "bling_numero": "26962",
+    "account_id": "acc_e04336f7f51d35d3",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "mathias",
+    "status": "rascunho",
+    "valor_total": 2886.1,
+    "itens": [
+      {
+        "sku": "EH1SB-71701W1",
+        "descricao": "Espingarda Eternal Single Barrel Hw Wood com cao, coronha madeira  cal. 12, Cano 71",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 2886.1,
+        "valor_total_item": 2886.1
+      }
+    ],
+    "data_pedido": "2026-09-08",
+    "data_pagamento": null,
+    "data_envio": "2026-09-08",
+    "data_entrega": null,
+    "notas": "Marca: Eternal Arms - Modelo: Single-Barrel HW Wood - Calibre: 12 GA - Acabamento: Cromo duro no cano / Receiver em alumínio - Funcionamento: Acionamento Simples (monotiro) - Carregador: Capacidade 1 cartucho - Comprimento Cano: 71 cm (28\") - País de fabricação: Turquia - Nº de Série: 21-9214",
+    "sincronizado_bling_em": "2026-09-21T18:40:39.942Z",
+    "criado_em": "2026-09-21T18:40:39.942Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:40:39.942Z",
+    "atualizado_por": "bling-sync"
   }
 }
