@@ -37,6 +37,9 @@ const blingOauth      = require('../lib/bling/oauth');
 const blingTokenStore = require('../lib/bling/tokenStore');
 const blingApi        = require('../lib/bling/api');
 const blingBackfill   = require('../lib/bling/backfill');
+const blingVendedores = require('../lib/bling/vendedores');
+const blingSync       = require('../lib/bling/sync');
+const { getFile: _ghGet, saveFile: _ghSave } = require('../lib/githubStore');
 
 // Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
 // Fallback pro esquema antigo (baseado no nome do usuário) fica só como safety-net.
@@ -544,7 +547,7 @@ module.exports = async (req, res) => {
   const crmMatch = url.match(/^\/api\/crm\/([a-z_]+)(?:\/([A-Za-z0-9\-_.]+))?$/);
   if (crmMatch && crmMatch[1] !== 'session-info' && crmMatch[1] !== 'migrate-parceiros' && crmMatch[1] !== 'docs' && crmMatch[1] !== 'cron' && crmMatch[1] !== 'fenix'
       && crmMatch[1] !== 'coocorrencia' && crmMatch[1] !== 'sugerir' && crmMatch[1] !== 'tarefas' && crmMatch[1] !== 'ficha'
-      && crmMatch[1] !== 'catalogo' && crmMatch[1] !== 'prospeccao') {
+      && crmMatch[1] !== 'catalogo' && crmMatch[1] !== 'prospeccao' && crmMatch[1] !== 'vendedores') {
     const colName = crmMatch[1];
     const docId = crmMatch[2] || null;
     const reg = crmColl.REGISTRY[colName];
@@ -1370,6 +1373,221 @@ module.exports = async (req, res) => {
       res.end(JSON.stringify({error: e.message || String(e)}));
     }
     return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // Reatribuição de VENDEDORES nos pedidos existentes
+  // Usada 1 vez (ou sempre que a lógica de mapping mudar) pra corrigir
+  // orders/accounts cujo vendedor caiu em "gerencia" por bug.
+  // ═════════════════════════════════════════════════════════════
+
+  const REATRIB_PATH = 'crm/reatribuicao-vendedores.json';
+  async function _reatribLer() {
+    try { return JSON.parse(await _ghGet(REATRIB_PATH)); } catch(e) { return null; }
+  }
+  async function _reatribSalvar(cp) {
+    await _ghSave(REATRIB_PATH, JSON.stringify(cp, null, 2), 'Reatribuição vendedores: checkpoint');
+  }
+
+  // ── GET /api/crm/vendedores/diagnostico — mostra amostra do formato do Bling
+  //     Útil pra confirmar que o campo vendedor está vindo (com nome/email/só id).
+  if (req.method === 'GET' && url === '/api/crm/vendedores/diagnostico') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      // Puxa 5 pedidos amostra do Bling (últimos 30 dias)
+      const ate = new Date().toISOString().slice(0,10);
+      const desde = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
+      const { pedidos } = await blingSync.puxarTodaListaPedidos({ desde, ate, limitePaginas: 1 });
+      const amostra = pedidos.slice(0, 5);
+      const detalhes = [];
+      for (const p of amostra) {
+        try {
+          const det = await blingSync.puxarDetalhePedido(p.id);
+          detalhes.push({
+            bling_id: p.id,
+            numero: det.numero,
+            data: det.data,
+            vendedor: det.vendedor || null, // ← o que interessa
+          });
+        } catch (e) {
+          detalhes.push({ bling_id: p.id, erro: e.message });
+        }
+      }
+      // Puxa mapa de vendedores do Bling
+      let mapaVendedores = null;
+      try { mapaVendedores = await blingVendedores.puxarMapa(); } catch(e) { mapaVendedores = { erro: e.message }; }
+      // Carrega users.json
+      const usersJson = await _loadUsersMap();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({
+        ok: true,
+        pedidos_amostra: detalhes,
+        vendedores_bling: mapaVendedores,
+        users_crm: Object.keys(usersJson || {}),
+      }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ── POST /api/crm/vendedores/reatribuir-iniciar — lista IDs pra processar
+  if (req.method === 'POST' && url === '/api/crm/vendedores/reatribuir-iniciar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      // Puxa TODOS os pedidos que temos no CRM (não do Bling — os orders já sincronizados)
+      const orders = await crmStore.listDocs('orders', o => o.status !== 'cancelado');
+      const ids = orders.map(o => o.bling_pedido_id).filter(Boolean);
+      // Carrega mapa de vendedores do Bling pra usar durante o processamento
+      let vendedorMapaBling = {};
+      try { vendedorMapaBling = await blingVendedores.puxarMapa({ forcar: true }); } catch(e) {}
+      const cp = {
+        status: 'em_andamento',
+        iniciado_em: new Date().toISOString(),
+        iniciado_por: sess.usuario,
+        total: ids.length,
+        processados: 0,
+        atualizados: 0,
+        ids_pendentes: ids,
+        vendedores_bling: vendedorMapaBling,
+        mudancas_por_login: {},
+      };
+      await _reatribSalvar(cp);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, checkpoint: cp }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ── POST /api/crm/vendedores/reatribuir-tick — processa lote de 25 pedidos
+  if (req.method === 'POST' && url === '/api/crm/vendedores/reatribuir-tick') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const cp = await _reatribLer();
+      if (!cp || cp.status !== 'em_andamento') { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nenhuma reatribuição em andamento.'})); return; }
+      if (!cp.ids_pendentes || !cp.ids_pendentes.length) {
+        // Finaliza: recalcula owner_id de cada account = vendedor mais frequente
+        await _finalizarReatribuicao(cp);
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ok: true, terminou: true, checkpoint: cp }));
+        return;
+      }
+      const LOTE = 25;
+      const lote = cp.ids_pendentes.slice(0, LOTE);
+      const resto = cp.ids_pendentes.slice(LOTE);
+
+      const usersJson = await _loadUsersMap();
+      const ordersAtual = await crmStore.getCollection('orders');
+      // Índice bling_id → order_id
+      const idxBling = {};
+      for (const [oid, o] of Object.entries(ordersAtual)) {
+        if (o && o.bling_pedido_id) idxBling[String(o.bling_pedido_id)] = oid;
+      }
+
+      let atualizados = 0;
+      const mudancas = cp.mudancas_por_login || {};
+
+      for (const blingId of lote) {
+        try {
+          const detalhe = await blingSync.puxarDetalhePedido(blingId);
+          const vendLogin = await blingSync.mapearVendedor(detalhe, usersJson, {
+            vendedorMapaBling: cp.vendedores_bling || {},
+          });
+          if (!vendLogin) continue; // não achou → deixa como gerencia
+          const orderId = idxBling[String(blingId)];
+          if (!orderId) continue;
+          const order = ordersAtual[orderId];
+          if (!order) continue;
+          if (order.vendedor_id === vendLogin) continue; // já certo
+          order.vendedor_id = vendLogin;
+          order.atualizado_em = new Date().toISOString();
+          order.atualizado_por = 'reatribuicao';
+          atualizados++;
+          mudancas[vendLogin] = (mudancas[vendLogin] || 0) + 1;
+        } catch (e) {
+          // silencia; pode ser rate limit ou pedido sumiu no Bling
+        }
+      }
+
+      // Salva orders atualizados (1 write só)
+      if (atualizados > 0) {
+        await crmStore.saveCollection('orders', ordersAtual, 'Reatribuição vendedores: +' + atualizados + ' orders');
+      }
+
+      cp.ids_pendentes = resto;
+      cp.processados = (cp.processados || 0) + lote.length;
+      cp.atualizados = (cp.atualizados || 0) + atualizados;
+      cp.mudancas_por_login = mudancas;
+      cp.ultimo_tick_em = new Date().toISOString();
+
+      if (cp.ids_pendentes.length === 0) {
+        await _finalizarReatribuicao(cp);
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ok: true, terminou: true, atualizados_neste_lote: atualizados, checkpoint: cp }));
+        return;
+      }
+      await _reatribSalvar(cp);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, terminou: false, atualizados_neste_lote: atualizados, checkpoint: cp }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error: e.message || String(e)}));
+    }
+    return;
+  }
+
+  // ── GET /api/crm/vendedores/reatribuir-status — mostra checkpoint atual
+  if (req.method === 'GET' && url === '/api/crm/vendedores/reatribuir-status') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const cp = await _reatribLer();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ checkpoint: cp }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // Helper interno: depois de terminar, recalcula owner_id de cada account = vendedor mais frequente
+  async function _finalizarReatribuicao(cp) {
+    const ordersAtual = await crmStore.getCollection('orders');
+    const accountsAtual = await crmStore.getCollection('accounts');
+    // Agrega: accountId → { login → count }
+    const contPorAcc = {};
+    for (const o of Object.values(ordersAtual)) {
+      if (!o || !o.account_id) continue;
+      if (!o.vendedor_id || o.vendedor_id === 'gerencia') continue;
+      const aid = o.account_id;
+      if (!contPorAcc[aid]) contPorAcc[aid] = {};
+      contPorAcc[aid][o.vendedor_id] = (contPorAcc[aid][o.vendedor_id] || 0) + 1;
+    }
+    let accsAtualizadas = 0;
+    for (const [aid, counts] of Object.entries(contPorAcc)) {
+      const acc = accountsAtual[aid];
+      if (!acc) continue;
+      // Vendedor mais frequente
+      const [top] = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+      if (!top) continue;
+      const [novoOwner] = top;
+      if (acc.owner_id === novoOwner) continue;
+      acc.owner_id = novoOwner;
+      acc.atualizado_em = new Date().toISOString();
+      acc.atualizado_por = 'reatribuicao';
+      accsAtualizadas++;
+    }
+    if (accsAtualizadas > 0) {
+      await crmStore.saveCollection('accounts', accountsAtual, 'Reatribuição: owner_id de ' + accsAtualizadas + ' accounts');
+    }
+    cp.status = 'concluido';
+    cp.concluido_em = new Date().toISOString();
+    cp.accounts_atualizadas = accsAtualizadas;
+    // Limpa mapa Bling pra não pesar no checkpoint
+    delete cp.vendedores_bling;
+    await _reatribSalvar(cp);
   }
 
   // ── GET /api/crm/catalogo/stats — estatísticas do catálogo (marcas, categorias, etc.)
