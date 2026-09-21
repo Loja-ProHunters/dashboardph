@@ -6446,33 +6446,46 @@ function crmAbreFichaProsp(accId){
 // ═══════════════════════════════════════════════════════════════
 async function crmReatribuirVendedores(){
   var out = document.getElementById('bling-test-result');
-  if (!confirm('Reatribuir vendedores em todos os pedidos existentes?\n\nIsso vai puxar cada pedido do Bling de novo, olhar o vendedor original e atualizar o CRM. Demora alguns minutos.\n\nContas cujo vendedor não estiver cadastrado no dashboard vão continuar como "gerencia".')) return;
-  out.innerHTML = '<span style="color:var(--gd)">🔄 Iniciando reatribuição…</span>';
+  if (!confirm('Reatribuir vendedores em todos os pedidos existentes?\n\nVersão robusta v2: com delay de 400ms entre requests + retry automático em rate limit.\n\nDemora ~4-6 minutos pros 529 pedidos. Deixa a aba aberta até terminar.')) return;
+  out.innerHTML = '<span style="color:var(--gd)">🔄 Iniciando reatribuição v2…</span>';
   try {
-    var r = await fetch('/api/crm/vendedores/reatribuir-iniciar', { method:'POST' });
+    var r = await fetch('/api/crm/vendedores/reatribuir-iniciar', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ forcar: true }) });
     var d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro ao iniciar');
     var cp = d.checkpoint;
-    out.innerHTML = '<span style="color:var(--gd)">🔄 Reatribuição iniciada.</span> ' +
-      cp.total + ' pedidos pra processar. Isso vai levar ~' + Math.ceil(cp.total / 25 * 5) + 's.';
-    // Loop de ticks até terminar
+    out.innerHTML = '<span style="color:var(--gd)">🔄 Iniciada.</span> ' +
+      cp.total + ' pedidos · estimativa ~' + Math.ceil(cp.total / 15 * 7) + 's.';
     while (true) {
       var rt = await fetch('/api/crm/vendedores/reatribuir-tick', { method:'POST' });
       var dt = await rt.json();
       if (!rt.ok) throw new Error(dt.error || 'Erro no tick');
       var cpAtual = dt.checkpoint;
+      var c = cpAtual.contadores || {};
       var pct = cpAtual.total ? Math.round((cpAtual.processados / cpAtual.total) * 100) : 100;
       out.innerHTML = '<span style="color:var(--gd)">🔄 Processando…</span> ' +
-        pct + '% · ' + cpAtual.processados + '/' + cpAtual.total + ' pedidos · ' +
-        (cpAtual.atualizados || 0) + ' vendedor corrigido';
+        pct + '% · ' + cpAtual.processados + '/' + cpAtual.total +
+        ' · ✓' + (c.atualizados||0) +
+        ' · rate-limit:' + (c.erro_rate_limit||0);
       if (dt.terminou) {
         var resumo = cpAtual.mudancas_por_login || {};
         var linhas = Object.entries(resumo).map(function(e){ return e[0]+': '+e[1]; }).join(' · ');
-        out.innerHTML = '<span style="color:var(--gd)">✓ Reatribuição concluída!</span><br>' +
-          '• ' + cpAtual.processados + ' pedidos processados<br>' +
-          '• ' + (cpAtual.atualizados || 0) + ' pedidos com vendedor corrigido<br>' +
-          '• ' + (cpAtual.accounts_atualizadas || 0) + ' contas com novo owner<br>' +
-          (linhas ? '• Distribuição: ' + linhas : '');
+        out.innerHTML =
+          '<div style="color:var(--gd);font-weight:700;margin-bottom:6px">✓ Reatribuição concluída!</div>' +
+          '<div style="margin-left:8px;font-size:12.5px;line-height:1.6">' +
+            '• <b>' + cpAtual.processados + '</b> pedidos processados<br>' +
+            '• <b>' + (c.atualizados||0) + '</b> pedidos com vendedor corrigido<br>' +
+            '• <b>' + (cpAtual.accounts_atualizadas||0) + '</b> contas com novo owner<br>' +
+            (linhas ? '• Distribuição por vendedor: <b>' + linhas + '</b><br>' : '') +
+            '<div style="margin-top:8px;padding-top:6px;border-top:1px dashed var(--bd);font-size:11.5px;color:var(--gy)">' +
+              '<b>Diagnóstico dos ' + cpAtual.processados + ' pedidos:</b><br>' +
+              '↳ ' + (c.ja_mapeado_correto||0) + ' já estavam com vendedor certo<br>' +
+              '↳ ' + (c.sem_vendedor_no_bling||0) + ' vieram sem vendedor no Bling (id=0)<br>' +
+              '↳ ' + (c.vendedor_nao_mapeado||0) + ' têm vendedor no Bling mas fora do CRM (Tray, Luis, Redin)<br>' +
+              '↳ ' + (c.order_nao_achado||0) + ' order não encontrado localmente<br>' +
+              '↳ <span style="color:' + ((c.erro_rate_limit||0)>0?'var(--r)':'inherit') + '">' + (c.erro_rate_limit||0) + ' falharam por rate limit</span><br>' +
+              '↳ ' + (c.erro_outro||0) + ' falharam por outro erro' +
+            '</div>' +
+          '</div>';
         break;
       }
     }
