@@ -1432,6 +1432,74 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // ── GET /api/crm/vendedores/investigar — puxa amostra maior e mostra vendedor cru + mapeamento
+  //     Ideal pra descobrir se o problema é no Bling (dado errado) ou no CRM (mapeamento).
+  //     Query: ?dias=30&limite=30  (padrão)
+  if (req.method === 'GET' && url.startsWith('/api/crm/vendedores/investigar')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const dias = Math.min(365, Number(u.searchParams.get('dias') || 30));
+      const limite = Math.min(50, Number(u.searchParams.get('limite') || 30));
+      const idFiltro = u.searchParams.get('id') || null; // ex: 15596916104 (Wesley)
+
+      const ate = new Date().toISOString().slice(0,10);
+      const desde = new Date(Date.now() - dias * 86400000).toISOString().slice(0,10);
+      const { pedidos } = await blingSync.puxarTodaListaPedidos({ desde, ate, limitePaginas: 5 });
+
+      const mapaBling = await blingVendedores.puxarMapa();
+      const usersJson = await _loadUsersMap();
+
+      const amostra = pedidos.slice(0, limite);
+      const linhas = [];
+      const porVendedorBling = {};
+      const porLoginMapeado  = {};
+
+      for (const p of amostra) {
+        try {
+          const det = await blingSync.puxarDetalhePedido(p.id);
+          const vend = det.vendedor || null;
+          const vendId = vend && (vend.id || (vend.contato && vend.contato.id)) || null;
+          const vendNomeCache = vendId ? (mapaBling[String(vendId)] && mapaBling[String(vendId)].nome) || null : null;
+          const login = await blingSync.mapearVendedor(det, usersJson, { vendedorMapaBling: mapaBling });
+          if (idFiltro && String(vendId) !== String(idFiltro)) continue;
+
+          const linha = {
+            bling_id: p.id,
+            numero: det.numero,
+            data: det.data,
+            situacao: det.situacao ? (det.situacao.valor || det.situacao.nome || det.situacao.descricao || det.situacao) : null,
+            vendedor_id_bling: vendId,
+            vendedor_nome_cache: vendNomeCache,
+            vendedor_raw_no_pedido: vend,
+            mapeado_para: login || 'gerencia',
+          };
+          linhas.push(linha);
+          const kBling = vendNomeCache || String(vendId) || 'sem_vendedor';
+          porVendedorBling[kBling] = (porVendedorBling[kBling] || 0) + 1;
+          porLoginMapeado[login || 'gerencia'] = (porLoginMapeado[login || 'gerencia'] || 0) + 1;
+        } catch (e) {
+          linhas.push({ bling_id: p.id, erro: e.message });
+        }
+      }
+
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({
+        ok: true,
+        parametros: { dias, limite, idFiltro },
+        total_pedidos_periodo: pedidos.length,
+        analisados: linhas.length,
+        resumo_por_vendedor_bling: porVendedorBling,
+        resumo_por_login_mapeado:  porLoginMapeado,
+        detalhe: linhas,
+      }, null, 2));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error: e.message || String(e)}));
+    }
+    return;
+  }
+
   // ── POST /api/crm/vendedores/reatribuir-iniciar — lista IDs pra processar
   if (req.method === 'POST' && url === '/api/crm/vendedores/reatribuir-iniciar') {
     const sess = getSession(req);
