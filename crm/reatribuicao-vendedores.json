@@ -3,24 +3,9 @@
   "iniciado_em": "2026-09-21T16:48:03.294Z",
   "iniciado_por": "gerencia",
   "total": 529,
-  "processados": 45,
+  "processados": 60,
   "atualizados": 0,
   "ids_pendentes": [
-    "24936617466",
-    "24929287124",
-    "24929237717",
-    "24928024801",
-    "24927748661",
-    "24925669249",
-    "24924147716",
-    "24923444289",
-    "24923255158",
-    "24919409671",
-    "24915822352",
-    "24910907424",
-    "24908485823",
-    "24906108327",
-    "24905221134",
     "24899165989",
     "24892364424",
     "24891947031",
@@ -532,11 +517,11 @@
   "contadores": {
     "atualizados": 0,
     "sem_vendedor_no_bling": 0,
-    "vendedor_nao_mapeado": 34,
-    "ja_mapeado_correto": 11,
+    "vendedor_nao_mapeado": 44,
+    "ja_mapeado_correto": 16,
     "order_nao_achado": 0,
     "erro_rate_limit": 0,
     "erro_outro": 0
   },
-  "ultimo_tick_em": "2026-09-21T16:48:43.729Z"
+  "ultimo_tick_em": "2026-09-21T16:48:57.073Z"
 }
