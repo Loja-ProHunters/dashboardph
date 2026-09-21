@@ -1,5 +1,10 @@
 [
   {
+    "ts": "2026-09-21T20:53:59.740Z",
+    "tipo": "guardrail_getcollection",
+    "msg": "ABORT: getCollection(orders) devolveu 0 mesmo após retry, mas state diz 920. Tenta de novo em alguns segundos."
+  },
+  {
     "ts": "2026-09-21T19:11:35.796Z",
     "tipo": "guardrail_getcollection",
     "msg": "ABORT: getCollection(orders) devolveu 0 mas state diz 920. Nada foi processado."
