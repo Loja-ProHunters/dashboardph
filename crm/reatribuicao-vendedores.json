@@ -1,64 +1,24 @@
 {
-  "status": "em_andamento",
+  "status": "concluido",
   "iniciado_em": "2026-09-21T16:48:03.294Z",
   "iniciado_por": "gerencia",
   "total": 529,
-  "processados": 525,
+  "processados": 529,
   "atualizados": 2,
-  "ids_pendentes": [
-    "26901195850",
-    "26899807658",
-    "26896783638",
-    "26896230542"
-  ],
-  "vendedores_bling": {
-    "872990182": {
-      "id": "872990182",
-      "nome": "Loja Integrada",
-      "email": ""
-    },
-    "9744561230": {
-      "id": "9744561230",
-      "nome": "Tray",
-      "email": ""
-    },
-    "15596458513": {
-      "id": "15596458513",
-      "nome": "Joao Carlos Redin - Vendedor",
-      "email": ""
-    },
-    "15596492308": {
-      "id": "15596492308",
-      "nome": "Luis Henrique Gonçalves",
-      "email": ""
-    },
-    "15596572600": {
-      "id": "15596572600",
-      "nome": "Pedro Henrique Dickmann",
-      "email": ""
-    },
-    "15596742630": {
-      "id": "15596742630",
-      "nome": "Enzo dos Santos Boschetto",
-      "email": ""
-    },
-    "15596916104": {
-      "id": "15596916104",
-      "nome": "Wesley Mathias Ciesielsky",
-      "email": ""
-    }
-  },
+  "ids_pendentes": [],
   "mudancas_por_login": {
     "dickmann": 2
   },
   "contadores": {
     "atualizados": 2,
-    "sem_vendedor_no_bling": 13,
+    "sem_vendedor_no_bling": 14,
     "vendedor_nao_mapeado": 381,
-    "ja_mapeado_correto": 129,
+    "ja_mapeado_correto": 132,
     "order_nao_achado": 0,
     "erro_rate_limit": 0,
     "erro_outro": 0
   },
-  "ultimo_tick_em": "2026-09-21T16:56:16.961Z"
+  "ultimo_tick_em": "2026-09-21T16:56:22.242Z",
+  "concluido_em": "2026-09-21T16:56:23.295Z",
+  "accounts_atualizadas": 1
 }
