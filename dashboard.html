@@ -5203,6 +5203,7 @@ async function crmBlingRefreshStatus(){
       '<button class="crm-btn" onclick="crmBlingTest()">Testar conexão</button>' +
       '<button class="crm-btn" onclick="crmBlingSyncAgora()">Sync agora (últimos 24h)</button>' +
       '<button class="crm-btn" onclick="crmBlingBackfillIniciar()">📥 Backfill histórico</button>' +
+      '<button class="crm-btn" onclick="crmVerificarSaude()">🛡 Verificar saúde CRM×Bling</button>' +
       '<button class="crm-btn" onclick="crmReatribuirVendedores()">🔄 Reatribuir vendedores</button>' +
       '<button class="crm-btn ghost" onclick="crmBlingRefresh()">Renovar token</button>' +
       '<a class="crm-btn ghost" href="/api/bling/authorize" target="_blank">Reconectar</a>' +
@@ -5247,7 +5248,7 @@ async function crmBlingBackfillIniciar(){
   try {
     const r = await fetch('/api/bling/backfill/iniciar', {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ meses: n }),
+      body: JSON.stringify({ meses: n, forcar: true }),
     });
     const d = await r.json();
     if (!r.ok) {
@@ -6439,6 +6440,41 @@ function crmAbreFichaProsp(accId){
   window.CRM.fichaPreSelect = accId;
   crmRenderSubTabs();
   crmRenderCurrent();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Verifica saúde do CRM comparando com Bling mês a mês
+// ═══════════════════════════════════════════════════════════════
+async function crmVerificarSaude(){
+  var out = document.getElementById('bling-test-result');
+  out.innerHTML = '<span style="color:var(--gd)">🛡 Verificando saúde CRM×Bling…</span> (pode levar ~30-60s)';
+  try {
+    var r = await fetch('/api/crm/bling/saude?meses=12');
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    var buracos = d.meses_com_buraco || [];
+    var linhasBuraco = buracos.map(function(b){
+      return '<tr><td>'+b.mes+'</td><td style="text-align:right">'+b.crm+'</td><td style="text-align:right">'+b.bling+'</td><td style="text-align:right;color:var(--r);font-weight:700">-'+b.faltando+'</td></tr>';
+    }).join('');
+    var htmlBuracos = buracos.length ?
+      '<table style="width:100%;font-size:12px;margin-top:6px;border-collapse:collapse">' +
+        '<thead><tr style="background:var(--bg)"><th style="text-align:left;padding:4px">Mês</th><th style="text-align:right;padding:4px">CRM</th><th style="text-align:right;padding:4px">Bling</th><th style="text-align:right;padding:4px">Faltando</th></tr></thead>' +
+        '<tbody>'+linhasBuraco+'</tbody></table>' +
+        '<div style="margin-top:8px"><button class="crm-btn" onclick="crmBlingBackfillIniciar()">📥 Recuperar buracos (backfill 12 meses)</button></div>'
+      :
+      '<div style="color:var(--gd);font-weight:600;margin-top:6px">✓ Zero buracos detectados. CRM está em dia com o Bling.</div>';
+    out.innerHTML =
+      '<div style="font-weight:700;margin-bottom:6px">🛡 Diagnóstico de saúde</div>' +
+      '<div style="font-size:12.5px;line-height:1.6">' +
+        '• Total no Bling (12 meses): <b>' + d.total_bling + '</b><br>' +
+        '• Total no CRM: <b>' + d.total_crm + '</b><br>' +
+        '• Diferença: <b style="color:' + (d.diff_total>0?'var(--r)':'var(--gd)') + '">' + (d.diff_total>=0?'-':'+') + Math.abs(d.diff_total) + '</b><br>' +
+        (buracos.length ? '<div style="color:var(--r);font-weight:700;margin-top:6px">⚠ ' + buracos.length + ' mês(es) com buraco:</div>' : '') +
+        htmlBuracos +
+      '</div>';
+  } catch (e) {
+    out.innerHTML = '<span style="color:var(--r)">Erro: ' + crmEsc(e.message) + '</span>';
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
