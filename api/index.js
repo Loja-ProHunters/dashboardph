@@ -1917,18 +1917,74 @@ module.exports = async (req, res) => {
   }
 
   // POST /api/bling/backfill/iniciar — puxa lista de IDs do range
+  //     Body: { meses?: 12, forcar?: true }
   if (req.method === 'POST' && url === '/api/bling/backfill/iniciar') {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
     try {
       const body = await readBody(req);
-      const { meses = 12 } = JSON.parse(body || '{}');
+      const payload = JSON.parse(body || '{}');
+      const meses = payload.meses || 12;
+      const forcar = !!payload.forcar;
       const mesesNum = Math.max(1, Math.min(60, Number(meses) || 12));
-      const r = await blingBackfill.iniciar({ meses: mesesNum, iniciado_por: sess.usuario });
+      const r = await blingBackfill.iniciar({ meses: mesesNum, iniciado_por: sess.usuario, forcar });
       res.writeHead(r.ok ? 200 : 409, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(r));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/bling/saude — verifica CRM ↔ Bling e retorna diff por mês
+  if (req.method === 'GET' && url.startsWith('/api/crm/bling/saude')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const meses = Math.max(1, Math.min(24, Number(u.searchParams.get('meses') || 12)));
+      const r = await blingBackfill.verificarSaude({ meses });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message || String(e)}));
+    }
+    return;
+  }
+
+  // GET /api/crm/bling/auto-recuperar — cron diário 5h UTC:
+  //   1) Verifica saúde. 2) Se tem buraco, dispara backfill 12 meses (forcar) pra recuperar.
+  //   3) Idempotente: se backfill já rodou hoje, pula.
+  if (req.method === 'GET' && url === '/api/crm/bling/auto-recuperar') {
+    const sess = getSession(req);
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const cronToken  = req.headers['x-cron-secret'];
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+    try {
+      const saude = await blingBackfill.verificarSaude({ meses: 12 });
+      if (!saude.meses_com_buraco || !saude.meses_com_buraco.length) {
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ok: true, motivo: 'sem_buracos', saude }));
+        return;
+      }
+      // Tem buraco → dispara backfill forçado se checkpoint não está em andamento OU é antigo (>6h)
+      const cp = await blingBackfill.lerCheckpoint();
+      if (cp && cp.status === 'em_andamento') {
+        const ultimo = cp.ultimo_lote_em ? new Date(cp.ultimo_lote_em) : new Date(cp.iniciado_em || 0);
+        const idadeH = (Date.now() - ultimo.getTime()) / 3600000;
+        if (idadeH < 6) {
+          res.writeHead(200,{'Content-Type':'application/json'});
+          res.end(JSON.stringify({ ok: true, motivo: 'backfill_recente_em_andamento', checkpoint: cp, saude }));
+          return;
+        }
+      }
+      const r = await blingBackfill.iniciar({ meses: 12, iniciado_por: 'auto-recuperar', forcar: true });
+      await blingBackfill.apendarLog({ tipo: 'auto_recuperar_disparado', saude, backfill: r });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, motivo: 'buracos_detectados_backfill_iniciado', saude, backfill: r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message || String(e)}));
     }
     return;
   }
