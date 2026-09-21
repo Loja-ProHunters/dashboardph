@@ -5203,6 +5203,7 @@ async function crmBlingRefreshStatus(){
       '<button class="crm-btn" onclick="crmBlingTest()">Testar conexão</button>' +
       '<button class="crm-btn" onclick="crmBlingSyncAgora()">Sync agora (últimos 24h)</button>' +
       '<button class="crm-btn" onclick="crmBlingBackfillIniciar()">📥 Backfill histórico</button>' +
+      '<button class="crm-btn" onclick="crmReatribuirVendedores()">🔄 Reatribuir vendedores</button>' +
       '<button class="crm-btn ghost" onclick="crmBlingRefresh()">Renovar token</button>' +
       '<a class="crm-btn ghost" href="/api/bling/authorize" target="_blank">Reconectar</a>' +
       '<button class="crm-btn danger" onclick="crmBlingDisconnect()">Desconectar</button>';
@@ -6438,6 +6439,46 @@ function crmAbreFichaProsp(accId){
   window.CRM.fichaPreSelect = accId;
   crmRenderSubTabs();
   crmRenderCurrent();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Reatribuição de vendedores nos pedidos (roda em lotes com checkpoint)
+// ═══════════════════════════════════════════════════════════════
+async function crmReatribuirVendedores(){
+  var out = document.getElementById('bling-test-result');
+  if (!confirm('Reatribuir vendedores em todos os pedidos existentes?\n\nIsso vai puxar cada pedido do Bling de novo, olhar o vendedor original e atualizar o CRM. Demora alguns minutos.\n\nContas cujo vendedor não estiver cadastrado no dashboard vão continuar como "gerencia".')) return;
+  out.innerHTML = '<span style="color:var(--gd)">🔄 Iniciando reatribuição…</span>';
+  try {
+    var r = await fetch('/api/crm/vendedores/reatribuir-iniciar', { method:'POST' });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro ao iniciar');
+    var cp = d.checkpoint;
+    out.innerHTML = '<span style="color:var(--gd)">🔄 Reatribuição iniciada.</span> ' +
+      cp.total + ' pedidos pra processar. Isso vai levar ~' + Math.ceil(cp.total / 25 * 5) + 's.';
+    // Loop de ticks até terminar
+    while (true) {
+      var rt = await fetch('/api/crm/vendedores/reatribuir-tick', { method:'POST' });
+      var dt = await rt.json();
+      if (!rt.ok) throw new Error(dt.error || 'Erro no tick');
+      var cpAtual = dt.checkpoint;
+      var pct = cpAtual.total ? Math.round((cpAtual.processados / cpAtual.total) * 100) : 100;
+      out.innerHTML = '<span style="color:var(--gd)">🔄 Processando…</span> ' +
+        pct + '% · ' + cpAtual.processados + '/' + cpAtual.total + ' pedidos · ' +
+        (cpAtual.atualizados || 0) + ' vendedor corrigido';
+      if (dt.terminou) {
+        var resumo = cpAtual.mudancas_por_login || {};
+        var linhas = Object.entries(resumo).map(function(e){ return e[0]+': '+e[1]; }).join(' · ');
+        out.innerHTML = '<span style="color:var(--gd)">✓ Reatribuição concluída!</span><br>' +
+          '• ' + cpAtual.processados + ' pedidos processados<br>' +
+          '• ' + (cpAtual.atualizados || 0) + ' pedidos com vendedor corrigido<br>' +
+          '• ' + (cpAtual.accounts_atualizadas || 0) + ' contas com novo owner<br>' +
+          (linhas ? '• Distribuição: ' + linhas : '');
+        break;
+      }
+    }
+  } catch (e) {
+    out.innerHTML = '<span style="color:var(--r)">Erro: ' + crmEsc(e.message) + '</span>';
+  }
 }
 
 function crmProspCSV(){
