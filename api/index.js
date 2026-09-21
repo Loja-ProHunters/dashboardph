@@ -1501,14 +1501,13 @@ module.exports = async (req, res) => {
   }
 
   // ── POST /api/crm/vendedores/reatribuir-iniciar — lista IDs pra processar
+  //     Body opcional: { forcar: true } → ignora checkpoint anterior e recomeça
   if (req.method === 'POST' && url === '/api/crm/vendedores/reatribuir-iniciar') {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
     try {
-      // Puxa TODOS os pedidos que temos no CRM (não do Bling — os orders já sincronizados)
       const orders = await crmStore.listDocs('orders', o => o.status !== 'cancelado');
       const ids = orders.map(o => o.bling_pedido_id).filter(Boolean);
-      // Carrega mapa de vendedores do Bling pra usar durante o processamento
       let vendedorMapaBling = {};
       try { vendedorMapaBling = await blingVendedores.puxarMapa({ forcar: true }); } catch(e) {}
       const cp = {
@@ -1521,6 +1520,10 @@ module.exports = async (req, res) => {
         ids_pendentes: ids,
         vendedores_bling: vendedorMapaBling,
         mudancas_por_login: {},
+        contadores: {
+          atualizados: 0, sem_vendedor_no_bling: 0, vendedor_nao_mapeado: 0,
+          ja_mapeado_correto: 0, order_nao_achado: 0, erro_rate_limit: 0, erro_outro: 0,
+        },
       };
       await _reatribSalvar(cp);
       res.writeHead(200,{'Content-Type':'application/json'});
@@ -1531,7 +1534,8 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // ── POST /api/crm/vendedores/reatribuir-tick — processa lote de 25 pedidos
+  // ── POST /api/crm/vendedores/reatribuir-tick — processa lote com delay+retry
+  //     v2: 400ms entre requests, retry em 429/503, contadores detalhados por motivo.
   if (req.method === 'POST' && url === '/api/crm/vendedores/reatribuir-tick') {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
@@ -1539,69 +1543,112 @@ module.exports = async (req, res) => {
       const cp = await _reatribLer();
       if (!cp || cp.status !== 'em_andamento') { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nenhuma reatribuição em andamento.'})); return; }
       if (!cp.ids_pendentes || !cp.ids_pendentes.length) {
-        // Finaliza: recalcula owner_id de cada account = vendedor mais frequente
         await _finalizarReatribuicao(cp);
         res.writeHead(200,{'Content-Type':'application/json'});
         res.end(JSON.stringify({ ok: true, terminou: true, checkpoint: cp }));
         return;
       }
-      const LOTE = 25;
+      const LOTE = 15;              // menor lote pra caber no timeout com delay
+      const DELAY_MS = 400;         // 2.5 req/s → respeita rate limit do Bling
+      const sleep = ms => new Promise(r => setTimeout(r, ms));
       const lote = cp.ids_pendentes.slice(0, LOTE);
       const resto = cp.ids_pendentes.slice(LOTE);
 
       const usersJson = await _loadUsersMap();
       const ordersAtual = await crmStore.getCollection('orders');
-      // Índice bling_id → order_id
       const idxBling = {};
       for (const [oid, o] of Object.entries(ordersAtual)) {
         if (o && o.bling_pedido_id) idxBling[String(o.bling_pedido_id)] = oid;
       }
 
-      let atualizados = 0;
+      // Contadores detalhados (persistidos no checkpoint)
+      const contadores = cp.contadores || {
+        atualizados: 0,
+        sem_vendedor_no_bling: 0,   // vendedor.id = 0 ou null → gerencia
+        vendedor_nao_mapeado: 0,    // vendedor cadastrado no Bling mas não é do CRM (Luis, Redin, Tray)
+        ja_mapeado_correto: 0,      // order já estava com vendedor certo
+        order_nao_achado: 0,        // bling_id não bateu com nenhum order local
+        erro_rate_limit: 0,         // 429/503 mesmo após retry
+        erro_outro: 0,              // outra exceção
+      };
       const mudancas = cp.mudancas_por_login || {};
 
-      for (const blingId of lote) {
-        try {
-          const detalhe = await blingSync.puxarDetalhePedido(blingId);
-          const vendLogin = await blingSync.mapearVendedor(detalhe, usersJson, {
-            vendedorMapaBling: cp.vendedores_bling || {},
-          });
-          if (!vendLogin) continue; // não achou → deixa como gerencia
-          const orderId = idxBling[String(blingId)];
-          if (!orderId) continue;
-          const order = ordersAtual[orderId];
-          if (!order) continue;
-          if (order.vendedor_id === vendLogin) continue; // já certo
-          order.vendedor_id = vendLogin;
-          order.atualizado_em = new Date().toISOString();
-          order.atualizado_por = 'reatribuicao';
-          atualizados++;
-          mudancas[vendLogin] = (mudancas[vendLogin] || 0) + 1;
-        } catch (e) {
-          // silencia; pode ser rate limit ou pedido sumiu no Bling
+      // Processa 1 pedido com retry em 429/503
+      async function processar(blingId) {
+        let detalhe = null;
+        let tentativas = 0;
+        while (tentativas < 3) {
+          tentativas++;
+          try {
+            detalhe = await blingSync.puxarDetalhePedido(blingId);
+            break;
+          } catch (e) {
+            const status = e.status || 0;
+            if (status === 429 || status === 503) {
+              // Backoff progressivo: 1s, 2s, 4s
+              await sleep(1000 * Math.pow(2, tentativas - 1));
+              if (tentativas >= 3) { contadores.erro_rate_limit++; return; }
+              continue;
+            }
+            contadores.erro_outro++;
+            return;
+          }
         }
+        if (!detalhe) { contadores.erro_outro++; return; }
+
+        // Extrai vendedor cru pra saber se foi realmente null ou só não mapeou
+        const v = detalhe.vendedor || null;
+        const vendIdBling = v && (v.id || (v.contato && v.contato.id)) || null;
+        const semVendBling = !vendIdBling || String(vendIdBling) === '0';
+
+        const vendLogin = await blingSync.mapearVendedor(detalhe, usersJson, {
+          vendedorMapaBling: cp.vendedores_bling || {},
+        });
+
+        if (!vendLogin) {
+          if (semVendBling) contadores.sem_vendedor_no_bling++;
+          else contadores.vendedor_nao_mapeado++;
+          return;
+        }
+        const orderId = idxBling[String(blingId)];
+        if (!orderId) { contadores.order_nao_achado++; return; }
+        const order = ordersAtual[orderId];
+        if (!order) { contadores.order_nao_achado++; return; }
+        if (order.vendedor_id === vendLogin) { contadores.ja_mapeado_correto++; return; }
+        order.vendedor_id = vendLogin;
+        order.atualizado_em = new Date().toISOString();
+        order.atualizado_por = 'reatribuicao';
+        contadores.atualizados++;
+        mudancas[vendLogin] = (mudancas[vendLogin] || 0) + 1;
       }
 
-      // Salva orders atualizados (1 write só)
-      if (atualizados > 0) {
-        await crmStore.saveCollection('orders', ordersAtual, 'Reatribuição vendedores: +' + atualizados + ' orders');
+      // Loop com delay entre chamadas
+      for (let i = 0; i < lote.length; i++) {
+        await processar(lote[i]);
+        if (i < lote.length - 1) await sleep(DELAY_MS);
+      }
+
+      // Salva orders (1 write) se algo mudou
+      if (contadores.atualizados > 0) {
+        await crmStore.saveCollection('orders', ordersAtual, 'Reatribuição v2: +' + contadores.atualizados + ' orders acumulado');
       }
 
       cp.ids_pendentes = resto;
       cp.processados = (cp.processados || 0) + lote.length;
-      cp.atualizados = (cp.atualizados || 0) + atualizados;
+      cp.contadores = contadores;
+      cp.atualizados = contadores.atualizados; // mantém compat com UI anterior
       cp.mudancas_por_login = mudancas;
       cp.ultimo_tick_em = new Date().toISOString();
 
       if (cp.ids_pendentes.length === 0) {
         await _finalizarReatribuicao(cp);
         res.writeHead(200,{'Content-Type':'application/json'});
-        res.end(JSON.stringify({ ok: true, terminou: true, atualizados_neste_lote: atualizados, checkpoint: cp }));
+        res.end(JSON.stringify({ ok: true, terminou: true, atualizados_neste_lote: 'ver contadores', contadores, checkpoint: cp }));
         return;
       }
       await _reatribSalvar(cp);
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ ok: true, terminou: false, atualizados_neste_lote: atualizados, checkpoint: cp }));
+      res.end(JSON.stringify({ ok: true, terminou: false, contadores, checkpoint: cp }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error: e.message || String(e)}));
     }
