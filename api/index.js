@@ -1936,8 +1936,8 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // GET /api/crm/bling/saude — verifica CRM ↔ Bling e retorna diff por mês
-  if (req.method === 'GET' && url.startsWith('/api/crm/bling/saude')) {
+  // GET /api/saude-bling — verifica CRM ↔ Bling e retorna diff por mês
+  if (req.method === 'GET' && url.startsWith('/api/saude-bling')) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
     try {
@@ -1952,10 +1952,10 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // GET /api/crm/bling/auto-recuperar — cron diário 5h UTC:
+  // GET /api/auto-recuperar-bling — cron diário 5h UTC:
   //   1) Verifica saúde. 2) Se tem buraco, dispara backfill 12 meses (forcar) pra recuperar.
   //   3) Idempotente: se backfill já rodou hoje, pula.
-  if (req.method === 'GET' && url === '/api/crm/bling/auto-recuperar') {
+  if (req.method === 'GET' && url === '/api/auto-recuperar-bling') {
     const sess = getSession(req);
     const vercelCron = req.headers['x-vercel-cron'] === '1';
     const cronToken  = req.headers['x-cron-secret'];
