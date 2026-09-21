@@ -6449,7 +6449,7 @@ async function crmVerificarSaude(){
   var out = document.getElementById('bling-test-result');
   out.innerHTML = '<span style="color:var(--gd)">🛡 Verificando saúde CRM×Bling…</span> (pode levar ~30-60s)';
   try {
-    var r = await fetch('/api/crm/bling/saude?meses=12');
+    var r = await fetch('/api/saude-bling?meses=12');
     var d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro');
     var buracos = d.meses_com_buraco || [];
