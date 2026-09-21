@@ -28400,5 +28400,673 @@
     "criado_por": "bling-sync",
     "atualizado_em": "2026-09-21T18:45:22.114Z",
     "atualizado_por": "bling-sync"
+  },
+  "ord_2564b43443024a7e": {
+    "id": "ord_2564b43443024a7e",
+    "bling_pedido_id": "26626710175",
+    "bling_numero": "26796",
+    "account_id": "acc_6c98b099c4f112e4",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 276.94,
+    "itens": [
+      {
+        "sku": "6942870304809",
+        "descricao": "Lanterna Camping Fenix CL09 Preta 200 Lúmens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 154.98,
+        "valor_total_item": 154.98
+      },
+      {
+        "sku": "6942870304731",
+        "descricao": "Bateria Fenix Recarregável 16340 700mAh 3.6V 2.52Wh De Íon de Lítio ARB-L16-700U",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 86,
+        "valor_total_item": 86
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6419\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-21T18:45:51.575Z",
+    "criado_em": "2026-09-21T18:45:51.575Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:45:51.575Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_5131fce27711c8ac": {
+    "id": "ord_5131fce27711c8ac",
+    "bling_pedido_id": "26625694413",
+    "bling_numero": "26795",
+    "account_id": "acc_384270a5bd89b56a",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 5001.89,
+    "itens": [
+      {
+        "sku": "HORN-30395-ID",
+        "descricao": "Projétil Hornady Calibre .308 160 GR FTX® (30-30 WIN)",
+        "categoria": null,
+        "quantidade": 400,
+        "valor_unitario": 12.504725,
+        "valor_total_item": 5001.89
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "DIFAL DE: R$602,69",
+    "sincronizado_bling_em": "2026-09-21T18:45:52.335Z",
+    "criado_em": "2026-09-21T18:45:52.335Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:45:52.335Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_9a5a7b6b5fa47f84": {
+    "id": "ord_9a5a7b6b5fa47f84",
+    "bling_pedido_id": "26624901864",
+    "bling_numero": "26794",
+    "account_id": "acc_b5a1e8f72fcd6697",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 807.5,
+    "itens": [
+      {
+        "sku": "3H-50",
+        "descricao": "Caixa para munição, marca J&J, capacidade 50 calibres .38Spl e .357 Magnun",
+        "categoria": null,
+        "quantidade": 25,
+        "valor_unitario": 9.5,
+        "valor_total_item": 237.5
+      },
+      {
+        "sku": "9H-50",
+        "descricao": "Caixa para munição, marca J&J, capacidade 50 calibres 9mm e .380 ACP",
+        "categoria": null,
+        "quantidade": 60,
+        "valor_unitario": 9.5,
+        "valor_total_item": 570
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15214\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-21T18:45:53.116Z",
+    "criado_em": "2026-09-21T18:45:53.116Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:45:53.116Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_04b5ac83ece84ffe": {
+    "id": "ord_04b5ac83ece84ffe",
+    "bling_pedido_id": "26623929523",
+    "bling_numero": "26793",
+    "account_id": "acc_9db8278769fd1468",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 924.9,
+    "itens": [
+      {
+        "sku": "MAG579",
+        "descricao": "Carregador Pmag, 10 Municoes, Calibre 7,62X51 /308Win, Short Action, Preto",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 855,
+        "valor_total_item": 855
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-21T18:45:53.879Z",
+    "criado_em": "2026-09-21T18:45:53.879Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:45:53.879Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_cca02312cf786422": {
+    "id": "ord_cca02312cf786422",
+    "bling_pedido_id": "26621250610",
+    "bling_numero": "26792",
+    "account_id": "acc_da759d830681f2dc",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 514.05,
+    "itens": [
+      {
+        "sku": "6942870305868",
+        "descricao": "Carregador de Bateria Fenix ARE-X11 SET",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 140.99,
+        "valor_total_item": 140.99
+      },
+      {
+        "sku": "6942870304021",
+        "descricao": "Lanterna Fenix LD12 (2017)  320 Lumens Preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 328.21,
+        "valor_total_item": 328.21
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6417\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\n4519233246 | 550209******7729 | 17/08/2026 11:28:54 |  | 4519233246 | ch_ApqgGjVPCkfVGOzX",
+    "sincronizado_bling_em": "2026-09-21T18:45:54.644Z",
+    "criado_em": "2026-09-21T18:45:54.644Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:45:54.644Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_dc5cb4d108027fcd": {
+    "id": "ord_dc5cb4d108027fcd",
+    "bling_pedido_id": "26621093878",
+    "bling_numero": "26790",
+    "account_id": "acc_efb8883975335a8c",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 6800,
+    "itens": [
+      {
+        "sku": "BALDR RL MINI",
+        "descricao": "Lanterna para armas Olight Baldr RL Mini preta",
+        "categoria": null,
+        "quantidade": 10,
+        "valor_unitario": 680,
+        "valor_total_item": 6800
+      }
+    ],
+    "data_pedido": "2026-08-17",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "Aos cuidados de: Sandro",
+    "sincronizado_bling_em": "2026-09-21T18:45:55.395Z",
+    "criado_em": "2026-09-21T18:45:55.395Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:45:55.395Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_e2c56690e25d9010": {
+    "id": "ord_e2c56690e25d9010",
+    "bling_pedido_id": "26615907052",
+    "bling_numero": "26789",
+    "account_id": "acc_8691510c05314c57",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 1679.6,
+    "itens": [
+      {
+        "sku": "VEC-SCOC-03II",
+        "descricao": "Luneta Vector Optics  Forester Gen II, amplitude de 1-5x, objetiva de 24mm",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1679.6,
+        "valor_total_item": 1679.6
+      }
+    ],
+    "data_pedido": "2026-08-16",
+    "data_pagamento": null,
+    "data_envio": "2026-08-16",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15212\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\n\nVENDA CONVERTIDA VENDEDOR AUTORIZADO: LUIS",
+    "sincronizado_bling_em": "2026-09-21T18:45:56.237Z",
+    "criado_em": "2026-09-21T18:45:56.237Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:45:56.237Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b3f034638137770a": {
+    "id": "ord_b3f034638137770a",
+    "bling_pedido_id": "26615344234",
+    "bling_numero": "26788",
+    "account_id": "acc_0678bcc54de0bc46",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1453.28,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-43",
+        "descricao": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1503.45,
+        "valor_total_item": 1503.45
+      }
+    ],
+    "data_pedido": "2026-08-16",
+    "data_pagamento": null,
+    "data_envio": "2026-08-16",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15210\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-21T18:45:57.003Z",
+    "criado_em": "2026-09-21T18:45:57.003Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:45:57.003Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_7d2059ec38c3318f": {
+    "id": "ord_7d2059ec38c3318f",
+    "bling_pedido_id": "26614481921",
+    "bling_numero": "26787",
+    "account_id": "acc_fa9e8237327b082d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 946.8,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-19II",
+        "descricao": "Red Dot Frenzy 1x17x24 - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 911.95,
+        "valor_total_item": 911.95
+      }
+    ],
+    "data_pedido": "2026-08-16",
+    "data_pagamento": null,
+    "data_envio": "2026-08-16",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15208\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\n4517894643 | 234076******9025 | 16/08/2026 03:39:51 |  | 4517894643 | ch_GkAE0b7c4BsrDR2q",
+    "sincronizado_bling_em": "2026-09-21T18:45:57.804Z",
+    "criado_em": "2026-09-21T18:45:57.804Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:45:57.804Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_3464e72bd11d34ec": {
+    "id": "ord_3464e72bd11d34ec",
+    "bling_pedido_id": "26614360561",
+    "bling_numero": "26786",
+    "account_id": "acc_01ff92800165624c",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 936,
+    "itens": [
+      {
+        "sku": "6942870312651-ID",
+        "descricao": "Lanterna Tática Fenix PD35R ACE + CL01 - 2000 Lúmens (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 944.44,
+        "valor_total_item": 944.44
+      }
+    ],
+    "data_pedido": "2026-08-15",
+    "data_pagamento": null,
+    "data_envio": "2026-08-15",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6415\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-21T18:45:58.623Z",
+    "criado_em": "2026-09-21T18:45:58.623Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:45:58.623Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_5e34ed2c55dc2673": {
+    "id": "ord_5e34ed2c55dc2673",
+    "bling_pedido_id": "26613923248",
+    "bling_numero": "26785",
+    "account_id": "acc_e91eccb7221472f5",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 617.4,
+    "itens": [
+      {
+        "sku": "VEC-SCRA-63",
+        "descricao": "Trilho, marca Vector Optics, Remington 700, 20 MOA, Ref:  SCRA-63",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 597,
+        "valor_total_item": 597
+      }
+    ],
+    "data_pedido": "2026-08-15",
+    "data_pagamento": null,
+    "data_envio": "2026-08-15",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15206\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\n4517716463 | 522590******0137 | 16/08/2026 00:13:34 |  | 4517716463 | ch_KBP03pQU4fyRrYoW",
+    "sincronizado_bling_em": "2026-09-21T18:45:59.399Z",
+    "criado_em": "2026-09-21T18:45:59.399Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:45:59.399Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_89dd625bf5355f0d": {
+    "id": "ord_89dd625bf5355f0d",
+    "bling_pedido_id": "26612629241",
+    "bling_numero": "26784",
+    "account_id": "acc_0b30054fd5f10454",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1643.2,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-47",
+        "descricao": "Red Dot Vector Optics Scrapper 1-29x SCRD-47",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1643.2,
+        "valor_total_item": 1643.2
+      }
+    ],
+    "data_pedido": "2026-08-15",
+    "data_pagamento": null,
+    "data_envio": "2026-08-15",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15204\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-21T18:46:00.162Z",
+    "criado_em": "2026-09-21T18:46:00.162Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:46:00.162Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_a4589e7ab22b3094": {
+    "id": "ord_a4589e7ab22b3094",
+    "bling_pedido_id": "26611018831",
+    "bling_numero": "26783",
+    "account_id": "acc_49f170f94c88f0a7",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 4816.12,
+    "itens": [
+      {
+        "sku": "VEC-SCOL-40",
+        "descricao": "Luneta Vector Optics Minotaur 12-60x60mm GNII MFL SFP SCOL-40",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 4770.35,
+        "valor_total_item": 4770.35
+      }
+    ],
+    "data_pedido": "2026-08-15",
+    "data_pagamento": null,
+    "data_envio": "2026-08-15",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15202\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-21T18:46:00.929Z",
+    "criado_em": "2026-09-21T18:46:00.929Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:46:00.929Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_6d72ee6941356933": {
+    "id": "ord_6d72ee6941356933",
+    "bling_pedido_id": "26610785547",
+    "bling_numero": "26782",
+    "account_id": "acc_d818eb06a4fafb1d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 312.52,
+    "itens": [
+      {
+        "sku": "VEC-RDSL01",
+        "descricao": "Red Dot Vector Optics  VictOptics, 1x18, Ref: RDSL01",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 289.9,
+        "valor_total_item": 289.9
+      }
+    ],
+    "data_pedido": "2026-08-15",
+    "data_pagamento": null,
+    "data_envio": "2026-08-15",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15198\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-21T18:46:01.722Z",
+    "criado_em": "2026-09-21T18:46:01.722Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:46:01.722Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_23861ad6d8dcb1b7": {
+    "id": "ord_23861ad6d8dcb1b7",
+    "bling_pedido_id": "26610651216",
+    "bling_numero": "26781",
+    "account_id": "acc_de934836569d9094",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 664.66,
+    "itens": [
+      {
+        "sku": "6942870307602",
+        "descricao": "Lanterna Fenix E35 V3.0 Preta 3000 Lumens",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 309.72,
+        "valor_total_item": 619.44
+      }
+    ],
+    "data_pedido": "2026-08-15",
+    "data_pagamento": null,
+    "data_envio": "2026-08-15",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6411\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-21T18:46:02.521Z",
+    "criado_em": "2026-09-21T18:46:02.521Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:46:02.521Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_41b73b0d754fa275": {
+    "id": "ord_41b73b0d754fa275",
+    "bling_pedido_id": "26603785199",
+    "bling_numero": "26780",
+    "account_id": "acc_869e948cb9d93986",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 623.26,
+    "itens": [
+      {
+        "sku": "RED-76289",
+        "descricao": "Bucha (Bushing) Redding Titanium Nitride .289\" (cal 6,5mm)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 637,
+        "valor_total_item": 637
+      }
+    ],
+    "data_pedido": "2026-08-14",
+    "data_pagamento": null,
+    "data_envio": "2026-08-14",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15196\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-21T18:46:03.330Z",
+    "criado_em": "2026-09-21T18:46:03.330Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:46:03.330Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b660c1defc639111": {
+    "id": "ord_b660c1defc639111",
+    "bling_pedido_id": "26621134410",
+    "bling_numero": "26791",
+    "account_id": "acc_cb4426c25a3f0c1d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1562.79,
+    "itens": [
+      {
+        "sku": "Horn-50095-ID",
+        "descricao": "Removedor universal de projéteis Cam Lock Hornady",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 888.89,
+        "valor_total_item": 888.89
+      },
+      {
+        "sku": "Horn-392160-ID",
+        "descricao": "Coletor Hornady para Projéteis (Collet #7) .308/.312",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 251,
+        "valor_total_item": 251
+      },
+      {
+        "sku": "Horn-392155-ID",
+        "descricao": "Coletor Hornady para Projéteis (Collet #2) .223",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 251,
+        "valor_total_item": 251
+      },
+      {
+        "sku": "Horn-392157-ID",
+        "descricao": "Coletor Hornady para Projéteis (Collet #4 ) .257/.264",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 251,
+        "valor_total_item": 251
+      }
+    ],
+    "data_pedido": "2026-08-13",
+    "data_pagamento": null,
+    "data_envio": "2026-08-17",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15194\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-21T18:46:04.086Z",
+    "criado_em": "2026-09-21T18:46:04.086Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:46:04.086Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_accf768b1f32987e": {
+    "id": "ord_accf768b1f32987e",
+    "bling_pedido_id": "26595674935",
+    "bling_numero": "26779",
+    "account_id": "acc_f1512276d40cd829",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1503.45,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-43",
+        "descricao": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1503.45,
+        "valor_total_item": 1503.45
+      }
+    ],
+    "data_pedido": "2026-08-13",
+    "data_pagamento": null,
+    "data_envio": "2026-08-13",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15192\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-21T18:46:04.866Z",
+    "criado_em": "2026-09-21T18:46:04.866Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:46:04.866Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_7d74aa70a8c5ed41": {
+    "id": "ord_7d74aa70a8c5ed41",
+    "bling_pedido_id": "26595119494",
+    "bling_numero": "26778",
+    "account_id": "acc_792d1064f71ce6bf",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 1358.02,
+    "itens": [
+      {
+        "sku": "VEC-SCOC-32",
+        "descricao": "Luneta Forester 1-5x24SFP GenII Bronze - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1309.1,
+        "valor_total_item": 1309.1
+      }
+    ],
+    "data_pedido": "2026-08-13",
+    "data_pagamento": null,
+    "data_envio": "2026-08-13",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15190\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\n4514260420 | 550209******8929 | 13/08/2026 16:08:32 |  | 4514260420 | ch_v3qoJ3ZcbOcaLd5K\n\nCONVERTIDO VENDEDOR: AUTORIZADO LUIS",
+    "sincronizado_bling_em": "2026-09-21T18:46:05.635Z",
+    "criado_em": "2026-09-21T18:46:05.635Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:46:05.635Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_22e4b2a3014e5584": {
+    "id": "ord_22e4b2a3014e5584",
+    "bling_pedido_id": "26591162516",
+    "bling_numero": "26777",
+    "account_id": "acc_7a8d584b1a955dd2",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 120.68,
+    "itens": [
+      {
+        "sku": "VEC-SCSC-07",
+        "descricao": "Protetor de Percursor (Snap Cap) Vector Optics, 12 GA, Ref: SCSC-07P",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 102,
+        "valor_total_item": 102
+      }
+    ],
+    "data_pedido": "2026-08-13",
+    "data_pagamento": null,
+    "data_envio": "2026-08-13",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 15188\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-21T18:46:06.404Z",
+    "criado_em": "2026-09-21T18:46:06.404Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-21T18:46:06.404Z",
+    "atualizado_por": "bling-sync"
   }
 }
