@@ -1,5 +1,13 @@
 [
   {
+    "ts": "2026-09-22T17:21:26.451Z",
+    "tipo": "backfill_iniciado",
+    "contaId": "prohunters",
+    "meses": 12,
+    "total_pedidos": 1962,
+    "iniciado_por": "gerencia"
+  },
+  {
     "ts": "2026-09-22T17:21:15.061Z",
     "tipo": "backfill_iniciado",
     "contaId": "calibre",
