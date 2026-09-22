@@ -1739,29 +1739,38 @@ module.exports = async (req, res) => {
   // Bling — OAuth 2.0 (integração com API v3)
   // ═════════════════════════════════════════════════════════════
 
-  // GET /api/bling/authorize — só gerência. Gera state, guarda em cookie,
-  // redireciona pro Bling. O gerente autoriza no painel do Bling e o Bling
-  // redireciona de volta pra /api/bling/callback.
-  if (req.method === 'GET' && url === '/api/bling/authorize') {
+  // GET /api/bling/authorize?conta=<X> — só gerência. Gera state (com contaId
+  // embutida), guarda em cookie, redireciona pro Bling. O gerente autoriza no
+  // painel do Bling e o Bling redireciona de volta pra /api/bling/callback.
+  // Se conta não vem, usa a padrão (prohunters).
+  if (req.method === 'GET' && url.startsWith('/api/bling/authorize')) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) {
       res.writeHead(403,{'Content-Type':'text/html; charset=utf-8'});
       res.end('<h2>Só gerência.</h2>');
       return;
     }
-    if (!config.blingClientId || !config.blingRedirectUri) {
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const conta = (u.searchParams.get('conta') || config.blingContaPadrao || 'prohunters').toLowerCase().trim();
+      const cfg = (config.blingContas || {})[conta];
+      if (!cfg || !cfg.ativa) {
+        res.writeHead(500,{'Content-Type':'text/html; charset=utf-8'});
+        res.end('<h2>Bling "' + conta + '" não configurado.</h2><p>Faltam env vars pra essa conta na Vercel.</p>');
+        return;
+      }
+      const state = blingOauth.buildStateComConta(conta);
+      const authUrl = blingOauth.buildAuthorizeUrl(conta, state);
+      // Cookie efêmero, apenas pra conferir no callback (10 min de vida).
+      // HttpOnly + SameSite=Lax pra sobreviver ao redirect do Bling.
+      const cookieVal = state + '|' + Buffer.from(sess.usuario).toString('base64url');
+      const cookie = 'bling_oauth_state=' + cookieVal + '; Max-Age=600; Path=/; HttpOnly; Secure; SameSite=Lax';
+      res.writeHead(302, { 'Location': authUrl, 'Set-Cookie': cookie });
+      res.end();
+    } catch (e) {
       res.writeHead(500,{'Content-Type':'text/html; charset=utf-8'});
-      res.end('<h2>Bling não configurado.</h2><p>Faltam env vars: BLING_CLIENT_ID e BLING_REDIRECT_URI na Vercel.</p>');
-      return;
+      res.end('<h2>Erro ao iniciar OAuth Bling:</h2><pre>' + String(e.message).replace(/</g,'&lt;') + '</pre>');
     }
-    const state = blingOauth.generateState();
-    const authUrl = blingOauth.buildAuthorizeUrl(state);
-    // Cookie efêmero, apenas pra conferir no callback (10 min de vida).
-    // HttpOnly + SameSite=Lax pra sobreviver ao redirect do Bling.
-    const cookieVal = state + '|' + Buffer.from(sess.usuario).toString('base64url');
-    const cookie = 'bling_oauth_state=' + cookieVal + '; Max-Age=600; Path=/; HttpOnly; Secure; SameSite=Lax';
-    res.writeHead(302, { 'Location': authUrl, 'Set-Cookie': cookie });
-    res.end();
     return;
   }
 
@@ -1798,9 +1807,12 @@ module.exports = async (req, res) => {
       const [stateSalvo, actorB64] = decodeURIComponent(cookieMatch[1]).split('|');
       if (!stateSalvo || stateSalvo !== stateRecebido) throw new Error('State não confere (possível CSRF).');
       const actorLogin = actorB64 ? Buffer.from(actorB64, 'base64url').toString('utf8') : null;
-      await blingOauth.exchangeCodeForToken(code, actorLogin);
+      // Extrai contaId embutida no state (formato "<random>.<contaId>")
+      const conta = blingOauth.extrairContaDoState(stateRecebido);
+      await blingOauth.exchangeCodeForToken(conta, code, actorLogin);
       // Limpa cookie state
       const clear = 'bling_oauth_state=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax';
+      const nomeConta = ((config.blingContas || {})[conta] || {}).nome || conta;
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Set-Cookie': clear });
       res.end(
         '<!doctype html><html><head><meta charset="utf-8"><title>Bling conectado</title>' +
@@ -1808,10 +1820,12 @@ module.exports = async (req, res) => {
         '.card{max-width:480px;margin:0 auto;background:#fff;padding:32px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.08)}' +
         '.ok{color:#0a6e2e;font-size:48px;margin-bottom:12px}' +
         'h1{font-size:20px;margin:0 0 8px}p{color:#666;font-size:14px}' +
+        '.badge{display:inline-block;background:#e6f4ea;color:#0a6e2e;padding:4px 10px;border-radius:6px;font-weight:600;font-size:13px;margin-top:8px}' +
         '.btn{display:inline-block;background:#0a6e2e;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;margin-top:16px}' +
         '</style></head><body><div class="card"><div class="ok">✓</div>' +
         '<h1>Bling conectado com sucesso</h1>' +
-        '<p>Você já pode fechar esta aba ou voltar pro Painel.</p>' +
+        '<div class="badge">' + String(nomeConta).replace(/</g,'&lt;') + '</div>' +
+        '<p style="margin-top:14px">Você já pode fechar esta aba ou voltar pro Painel.</p>' +
         '<a class="btn" href="/">← Voltar ao Portal</a>' +
         '</div></body></html>'
       );
@@ -1832,31 +1846,50 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // GET /api/bling/status — JSON pra UI mostrar estado da conexão.
-  // Não retorna tokens em claro; só metadados.
-  if (req.method === 'GET' && url === '/api/bling/status') {
+  // Helper local: extrai contaId de ?conta= com fallback pra padrão
+  function _contaDaQuery(reqUrl) {
+    try {
+      const u = new URL('http://x' + (reqUrl || ''));
+      const c = (u.searchParams.get('conta') || '').toLowerCase().trim();
+      return c || (config.blingContaPadrao || 'prohunters');
+    } catch (e) { return config.blingContaPadrao || 'prohunters'; }
+  }
+
+  // GET /api/bling/status — JSON pra UI mostrar estado de TODAS as contas.
+  // Sem ?conta=: retorna { contas: [...] } com status de cada uma.
+  // Com ?conta=X: retorna apenas essa conta (compat com UI antiga).
+  if (req.method === 'GET' && url.startsWith('/api/bling/status')) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) {
       res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return;
     }
     try {
-      const info = await blingTokenStore.loadTokenInfo();
-      const configOk = !!(config.blingClientId && config.blingClientSecret && config.blingRedirectUri);
+      const u = new URL('http://x' + (req.url || ''));
+      const contaQ = (u.searchParams.get('conta') || '').toLowerCase().trim();
+      if (contaQ) {
+        const info = await blingTokenStore.loadTokenInfo(contaQ);
+        const cfg = (config.blingContas || {})[contaQ] || {};
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ...info, configurado: !!cfg.ativa }));
+        return;
+      }
+      const contas = await blingTokenStore.listContasInfo();
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ ...info, configurado: configOk }));
+      res.end(JSON.stringify({ contas, padrao: config.blingContaPadrao || 'prohunters' }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
     return;
   }
 
-  // POST /api/bling/refresh — força refresh manual (debug/manutenção).
-  if (req.method === 'POST' && url === '/api/bling/refresh') {
+  // POST /api/bling/refresh?conta=<X> — força refresh manual (debug/manutenção).
+  if (req.method === 'POST' && url.startsWith('/api/bling/refresh')) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
     try {
-      await blingOauth.refreshAccessToken();
-      const info = await blingTokenStore.loadTokenInfo();
+      const conta = _contaDaQuery(req.url);
+      await blingOauth.refreshAccessToken(conta);
+      const info = await blingTokenStore.loadTokenInfo(conta);
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, ...info }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
@@ -1864,28 +1897,28 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // POST /api/bling/disconnect — revoga o token local (não invalida no Bling,
-  // só apaga do lado nosso).
-  if (req.method === 'POST' && url === '/api/bling/disconnect') {
+  // POST /api/bling/disconnect?conta=<X> — revoga o token local dessa conta.
+  if (req.method === 'POST' && url.startsWith('/api/bling/disconnect')) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
     try {
-      await blingTokenStore.deleteToken();
-      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+      const conta = _contaDaQuery(req.url);
+      await blingTokenStore.deleteToken(conta);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, contaId: conta }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
     return;
   }
 
-  // GET /api/bling/test — chama um endpoint leve do Bling pra provar que o
-  // token está válido e a integração responde.
-  if (req.method === 'GET' && url === '/api/bling/test') {
+  // GET /api/bling/test?conta=<X> — testa conexão da conta especificada.
+  if (req.method === 'GET' && url.startsWith('/api/bling/test')) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
     try {
-      const r = await blingApi.testConnection();
-      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, resposta: r }));
+      const conta = _contaDaQuery(req.url);
+      const r = await blingApi.testConnection(conta);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, contaId: conta, resposta: r }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message, status:e.status||500}));
     }
@@ -1902,59 +1935,84 @@ module.exports = async (req, res) => {
     catch (e) { return {}; }
   }
 
-  // GET /api/bling/backfill/status — situação atual do backfill
-  if (req.method === 'GET' && url === '/api/bling/backfill/status') {
+  // GET /api/bling/backfill/status?conta=<X> — situação atual do backfill DA CONTA
+  //   Sem ?conta=: retorna { contas: [{contaId, checkpoint}, ...] } com todas
+  if (req.method === 'GET' && url.startsWith('/api/bling/backfill/status')) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
     try {
-      const cp = await blingBackfill.lerCheckpoint();
+      const u = new URL('http://x' + (req.url || ''));
+      const contaQ = (u.searchParams.get('conta') || '').toLowerCase().trim();
+      if (contaQ) {
+        const cp = await blingBackfill.lerCheckpoint(contaQ);
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ contaId: contaQ, checkpoint: cp }));
+        return;
+      }
+      const contas = config.blingContas || {};
+      const out = [];
+      for (const [cid, cfg] of Object.entries(contas)) {
+        const cp = await blingBackfill.lerCheckpoint(cid);
+        out.push({ contaId: cid, nome: cfg.nome, ativa: !!cfg.ativa, checkpoint: cp });
+      }
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ checkpoint: cp }));
+      res.end(JSON.stringify({ contas: out }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
     return;
   }
 
-  // POST /api/bling/backfill/iniciar — puxa lista de IDs do range
-  //     Body: { meses?: 12, forcar?: true }
-  if (req.method === 'POST' && url === '/api/bling/backfill/iniciar') {
+  // POST /api/bling/backfill/iniciar?conta=<X> — puxa lista de IDs do range
+  //     Body: { meses?: 12, forcar?: true, conta?: 'prohunters'|'calibre' }
+  //     ?conta= tem precedência sobre body.conta.
+  if (req.method === 'POST' && url.startsWith('/api/bling/backfill/iniciar')) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
     try {
       const body = await readBody(req);
       const payload = JSON.parse(body || '{}');
+      const u = new URL('http://x' + (req.url || ''));
+      const conta = ((u.searchParams.get('conta') || payload.conta || config.blingContaPadrao || 'prohunters') + '').toLowerCase().trim();
       const meses = payload.meses || 12;
       const forcar = !!payload.forcar;
       const mesesNum = Math.max(1, Math.min(60, Number(meses) || 12));
-      const r = await blingBackfill.iniciar({ meses: mesesNum, iniciado_por: sess.usuario, forcar });
+      const r = await blingBackfill.iniciar({ meses: mesesNum, iniciado_por: sess.usuario, forcar, contaId: conta });
       res.writeHead(r.ok ? 200 : 409, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(r));
+      res.end(JSON.stringify({ contaId: conta, ...r }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
     return;
   }
 
-  // GET /api/saude-bling — verifica CRM ↔ Bling e retorna diff por mês
+  // GET /api/saude-bling?conta=<X>&meses=12 — verifica CRM ↔ Bling e retorna diff por mês
+  //   Sem ?conta=: retorna { resultados: [...] } com saúde de TODAS as contas ativas.
   if (req.method === 'GET' && url.startsWith('/api/saude-bling')) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
     try {
       const u = new URL('http://x' + (req.url || ''));
       const meses = Math.max(1, Math.min(24, Number(u.searchParams.get('meses') || 12)));
-      const r = await blingBackfill.verificarSaude({ meses });
-      res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify(r));
+      const contaQ = (u.searchParams.get('conta') || '').toLowerCase().trim();
+      if (contaQ) {
+        const r = await blingBackfill.verificarSaude({ meses, contaId: contaQ });
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify(r));
+      } else {
+        const r = await blingBackfill.verificarSaudeTodas({ meses });
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify(r));
+      }
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message || String(e)}));
     }
     return;
   }
 
-  // GET /api/auto-recuperar-bling — cron diário 5h UTC:
-  //   1) Verifica saúde. 2) Se tem buraco, dispara backfill 12 meses (forcar) pra recuperar.
-  //   3) Idempotente: se backfill já rodou hoje, pula.
+  // GET /api/auto-recuperar-bling — cron diário: itera TODAS as contas ativas.
+  //   1) Pra cada conta, verifica saúde. 2) Se tem buraco e checkpoint não é recente,
+  //      dispara backfill 12 meses (forcar) pra recuperar. 3) Idempotente por conta.
   if (req.method === 'GET' && url === '/api/auto-recuperar-bling') {
     const sess = getSession(req);
     const vercelCron = req.headers['x-vercel-cron'] === '1';
@@ -1962,71 +2020,92 @@ module.exports = async (req, res) => {
     const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
     if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
     try {
-      const saude = await blingBackfill.verificarSaude({ meses: 12 });
-      if (!saude.meses_com_buraco || !saude.meses_com_buraco.length) {
-        res.writeHead(200,{'Content-Type':'application/json'});
-        res.end(JSON.stringify({ ok: true, motivo: 'sem_buracos', saude }));
-        return;
-      }
-      // Tem buraco → dispara backfill forçado se checkpoint não está em andamento OU é antigo (>6h)
-      const cp = await blingBackfill.lerCheckpoint();
-      if (cp && cp.status === 'em_andamento') {
-        const ultimo = cp.ultimo_lote_em ? new Date(cp.ultimo_lote_em) : new Date(cp.iniciado_em || 0);
-        const idadeH = (Date.now() - ultimo.getTime()) / 3600000;
-        if (idadeH < 6) {
-          res.writeHead(200,{'Content-Type':'application/json'});
-          res.end(JSON.stringify({ ok: true, motivo: 'backfill_recente_em_andamento', checkpoint: cp, saude }));
-          return;
+      const contas = config.blingContas || {};
+      const resultados = [];
+      for (const [cid, cfg] of Object.entries(contas)) {
+        if (!cfg.ativa) { resultados.push({ contaId: cid, pulou: true, motivo: 'conta não configurada' }); continue; }
+        try {
+          const saude = await blingBackfill.verificarSaude({ meses: 12, contaId: cid });
+          if (!saude.meses_com_buraco || !saude.meses_com_buraco.length) {
+            resultados.push({ contaId: cid, motivo: 'sem_buracos', saude });
+            continue;
+          }
+          const cp = await blingBackfill.lerCheckpoint(cid);
+          if (cp && cp.status === 'em_andamento') {
+            const ultimo = cp.ultimo_lote_em ? new Date(cp.ultimo_lote_em) : new Date(cp.iniciado_em || 0);
+            const idadeH = (Date.now() - ultimo.getTime()) / 3600000;
+            if (idadeH < 6) {
+              resultados.push({ contaId: cid, motivo: 'backfill_recente_em_andamento', checkpoint: cp, saude });
+              continue;
+            }
+          }
+          const r = await blingBackfill.iniciar({ meses: 12, iniciado_por: 'auto-recuperar', forcar: true, contaId: cid });
+          await blingBackfill.apendarLog({ tipo: 'auto_recuperar_disparado', contaId: cid, saude, backfill: r });
+          resultados.push({ contaId: cid, motivo: 'buracos_detectados_backfill_iniciado', saude, backfill: r });
+        } catch (e) {
+          resultados.push({ contaId: cid, ok: false, erro: e.message });
         }
       }
-      const r = await blingBackfill.iniciar({ meses: 12, iniciado_por: 'auto-recuperar', forcar: true });
-      await blingBackfill.apendarLog({ tipo: 'auto_recuperar_disparado', saude, backfill: r });
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ ok: true, motivo: 'buracos_detectados_backfill_iniciado', saude, backfill: r }));
+      res.end(JSON.stringify({ ok: true, resultados }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message || String(e)}));
     }
     return;
   }
 
-  // POST /api/bling/backfill/continuar — processa próximo lote
-  if (req.method === 'POST' && url === '/api/bling/backfill/continuar') {
-    const sess = getSession(req);
-    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
-    try {
-      const usersJson = await _loadUsersMap();
-      const r = await blingBackfill.continuar({ usersJson, ownerFallback: 'gerencia' });
-      res.writeHead(r.ok ? 200 : 409, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(r));
-    } catch (e) {
-      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
-    }
-    return;
-  }
-
-  // POST /api/bling/backfill/cancelar — apaga checkpoint (sem apagar dados)
-  if (req.method === 'POST' && url === '/api/bling/backfill/cancelar') {
-    const sess = getSession(req);
-    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
-    try {
-      await blingBackfill.apagarCheckpoint();
-      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ok:true}));
-    } catch (e) {
-      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
-    }
-    return;
-  }
-
-  // POST /api/bling/sync-agora — sync incremental manual (últimos N dias)
-  if (req.method === 'POST' && url === '/api/bling/sync-agora') {
+  // POST /api/bling/backfill/continuar?conta=<X> — processa próximo lote DA CONTA
+  if (req.method === 'POST' && url.startsWith('/api/bling/backfill/continuar')) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
     try {
       const body = await readBody(req);
-      const { dias = 1 } = JSON.parse(body || '{}');
+      let payload = {}; try { payload = JSON.parse(body || '{}'); } catch (e) {}
+      const u = new URL('http://x' + (req.url || ''));
+      const conta = ((u.searchParams.get('conta') || payload.conta || config.blingContaPadrao || 'prohunters') + '').toLowerCase().trim();
       const usersJson = await _loadUsersMap();
-      const r = await blingBackfill.syncIncremental({ dias: Math.max(1, Math.min(30, Number(dias) || 1)), usersJson });
-      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
+      const r = await blingBackfill.continuar({ usersJson, ownerFallback: 'gerencia', contaId: conta });
+      res.writeHead(r.ok ? 200 : 409, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ contaId: conta, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/bling/backfill/cancelar?conta=<X> — apaga checkpoint (sem apagar dados)
+  if (req.method === 'POST' && url.startsWith('/api/bling/backfill/cancelar')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const conta = _contaDaQuery(req.url);
+      await blingBackfill.apagarCheckpoint(conta);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ok:true, contaId: conta}));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/bling/sync-agora?conta=<X> — sync incremental manual (últimos N dias)
+  //   Sem ?conta= e sem body.conta: roda pra TODAS as contas ativas.
+  if (req.method === 'POST' && url.startsWith('/api/bling/sync-agora')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const body = await readBody(req);
+      let payload = {}; try { payload = JSON.parse(body || '{}'); } catch (e) {}
+      const dias = Math.max(1, Math.min(30, Number(payload.dias) || 1));
+      const u = new URL('http://x' + (req.url || ''));
+      const conta = ((u.searchParams.get('conta') || payload.conta || '') + '').toLowerCase().trim();
+      const usersJson = await _loadUsersMap();
+      if (conta) {
+        const r = await blingBackfill.syncIncremental({ dias, usersJson, contaId: conta });
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
+      } else {
+        const r = await blingBackfill.syncIncrementalTodas({ dias, usersJson });
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
+      }
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
@@ -2034,8 +2113,8 @@ module.exports = async (req, res) => {
   }
 
   // GET /api/bling/cron/sync — pra Vercel Cron ou disparo externo
+  // Roda sync incremental de 1 dia pra TODAS as contas ativas em sequência.
   // Protegido por x-cron-secret OU sessão admin OU header do Vercel Cron.
-  // (Vercel Cron chama com header `x-vercel-cron: 1` — aceitamos.)
   if (req.method === 'GET' && url === '/api/bling/cron/sync') {
     const sess = getSession(req);
     const cronToken = req.headers['x-cron-secret'];
@@ -2044,7 +2123,7 @@ module.exports = async (req, res) => {
     if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
     try {
       const usersJson = await _loadUsersMap();
-      const r = await blingBackfill.syncIncremental({ dias: 1, usersJson });
+      const r = await blingBackfill.syncIncrementalTodas({ dias: 1, usersJson });
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
@@ -2052,56 +2131,55 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // GET /api/bling/cron/backfill-tick — processa 1 lote do backfill em andamento
-  // e AUTO-ENCADEIA a próxima chamada em background (fire-and-forget), fazendo
-  // o backfill inteiro terminar sozinho sem UI aberta.
-  // Guarda anti-loop: se checkpoint não tá em_andamento ou tem 0 pendentes,
-  // apenas retorna. Salvaguarda extra: contador ticks_hoje pra parar em 500
-  // ticks/dia caso algo dê muito errado.
-  if (req.method === 'GET' && url === '/api/bling/cron/backfill-tick') {
+  // GET /api/bling/cron/backfill-tick?conta=<X> — processa 1 lote da conta indicada.
+  //   Sem ?conta=: varre TODAS as contas ativas e roda 1 tick pra cada uma com
+  //   backfill em andamento (útil pro Vercel Cron sem parâmetros).
+  //   AUTO-CHAIN preserva ?conta= pra o próximo tick daquela conta especificamente.
+  //   Guarda anti-loop: ticks_hoje por conta, para em 500/dia.
+  if (req.method === 'GET' && url.startsWith('/api/bling/cron/backfill-tick')) {
     const sess = getSession(req);
     const cronToken = req.headers['x-cron-secret'];
     const vercelCron = req.headers['x-vercel-cron'] === '1';
     const chainToken = req.headers['x-bling-chain'] === config.sessionSecret; // self-invocation
     const autorizado = vercelCron || chainToken || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
     if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
-    try {
-      const cpAntes = await blingBackfill.lerCheckpoint();
+
+    // Helper local — path do checkpoint por conta (espelha backfill.js)
+    function _cpPath(cid) {
+      return (cid === 'prohunters') ? 'crm/bling-backfill.json' : ('crm/bling-backfill-' + cid + '.json');
+    }
+
+    async function _tickUmaConta(cid) {
+      const cpAntes = await blingBackfill.lerCheckpoint(cid);
       if (!cpAntes || cpAntes.status !== 'em_andamento' || !cpAntes.ids_pendentes || cpAntes.ids_pendentes.length === 0) {
-        res.writeHead(200,{'Content-Type':'application/json'});
-        res.end(JSON.stringify({ ok: true, sem_backfill: true }));
-        return;
+        return { contaId: cid, ok: true, sem_backfill: true };
       }
-      // Guarda anti-loop-runaway
       const ticksHoje = (cpAntes.ticks_hoje_data === new Date().toISOString().slice(0,10))
         ? (cpAntes.ticks_hoje_count || 0) : 0;
       if (ticksHoje >= 500) {
-        res.writeHead(200,{'Content-Type':'application/json'});
-        res.end(JSON.stringify({ ok: true, limite_ticks_diario: true, ticks_hoje: ticksHoje }));
-        return;
+        return { contaId: cid, ok: true, limite_ticks_diario: true, ticks_hoje: ticksHoje };
       }
       const usersJson = await _loadUsersMap();
-      const r = await blingBackfill.continuar({ usersJson, ownerFallback: 'gerencia' });
+      const r = await blingBackfill.continuar({ usersJson, ownerFallback: 'gerencia', contaId: cid });
       // Atualiza contador de ticks (best-effort)
       try {
-        const cpDepois = await blingBackfill.lerCheckpoint();
+        const cpDepois = await blingBackfill.lerCheckpoint(cid);
         if (cpDepois && cpDepois.status === 'em_andamento') {
           cpDepois.ticks_hoje_data = new Date().toISOString().slice(0,10);
           cpDepois.ticks_hoje_count = ticksHoje + 1;
           const { saveFile } = require('../lib/githubStore');
-          await saveFile('crm/bling-backfill.json', JSON.stringify(cpDepois, null, 2), 'Bling backfill: tick ' + (ticksHoje+1));
+          await saveFile(_cpPath(cid), JSON.stringify(cpDepois, null, 2), 'Bling backfill [' + cid + ']: tick ' + (ticksHoje+1));
         }
       } catch (e) { /* silencia */ }
-      // AUTO-CHAIN: se ainda tem trabalho e não bateu limite, dispara próximo tick em background
+      // AUTO-CHAIN: se ainda tem trabalho e não bateu limite, dispara próximo tick (com ?conta=)
       if (!r.terminou && (ticksHoje + 1) < 500) {
         const host = req.headers['x-forwarded-host'] || req.headers.host || 'dashboardph.vercel.app';
-        const url = 'https://' + host + '/api/bling/cron/backfill-tick';
-        // Fire-and-forget: dispara sem esperar resposta
+        const nextUrl = 'https://' + host + '/api/bling/cron/backfill-tick?conta=' + encodeURIComponent(cid);
         try {
           const https = require('https');
-          const u = new URL(url);
+          const u = new URL(nextUrl);
           const chainReq = https.request({
-            hostname: u.hostname, path: u.pathname, method: 'GET',
+            hostname: u.hostname, path: u.pathname + u.search, method: 'GET',
             headers: { 'x-bling-chain': config.sessionSecret, 'User-Agent': 'bling-chain' },
             timeout: 3000,
           }, () => {});
@@ -2110,8 +2188,28 @@ module.exports = async (req, res) => {
           chainReq.end();
         } catch (e) { /* silencia */ }
       }
-      res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ ok: true, ...r, chained: !r.terminou }));
+      return { contaId: cid, ok: true, ...r, chained: !r.terminou };
+    }
+
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const contaQ = (u.searchParams.get('conta') || '').toLowerCase().trim();
+      if (contaQ) {
+        const r = await _tickUmaConta(contaQ);
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify(r));
+      } else {
+        // Varre todas as contas ativas — útil pro Vercel Cron sem params.
+        const contas = config.blingContas || {};
+        const resultados = [];
+        for (const [cid, cfg] of Object.entries(contas)) {
+          if (!cfg.ativa) { resultados.push({ contaId: cid, pulou: true, motivo: 'conta não configurada' }); continue; }
+          try { resultados.push(await _tickUmaConta(cid)); }
+          catch (e) { resultados.push({ contaId: cid, ok: false, erro: e.message }); }
+        }
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ok: true, resultados }));
+      }
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
