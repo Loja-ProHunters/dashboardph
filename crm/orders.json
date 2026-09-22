@@ -61985,5 +61985,705 @@
     "criado_por": "bling-sync",
     "atualizado_em": "2026-09-22T12:08:38.198Z",
     "atualizado_por": "bling-sync"
+  },
+  "ord_0bc9b083bdebad4c": {
+    "id": "ord_0bc9b083bdebad4c",
+    "bling_pedido_id": "25460272363",
+    "bling_numero": "25839",
+    "account_id": "acc_01f3462252b715f1",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 104.06,
+    "itens": [
+      {
+        "sku": "VEC-SCOT-23",
+        "descricao": "Protecao para trilhos, marca Vector Optics, Ref: SCOT-23",
+        "categoria": null,
+        "quantidade": 6,
+        "valor_unitario": 13,
+        "valor_total_item": 78
+      }
+    ],
+    "data_pedido": "2026-04-01",
+    "data_pagamento": null,
+    "data_envio": "2026-04-01",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:08:47.511Z",
+    "criado_em": "2026-09-22T12:08:47.511Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:47.511Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_ea266e13869dc4be": {
+    "id": "ord_ea266e13869dc4be",
+    "bling_pedido_id": "25459359812",
+    "bling_numero": "25837",
+    "account_id": "acc_856921e59418db4f",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 1019.88,
+    "itens": [
+      {
+        "sku": "VEC-SCSC-07",
+        "descricao": "Protetor de Percursor (Snap Cap) Vector Optics, 12 GA, Ref: SCSC-07P",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 102,
+        "valor_total_item": 510
+      },
+      {
+        "sku": "VEC-SCSC-01",
+        "descricao": "Protetor de Percursor (Snap Cap) Vector Optics, 223 Rem, Ref: SCSC-01",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 124,
+        "valor_total_item": 248
+      },
+      {
+        "sku": "VEC-SCSC-04BP",
+        "descricao": "Protetor de Percursor (Snap Cap) Vector Optics, 12 unidades SCSC-04BPP 9mm",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 229,
+        "valor_total_item": 229
+      }
+    ],
+    "data_pedido": "2026-04-01",
+    "data_pagamento": null,
+    "data_envio": "2026-04-01",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14364\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-22T12:08:48.270Z",
+    "criado_em": "2026-09-22T12:08:48.270Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:48.270Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_8ce528a4cfd872d9": {
+    "id": "ord_8ce528a4cfd872d9",
+    "bling_pedido_id": "25459272527",
+    "bling_numero": "25836",
+    "account_id": "acc_26e69ca8cda02ecd",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 812.25,
+    "itens": [
+      {
+        "sku": "CBC-10029648",
+        "descricao": "Munição CBC Cal 9mm Luger LPC PolyMatch 147gr",
+        "categoria": null,
+        "quantidade": 100,
+        "valor_unitario": 4.347,
+        "valor_total_item": 434.70000000000005
+      },
+      {
+        "sku": "CBC-10000428",
+        "descricao": "Munição CBC Cal 9mm LUGER ETOG 124gr",
+        "categoria": null,
+        "quantidade": 50,
+        "valor_unitario": 7.551,
+        "valor_total_item": 377.55
+      }
+    ],
+    "data_pedido": "2026-04-01",
+    "data_pagamento": null,
+    "data_envio": "2026-04-01",
+    "data_entrega": null,
+    "notas": "pagamento em 10x sem juros\ntransportado por Ezequiel valor de: R$250",
+    "sincronizado_bling_em": "2026-09-22T12:08:49.067Z",
+    "criado_em": "2026-09-22T12:08:49.067Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:49.067Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_0177bfebe313467f": {
+    "id": "ord_0177bfebe313467f",
+    "bling_pedido_id": "25458808396",
+    "bling_numero": "25835",
+    "account_id": "acc_25f2d858856874b8",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 314.91,
+    "itens": [
+      {
+        "sku": "6942870369358",
+        "descricao": "Bateria Fenix Recarregável 21700 5000mAh 3.6V 18Wh De Íon de Lítio ARB-L21-5000U",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 288,
+        "valor_total_item": 288
+      }
+    ],
+    "data_pedido": "2026-04-01",
+    "data_pagamento": null,
+    "data_envio": "2026-04-01",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:08:49.844Z",
+    "criado_em": "2026-09-22T12:08:49.844Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:49.844Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b5bb9cb834338055": {
+    "id": "ord_b5bb9cb834338055",
+    "bling_pedido_id": "25457621771",
+    "bling_numero": "25834",
+    "account_id": "acc_918e72f04d369642",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 218.17,
+    "itens": [
+      {
+        "sku": "RED-11013",
+        "descricao": "Shellholder Redding #13",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 200,
+        "valor_total_item": 200
+      }
+    ],
+    "data_pedido": "2026-04-01",
+    "data_pagamento": null,
+    "data_envio": "2026-04-01",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14362\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:08:50.611Z",
+    "criado_em": "2026-09-22T12:08:50.611Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:50.611Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_4998776132281e08": {
+    "id": "ord_4998776132281e08",
+    "bling_pedido_id": "25457519920",
+    "bling_numero": "25833",
+    "account_id": "acc_0fad4492ed069bde",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 3508.03,
+    "itens": [
+      {
+        "sku": "6942870304069",
+        "descricao": "Suporte de Lanterna para Arma Fenix - ALG-00",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 109.79,
+        "valor_total_item": 109.79
+      },
+      {
+        "sku": "6942870309002-ID",
+        "descricao": "Lanterna Fenix HT30R - 500 Lúmens  (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 3294,
+        "valor_total_item": 3294
+      }
+    ],
+    "data_pedido": "2026-04-01",
+    "data_pagamento": null,
+    "data_envio": "2026-04-01",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6077\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\nNº de série: 1J021000985",
+    "sincronizado_bling_em": "2026-09-22T12:08:51.411Z",
+    "criado_em": "2026-09-22T12:08:51.411Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:51.411Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_6cf61054679f8f34": {
+    "id": "ord_6cf61054679f8f34",
+    "bling_pedido_id": "25457474459",
+    "bling_numero": "25832",
+    "account_id": "acc_7e9c97c208c1859d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 8278.2,
+    "itens": [
+      {
+        "sku": "6942870304595",
+        "descricao": "Bateria Fenix Recarregável 18650 2600mAh 3.6V 9.36Wh De Íon de Lítio ARB-L18-2600U",
+        "categoria": null,
+        "quantidade": 70,
+        "valor_unitario": 118.26,
+        "valor_total_item": 8278.2
+      }
+    ],
+    "data_pedido": "2026-04-01",
+    "data_pagamento": null,
+    "data_envio": "2026-04-01",
+    "data_entrega": null,
+    "notas": "Aos cuidados de: Andrea Bazarim",
+    "sincronizado_bling_em": "2026-09-22T12:08:52.220Z",
+    "criado_em": "2026-09-22T12:08:52.220Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:52.220Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_4f9c29e3e26d12ea": {
+    "id": "ord_4f9c29e3e26d12ea",
+    "bling_pedido_id": "25456594034",
+    "bling_numero": "25831",
+    "account_id": "acc_7bc02bb7d918e6c9",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 3523.64,
+    "itens": [
+      {
+        "sku": "EH1SB-71801W1",
+        "descricao": "Espingarda Eternal Single Barrel Hw Wood sem cao, coronha madeira  cal. 12, Cano 71",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 3137.19,
+        "valor_total_item": 3137.19
+      }
+    ],
+    "data_pedido": "2026-04-01",
+    "data_pagamento": null,
+    "data_envio": "2026-04-01",
+    "data_entrega": null,
+    "notas": "Nº de série: 21-9580",
+    "sincronizado_bling_em": "2026-09-22T12:08:53.033Z",
+    "criado_em": "2026-09-22T12:08:53.033Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:53.033Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_404d09c217661d14": {
+    "id": "ord_404d09c217661d14",
+    "bling_pedido_id": "25456012297",
+    "bling_numero": "25830",
+    "account_id": "acc_0f2b62f04b6e2c70",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 125.91,
+    "itens": [
+      {
+        "sku": "VEC-SCBCR-14",
+        "descricao": "Colimador para calibre .40 S&W - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 112,
+        "valor_total_item": 112
+      }
+    ],
+    "data_pedido": "2026-04-01",
+    "data_pagamento": null,
+    "data_envio": "2026-04-01",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14360\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:08:53.837Z",
+    "criado_em": "2026-09-22T12:08:53.837Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:53.837Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_518e4ced16e298ac": {
+    "id": "ord_518e4ced16e298ac",
+    "bling_pedido_id": "25453533743",
+    "bling_numero": "25829",
+    "account_id": "acc_ea26681851f9575a",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 739.2,
+    "itens": [
+      {
+        "sku": "6942870305868",
+        "descricao": "Carregador de Bateria Fenix ARE-X11 SET",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 140.99,
+        "valor_total_item": 140.99
+      },
+      {
+        "sku": "6942870305905",
+        "descricao": "Bateria Fenix Recarregável 16340 700mAh 3.6V 2.52Wh De Íon de Lítio ARB-L16-700UP",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 97,
+        "valor_total_item": 97
+      },
+      {
+        "sku": "6942870306650",
+        "descricao": "Lanterna Fenix E30R 1600 Lumens Preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 248.47,
+        "valor_total_item": 248.47
+      },
+      {
+        "sku": "6942870307831",
+        "descricao": "Lanterna multiuso Fenix E-LITE, 150 Lumens preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 83.21,
+        "valor_total_item": 83.21
+      },
+      {
+        "sku": "6942870305936",
+        "descricao": "Lanterna manual Fenix LD02 V2.0 70 Lumens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 132.9,
+        "valor_total_item": 132.9
+      }
+    ],
+    "data_pedido": "2026-04-01",
+    "data_pagamento": null,
+    "data_envio": "2026-04-01",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14358\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\nNº de série: E7FEZR01580\nNº de série: EBYECF02555\nNº de série: WHEEK300206",
+    "sincronizado_bling_em": "2026-09-22T12:08:54.611Z",
+    "criado_em": "2026-09-22T12:08:54.611Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:54.611Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_c58ce55800b32fa7": {
+    "id": "ord_c58ce55800b32fa7",
+    "bling_pedido_id": "25453175880",
+    "bling_numero": "25828",
+    "account_id": "acc_a94dc97925497a51",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1283.1,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-M36",
+        "descricao": "Red Dot Frenzy 1x22x26 MOS Multi Reticular - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1283.1,
+        "valor_total_item": 1283.1
+      }
+    ],
+    "data_pedido": "2026-04-01",
+    "data_pagamento": null,
+    "data_envio": "2026-04-01",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14356\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:08:55.392Z",
+    "criado_em": "2026-09-22T12:08:55.392Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:55.392Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_ef7a3c0899351cfe": {
+    "id": "ord_ef7a3c0899351cfe",
+    "bling_pedido_id": "25459627433",
+    "bling_numero": "25838",
+    "account_id": "acc_6ad881c62674ddfb",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 147.31,
+    "itens": [
+      {
+        "sku": "6942870309156-ID",
+        "descricao": "Lanterna de Cabeça Fenix HL16 450 Lúmens Preta (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 117.88,
+        "valor_total_item": 117.88
+      }
+    ],
+    "data_pedido": "2026-03-31",
+    "data_pagamento": null,
+    "data_envio": "2026-04-01",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14352\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\nNº de série: 1J323Z00001",
+    "sincronizado_bling_em": "2026-09-22T12:08:56.203Z",
+    "criado_em": "2026-09-22T12:08:56.203Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:56.203Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_44355d63eb2520c7": {
+    "id": "ord_44355d63eb2520c7",
+    "bling_pedido_id": "25452410799",
+    "bling_numero": "25827",
+    "account_id": "acc_13a9ff22f6bdcb97",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 262.88,
+    "itens": [
+      {
+        "sku": "6942870306650",
+        "descricao": "Lanterna Fenix E30R 1600 Lumens Preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 248.47,
+        "valor_total_item": 248.47
+      }
+    ],
+    "data_pedido": "2026-03-31",
+    "data_pagamento": null,
+    "data_envio": "2026-03-31",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6075\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\nNº de série: E7FEZR01609",
+    "sincronizado_bling_em": "2026-09-22T12:08:56.999Z",
+    "criado_em": "2026-09-22T12:08:56.999Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:56.999Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_d69a1c884650584b": {
+    "id": "ord_d69a1c884650584b",
+    "bling_pedido_id": "25450001262",
+    "bling_numero": "25826",
+    "account_id": "acc_5821a6258f760680",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 2150,
+    "itens": [
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna Fenix TK16 V2.0 - 3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 995.63,
+        "valor_total_item": 995.63
+      },
+      {
+        "sku": "6942870306391-ID",
+        "descricao": "Carregador de Baterias Fenix ARE-A4 (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 447.3,
+        "valor_total_item": 447.3
+      },
+      {
+        "sku": "6942870308463",
+        "descricao": "Lanterna para armas Fenix GL19R",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 707.07,
+        "valor_total_item": 707.07
+      }
+    ],
+    "data_pedido": "2026-03-31",
+    "data_pagamento": null,
+    "data_envio": "2026-03-31",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:08:57.830Z",
+    "criado_em": "2026-09-22T12:08:57.830Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:57.830Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_02f2b0613305e68c": {
+    "id": "ord_02f2b0613305e68c",
+    "bling_pedido_id": "25449937633",
+    "bling_numero": "25825",
+    "account_id": "acc_3cdd1f003e305970",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 75.12,
+    "itens": [
+      {
+        "sku": "6942870304236",
+        "descricao": "Carregador de Bateria Fenix ARE-X1 SET",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 75.12,
+        "valor_total_item": 75.12
+      }
+    ],
+    "data_pedido": "2026-03-31",
+    "data_pagamento": null,
+    "data_envio": "2026-03-31",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:08:58.600Z",
+    "criado_em": "2026-09-22T12:08:58.600Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:58.600Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_538b65da932079f2": {
+    "id": "ord_538b65da932079f2",
+    "bling_pedido_id": "25447471705",
+    "bling_numero": "25824",
+    "account_id": "acc_b5f26d8412f6b5b6",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 161.6,
+    "itens": [
+      {
+        "sku": "6942870305868",
+        "descricao": "Carregador de Bateria Fenix ARE-X11 SET",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 140.99,
+        "valor_total_item": 140.99
+      }
+    ],
+    "data_pedido": "2026-03-31",
+    "data_pagamento": null,
+    "data_envio": "2026-03-31",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14354\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:08:59.388Z",
+    "criado_em": "2026-09-22T12:08:59.388Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:08:59.388Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_bdfa4ff77fda89f3": {
+    "id": "ord_bdfa4ff77fda89f3",
+    "bling_pedido_id": "25446330660",
+    "bling_numero": "25823",
+    "account_id": "acc_75754bb68df992f9",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 75.12,
+    "itens": [
+      {
+        "sku": "6942870303246",
+        "descricao": "Carregador de Bateria Fenix ARE-X1",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 75.12,
+        "valor_total_item": 75.12
+      }
+    ],
+    "data_pedido": "2026-03-31",
+    "data_pagamento": null,
+    "data_envio": "2026-03-31",
+    "data_entrega": null,
+    "notas": "Frete grátis pois o produto está sob envio de substituição",
+    "sincronizado_bling_em": "2026-09-22T12:09:00.207Z",
+    "criado_em": "2026-09-22T12:09:00.207Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:09:00.207Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_246cd0c7e9f88003": {
+    "id": "ord_246cd0c7e9f88003",
+    "bling_pedido_id": "25446317809",
+    "bling_numero": "25822",
+    "account_id": "acc_d5ff8652d0402e29",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 166.11,
+    "itens": [
+      {
+        "sku": "6942870305868",
+        "descricao": "Carregador de Bateria Fenix ARE-X11 SET",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 140.99,
+        "valor_total_item": 140.99
+      }
+    ],
+    "data_pedido": "2026-03-31",
+    "data_pagamento": null,
+    "data_envio": "2026-03-31",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14350\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:09:01.007Z",
+    "criado_em": "2026-09-22T12:09:01.007Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:09:01.007Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_fca56dc794623cdf": {
+    "id": "ord_fca56dc794623cdf",
+    "bling_pedido_id": "25446309638",
+    "bling_numero": "25821",
+    "account_id": "acc_43add66356f03516",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 171.81,
+    "itens": [
+      {
+        "sku": "6942870305868",
+        "descricao": "Carregador de Bateria Fenix ARE-X11 SET",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 140.99,
+        "valor_total_item": 140.99
+      }
+    ],
+    "data_pedido": "2026-03-31",
+    "data_pagamento": null,
+    "data_envio": "2026-03-31",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14348\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-22T12:09:01.809Z",
+    "criado_em": "2026-09-22T12:09:01.809Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:09:01.809Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_73c57ede57e72d69": {
+    "id": "ord_73c57ede57e72d69",
+    "bling_pedido_id": "25444435755",
+    "bling_numero": "25820",
+    "account_id": "acc_3de17fcbfc0bf7ab",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 159,
+    "itens": [
+      {
+        "sku": "VEC-SCSC-07",
+        "descricao": "Protetor de Percursor (Snap Cap) Vector Optics, 12 GA, Ref: SCSC-07P",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 98.134,
+        "valor_total_item": 98.134
+      }
+    ],
+    "data_pedido": "2026-03-31",
+    "data_pagamento": null,
+    "data_envio": "2026-03-31",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:09:02.598Z",
+    "criado_em": "2026-09-22T12:09:02.598Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:09:02.598Z",
+    "atualizado_por": "bling-sync"
   }
 }
