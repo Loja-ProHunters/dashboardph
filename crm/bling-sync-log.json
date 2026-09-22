@@ -1,5 +1,15 @@
 [
   {
+    "ts": "2026-09-22T17:57:24.701Z",
+    "tipo": "backfill_concluido",
+    "contaId": "prohunters",
+    "pedidos_processados": 1962,
+    "accounts_criadas": 17,
+    "orders_criadas": 25,
+    "ja_existentes": 1931,
+    "rate_limit_perdidos": 0
+  },
+  {
     "ts": "2026-09-22T17:28:16.787Z",
     "tipo": "backfill_concluido",
     "contaId": "calibre",
