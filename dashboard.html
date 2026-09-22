@@ -6223,6 +6223,10 @@ async function crmAbreFicha(accId){
         '</div>' +
         '<div id="fic-sugestoes"></div>' +
         '<div class="fic-section">' +
+          '<h4>💰 Contas em aberto <span style="font-size:11px;font-weight:400;color:var(--gy)">(consulta ao vivo no Bling)</span></h4>' +
+          '<div id="fic-contas-abertas"><div style="font-size:12px;color:var(--gy)">🔄 Consultando Pro Hunters e Calibre…</div></div>' +
+        '</div>' +
+        '<div class="fic-section">' +
           '<h4>📦 Histórico de pedidos ('+orders.length+')</h4>' +
           (orders.length ? orders.slice(0,20).map(function(o){
             var itensTxt = (o.itens||[]).slice(0,3).map(function(i){ return i.sku||i.descricao||''; }).filter(Boolean).join(', ');
@@ -6240,8 +6244,82 @@ async function crmAbreFicha(accId){
         '</div>' +
       '</div>';
     wrap.innerHTML = html;
+    // Dispara consulta de contas em aberto em background (não bloqueia a ficha)
+    crmCarregarContasAbertas(accId);
   } catch (e) {
     wrap.innerHTML = '<div class="crm-empty">Erro: '+crmEsc(e.message)+'</div>';
+  }
+}
+
+// ── Contas em aberto — consulta ao vivo no Bling (2 empresas) ─────
+async function crmCarregarContasAbertas(accId){
+  var box = document.getElementById('fic-contas-abertas');
+  if (!box) return;
+  try {
+    var r = await fetch('/api/crm/ficha/'+encodeURIComponent(accId)+'/contas-abertas');
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro ao consultar');
+    var contas = d.contas || [];
+    // Se algum bling deu erro específico, mostra no rodapé
+    var errosPorBling = (d.detalhe_por_bling || []).filter(function(x){ return x.erro; })
+      .map(function(x){ return x.contaId + ': ' + x.erro; });
+    if (!contas.length) {
+      var msg = '<div style="font-size:12.5px;color:var(--gd);padding:8px;background:#e7f5ec;border-radius:6px">✓ Cliente sem contas em aberto nas duas empresas.</div>';
+      if (errosPorBling.length) msg += '<div style="font-size:11px;color:#a06210;margin-top:6px">⚠ ' + crmEsc(errosPorBling.join(' · ')) + '</div>';
+      box.innerHTML = msg;
+      return;
+    }
+    var htmlLinhas = contas.map(function(c){
+      var vencFmt = c.vencimento ? crmFmtDate(c.vencimento) : '—';
+      var atrasoTxt = '';
+      var atrasoColor = 'var(--gy)';
+      if (c.dias_atraso == null) atrasoTxt = '';
+      else if (c.dias_atraso > 0) { atrasoTxt = c.dias_atraso + 'd atraso'; atrasoColor = 'var(--r)'; }
+      else if (c.dias_atraso === 0) { atrasoTxt = 'hoje'; atrasoColor = '#a06210'; }
+      else { atrasoTxt = 'em ' + Math.abs(c.dias_atraso) + 'd'; atrasoColor = 'var(--gd)'; }
+      var empresa = c.bling_conta_origem === 'calibre' ? 'Calibre' : 'Pro Hunters';
+      var empCor = c.bling_conta_origem === 'calibre' ? '#7a5cff' : '#0a6e2e';
+      var sitBadge = c.situacao === 'parcial'
+        ? '<span style="background:#fef4e7;color:#a06210;font-size:10px;padding:2px 6px;border-radius:99px;margin-left:4px">parcial</span>'
+        : '';
+      var pedidoTxt = c.pedido ? (' · Pedido ' + (c.pedido.numero || '#' + c.pedido.id)) : '';
+      var boletoTxt = c.link_boleto
+        ? ' · <a href="' + crmEsc(c.link_boleto) + '" target="_blank" style="color:var(--gd)">🔗 boleto</a>'
+        : '';
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:1px solid var(--bd);gap:8px">' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-size:12.5px;font-weight:600;color:var(--tx)">' + crmEsc(c.historico || '(sem descrição)') + sitBadge + '</div>' +
+          '<div style="font-size:11px;color:var(--gy);margin-top:2px">' +
+            '<span style="color:' + empCor + ';font-weight:600">' + empresa + '</span>' +
+            ' · Vence ' + vencFmt +
+            (atrasoTxt ? ' · <span style="color:' + atrasoColor + ';font-weight:600">' + atrasoTxt + '</span>' : '') +
+            pedidoTxt + boletoTxt +
+          '</div>' +
+        '</div>' +
+        '<div style="font-weight:700;color:' + (c.em_atraso ? 'var(--r)' : 'var(--tx)') + ';font-size:14px;white-space:nowrap">' +
+          crmFmtBRL(c.saldo) +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    var resumoTxt =
+      '<div style="display:flex;gap:14px;flex-wrap:wrap;padding:8px 10px;background:var(--bg);border-radius:6px;margin-bottom:6px;font-size:12.5px">' +
+        '<div><b>' + d.qtd_contas_em_aberto + '</b> conta(s) em aberto</div>' +
+        '<div>Total: <b>' + crmFmtBRL(d.total_em_aberto) + '</b></div>' +
+        (d.total_atrasado > 0
+          ? '<div style="color:var(--r);font-weight:700">🔴 Atrasado: ' + crmFmtBRL(d.total_atrasado) + ' (' + d.qtd_contas_atrasadas + ' cta)</div>'
+          : '<div style="color:var(--gd)">✓ Nada em atraso</div>') +
+      '</div>';
+
+    var errosBloco = errosPorBling.length
+      ? '<div style="font-size:11px;color:#a06210;margin-top:6px;padding:4px 8px;background:#fef4e7;border-radius:4px">⚠ ' + crmEsc(errosPorBling.join(' · ')) + '</div>'
+      : '';
+
+    box.innerHTML = resumoTxt +
+      '<div style="border:1px solid var(--bd);border-radius:8px;overflow:hidden;background:var(--wh)">' + htmlLinhas + '</div>' +
+      errosBloco;
+  } catch (e) {
+    box.innerHTML = '<div style="font-size:12px;color:var(--r);padding:8px;background:#fbe6e6;border-radius:6px">Erro ao consultar contas: ' + crmEsc(e.message) + '</div>';
   }
 }
 
