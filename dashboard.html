@@ -5308,46 +5308,61 @@ async function crmBlingBackfillIniciar(conta){
   }
 }
 
-// Loop que chama /continuar até terminar (por conta). Faz polling do status.
+// Polling puro (por conta). O trabalho REAL fica com o auto-chain do servidor
+// (o próprio /api/bling/cron/backfill-tick chama a si mesmo em background até
+// terminar). A aba SÓ observa via GET /backfill/status. Se detectar que o
+// progresso está parado por muito tempo, re-dispara um tick manualmente.
+// Assim, mesmo se o usuário fechar a aba, o backfill continua.
 async function crmBlingBackfillLoop(conta){
   const out = _blingOut(conta);
-  let seguir = true;
-  let erros_seguidos = 0;
-  while (seguir) {
+  let ultimoFeito = -1;
+  let pollsSemAvanco = 0;
+  let errosSeguidos = 0;
+  while (true) {
+    await new Promise(rs => setTimeout(rs, 3000));
     try {
-      const r = await fetch('/api/bling/backfill/continuar?conta=' + encodeURIComponent(conta), { method: 'POST' });
-      const d = await r.json();
+      const r = await fetch('/api/bling/backfill/status?conta=' + encodeURIComponent(conta));
       if (!r.ok) {
-        erros_seguidos++;
-        if (erros_seguidos >= 3) { out.innerHTML = '<span style="color:var(--r)">Backfill parou após 3 falhas: ' + crmEsc(d.error || 'erro') + '</span>'; return; }
-        await new Promise(rs => setTimeout(rs, 3000));
+        errosSeguidos++;
+        if (errosSeguidos >= 10) { out.innerHTML = '<span style="color:var(--r)">Não consigo mais consultar o status. Recarregue a página.</span>'; return; }
         continue;
       }
-      erros_seguidos = 0;
+      errosSeguidos = 0;
+      const d = await r.json();
       const cp = d.checkpoint || {};
       const feito = cp.processados || 0;
       const total = cp.total_original || 1;
       const pct = Math.round((feito / total) * 100);
+      const pendentes = (cp.ids_pendentes && cp.ids_pendentes.length) || 0;
+      const terminou = (cp.status === 'concluido') || (pendentes === 0 && total > 0);
       out.innerHTML =
         '<div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px 12px">' +
           '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><strong>Backfill em andamento (' + conta + ')</strong><span>' + feito + ' / ' + total + ' pedidos · ' + pct + '%</span></div>' +
           '<div style="height:6px;background:var(--bd);border-radius:99px;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:var(--gd);transition:width .3s"></div></div>' +
           '<div style="margin-top:6px;font-size:11px;color:var(--gy)">' +
-            (cp.accounts_criadas || 0) + ' contas · ' + (cp.orders_criadas || 0) + ' pedidos · ' + ((cp.avisos && cp.avisos.length) || 0) + ' avisos' +
+            (cp.accounts_criadas || 0) + ' contas · ' + (cp.orders_criadas || 0) + ' pedidos · ' + ((cp.avisos && cp.avisos.length) || 0) + ' avisos · rodando no servidor' +
           '</div>' +
         '</div>';
-      if (d.terminou) {
+      if (terminou) {
         out.innerHTML +=
           '<div style="margin-top:10px;color:var(--gd);font-weight:600">✓ Backfill de ' + conta + ' concluído! ' +
-          cp.accounts_criadas + ' contas e ' + cp.orders_criadas + ' pedidos importados.</div>';
-        seguir = false;
-        break;
+          (cp.accounts_criadas || 0) + ' contas e ' + (cp.orders_criadas || 0) + ' pedidos importados.</div>';
+        return;
       }
-      if (d.processados_neste_lote === 0) await new Promise(rs => setTimeout(rs, 2000));
+      // Detecção de "parado" — se 10 polls (30s) sem avanço, re-dispara tick.
+      if (feito === ultimoFeito) {
+        pollsSemAvanco++;
+        if (pollsSemAvanco >= 10) {
+          try { fetch('/api/bling/cron/backfill-tick?conta=' + encodeURIComponent(conta)); } catch (e) {}
+          pollsSemAvanco = 0;
+        }
+      } else {
+        pollsSemAvanco = 0;
+        ultimoFeito = feito;
+      }
     } catch (e) {
-      erros_seguidos++;
-      if (erros_seguidos >= 3) { out.innerHTML = '<span style="color:var(--r)">Backfill interrompido: ' + crmEsc(e.message) + '</span>'; return; }
-      await new Promise(rs => setTimeout(rs, 3000));
+      errosSeguidos++;
+      if (errosSeguidos >= 10) { out.innerHTML = '<span style="color:var(--r)">Polling interrompido: ' + crmEsc(e.message) + '</span>'; return; }
     }
   }
 }
