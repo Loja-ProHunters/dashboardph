@@ -40009,16 +40009,16 @@
     "atualizado_em": "2026-09-22T11:43:39.824Z",
     "atualizado_por": "bling-sync"
   },
-  "ord_1681c8bab71cbc35": {
-    "id": "ord_1681c8bab71cbc35",
-    "bling_pedido_id": "26269250557",
-    "bling_numero": "26456",
-    "account_id": "acc_76e259c946da338a",
+  "ord_e4cb864906db148e": {
+    "id": "ord_e4cb864906db148e",
+    "bling_pedido_id": "26240652802",
+    "bling_numero": "26438",
+    "account_id": "acc_95a460aa35212dd6",
     "opportunity_id": null,
     "referral_id": null,
     "vendedor_id": "gerencia",
     "status": "rascunho",
-    "valor_total": 882.92,
+    "valor_total": 827.92,
     "itens": [
       {
         "sku": "VEC-SCRD-03",
@@ -40029,97 +40029,925 @@
         "valor_total_item": 797.55
       }
     ],
-    "data_pedido": "2026-07-07",
+    "data_pedido": "2026-07-03",
     "data_pagamento": null,
-    "data_envio": "2026-07-07",
+    "data_envio": "2026-07-03",
     "data_entrega": null,
-    "notas": null,
-    "sincronizado_bling_em": "2026-09-22T11:44:32.866Z",
-    "criado_em": "2026-09-22T11:44:32.866Z",
+    "notas": "Nº Pedido Loja: 14916\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T11:44:24.694Z",
+    "criado_em": "2026-09-22T11:44:24.694Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:32.866Z",
+    "atualizado_em": "2026-09-22T11:44:24.694Z",
     "atualizado_por": "bling-sync"
   },
-  "ord_fca5c181d539e7c8": {
-    "id": "ord_fca5c181d539e7c8",
-    "bling_pedido_id": "26265841661",
-    "bling_numero": "26455",
-    "account_id": "acc_84e4f9509d8df49e",
+  "ord_49944f8ebeaf71d1": {
+    "id": "ord_49944f8ebeaf71d1",
+    "bling_pedido_id": "26238343538",
+    "bling_numero": "26437",
+    "account_id": "acc_9a386eb9721dacb1",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 290.2,
+    "itens": [
+      {
+        "sku": "RUIKE-D198-PB",
+        "descricao": "Canivete Dobrável Ruike D198-PB",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 284,
+        "valor_total_item": 284
+      }
+    ],
+    "data_pedido": "2026-07-03",
+    "data_pagamento": null,
+    "data_envio": "2026-07-03",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14914\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T11:44:25.476Z",
+    "criado_em": "2026-09-22T11:44:25.476Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:25.476Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_fb293504d11a4f0e": {
+    "id": "ord_fb293504d11a4f0e",
+    "bling_pedido_id": "26238208313",
+    "bling_numero": "26436",
+    "account_id": "acc_9a386eb9721dacb1",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 244.6,
+    "itens": [
+      {
+        "sku": "RUIKE-S22-N",
+        "descricao": "Canivete Ruike S22-N",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 236,
+        "valor_total_item": 236
+      }
+    ],
+    "data_pedido": "2026-07-03",
+    "data_pagamento": null,
+    "data_envio": "2026-07-03",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14912\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\n\nObs Cliente: Se não estivermos em casa, favor entregar para os vizinhos e me informar pra qual vizinho foi entregue por e-mail ou por whats. Obrigado.",
+    "sincronizado_bling_em": "2026-09-22T11:44:26.270Z",
+    "criado_em": "2026-09-22T11:44:26.270Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:26.270Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b1c624932a865097": {
+    "id": "ord_b1c624932a865097",
+    "bling_pedido_id": "26237771708",
+    "bling_numero": "26435",
+    "account_id": "acc_304d8212b1bd2e02",
     "opportunity_id": null,
     "referral_id": null,
     "vendedor_id": "mathias",
     "status": "rascunho",
-    "valor_total": 3666,
+    "valor_total": 399.57,
     "itens": [
       {
-        "sku": "HORN-30395-ID",
-        "descricao": "Projétil Hornady Calibre .308 160 GR FTX® (30-30 WIN)",
+        "sku": "GF-KIG19RD",
+        "descricao": "Coldre Velado Kydex 30-30 Outdoors para Glock 19/19X/25/44/45 c/ Red Dot",
         "categoria": null,
-        "quantidade": 300,
-        "valor_unitario": 12.22,
-        "valor_total_item": 3666
+        "quantidade": 1,
+        "valor_unitario": 387,
+        "valor_total_item": 387
       }
     ],
-    "data_pedido": "2026-07-07",
+    "data_pedido": "2026-07-03",
     "data_pagamento": null,
-    "data_envio": "2026-07-07",
+    "data_envio": "2026-07-03",
     "data_entrega": null,
     "notas": null,
-    "sincronizado_bling_em": "2026-09-22T11:44:34.006Z",
-    "criado_em": "2026-09-22T11:44:34.006Z",
+    "sincronizado_bling_em": "2026-09-22T11:44:27.075Z",
+    "criado_em": "2026-09-22T11:44:27.075Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:34.006Z",
+    "atualizado_em": "2026-09-22T11:44:27.075Z",
     "atualizado_por": "bling-sync"
   },
-  "ord_1dda3e3ee30fb644": {
-    "id": "ord_1dda3e3ee30fb644",
-    "bling_pedido_id": "26261214191",
-    "bling_numero": "26454",
-    "account_id": "acc_49f59dc8b1af4fed",
+  "ord_8270cc431f5cf5b5": {
+    "id": "ord_8270cc431f5cf5b5",
+    "bling_pedido_id": "26236561593",
+    "bling_numero": "26434",
+    "account_id": "acc_c41661749e73e6f9",
     "opportunity_id": null,
     "referral_id": null,
     "vendedor_id": "gerencia",
     "status": "rascunho",
-    "valor_total": 2118.49,
+    "valor_total": 697.52,
     "itens": [
       {
-        "sku": "6942870306643",
-        "descricao": "Carregador para baterias Fenix ARE-D2 (USA Plug)",
+        "sku": "6942870304595",
+        "descricao": "Bateria Fenix Recarregável 18650 2600mAh 3.6V 9.36Wh De Íon de Lítio ARB-L18-2600U",
         "categoria": null,
-        "quantidade": 4,
-        "valor_unitario": 298.8,
-        "valor_total_item": 1195.2
+        "quantidade": 1,
+        "valor_unitario": 146,
+        "valor_total_item": 146
       },
       {
-        "sku": "6942870311104-ID",
-        "descricao": "Bateria Fenix Recarregável 18650 3400mAh 3.6V 12.24Wh De Íon de Lítio ARB-L18-3400U V3.0 (ID)",
+        "sku": "6942870304724",
+        "descricao": "Bateria Fenix Recarregável 18650 3500mAh 3.6V 12.6Wh De Íon de Lítio ARB-L18-3500U",
         "categoria": null,
-        "quantidade": 4,
-        "valor_unitario": 221.4,
-        "valor_total_item": 885.6
+        "quantidade": 2,
+        "valor_unitario": 260,
+        "valor_total_item": 520
       }
     ],
-    "data_pedido": "2026-07-06",
+    "data_pedido": "2026-07-03",
     "data_pagamento": null,
-    "data_envio": "2026-07-06",
+    "data_envio": "2026-07-03",
     "data_entrega": null,
-    "notas": "CATEGORIA REVENDA",
-    "sincronizado_bling_em": "2026-09-22T11:44:34.755Z",
-    "criado_em": "2026-09-22T11:44:34.755Z",
+    "notas": "Nº Pedido Loja: 6303\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-22T11:44:28.136Z",
+    "criado_em": "2026-09-22T11:44:28.136Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:34.755Z",
+    "atualizado_em": "2026-09-22T11:44:28.136Z",
     "atualizado_por": "bling-sync"
   },
-  "ord_bf859ca5db0b1087": {
-    "id": "ord_bf859ca5db0b1087",
-    "bling_pedido_id": "26261030953",
-    "bling_numero": "26453",
-    "account_id": "acc_568318debada8aec",
+  "ord_e59471ebd636a1f4": {
+    "id": "ord_e59471ebd636a1f4",
+    "bling_pedido_id": "26235895053",
+    "bling_numero": "26433",
+    "account_id": "acc_809b336a3817de9b",
     "opportunity_id": null,
     "referral_id": null,
     "vendedor_id": "gerencia",
     "status": "rascunho",
-    "valor_total": 190.99,
+    "valor_total": 1503.45,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-43",
+        "descricao": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1503.45,
+        "valor_total_item": 1503.45
+      }
+    ],
+    "data_pedido": "2026-07-03",
+    "data_pagamento": null,
+    "data_envio": "2026-07-03",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14910\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T11:44:28.929Z",
+    "criado_em": "2026-09-22T11:44:28.929Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:28.929Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_a63748baf5e0ea1b": {
+    "id": "ord_a63748baf5e0ea1b",
+    "bling_pedido_id": "26235356959",
+    "bling_numero": "26432",
+    "account_id": "acc_432c7e5627c958c2",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 94.7,
+    "itens": [
+      {
+        "sku": "D1154-ID",
+        "descricao": "D1154 Fenix Metal Retractable Pen (Golden)",
+        "categoria": null,
+        "quantidade": 100,
+        "valor_unitario": 0.947,
+        "valor_total_item": 94.69999999999999
+      }
+    ],
+    "data_pedido": "2026-07-03",
+    "data_pagamento": null,
+    "data_envio": "2026-07-03",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:29.670Z",
+    "criado_em": "2026-09-22T11:44:29.670Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:29.670Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_ea7c02be5c5c7741": {
+    "id": "ord_ea7c02be5c5c7741",
+    "bling_pedido_id": "26235295648",
+    "bling_numero": "26431",
+    "account_id": "acc_432c7e5627c958c2",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 732.21,
+    "itens": [
+      {
+        "sku": "D1147-ID",
+        "descricao": "D1147 Fenix Floor-standing Showcase",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1732.211,
+        "valor_total_item": 1732.211
+      }
+    ],
+    "data_pedido": "2026-07-03",
+    "data_pagamento": null,
+    "data_envio": "2026-07-03",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:30.423Z",
+    "criado_em": "2026-09-22T11:44:30.423Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:30.423Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_4aae68e8f95deebb": {
+    "id": "ord_4aae68e8f95deebb",
+    "bling_pedido_id": "26235289198",
+    "bling_numero": "26430",
+    "account_id": "acc_432c7e5627c958c2",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 732.21,
+    "itens": [
+      {
+        "sku": "D1147-ID",
+        "descricao": "D1147 Fenix Floor-standing Showcase",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1732.211,
+        "valor_total_item": 1732.211
+      }
+    ],
+    "data_pedido": "2026-07-03",
+    "data_pagamento": null,
+    "data_envio": "2026-07-03",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:31.174Z",
+    "criado_em": "2026-09-22T11:44:31.174Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:31.174Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b8e224350244cb80": {
+    "id": "ord_b8e224350244cb80",
+    "bling_pedido_id": "26235278651",
+    "bling_numero": "26429",
+    "account_id": "acc_432c7e5627c958c2",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 224.89,
+    "itens": [
+      {
+        "sku": "D1150-ID",
+        "descricao": "D1150 Fenix Multifunctional Snap Hook",
+        "categoria": null,
+        "quantidade": 199,
+        "valor_unitario": 1.893,
+        "valor_total_item": 376.707
+      },
+      {
+        "sku": "D1043-ID",
+        "descricao": "D1043 Fenix Sport Backpack V2.0",
+        "categoria": null,
+        "quantidade": 50,
+        "valor_unitario": 4.733,
+        "valor_total_item": 236.64999999999998
+      },
+      {
+        "sku": "D1095-ID",
+        "descricao": "D1095 Fenix Cap V2.0 (Camo)",
+        "categoria": null,
+        "quantidade": 100,
+        "valor_unitario": 9.466,
+        "valor_total_item": 946.5999999999999
+      },
+      {
+        "sku": "D1027-ID",
+        "descricao": "D1027 Fenix Flag",
+        "categoria": null,
+        "quantidade": 3,
+        "valor_unitario": 1.893,
+        "valor_total_item": 5.679
+      },
+      {
+        "sku": "D1097-ID",
+        "descricao": "D1097 Fenix Handheld Flag",
+        "categoria": null,
+        "quantidade": 3,
+        "valor_unitario": 2.082,
+        "valor_total_item": 6.2459999999999996
+      },
+      {
+        "sku": "D1098-ID",
+        "descricao": "D1098-ID\tFenix Anti-Theft Clasp V3.0",
+        "categoria": null,
+        "quantidade": 3,
+        "valor_unitario": 1,
+        "valor_total_item": 3
+      }
+    ],
+    "data_pedido": "2026-07-03",
+    "data_pagamento": null,
+    "data_envio": "2026-07-03",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:31.956Z",
+    "criado_em": "2026-09-22T11:44:31.956Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:31.956Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_a1fd18ee0579c211": {
+    "id": "ord_a1fd18ee0579c211",
+    "bling_pedido_id": "26235193031",
+    "bling_numero": "26428",
+    "account_id": "acc_432c7e5627c958c2",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1732.21,
+    "itens": [
+      {
+        "sku": "D1147-ID",
+        "descricao": "D1147 Fenix Floor-standing Showcase",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1732.211,
+        "valor_total_item": 1732.211
+      }
+    ],
+    "data_pedido": "2026-07-03",
+    "data_pagamento": null,
+    "data_envio": "2026-07-03",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:32.740Z",
+    "criado_em": "2026-09-22T11:44:32.740Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:32.740Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_50915b6b58e37de4": {
+    "id": "ord_50915b6b58e37de4",
+    "bling_pedido_id": "26235156604",
+    "bling_numero": "26426",
+    "account_id": "acc_432c7e5627c958c2",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 9825.6,
+    "itens": [
+      {
+        "sku": "6942870312620-ID",
+        "descricao": "Lanterna Fenix HT18R V2.0 3700 lumens (ID)",
+        "categoria": null,
+        "quantidade": 16,
+        "valor_unitario": 1864.1,
+        "valor_total_item": 29825.6
+      }
+    ],
+    "data_pedido": "2026-07-03",
+    "data_pagamento": null,
+    "data_envio": "2026-07-03",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:35.399Z",
+    "criado_em": "2026-09-22T11:44:35.399Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:35.399Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_536b8b442189d9ff": {
+    "id": "ord_536b8b442189d9ff",
+    "bling_pedido_id": "26235141444",
+    "bling_numero": "26425",
+    "account_id": "acc_432c7e5627c958c2",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 8553.8,
+    "itens": [
+      {
+        "sku": "6942870312620-ID",
+        "descricao": "Lanterna Fenix HT18R V2.0 3700 lumens (ID)",
+        "categoria": null,
+        "quantidade": 18,
+        "valor_unitario": 1864.1,
+        "valor_total_item": 33553.799999999996
+      }
+    ],
+    "data_pedido": "2026-07-03",
+    "data_pagamento": null,
+    "data_envio": "2026-07-03",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:36.168Z",
+    "criado_em": "2026-09-22T11:44:36.168Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:36.168Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_ac61e5a8fb2516e4": {
+    "id": "ord_ac61e5a8fb2516e4",
+    "bling_pedido_id": "26235111986",
+    "bling_numero": "26424",
+    "account_id": "acc_432c7e5627c958c2",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 19392,
+    "itens": [
+      {
+        "sku": "RUIKE-M51-N",
+        "descricao": "Canivete Ruike M51-N",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 619,
+        "valor_total_item": 1238
+      },
+      {
+        "sku": "RUIKE-L51-N",
+        "descricao": "Canivete Ruike L51-N",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 676,
+        "valor_total_item": 1352
+      },
+      {
+        "sku": "RUIKE-L42-B",
+        "descricao": "Canivete Multifuncional Ruike L42-B",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 591,
+        "valor_total_item": 1182
+      },
+      {
+        "sku": "RUIKE-L41-B",
+        "descricao": "Canivete Ruike L41-B",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 591,
+        "valor_total_item": 2955
+      },
+      {
+        "sku": "RUIKE-L32-G",
+        "descricao": "Canivete Multifuncional Ruike L32-G",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 500,
+        "valor_total_item": 1000
+      },
+      {
+        "sku": "RUIKE-L32-B",
+        "descricao": "Canivete Multifuncional Ruike L32-B",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 500,
+        "valor_total_item": 2000
+      },
+      {
+        "sku": "RUIKE-F181-B1",
+        "descricao": "Canivete Dobrável Ruike F181-B1 (Black)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 890,
+        "valor_total_item": 1780
+      },
+      {
+        "sku": "RUIKE-F181-B",
+        "descricao": "Canivete Dobrável Ruike F181-B (Black)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 890,
+        "valor_total_item": 1780
+      },
+      {
+        "sku": "RUIKE-F181-W",
+        "descricao": "Canivete Dobrável Ruike F181-W (Desert Yellow)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 890,
+        "valor_total_item": 890
+      },
+      {
+        "sku": "RUIKE-M126-TZ",
+        "descricao": "Canivete Ruike Modelo M126-TZ",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1328,
+        "valor_total_item": 1328
+      },
+      {
+        "sku": "RUIKE-M661-TZ",
+        "descricao": "Canivete Dobrável Ruike M661-TZ",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 917,
+        "valor_total_item": 917
+      },
+      {
+        "sku": "RUIKE-P881-W",
+        "descricao": "Canivete Dobrável Ruike P881-W",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 587,
+        "valor_total_item": 1174
+      },
+      {
+        "sku": "RUIKE-P881-B1",
+        "descricao": "Canivete Dobrável Ruike P881-B1",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 587,
+        "valor_total_item": 1174
+      },
+      {
+        "sku": "RUIKE-P851-B",
+        "descricao": "Faca Ruike P851-B",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 549,
+        "valor_total_item": 1098
+      },
+      {
+        "sku": "RUIKE-P843-W",
+        "descricao": "Canivete Dobrável Ruike Modelo P843-W",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 515,
+        "valor_total_item": 1030
+      },
+      {
+        "sku": "RUIKE-P843-B",
+        "descricao": "Canivete Dobrável Ruike Modelo P843-B",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 515,
+        "valor_total_item": 1030
+      },
+      {
+        "sku": "RUIKE-P127-CB",
+        "descricao": "Canivete Dobrável Ruike Modelo P127-CB",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 600,
+        "valor_total_item": 1200
+      },
+      {
+        "sku": "RUIKE-P127-B",
+        "descricao": "Canivete Dobrável Ruike Modelo P127-B",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 547,
+        "valor_total_item": 1094
+      },
+      {
+        "sku": "RUIKE-D198-PB",
+        "descricao": "Canivete Dobrável Ruike D198-PB",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 284,
+        "valor_total_item": 568
+      },
+      {
+        "sku": "RUIKE-M195",
+        "descricao": "Canivete Dobrável Ruike M195",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 1087,
+        "valor_total_item": 2174
+      },
+      {
+        "sku": "RUIKE-P121-B",
+        "descricao": "Canivete Ruike P121-B",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 426,
+        "valor_total_item": 1704
+      },
+      {
+        "sku": "RUIKE-P121-G",
+        "descricao": "Canivete Ruike P121-G",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 426,
+        "valor_total_item": 1704
+      },
+      {
+        "sku": "RUIKE-P662-B",
+        "descricao": "Canivete Ruike P662B",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 312,
+        "valor_total_item": 1248
+      },
+      {
+        "sku": "RUIKE-P875-SZ",
+        "descricao": "Canivete Ruike P875-SZ",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 632,
+        "valor_total_item": 2528
+      },
+      {
+        "sku": "RUIKE-P865-B",
+        "descricao": "Canivete Ruike P865-B",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 422,
+        "valor_total_item": 844
+      },
+      {
+        "sku": "RUIKE-P801-SB",
+        "descricao": "Canivete Ruike P801-SB",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 403,
+        "valor_total_item": 806
+      },
+      {
+        "sku": "RUIKE-P671-CB",
+        "descricao": "Canivete Ruike P671-CB",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 477,
+        "valor_total_item": 1908
+      },
+      {
+        "sku": "RUIKE-P128-SB",
+        "descricao": "Canivete Ruike P128-SB",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 564,
+        "valor_total_item": 1128
+      },
+      {
+        "sku": "RUIKE-P108-SB",
+        "descricao": "Canivete Ruike P108-SB",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 540,
+        "valor_total_item": 1080
+      },
+      {
+        "sku": "RUIKE-M875-TZ",
+        "descricao": "Canivete Ruike M875-TZ",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1430,
+        "valor_total_item": 1430
+      },
+      {
+        "sku": "RUIKE-M108-TZ",
+        "descricao": "Canivete Ruike M108-TZ",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1326,
+        "valor_total_item": 1326
+      },
+      {
+        "sku": "RUIKE-D191-B",
+        "descricao": "Canivete Ruike D191-B",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 327,
+        "valor_total_item": 654
+      },
+      {
+        "sku": "RUIKE-P852-B",
+        "descricao": "Canivete Ruike P852-B",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 574,
+        "valor_total_item": 574
+      },
+      {
+        "sku": "RUIKE-P155-W",
+        "descricao": "Canivete Ruike P155-W",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 551,
+        "valor_total_item": 2204
+      },
+      {
+        "sku": "RUIKE-P155-B",
+        "descricao": "Canivete Ruike P155-B",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 551,
+        "valor_total_item": 2204
+      },
+      {
+        "sku": "RUIKE-F815-J",
+        "descricao": "Faca Ruike F815-J",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 562,
+        "valor_total_item": 2248
+      },
+      {
+        "sku": "RUIKE-F815-B",
+        "descricao": "Faca Ruike F815-B",
+        "categoria": null,
+        "quantidade": 7,
+        "valor_unitario": 562,
+        "valor_total_item": 3934
+      },
+      {
+        "sku": "RUIKE-F118-G",
+        "descricao": "Faca Ruike F118-G",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 824,
+        "valor_total_item": 3296
+      },
+      {
+        "sku": "RUIKE-F118-B",
+        "descricao": "Faca Ruike F118-B",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 824,
+        "valor_total_item": 4120
+      },
+      {
+        "sku": "RUIKE-P138-B",
+        "descricao": "Canivete Ruike P138-B",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 621,
+        "valor_total_item": 1242
+      },
+      {
+        "sku": "RUIKE-P138-W",
+        "descricao": "Canivete Ruike P138-W",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 621,
+        "valor_total_item": 1242
+      },
+      {
+        "sku": "RUIKE-P841-L",
+        "descricao": "Canivete Ruike P841-L",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 483,
+        "valor_total_item": 966
+      },
+      {
+        "sku": "RUIKE-P831-SF",
+        "descricao": "Canivete Ruike P831-SF",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 428,
+        "valor_total_item": 856
+      },
+      {
+        "sku": "RUIKE-P801-SF",
+        "descricao": "Canivete Ruike P801-SF",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 360,
+        "valor_total_item": 1440
+      },
+      {
+        "sku": "RUIKE-P108-SF",
+        "descricao": "Canivete Ruike P108-SF",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 477,
+        "valor_total_item": 477
+      },
+      {
+        "sku": "RUIKE-P105-Q",
+        "descricao": "Canivete Ruike P105-Q",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 445,
+        "valor_total_item": 1780
+      },
+      {
+        "sku": "RUIKE-LD41-B",
+        "descricao": "Canivete Ruike LD41-B",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 674,
+        "valor_total_item": 1348
+      },
+      {
+        "sku": "RUIKE-LD31-B",
+        "descricao": "Canivete Ruike LD31-B",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 591,
+        "valor_total_item": 1182
+      },
+      {
+        "sku": "RUIKE-L51-B",
+        "descricao": "Canivete Ruike L51-B",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 676,
+        "valor_total_item": 1352
+      },
+      {
+        "sku": "RUIKE-M51-B",
+        "descricao": "Canivete Ruike M51-B",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 619,
+        "valor_total_item": 1238
+      },
+      {
+        "sku": "RUIKE-M41-B",
+        "descricao": "Canivete Ruike M41-B",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 549,
+        "valor_total_item": 2745
+      },
+      {
+        "sku": "RUIKE-M11-B",
+        "descricao": "Canivete Ruike M11-B",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 324,
+        "valor_total_item": 1620
+      }
+    ],
+    "data_pedido": "2026-07-03",
+    "data_pagamento": null,
+    "data_envio": "2026-07-03",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:36.928Z",
+    "criado_em": "2026-09-22T11:44:36.928Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:36.928Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_1d61b4cf21f2a853": {
+    "id": "ord_1d61b4cf21f2a853",
+    "bling_pedido_id": "26234909417",
+    "bling_numero": "26423",
+    "account_id": "acc_def699a2aa6a643d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 2039.81,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-43",
+        "descricao": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1353.105,
+        "valor_total_item": 1353.105
+      },
+      {
+        "sku": "BALDR RL MINI",
+        "descricao": "Lanterna para armas Olight Baldr RL Mini preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 686.7,
+        "valor_total_item": 686.7
+      }
+    ],
+    "data_pedido": "2026-07-03",
+    "data_pagamento": null,
+    "data_envio": "2026-07-03",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:37.708Z",
+    "criado_em": "2026-09-22T11:44:37.708Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:37.708Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b37925ab3846ca28": {
+    "id": "ord_b37925ab3846ca28",
+    "bling_pedido_id": "26230622134",
+    "bling_numero": "26422",
+    "account_id": "acc_9a7014281141333b",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 136.77,
     "itens": [
       {
         "sku": "6942870304069",
@@ -40130,261 +40958,67 @@
         "valor_total_item": 109.79
       }
     ],
-    "data_pedido": "2026-07-06",
+    "data_pedido": "2026-07-02",
     "data_pagamento": null,
-    "data_envio": "2026-07-06",
+    "data_envio": "2026-07-02",
     "data_entrega": null,
-    "notas": "Nº Pedido Loja: 6307\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
-    "sincronizado_bling_em": "2026-09-22T11:44:36.685Z",
-    "criado_em": "2026-09-22T11:44:36.685Z",
+    "notas": "Nº Pedido Loja: 6301\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T11:44:38.463Z",
+    "criado_em": "2026-09-22T11:44:38.463Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:36.685Z",
+    "atualizado_em": "2026-09-22T11:44:38.463Z",
     "atualizado_por": "bling-sync"
   },
-  "ord_cb6a46fcd1438b4c": {
-    "id": "ord_cb6a46fcd1438b4c",
-    "bling_pedido_id": "26260920297",
-    "bling_numero": "26452",
-    "account_id": "acc_fb15149f12a777e4",
-    "opportunity_id": null,
-    "referral_id": null,
-    "vendedor_id": "gerencia",
-    "status": "rascunho",
-    "valor_total": 1856.12,
-    "itens": [
-      {
-        "sku": "STAG01155",
-        "descricao": "Pistola Pcp Stinger  Diana, Calibre: 5.5Mm",
-        "categoria": null,
-        "quantidade": 1,
-        "valor_unitario": 1196.91,
-        "valor_total_item": 1196.91
-      },
-      {
-        "sku": "Strike-bomba-m",
-        "descricao": "Bomba de Ar Manual - Airgun Strike - Base Fixa",
-        "categoria": null,
-        "quantidade": 1,
-        "valor_unitario": 582.948,
-        "valor_total_item": 582.948
-      },
-      {
-        "sku": "NTK-901036-UN",
-        "descricao": "Canivete NTK Nimitz",
-        "categoria": null,
-        "quantidade": 1,
-        "valor_unitario": 76.257,
-        "valor_total_item": 76.257
-      }
-    ],
-    "data_pedido": "2026-07-06",
-    "data_pagamento": null,
-    "data_envio": "2026-07-06",
-    "data_entrega": null,
-    "notas": null,
-    "sincronizado_bling_em": "2026-09-22T11:44:37.446Z",
-    "criado_em": "2026-09-22T11:44:37.446Z",
-    "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:37.446Z",
-    "atualizado_por": "bling-sync"
-  },
-  "ord_00465952789023b2": {
-    "id": "ord_00465952789023b2",
-    "bling_pedido_id": "26259508146",
-    "bling_numero": "26451",
-    "account_id": "acc_1adca7201becffd9",
-    "opportunity_id": null,
-    "referral_id": null,
-    "vendedor_id": "gerencia",
-    "status": "rascunho",
-    "valor_total": 525.45,
-    "itens": [
-      {
-        "sku": "VEC-RDSL16",
-        "descricao": "Red Dot Victoptics SPX 1x22",
-        "categoria": null,
-        "quantidade": 1,
-        "valor_unitario": 505.05,
-        "valor_total_item": 505.05
-      }
-    ],
-    "data_pedido": "2026-07-06",
-    "data_pagamento": null,
-    "data_envio": "2026-07-06",
-    "data_entrega": null,
-    "notas": "Nº Pedido Loja: 14938\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
-    "sincronizado_bling_em": "2026-09-22T11:44:38.239Z",
-    "criado_em": "2026-09-22T11:44:38.239Z",
-    "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:38.239Z",
-    "atualizado_por": "bling-sync"
-  },
-  "ord_19f8d8e8e37ca9c2": {
-    "id": "ord_19f8d8e8e37ca9c2",
-    "bling_pedido_id": "26257551075",
-    "bling_numero": "26450",
-    "account_id": "acc_ee6aa13f500017a2",
-    "opportunity_id": null,
-    "referral_id": null,
-    "vendedor_id": "mathias",
-    "status": "rascunho",
-    "valor_total": 147,
-    "itens": [
-      {
-        "sku": "6942870305868",
-        "descricao": "Carregador de Bateria Fenix ARE-X11 SET",
-        "categoria": null,
-        "quantidade": 1,
-        "valor_unitario": 133.94,
-        "valor_total_item": 133.94
-      }
-    ],
-    "data_pedido": "2026-07-06",
-    "data_pagamento": null,
-    "data_envio": "2026-07-06",
-    "data_entrega": null,
-    "notas": null,
-    "sincronizado_bling_em": "2026-09-22T11:44:39.021Z",
-    "criado_em": "2026-09-22T11:44:39.021Z",
-    "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:39.021Z",
-    "atualizado_por": "bling-sync"
-  },
-  "ord_df9a90f5af1bf4d7": {
-    "id": "ord_df9a90f5af1bf4d7",
-    "bling_pedido_id": "26256593569",
-    "bling_numero": "26449",
-    "account_id": "acc_5822e378883e75a4",
+  "ord_05a8256998a63d2b": {
+    "id": "ord_05a8256998a63d2b",
+    "bling_pedido_id": "26230302834",
+    "bling_numero": "26421",
+    "account_id": "acc_bfc2dc3ace8a75b6",
     "opportunity_id": null,
     "referral_id": null,
     "vendedor_id": "boschetto",
     "status": "rascunho",
-    "valor_total": 950,
+    "valor_total": 402,
     "itens": [
       {
-        "sku": "MAG579",
-        "descricao": "Carregador Pmag, 10 Municoes, Calibre 7,62X51 /308Win, Short Action, Preto",
+        "sku": "CCIAMMOBLAZER",
+        "descricao": "Munição CCI Cal 22 LR Blazer Rimfire 40gr",
+        "categoria": null,
+        "quantidade": 250,
+        "valor_unitario": 1.608,
+        "valor_total_item": 402
+      }
+    ],
+    "data_pedido": "2026-07-02",
+    "data_pagamento": null,
+    "data_envio": "2026-07-02",
+    "data_entrega": null,
+    "notas": "RETIRADA NA LOJA!",
+    "sincronizado_bling_em": "2026-09-22T11:44:39.202Z",
+    "criado_em": "2026-09-22T11:44:39.202Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:39.202Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b77670948f26abdb": {
+    "id": "ord_b77670948f26abdb",
+    "bling_pedido_id": "26230210603",
+    "bling_numero": "26420",
+    "account_id": "acc_5e30486ea11a93f6",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "mathias",
+    "status": "rascunho",
+    "valor_total": 1758.7,
+    "itens": [
+      {
+        "sku": "BALDR RL MINI",
+        "descricao": "Lanterna para armas Olight Baldr RL Mini preta",
         "categoria": null,
         "quantidade": 1,
-        "valor_unitario": 950,
-        "valor_total_item": 950
-      }
-    ],
-    "data_pedido": "2026-07-06",
-    "data_pagamento": null,
-    "data_envio": "2026-07-06",
-    "data_entrega": null,
-    "notas": "frete gratis!",
-    "sincronizado_bling_em": "2026-09-22T11:44:39.790Z",
-    "criado_em": "2026-09-22T11:44:39.790Z",
-    "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:39.790Z",
-    "atualizado_por": "bling-sync"
-  },
-  "ord_7b4a5dd9a3ba27cf": {
-    "id": "ord_7b4a5dd9a3ba27cf",
-    "bling_pedido_id": "26256456445",
-    "bling_numero": "26448",
-    "account_id": "acc_76e259c946da338a",
-    "opportunity_id": null,
-    "referral_id": null,
-    "vendedor_id": "gerencia",
-    "status": "rascunho",
-    "valor_total": 882.92,
-    "itens": [
-      {
-        "sku": "VEC-SCRD-03",
-        "descricao": "Red Dot Condor 2x42 - Vector Optics SCRD-03",
-        "categoria": null,
-        "quantidade": 1,
-        "valor_unitario": 797.55,
-        "valor_total_item": 797.55
-      }
-    ],
-    "data_pedido": "2026-07-06",
-    "data_pagamento": null,
-    "data_envio": "2026-07-06",
-    "data_entrega": null,
-    "notas": null,
-    "sincronizado_bling_em": "2026-09-22T11:44:40.581Z",
-    "criado_em": "2026-09-22T11:44:40.581Z",
-    "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:40.581Z",
-    "atualizado_por": "bling-sync"
-  },
-  "ord_b5fb764374160a77": {
-    "id": "ord_b5fb764374160a77",
-    "bling_pedido_id": "26255199060",
-    "bling_numero": "26447",
-    "account_id": "acc_0ca4182eceed9e3c",
-    "opportunity_id": null,
-    "referral_id": null,
-    "vendedor_id": "gerencia",
-    "status": "rascunho",
-    "valor_total": 218.8,
-    "itens": [
-      {
-        "sku": "VEC-SCSC-07",
-        "descricao": "Protetor de Percursor (Snap Cap) Vector Optics, 12 GA, Ref: SCSC-07P",
-        "categoria": null,
-        "quantidade": 2,
-        "valor_unitario": 102,
-        "valor_total_item": 204
-      }
-    ],
-    "data_pedido": "2026-07-06",
-    "data_pagamento": null,
-    "data_envio": "2026-07-06",
-    "data_entrega": null,
-    "notas": "Nº Pedido Loja: 14936\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
-    "sincronizado_bling_em": "2026-09-22T11:44:41.360Z",
-    "criado_em": "2026-09-22T11:44:41.360Z",
-    "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:41.360Z",
-    "atualizado_por": "bling-sync"
-  },
-  "ord_dab829f4360a28e3": {
-    "id": "ord_dab829f4360a28e3",
-    "bling_pedido_id": "26251584066",
-    "bling_numero": "26446",
-    "account_id": "acc_6cdef5f5f6f50c46",
-    "opportunity_id": null,
-    "referral_id": null,
-    "vendedor_id": "gerencia",
-    "status": "rascunho",
-    "valor_total": 277.34,
-    "itens": [
-      {
-        "sku": "6942870304724",
-        "descricao": "Bateria Fenix Recarregável 18650 3500mAh 3.6V 12.6Wh De Íon de Lítio ARB-L18-3500U",
-        "categoria": null,
-        "quantidade": 1,
-        "valor_unitario": 260,
-        "valor_total_item": 260
-      }
-    ],
-    "data_pedido": "2026-07-05",
-    "data_pagamento": null,
-    "data_envio": "2026-07-05",
-    "data_entrega": null,
-    "notas": "Nº Pedido Loja: 6305\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
-    "sincronizado_bling_em": "2026-09-22T11:44:42.140Z",
-    "criado_em": "2026-09-22T11:44:42.140Z",
-    "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:42.140Z",
-    "atualizado_por": "bling-sync"
-  },
-  "ord_ffeb0c9be8001b70": {
-    "id": "ord_ffeb0c9be8001b70",
-    "bling_pedido_id": "26250296567",
-    "bling_numero": "26445",
-    "account_id": "acc_9bd7e361afea51af",
-    "opportunity_id": null,
-    "referral_id": null,
-    "vendedor_id": "gerencia",
-    "status": "rascunho",
-    "valor_total": 945.22,
-    "itens": [
+        "valor_unitario": 763.9,
+        "valor_total_item": 763.9
+      },
       {
         "sku": "VEC-SCRD-19II",
         "descricao": "Red Dot Frenzy 1x17x24 - Vector Optics",
@@ -40394,25 +41028,95 @@
         "valor_total_item": 911.95
       }
     ],
-    "data_pedido": "2026-07-05",
+    "data_pedido": "2026-07-02",
     "data_pagamento": null,
-    "data_envio": "2026-07-05",
+    "data_envio": "2026-07-02",
     "data_entrega": null,
-    "notas": "Nº Pedido Loja: 14934\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
-    "sincronizado_bling_em": "2026-09-22T11:44:42.913Z",
-    "criado_em": "2026-09-22T11:44:42.913Z",
+    "notas": "Pago com o cartão de Talita",
+    "sincronizado_bling_em": "2026-09-22T11:44:41.130Z",
+    "criado_em": "2026-09-22T11:44:41.130Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:42.913Z",
+    "atualizado_em": "2026-09-22T11:44:41.130Z",
     "atualizado_por": "bling-sync"
   },
-  "ord_94f863b9b65aa93e": {
-    "id": "ord_94f863b9b65aa93e",
-    "bling_pedido_id": "26250227751",
-    "bling_numero": "26444",
-    "account_id": "acc_199aad9df2936ebe",
+  "ord_4b46a4669f746f27": {
+    "id": "ord_4b46a4669f746f27",
+    "bling_pedido_id": "26227681291",
+    "bling_numero": "26419",
+    "account_id": "acc_af17ef83230f25da",
     "opportunity_id": null,
     "referral_id": null,
-    "vendedor_id": "gerencia",
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 1266.35,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-43",
+        "descricao": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1311.95,
+        "valor_total_item": 1311.95
+      }
+    ],
+    "data_pedido": "2026-07-02",
+    "data_pagamento": null,
+    "data_envio": "2026-07-02",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:41.892Z",
+    "criado_em": "2026-09-22T11:44:41.892Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:41.892Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_3150cac8b401d9fb": {
+    "id": "ord_3150cac8b401d9fb",
+    "bling_pedido_id": "26226027127",
+    "bling_numero": "26418",
+    "account_id": "acc_f756a147d1136cb5",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 1650.3,
+    "itens": [
+      {
+        "sku": "Ruger-90451",
+        "descricao": "Carregador Ruger 10/22, Calibre 22LR, 10 tiros - BX-1",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 367.2,
+        "valor_total_item": 367.2
+      },
+      {
+        "sku": "VEC-SCRD-M36",
+        "descricao": "Red Dot Frenzy 1x22x26 MOS Multi Reticular - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1283.1,
+        "valor_total_item": 1283.1
+      }
+    ],
+    "data_pedido": "2026-07-02",
+    "data_pagamento": null,
+    "data_envio": "2026-07-02",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:47.432Z",
+    "criado_em": "2026-09-22T11:44:47.432Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:47.432Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_22079aa87b6abe0e": {
+    "id": "ord_22079aa87b6abe0e",
+    "bling_pedido_id": "26226012637",
+    "bling_numero": "26417",
+    "account_id": "acc_f756a147d1136cb5",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
     "status": "rascunho",
     "valor_total": 1283.1,
     "itens": [
@@ -40425,120 +41129,874 @@
         "valor_total_item": 1283.1
       }
     ],
-    "data_pedido": "2026-07-05",
+    "data_pedido": "2026-07-02",
     "data_pagamento": null,
-    "data_envio": "2026-07-05",
+    "data_envio": "2026-07-02",
     "data_entrega": null,
-    "notas": "Nº Pedido Loja: 14932\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
-    "sincronizado_bling_em": "2026-09-22T11:44:43.662Z",
-    "criado_em": "2026-09-22T11:44:43.662Z",
+    "notas": "FRETE GRATIS!",
+    "sincronizado_bling_em": "2026-09-22T11:44:48.231Z",
+    "criado_em": "2026-09-22T11:44:48.231Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:43.662Z",
+    "atualizado_em": "2026-09-22T11:44:48.231Z",
     "atualizado_por": "bling-sync"
   },
-  "ord_4ac32e4fba7ea8e9": {
-    "id": "ord_4ac32e4fba7ea8e9",
-    "bling_pedido_id": "26284292578",
-    "bling_numero": "26466",
-    "account_id": "acc_0f672b93c10f1660",
+  "ord_67d1eb254d96d77c": {
+    "id": "ord_67d1eb254d96d77c",
+    "bling_pedido_id": "26225221818",
+    "bling_numero": "26416",
+    "account_id": "acc_432c7e5627c958c2",
     "opportunity_id": null,
     "referral_id": null,
     "vendedor_id": "gerencia",
     "status": "rascunho",
-    "valor_total": 541.28,
+    "valor_total": 50000.21,
     "itens": [
       {
-        "sku": "VEC-RSCFS-06",
-        "descricao": "Bipé de Fibra de Carbono 6-9\" Swivel Spring - Vector Optics",
+        "sku": "6942870307206",
+        "descricao": "Lanterna Tática Fenix TK30 Preta 500 Lumens",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 3198,
+        "valor_total_item": 6396
+      },
+      {
+        "sku": "6942870309118",
+        "descricao": "Kit Lanternas para Bike Fenix BC26R 1600 Lúmens + BC05R V2.0 15 Lúmens",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 1062,
+        "valor_total_item": 2124
+      },
+      {
+        "sku": "6942870309033-ID",
+        "descricao": "Lanterna Fenix PD36R Pro, preta, 2800 lúmens (ID)",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 1177.78,
+        "valor_total_item": 5888.9
+      },
+      {
+        "sku": "6942870308081",
+        "descricao": "Lanterna Fenix C6 V3.0, 1500 Lumens preta",
+        "categoria": null,
+        "quantidade": 20,
+        "valor_unitario": 432,
+        "valor_total_item": 8640
+      },
+      {
+        "sku": "6942870305295",
+        "descricao": "Lanterna de Cabeça Fenix HL40R Cinza 600 Lúmens",
+        "categoria": null,
+        "quantidade": 20,
+        "valor_unitario": 712,
+        "valor_total_item": 14240
+      },
+      {
+        "sku": "6942870308944-ID",
+        "descricao": "Lanterna Fenix E18R V2.0 1200 Lúmens Preta",
+        "categoria": null,
+        "quantidade": 10,
+        "valor_unitario": 764,
+        "valor_total_item": 7640
+      },
+      {
+        "sku": "6942870307794",
+        "descricao": "Lanterna Fenix E05R - 400 Lúmens (Verde)",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 349,
+        "valor_total_item": 1745
+      },
+      {
+        "sku": "6942870307787",
+        "descricao": "Lanterna Fenix E05R - 400 Lúmens (Marrom)",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 349,
+        "valor_total_item": 1745
+      },
+      {
+        "sku": "6942870308005",
+        "descricao": "Lanterna Fenix E05R - 400 Lúmens",
+        "categoria": null,
+        "quantidade": 15,
+        "valor_unitario": 349,
+        "valor_total_item": 5235
+      },
+      {
+        "sku": "6942870307657",
+        "descricao": "Lanterna manual Fenix E02R, 200  Lumens azul",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 273,
+        "valor_total_item": 546
+      },
+      {
+        "sku": "6942870307732",
+        "descricao": "Lanterna manual Fenix E02R, 200  Lumens preta",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 273,
+        "valor_total_item": 546
+      },
+      {
+        "sku": "6942870307664",
+        "descricao": "Lanterna manual Fenix E02R, 200  Lumens marrom",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 273,
+        "valor_total_item": 546
+      },
+      {
+        "sku": "6942870307350",
+        "descricao": "Lanterna manual Fenix E12 V2.0, 160 Lumens preta",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 300,
+        "valor_total_item": 1500
+      },
+      {
+        "sku": "6942870308012",
+        "descricao": "Lanterna EDC Fenix E09R - 600 Lúmens",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 465,
+        "valor_total_item": 2325
+      },
+      {
+        "sku": "6942870307404",
+        "descricao": "Lanterna EDC Fenix E03R - 260 Lúmens",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 300,
+        "valor_total_item": 1500
+      },
+      {
+        "sku": "6942870306650",
+        "descricao": "Lanterna Fenix E30R 1600 Lumens Preta",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 947,
+        "valor_total_item": 4735
+      },
+      {
+        "sku": "6942870306179",
+        "descricao": "Lanterna manual Fenix WF05E,  85 Lumens preta",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 415,
+        "valor_total_item": 2075
+      },
+      {
+        "sku": "6942870307886",
+        "descricao": "Lanterna manual Fenix WT16R, 300 Lumens preta",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 769,
+        "valor_total_item": 1538
+      },
+      {
+        "sku": "6942870307459",
+        "descricao": "Lanterna manual Fenix WT25R 1000 Lumens preta",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 946,
+        "valor_total_item": 1892
+      },
+      {
+        "sku": "6942870306537",
+        "descricao": "Lanterna Fenix WT50R 3200 Lumens",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 2948,
+        "valor_total_item": 5896
+      },
+      {
+        "sku": "6942870309095-ID",
+        "descricao": "Fenix T6 Penlight - Azul  (ID)",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 416,
+        "valor_total_item": 1664
+      },
+      {
+        "sku": "6942870309057-ID",
+        "descricao": "Fenix T6 Penlight - Preto  (ID)",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 416,
+        "valor_total_item": 1664
+      },
+      {
+        "sku": "6942870309026-ID",
+        "descricao": "Lanterna Fenix WF26R 3000 lumens (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 1604,
+        "valor_total_item": 3208
+      },
+      {
+        "sku": "6942870314303-ID",
+        "descricao": "Lanterna Fenix E06R Pro Preta 700 lumens (ID)",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 913.5,
+        "valor_total_item": 3654
+      },
+      {
+        "sku": "6942870310510-ID",
+        "descricao": "Lanterna Tática Fenix LR60R 21000 Lumens Preto  (ID)",
         "categoria": null,
         "quantidade": 1,
-        "valor_unitario": 543,
-        "valor_total_item": 543
-      }
-    ],
-    "data_pedido": "2026-07-04",
-    "data_pagamento": null,
-    "data_envio": "2026-07-08",
-    "data_entrega": null,
-    "notas": "Nº Pedido Loja: 14930\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
-    "sincronizado_bling_em": "2026-09-22T11:44:44.420Z",
-    "criado_em": "2026-09-22T11:44:44.420Z",
-    "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:44.420Z",
-    "atualizado_por": "bling-sync"
-  },
-  "ord_709fa17cd196c316": {
-    "id": "ord_709fa17cd196c316",
-    "bling_pedido_id": "26278480215",
-    "bling_numero": "26462",
-    "account_id": "acc_d196ca6aa4c3e008",
-    "opportunity_id": null,
-    "referral_id": null,
-    "vendedor_id": "gerencia",
-    "status": "rascunho",
-    "valor_total": 3594.82,
-    "itens": [
+        "valor_unitario": 5245.5,
+        "valor_total_item": 5245.5
+      },
       {
-        "sku": "PL-MINI2 Valkyrie (Desert Tan)",
-        "descricao": "Lanterna para armas Olight PL-Mini 2 Valkyrie Desert Tan",
+        "sku": "6942870312378-ID",
+        "descricao": "Lanterna de Cabeça Fenix HM55R Preta 1200 lumens (ID)",
         "categoria": null,
-        "quantidade": 6,
-        "valor_unitario": 624.99,
-        "valor_total_item": 3749.94
-      }
-    ],
-    "data_pedido": "2026-07-04",
-    "data_pagamento": null,
-    "data_envio": "2026-07-08",
-    "data_entrega": null,
-    "notas": "Nº Pedido Loja: 14926\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
-    "sincronizado_bling_em": "2026-09-22T11:44:45.172Z",
-    "criado_em": "2026-09-22T11:44:45.172Z",
-    "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:45.172Z",
-    "atualizado_por": "bling-sync"
-  },
-  "ord_4cdca3ebca8dc78e": {
-    "id": "ord_4cdca3ebca8dc78e",
-    "bling_pedido_id": "26246422842",
-    "bling_numero": "26443",
-    "account_id": "acc_667aad1e9eaeec7f",
-    "opportunity_id": null,
-    "referral_id": null,
-    "vendedor_id": "gerencia",
-    "status": "rascunho",
-    "valor_total": 615.15,
-    "itens": [
+        "quantidade": 8,
+        "valor_unitario": 938.6,
+        "valor_total_item": 7508.8
+      },
       {
-        "sku": "PL-MINI2 Valkyrie",
-        "descricao": "Lanterna para armas Olight PL-Mini 2 Valkyrie preta",
+        "sku": "6942870311074-ID",
+        "descricao": "Lanterna de Cabeça Fenix HP35R Preta 4000 lumens (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 2861.2,
+        "valor_total_item": 5722.4
+      },
+      {
+        "sku": "6942870309538-ID",
+        "descricao": "Lanterna de cabeca Fenix HM71R, 2700 Lumens, (ID)",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 1374,
+        "valor_total_item": 5496
+      },
+      {
+        "sku": "6942870310671-ID",
+        "descricao": "Lanterna de Cabeça Fenix HM75R 1600 lumens (ID)",
+        "categoria": null,
+        "quantidade": 4,
+        "valor_unitario": 2124.2,
+        "valor_total_item": 8496.8
+      },
+      {
+        "sku": "6942870312651-ID",
+        "descricao": "Lanterna Tática Fenix PD35R ACE + CL01 - 2000 Lúmens (ID)",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 944.44,
+        "valor_total_item": 4722.200000000001
+      },
+      {
+        "sku": "6942870312439-ID",
+        "descricao": "Lanterna Tática Fenix PD36R ACE - 3000 Lúmens (ID)",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 1277,
+        "valor_total_item": 6385
+      },
+      {
+        "sku": "6942870312200-ID",
+        "descricao": "Lanterna Fenix TK35R, preta 5800 Lumens (ID)",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 2496,
+        "valor_total_item": 12480
+      },
+      {
+        "sku": "6942870311005-ID",
+        "descricao": "Lanterna Fenix TK05R, preta 1000 Lumens (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 1008,
+        "valor_total_item": 2016
+      },
+      {
+        "sku": "6942870309989-ID",
+        "descricao": "Lanterna Fenix PD40R V3.0 3000 Lúmens (ID)",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 1533,
+        "valor_total_item": 7665
+      },
+      {
+        "sku": "6942870306216",
+        "descricao": "Lanterna Camping Fenix CL26R Preta 400 Lumens",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 712,
+        "valor_total_item": 1424
+      },
+      {
+        "sku": "6942870306636",
+        "descricao": "Lanterna manual Fenix WF11E, 200 Lumens laranja",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 712,
+        "valor_total_item": 3560
+      },
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna Fenix TK16 V2.0 - 3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 1151,
+        "valor_total_item": 5755
+      },
+      {
+        "sku": "6942870308067-ID",
+        "descricao": "Lanterna Fenix LR80R, preta,18000 Lumens (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 5694,
+        "valor_total_item": 11388
+      },
+      {
+        "sku": "6942870307817-ID",
+        "descricao": "Lanterna Fenix LR50R, preta 12000 Lumens (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 4074,
+        "valor_total_item": 8148
+      },
+      {
+        "sku": "6942870308180",
+        "descricao": "Lanterna manual Fenix PD35 V3.0, 1700 Lumens preta",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 833.33,
+        "valor_total_item": 4166.650000000001
+      },
+      {
+        "sku": "6942870307534",
+        "descricao": "Lanterna Fenix E01 V2.0 100 Lumens (ID) Azul",
+        "categoria": null,
+        "quantidade": 10,
+        "valor_unitario": 170,
+        "valor_total_item": 1700
+      },
+      {
+        "sku": "6942870307510",
+        "descricao": "Lanterna Fenix E01 V2.0 100 Lumens Preta",
+        "categoria": null,
+        "quantidade": 20,
+        "valor_unitario": 170,
+        "valor_total_item": 3400
+      },
+      {
+        "sku": "6942870306391-ID",
+        "descricao": "Carregador de Baterias Fenix ARE-A4 (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 497,
+        "valor_total_item": 994
+      },
+      {
+        "sku": "6942870303840",
+        "descricao": "Lanterna Fenix SD20 1000 Lúmens Preta",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 1297,
+        "valor_total_item": 6485
+      },
+      {
+        "sku": "6942870303918",
+        "descricao": "Lanterna para Camping Fenix CL30R 650 Lumens Preta",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 1291,
+        "valor_total_item": 2582
+      },
+      {
+        "sku": "6942870304588",
+        "descricao": "Lanterna Fenix SD11 1000 Lúmens Preta",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 1123,
+        "valor_total_item": 5615
+      },
+      {
+        "sku": "6942870307213",
+        "descricao": "Lanterna Fenix HT18 Preta 1500 Lumens",
         "categoria": null,
         "quantidade": 1,
-        "valor_unitario": 624.99,
-        "valor_total_item": 624.99
+        "valor_unitario": 1537,
+        "valor_total_item": 1537
+      },
+      {
+        "sku": "6942870310541K-ID",
+        "descricao": "Lanterna Fenix HT18R Preta 2800 lumens + ALG-18 + AER-05 (ID)",
+        "categoria": null,
+        "quantidade": 10,
+        "valor_unitario": 2150,
+        "valor_total_item": 21500
+      },
+      {
+        "sku": "6942870310268-ID",
+        "descricao": "Lanterna Fenix HT32 Preta 2500 Lumens (ID)",
+        "categoria": null,
+        "quantidade": 10,
+        "valor_unitario": 2015,
+        "valor_total_item": 20150
+      },
+      {
+        "sku": "6942870309002-ID",
+        "descricao": "Lanterna Fenix HT30R - 500 Lúmens  (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 3294,
+        "valor_total_item": 6588
+      },
+      {
+        "sku": "6942870306452-ID",
+        "descricao": "Carregador para baterias Fenix ARE-A2 (USA Plug) (ID)",
+        "categoria": null,
+        "quantidade": 5,
+        "valor_unitario": 294,
+        "valor_total_item": 1470
+      },
+      {
+        "sku": "6942870308494-ID",
+        "descricao": "Lanterna de bicicleta Fenix BC26R, preta 1600 Lumens (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 1031,
+        "valor_total_item": 2062
+      },
+      {
+        "sku": "6942870305950",
+        "descricao": "Lanterna de bicicleta Fenix BC25R, 600 Lumens, preta",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 592,
+        "valor_total_item": 1184
+      },
+      {
+        "sku": "6942870308043",
+        "descricao": "Lanterna manual Fenix WF30RE,  280 Lumens preta",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 1159,
+        "valor_total_item": 2318
+      },
+      {
+        "sku": "6942870306902-ID",
+        "descricao": "Acionador remoto para Lanterna Fenix AER-02 V2.0 (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 270,
+        "valor_total_item": 540
+      },
+      {
+        "sku": "6942870306919",
+        "descricao": "Acionador remoto para Lanterna Fenix AER-03 V2.0",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 270,
+        "valor_total_item": 540
+      },
+      {
+        "sku": "6942870307800",
+        "descricao": "Acionador remoto para lanterna,  Fenix AER-05",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 270,
+        "valor_total_item": 540
+      },
+      {
+        "sku": "6942870309132",
+        "descricao": "Acionador remoto para Lanterna Fenix AER-06S",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 485,
+        "valor_total_item": 970
+      },
+      {
+        "sku": "6942870307671-ID",
+        "descricao": "Acionador remoto para lanterna,  Fenix AER-04 (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 270,
+        "valor_total_item": 540
+      },
+      {
+        "sku": "6942870307428-ID",
+        "descricao": "Coldre para Lanterna Fenix ALP-10S (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 132,
+        "valor_total_item": 264
+      },
+      {
+        "sku": "6942870311159-ID",
+        "descricao": "Bateria Fenix Recarregável  21700 6000mAh 3.6V 21.6Wh De Íon de Lítio ARB-L21-6000 (ID)",
+        "categoria": null,
+        "quantidade": 8,
+        "valor_unitario": 373,
+        "valor_total_item": 2984
+      },
+      {
+        "sku": "6942870304724",
+        "descricao": "Bateria Fenix Recarregável 18650 3500mAh 3.6V 12.6Wh De Íon de Lítio ARB-L18-3500U",
+        "categoria": null,
+        "quantidade": 8,
+        "valor_unitario": 260,
+        "valor_total_item": 2080
+      },
+      {
+        "sku": "6942870304595",
+        "descricao": "Bateria Fenix Recarregável 18650 2600mAh 3.6V 9.36Wh De Íon de Lítio ARB-L18-2600U",
+        "categoria": null,
+        "quantidade": 12,
+        "valor_unitario": 146,
+        "valor_total_item": 1752
+      },
+      {
+        "sku": "6942870305417",
+        "descricao": "Lanterna manual Fenix TK72R ,  9000 Lumens preta",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 4000.3,
+        "valor_total_item": 8000.6
+      },
+      {
+        "sku": "6942870307190",
+        "descricao": "Lanterna Tática Fenix TK26R Preta 1500 Lumens",
+        "categoria": null,
+        "quantidade": 10,
+        "valor_unitario": 1417,
+        "valor_total_item": 14170
+      },
+      {
+        "sku": "6942870311098-ID",
+        "descricao": "Bateria Fenix Recarregável 18650 4000mAh 3.6V 14.4Wh De Íon de Lítio ARB-L18-4000 (ID)",
+        "categoria": null,
+        "quantidade": 8,
+        "valor_unitario": 266.67,
+        "valor_total_item": 2133.36
+      },
+      {
+        "sku": "6942870303505",
+        "descricao": "Bateria Fenix Recarregável 18650 3500mAh 3.6V 12.6Wh De Íon de Lítio ARB-L18-3500",
+        "categoria": null,
+        "quantidade": 8,
+        "valor_unitario": 250,
+        "valor_total_item": 2000
+      },
+      {
+        "sku": "6942870369358",
+        "descricao": "Bateria Fenix Recarregável 21700 5000mAh 3.6V 18Wh De Íon de Lítio ARB-L21-5000U",
+        "categoria": null,
+        "quantidade": 36,
+        "valor_unitario": 320,
+        "valor_total_item": 11520
+      },
+      {
+        "sku": "6942870308616",
+        "descricao": "Lanterna para Armas Fenix GL22",
+        "categoria": null,
+        "quantidade": 10,
+        "valor_unitario": 1379,
+        "valor_total_item": 13790
+      },
+      {
+        "sku": "6942870311524-ID",
+        "descricao": "Lanterna para arma Fenix GL19R V2.0 1200 lumens (ID)",
+        "categoria": null,
+        "quantidade": 10,
+        "valor_unitario": 1235.6,
+        "valor_total_item": 12356
       }
     ],
-    "data_pedido": "2026-07-04",
+    "data_pedido": "2026-07-02",
     "data_pagamento": null,
-    "data_envio": "2026-07-04",
+    "data_envio": "2026-07-02",
     "data_entrega": null,
-    "notas": "Nº Pedido Loja: 14928\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
-    "sincronizado_bling_em": "2026-09-22T11:44:45.960Z",
-    "criado_em": "2026-09-22T11:44:45.960Z",
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:48.993Z",
+    "criado_em": "2026-09-22T11:44:48.993Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:45.960Z",
+    "atualizado_em": "2026-09-22T11:44:48.993Z",
     "atualizado_por": "bling-sync"
   },
-  "ord_453d5c2ca2adca57": {
-    "id": "ord_453d5c2ca2adca57",
-    "bling_pedido_id": "26242569400",
-    "bling_numero": "26442",
-    "account_id": "acc_b6f5b110645e9490",
+  "ord_034ad3a6c6301a15": {
+    "id": "ord_034ad3a6c6301a15",
+    "bling_pedido_id": "26225183128",
+    "bling_numero": "26415",
+    "account_id": "acc_d63cdae41562bd07",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 53.9,
+    "itens": [
+      {
+        "sku": "BOPE-PRETA-M",
+        "descricao": "Camiseta Estampada BOPE Preta - Tamanho M",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 53.9,
+        "valor_total_item": 53.9
+      }
+    ],
+    "data_pedido": "2026-07-02",
+    "data_pagamento": null,
+    "data_envio": "2026-07-02",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:49.791Z",
+    "criado_em": "2026-09-22T11:44:49.791Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:49.791Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_2886bad4f9cb100f": {
+    "id": "ord_2886bad4f9cb100f",
+    "bling_pedido_id": "26224159938",
+    "bling_numero": "26414",
+    "account_id": "acc_c70f5403853edef8",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 3000,
+    "itens": [
+      {
+        "sku": "VEC-SCFF-26",
+        "descricao": "Luneta Vector Optics Marksman 6-24x50 FFP",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 2800,
+        "valor_total_item": 2800
+      },
+      {
+        "sku": "3030-00003-V",
+        "descricao": "Meia de Protecao 30-30Outdoors para Armas e Acessorios  tamanho G Verde",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 100,
+        "valor_total_item": 100
+      }
+    ],
+    "data_pedido": "2026-07-02",
+    "data_pagamento": null,
+    "data_envio": "2026-07-02",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:50.565Z",
+    "criado_em": "2026-09-22T11:44:50.565Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:50.565Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_bb16d0dc2c6c0d4a": {
+    "id": "ord_bb16d0dc2c6c0d4a",
+    "bling_pedido_id": "26220425351",
+    "bling_numero": "26413",
+    "account_id": "acc_3552409494498ac1",
     "opportunity_id": null,
     "referral_id": null,
     "vendedor_id": "gerencia",
     "status": "rascunho",
-    "valor_total": 866.35,
+    "valor_total": 206.2,
+    "itens": [
+      {
+        "sku": "VEC-RDSL15",
+        "descricao": "Mira Red Dot Z1 1x23x34 - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 195,
+        "valor_total_item": 195
+      }
+    ],
+    "data_pedido": "2026-07-01",
+    "data_pagamento": null,
+    "data_envio": "2026-07-01",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14904\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T11:44:51.337Z",
+    "criado_em": "2026-09-22T11:44:51.337Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:51.337Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_caeac119083b4fec": {
+    "id": "ord_caeac119083b4fec",
+    "bling_pedido_id": "26219562636",
+    "bling_numero": "26412",
+    "account_id": "acc_f2a07dd06f44fecb",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "mathias",
+    "status": "rascunho",
+    "valor_total": 88,
+    "itens": [
+      {
+        "sku": "10075-0001",
+        "descricao": "Bandoleira 1 Ponta Cal 12 - Preto",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 88,
+        "valor_total_item": 88
+      }
+    ],
+    "data_pedido": "2026-07-01",
+    "data_pagamento": null,
+    "data_envio": "2026-07-01",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:52.126Z",
+    "criado_em": "2026-09-22T11:44:52.126Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:52.126Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_71d0980e16ee13f2": {
+    "id": "ord_71d0980e16ee13f2",
+    "bling_pedido_id": "26218895511",
+    "bling_numero": "26411",
+    "account_id": "acc_11f3d7c126bd1c4e",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 136.85,
+    "itens": [
+      {
+        "sku": "VEC-SCRA-59",
+        "descricao": "Trilho para acoplar Luneta/Red Dot  0,83\" - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 61,
+        "valor_total_item": 61
+      },
+      {
+        "sku": "VEC-SCRA-60",
+        "descricao": "Trilho para acoplar Luneta/Red Dot  1\" - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 61,
+        "valor_total_item": 61
+      }
+    ],
+    "data_pedido": "2026-07-01",
+    "data_pagamento": null,
+    "data_envio": "2026-07-01",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14902\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T11:44:52.904Z",
+    "criado_em": "2026-09-22T11:44:52.904Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:52.904Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_f6d5e63ddf9eebe0": {
+    "id": "ord_f6d5e63ddf9eebe0",
+    "bling_pedido_id": "26218208629",
+    "bling_numero": "26410",
+    "account_id": "acc_6b051154ec4958f1",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "mathias",
+    "status": "rascunho",
+    "valor_total": 687.51,
+    "itens": [
+      {
+        "sku": "BALDR RL MINI",
+        "descricao": "Lanterna para armas Olight Baldr RL Mini preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 687.51,
+        "valor_total_item": 687.51
+      }
+    ],
+    "data_pedido": "2026-07-01",
+    "data_pagamento": null,
+    "data_envio": "2026-07-01",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:53.683Z",
+    "criado_em": "2026-09-22T11:44:53.683Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:53.683Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_75bf00a7a3fb4abe": {
+    "id": "ord_75bf00a7a3fb4abe",
+    "bling_pedido_id": "26215716732",
+    "bling_numero": "26409",
+    "account_id": "acc_03deaa3cd1eb6fae",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 286,
+    "itens": [
+      {
+        "sku": "6942870311104-ID",
+        "descricao": "Bateria Fenix Recarregável 18650 3400mAh 3.6V 12.24Wh De Íon de Lítio ARB-L18-3400U V3.0 (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 246,
+        "valor_total_item": 246
+      }
+    ],
+    "data_pedido": "2026-07-01",
+    "data_pagamento": null,
+    "data_envio": "2026-07-01",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:54.463Z",
+    "criado_em": "2026-09-22T11:44:54.463Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:54.463Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_b36463f19e659a9e": {
+    "id": "ord_b36463f19e659a9e",
+    "bling_pedido_id": "26214649650",
+    "bling_numero": "26408",
+    "account_id": "acc_f33bb245a39da6ff",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 134,
+    "itens": [
+      {
+        "sku": "CBC-10001834",
+        "descricao": "Espoleta FULMIN CBC 1 1/2 S.PISTOL",
+        "categoria": null,
+        "quantidade": 100,
+        "valor_unitario": 1.34,
+        "valor_total_item": 134
+      }
+    ],
+    "data_pedido": "2026-07-01",
+    "data_pagamento": null,
+    "data_envio": "2026-07-01",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:55.249Z",
+    "criado_em": "2026-09-22T11:44:55.249Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:55.249Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_887c3e0998353470": {
+    "id": "ord_887c3e0998353470",
+    "bling_pedido_id": "26208845209",
+    "bling_numero": "26407",
+    "account_id": "acc_67d1bcfc1290dfe2",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "mathias",
+    "status": "rascunho",
+    "valor_total": 901.2,
     "itens": [
       {
         "sku": "VEC-SCRD-19II",
@@ -40549,108 +42007,279 @@
         "valor_total_item": 911.95
       }
     ],
-    "data_pedido": "2026-07-04",
+    "data_pedido": "2026-06-30",
     "data_pagamento": null,
-    "data_envio": "2026-07-04",
+    "data_envio": "2026-06-30",
     "data_entrega": null,
-    "notas": "Nº Pedido Loja: 14924\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
-    "sincronizado_bling_em": "2026-09-22T11:44:46.742Z",
-    "criado_em": "2026-09-22T11:44:46.742Z",
+    "notas": "Nº Pedido Loja: 14900\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T11:44:56.037Z",
+    "criado_em": "2026-09-22T11:44:56.037Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:46.742Z",
+    "atualizado_em": "2026-09-22T11:44:56.037Z",
     "atualizado_por": "bling-sync"
   },
-  "ord_e5d23ba8a26a9c2b": {
-    "id": "ord_e5d23ba8a26a9c2b",
-    "bling_pedido_id": "26241925801",
-    "bling_numero": "26441",
-    "account_id": "acc_104fbae290eea5da",
+  "ord_7dfbf4ec47058adb": {
+    "id": "ord_7dfbf4ec47058adb",
+    "bling_pedido_id": "26208376464",
+    "bling_numero": "26406",
+    "account_id": "acc_d4209e61eaaf25be",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1235.6,
+    "itens": [
+      {
+        "sku": "6942870311524-ID",
+        "descricao": "Lanterna para arma Fenix GL19R V2.0 1200 lumens (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1235.6,
+        "valor_total_item": 1235.6
+      }
+    ],
+    "data_pedido": "2026-06-30",
+    "data_pagamento": null,
+    "data_envio": "2026-06-30",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6299\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T11:44:56.846Z",
+    "criado_em": "2026-09-22T11:44:56.846Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:56.846Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_9836d5abf1079bf3": {
+    "id": "ord_9836d5abf1079bf3",
+    "bling_pedido_id": "26207818599",
+    "bling_numero": "26405",
+    "account_id": "acc_57069cfeda89a7a8",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 265.08,
+    "itens": [
+      {
+        "sku": "6942870303680",
+        "descricao": "Lanterna Tática Fenix PD32 Preta 900 lúmens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 265.8,
+        "valor_total_item": 265.8
+      }
+    ],
+    "data_pedido": "2026-06-30",
+    "data_pagamento": null,
+    "data_envio": "2026-06-30",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14898\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-22T11:44:57.622Z",
+    "criado_em": "2026-09-22T11:44:57.622Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:57.622Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_0a86561a4ea148dc": {
+    "id": "ord_0a86561a4ea148dc",
+    "bling_pedido_id": "26207400307",
+    "bling_numero": "26404",
+    "account_id": "acc_ba339b95785394e8",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1593.7,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-47",
+        "descricao": "Luneta Vector Optics Scrapper 1-29x SCRD-47",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1643.2,
+        "valor_total_item": 1643.2
+      }
+    ],
+    "data_pedido": "2026-06-30",
+    "data_pagamento": null,
+    "data_envio": "2026-06-30",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14896\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T11:44:58.442Z",
+    "criado_em": "2026-09-22T11:44:58.442Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:58.442Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_568cb21d21d8bb17": {
+    "id": "ord_568cb21d21d8bb17",
+    "bling_pedido_id": "26206418248",
+    "bling_numero": "26403",
+    "account_id": "acc_16651a8d47931e91",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 44,
+    "itens": [
+      {
+        "sku": "GS-04",
+        "descricao": "Cilindro Swiss Arms Co2 12g",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 44,
+        "valor_total_item": 44
+      }
+    ],
+    "data_pedido": "2026-06-30",
+    "data_pagamento": null,
+    "data_envio": "2026-06-30",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:59.202Z",
+    "criado_em": "2026-09-22T11:44:59.202Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:44:59.202Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_c09c48f52d2bcf0d": {
+    "id": "ord_c09c48f52d2bcf0d",
+    "bling_pedido_id": "26205804202",
+    "bling_numero": "26402",
+    "account_id": "acc_98baa87a06c1bfcf",
     "opportunity_id": null,
     "referral_id": null,
     "vendedor_id": "dickmann",
     "status": "rascunho",
-    "valor_total": 364.12,
+    "valor_total": 685,
     "itens": [
       {
-        "sku": "VEC-OPSL20",
-        "descricao": "Luneta Vector Optics  Victoroptics PAC, amplitude de 3-9x, objetiva de 40mm",
+        "sku": "CBC-10025866",
+        "descricao": "Munição CBC Cal. 5,56x45mm Comum M193 Treina 55gr",
+        "categoria": null,
+        "quantidade": 50,
+        "valor_unitario": 12.2,
+        "valor_total_item": 610
+      },
+      {
+        "sku": "WAR-2490",
+        "descricao": "Bolsa Warfare Recon Preto",
         "categoria": null,
         "quantidade": 1,
-        "valor_unitario": 330.85,
-        "valor_total_item": 330.85
+        "valor_unitario": 75,
+        "valor_total_item": 75
       }
     ],
-    "data_pedido": "2026-07-03",
+    "data_pedido": "2026-06-30",
     "data_pagamento": null,
-    "data_envio": "2026-07-03",
+    "data_envio": "2026-06-30",
     "data_entrega": null,
-    "notas": "Nº Pedido Loja: 14922\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
-    "sincronizado_bling_em": "2026-09-22T11:44:47.540Z",
-    "criado_em": "2026-09-22T11:44:47.540Z",
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:44:59.951Z",
+    "criado_em": "2026-09-22T11:44:59.951Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:47.540Z",
+    "atualizado_em": "2026-09-22T11:44:59.951Z",
     "atualizado_por": "bling-sync"
   },
-  "ord_624f8e3be5f72e09": {
-    "id": "ord_624f8e3be5f72e09",
-    "bling_pedido_id": "26241755577",
-    "bling_numero": "26440",
-    "account_id": "acc_77e13f3cd8d288d5",
+  "ord_d52108da72216781": {
+    "id": "ord_d52108da72216781",
+    "bling_pedido_id": "26205639706",
+    "bling_numero": "26401",
+    "account_id": "acc_52f1c10295b71dc5",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 321.6,
+    "itens": [
+      {
+        "sku": "CCIAMMOBLAZER",
+        "descricao": "Munição CCI Cal 22 LR Blazer Rimfire 40gr",
+        "categoria": null,
+        "quantidade": 200,
+        "valor_unitario": 1.608,
+        "valor_total_item": 321.6
+      }
+    ],
+    "data_pedido": "2026-06-30",
+    "data_pagamento": null,
+    "data_envio": "2026-06-30",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T11:45:00.742Z",
+    "criado_em": "2026-09-22T11:45:00.742Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T11:45:00.742Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_2267ca76ab88b6ff": {
+    "id": "ord_2267ca76ab88b6ff",
+    "bling_pedido_id": "26201058260",
+    "bling_numero": "26400",
+    "account_id": "acc_dbba9eac7f0cb99e",
     "opportunity_id": null,
     "referral_id": null,
     "vendedor_id": "gerencia",
     "status": "rascunho",
-    "valor_total": 519.91,
+    "valor_total": 413,
     "itens": [
       {
-        "sku": "03MIR00007B",
-        "descricao": "TM007 - Limited / Stock / Match",
+        "sku": "6942870308241-ID",
+        "descricao": "Lanterna Traseira para Bike BC05R V2.0 15 Lúmens (ID)",
         "categoria": null,
         "quantidade": 1,
-        "valor_unitario": 522,
-        "valor_total_item": 522
+        "valor_unitario": 228,
+        "valor_total_item": 228
+      },
+      {
+        "sku": "6942870308296-ID",
+        "descricao": "Carregador de Baterias Fenix ARE-X1 V2.0 (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 158,
+        "valor_total_item": 158
       }
     ],
-    "data_pedido": "2026-07-03",
+    "data_pedido": "2026-06-29",
     "data_pagamento": null,
-    "data_envio": "2026-07-03",
+    "data_envio": "2026-06-29",
     "data_entrega": null,
-    "notas": "Nº Pedido Loja: 14920\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
-    "sincronizado_bling_em": "2026-09-22T11:44:49.500Z",
-    "criado_em": "2026-09-22T11:44:49.500Z",
+    "notas": "Nº Pedido Loja: 6297\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\nNº de série: 0WC21200255",
+    "sincronizado_bling_em": "2026-09-22T11:45:01.530Z",
+    "criado_em": "2026-09-22T11:45:01.530Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:49.500Z",
+    "atualizado_em": "2026-09-22T11:45:01.530Z",
     "atualizado_por": "bling-sync"
   },
-  "ord_c9070cc841a0b225": {
-    "id": "ord_c9070cc841a0b225",
-    "bling_pedido_id": "26240907321",
-    "bling_numero": "26439",
-    "account_id": "acc_9da0032e33fbd7b9",
+  "ord_f23a97c82f71736c": {
+    "id": "ord_f23a97c82f71736c",
+    "bling_pedido_id": "26200626815",
+    "bling_numero": "26399",
+    "account_id": "acc_d538e97356cc1489",
     "opportunity_id": null,
     "referral_id": null,
     "vendedor_id": "gerencia",
     "status": "rascunho",
-    "valor_total": 418.53,
+    "valor_total": 1046.43,
     "itens": [
       {
-        "sku": "X-WM03",
-        "descricao": "Suporte de lanterna (mount) Olight X-WM03",
+        "sku": "6942870309446-ID",
+        "descricao": "Lanterna de cabeca Fenix HM61R V2.0 1600 Lumens (ID)",
         "categoria": null,
         "quantidade": 1,
-        "valor_unitario": 389.9,
-        "valor_total_item": 389.9
+        "valor_unitario": 1031,
+        "valor_total_item": 1031
       }
     ],
-    "data_pedido": "2026-07-03",
+    "data_pedido": "2026-06-29",
     "data_pagamento": null,
-    "data_envio": "2026-07-03",
+    "data_envio": "2026-06-29",
     "data_entrega": null,
-    "notas": "Nº Pedido Loja: 14918\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
-    "sincronizado_bling_em": "2026-09-22T11:44:50.298Z",
-    "criado_em": "2026-09-22T11:44:50.298Z",
+    "notas": "Nº Pedido Loja: 6295\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-22T11:45:02.303Z",
+    "criado_em": "2026-09-22T11:45:02.303Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:50.298Z",
+    "atualizado_em": "2026-09-22T11:45:02.303Z",
     "atualizado_por": "bling-sync"
   }
 }
