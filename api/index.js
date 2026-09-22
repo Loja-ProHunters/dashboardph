@@ -39,6 +39,7 @@ const blingApi        = require('../lib/bling/api');
 const blingBackfill   = require('../lib/bling/backfill');
 const blingVendedores = require('../lib/bling/vendedores');
 const blingSync       = require('../lib/bling/sync');
+const blingContasReceber = require('../lib/bling/contasReceber');
 const { getFile: _ghGet, saveFile: _ghSave } = require('../lib/githubStore');
 
 // Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
@@ -1732,6 +1733,31 @@ module.exports = async (req, res) => {
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ account, orders, activities }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/ficha/:accountId/contas-abertas — contas a receber em aberto
+  // Busca AO VIVO no Bling (Pro Hunters + Calibre) porque contas mudam constantemente
+  // (pagamentos entrando). Não guarda cache no CRM. Retorna consolidado.
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/ficha\/[a-zA-Z0-9_\-]+\/contas-abertas$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const accId = url.split('/')[4];
+      const account = await crmStore.getDoc('accounts', accId);
+      if (!account) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Cliente não encontrado'})); return; }
+      const cpf = account.cpf_cnpj || null;
+      const idsPorConta = account.bling_contato_id_por_conta || {};
+      // Fallback: se o account só tem bling_contato_id (legado), aponta ele pra 'prohunters'
+      if (!Object.keys(idsPorConta).length && account.bling_contato_id) {
+        idsPorConta.prohunters = String(account.bling_contato_id);
+      }
+      const r = await blingContasReceber.buscarEmAbertoDoCliente({ cpf, idsPorConta });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, account_id: accId, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
     return;
   }
 
