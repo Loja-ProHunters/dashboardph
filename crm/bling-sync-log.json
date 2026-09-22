@@ -1,5 +1,13 @@
 [
   {
+    "ts": "2026-09-22T17:21:15.061Z",
+    "tipo": "backfill_iniciado",
+    "contaId": "calibre",
+    "meses": 12,
+    "total_pedidos": 369,
+    "iniciado_por": "gerencia"
+  },
+  {
     "ts": "2026-09-22T16:47:54.414Z",
     "tipo": "backfill_concluido",
     "contaId": "calibre",
