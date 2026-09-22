@@ -69437,5 +69437,424 @@
     "criado_por": "bling-sync",
     "atualizado_em": "2026-09-22T12:18:46.163Z",
     "atualizado_por": "bling-sync"
+  },
+  "ord_98146af866c71917": {
+    "id": "ord_98146af866c71917",
+    "bling_pedido_id": "25077282397",
+    "bling_numero": "25618",
+    "account_id": "acc_910e2a1f0d283b1c",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 834,
+    "itens": [
+      {
+        "sku": "03PER00006B-ID",
+        "descricao": "Percursor Tanfoglio compatível com pistolas do modelo FT (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 685,
+        "valor_total_item": 685
+      },
+      {
+        "sku": "03MOL00002-ID",
+        "descricao": "Mola do percussor Tanfóglio para os modelos FT (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 79,
+        "valor_total_item": 79
+      }
+    ],
+    "data_pedido": "2026-02-12",
+    "data_pagamento": null,
+    "data_envio": "2026-02-12",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:19:37.664Z",
+    "criado_em": "2026-09-22T12:19:37.664Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:19:37.664Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_9562e80d6db402aa": {
+    "id": "ord_9562e80d6db402aa",
+    "bling_pedido_id": "25074369277",
+    "bling_numero": "25617",
+    "account_id": "acc_e7ed9d8d3ad1cf1a",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 853.58,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-60",
+        "descricao": "Red Dot Maverick-IV 1x20 MiniMIL - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 853.58,
+        "valor_total_item": 853.58
+      }
+    ],
+    "data_pedido": "2026-02-12",
+    "data_pagamento": null,
+    "data_envio": "2026-02-12",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:19:38.413Z",
+    "criado_em": "2026-09-22T12:19:38.413Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:19:38.413Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_9d197b6c3ad07281": {
+    "id": "ord_9d197b6c3ad07281",
+    "bling_pedido_id": "25072468019",
+    "bling_numero": "25616",
+    "account_id": "acc_e71fe62a4ef77466",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 164.13,
+    "itens": [
+      {
+        "sku": "VEC-SCRA-31",
+        "descricao": "Trilho para acoplar Luneta/RedDot comprimento 3,9\" - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 84,
+        "valor_total_item": 84
+      },
+      {
+        "sku": "VEC-SCRA-60",
+        "descricao": "Trilho para acoplar Luneta/Red Dot  1\" - Vector Optics",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 61,
+        "valor_total_item": 61
+      }
+    ],
+    "data_pedido": "2026-02-12",
+    "data_pagamento": null,
+    "data_envio": "2026-02-12",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14190\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:19:39.166Z",
+    "criado_em": "2026-09-22T12:19:39.166Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:19:39.166Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_0a857214f1ef7d7e": {
+    "id": "ord_0a857214f1ef7d7e",
+    "bling_pedido_id": "25058680843",
+    "bling_numero": "25615",
+    "account_id": "acc_48eb863077e79d58",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 1038.11,
+    "itens": [
+      {
+        "sku": "RED-99600",
+        "descricao": "Alimentador Redding Automatico de Espoleta de Barra Deslizante",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 983.7,
+        "valor_total_item": 983.7
+      }
+    ],
+    "data_pedido": "2026-02-10",
+    "data_pagamento": null,
+    "data_envio": "2026-02-10",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:19:39.925Z",
+    "criado_em": "2026-09-22T12:19:39.925Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:19:39.925Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_ba61f6e54e2b76ef": {
+    "id": "ord_ba61f6e54e2b76ef",
+    "bling_pedido_id": "25058574621",
+    "bling_numero": "25614",
+    "account_id": "acc_3671200e3589f4cc",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 216.34,
+    "itens": [
+      {
+        "sku": "RED-11013",
+        "descricao": "Shellholder Redding #13",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 200,
+        "valor_total_item": 200
+      }
+    ],
+    "data_pedido": "2026-02-10",
+    "data_pagamento": null,
+    "data_envio": "2026-02-10",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14188\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:19:40.707Z",
+    "criado_em": "2026-09-22T12:19:40.707Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:19:40.707Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_cc80c360f9542123": {
+    "id": "ord_cc80c360f9542123",
+    "bling_pedido_id": "25058246226",
+    "bling_numero": "25613",
+    "account_id": "acc_c93eacd0118c4e08",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 293.35,
+    "itens": [
+      {
+        "sku": "6942870306902",
+        "descricao": "Acionador remoto para Lanterna Fenix AER-02 V2.0",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 270,
+        "valor_total_item": 270
+      }
+    ],
+    "data_pedido": "2026-02-10",
+    "data_pagamento": null,
+    "data_envio": "2026-02-10",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 5955\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:19:41.524Z",
+    "criado_em": "2026-09-22T12:19:41.524Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:19:41.524Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_2ce6a1f935af2f3d": {
+    "id": "ord_2ce6a1f935af2f3d",
+    "bling_pedido_id": "25056528858",
+    "bling_numero": "25612",
+    "account_id": "acc_060d66fabf3fe95f",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1126.75,
+    "itens": [
+      {
+        "sku": "6942870312651-ID",
+        "descricao": "Lanterna Tática Fenix PD35R ACE + CL01 - 2000 Lúmens (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1084.89,
+        "valor_total_item": 1084.89
+      }
+    ],
+    "data_pedido": "2026-02-10",
+    "data_pagamento": null,
+    "data_envio": "2026-02-10",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 5953\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-22T12:19:42.270Z",
+    "criado_em": "2026-09-22T12:19:42.270Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:19:42.270Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_60e1dc70db1b279c": {
+    "id": "ord_60e1dc70db1b279c",
+    "bling_pedido_id": "25056433190",
+    "bling_numero": "25611",
+    "account_id": "acc_f24dabb6928a47e4",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 8925,
+    "itens": [
+      {
+        "sku": "6942870306926",
+        "descricao": "Lanterna Fenix PD36R - 1600 Lúmens preto",
+        "categoria": null,
+        "quantidade": 10,
+        "valor_unitario": 892.5,
+        "valor_total_item": 8925
+      }
+    ],
+    "data_pedido": "2026-02-10",
+    "data_pagamento": null,
+    "data_envio": "2026-02-10",
+    "data_entrega": null,
+    "notas": "Nº de série: 8JTEKV01996 - 8JTEKV00260 - 8JTEKV00754 - 8JTEKV00314 - 8JTEKV01978 - 8JTEKV01976 - 8JTEKV01950 - 8JTEKV01991 - 8JTEKV00691 - 8JTEKV02017",
+    "sincronizado_bling_em": "2026-09-22T12:19:43.050Z",
+    "criado_em": "2026-09-22T12:19:43.050Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:19:43.050Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_160979c48fdcb729": {
+    "id": "ord_160979c48fdcb729",
+    "bling_pedido_id": "25054558274",
+    "bling_numero": "25610",
+    "account_id": "acc_040945aaed5e51bc",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 359.2,
+    "itens": [
+      {
+        "sku": "VEC-RDSL01",
+        "descricao": "Red Dot Vector Optics  VictOptics, 1x18, Ref: RDSL01",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 312.2,
+        "valor_total_item": 312.2
+      }
+    ],
+    "data_pedido": "2026-02-10",
+    "data_pagamento": null,
+    "data_envio": "2026-02-10",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:19:43.811Z",
+    "criado_em": "2026-09-22T12:19:43.811Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:19:43.811Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_2b7b427a31860803": {
+    "id": "ord_2b7b427a31860803",
+    "bling_pedido_id": "25053153198",
+    "bling_numero": "25609",
+    "account_id": "acc_83e44670d1f8c612",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 117.9,
+    "itens": [
+      {
+        "sku": "",
+        "descricao": "MUNICAO CCI CAL.22 LR 40GR BLAZER LRN CX 50",
+        "categoria": null,
+        "quantidade": 50,
+        "valor_unitario": 2.358,
+        "valor_total_item": 117.9
+      }
+    ],
+    "data_pedido": "2026-02-10",
+    "data_pagamento": null,
+    "data_envio": "2026-02-10",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:19:44.591Z",
+    "criado_em": "2026-09-22T12:19:44.591Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:19:44.591Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_dc401e6977857284": {
+    "id": "ord_dc401e6977857284",
+    "bling_pedido_id": "25048526074",
+    "bling_numero": "25608",
+    "account_id": "acc_fbc94af94a3fd1c7",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 642.2,
+    "itens": [
+      {
+        "sku": "RUIKE-L51-N",
+        "descricao": "Canivete Ruike L51-N",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 676,
+        "valor_total_item": 676
+      }
+    ],
+    "data_pedido": "2026-02-09",
+    "data_pagamento": null,
+    "data_envio": "2026-02-09",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14186\nLocal de venda: LOJA VIRTUAL\nTransportadora: Retirar na loja",
+    "sincronizado_bling_em": "2026-09-22T12:19:45.358Z",
+    "criado_em": "2026-09-22T12:19:45.358Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:19:45.358Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_7e9abe5dfe911f18": {
+    "id": "ord_7e9abe5dfe911f18",
+    "bling_pedido_id": "25048497684",
+    "bling_numero": "25607",
+    "account_id": "acc_4950a89265fb1d1f",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 1093.45,
+    "itens": [
+      {
+        "sku": "6942870307749-ID",
+        "descricao": "Lanterna Fenix TK16 V2.0 - 3100 Lumens preta (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1093.45,
+        "valor_total_item": 1093.45
+      }
+    ],
+    "data_pedido": "2026-02-09",
+    "data_pagamento": null,
+    "data_envio": "2026-02-09",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:19:46.126Z",
+    "criado_em": "2026-09-22T12:19:46.126Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:19:46.126Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_f9221391506f1dfe": {
+    "id": "ord_f9221391506f1dfe",
+    "bling_pedido_id": "25044099827",
+    "bling_numero": "25606",
+    "account_id": "acc_1727333bb47de5ce",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 25000,
+    "itens": [
+      {
+        "sku": "Ruger-6903",
+        "descricao": "Rifle Ruger American Rifle Standard, Calibre 308 win,  4 tiros",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 25000,
+        "valor_total_item": 25000
+      }
+    ],
+    "data_pedido": "2026-02-09",
+    "data_pagamento": null,
+    "data_envio": "2026-02-09",
+    "data_entrega": null,
+    "notas": "Nº serie: 690881230\nforma de pagamento combinado!",
+    "sincronizado_bling_em": "2026-09-22T12:19:46.876Z",
+    "criado_em": "2026-09-22T12:19:46.876Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:19:46.876Z",
+    "atualizado_por": "bling-sync"
   }
 }
