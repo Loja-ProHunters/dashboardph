@@ -4824,17 +4824,17 @@ async function crmRenderPainel(){
     ? '<div style="margin-top:22px;padding:16px;background:var(--bg);border:1px dashed var(--bd);border-radius:10px"><div style="font-weight:600;font-size:13px;margin-bottom:6px">Migração de Parceiros</div><div style="font-size:12px;color:var(--gy);margin-bottom:10px">Importa os partners de <code>parceiros.json</code> como Referrals. Idempotente — pode rodar quantas vezes quiser.</div><button class="crm-btn" onclick="crmMigrateParceiros()">Importar parceiros como referrals</button><div id="crm-migrate-result" style="margin-top:10px;font-size:12px"></div></div>'
     : '';
 
-  // Card de integração Bling (só admin)
+  // Card de integração Bling MULTI-CONTA (só admin)
+  // Renderiza um bloco por conta configurada em config.blingContas.
   var blingCard = sess.isAdmin
-    ? '<div id="bling-card" style="margin-top:22px;padding:18px 20px;background:var(--wh);border:1px solid var(--bd);border-radius:12px;box-shadow:var(--sh-1)">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">' +
-          '<div><div style="font-weight:700;font-size:14px;color:var(--tx)">🔗 Integração Bling</div>' +
-          '<div style="font-size:11.5px;color:var(--gy)">Sync automática de pedidos, contatos e produtos</div></div>' +
-          '<div id="bling-status-badge" style="font-size:10.5px;font-weight:700;letter-spacing:.4px;padding:4px 10px;border-radius:99px;background:var(--bg);color:var(--gy);text-transform:uppercase">carregando…</div>' +
+    ? '<div id="bling-card" style="margin-top:22px">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">' +
+          '<div><div style="font-weight:700;font-size:15px;color:var(--tx)">🔗 Integração Bling (Multi-Conta)</div>' +
+          '<div style="font-size:11.5px;color:var(--gy)">Sync automática de pedidos, contatos e produtos das duas empresas</div></div>' +
         '</div>' +
-        '<div id="bling-details" style="font-size:12px;color:var(--gy);margin:8px 0"></div>' +
-        '<div id="bling-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div>' +
-        '<div id="bling-test-result" style="margin-top:10px;font-size:12px"></div>' +
+        '<div id="bling-contas" style="display:grid;grid-template-columns:1fr;gap:14px">' +
+          '<div style="padding:14px;background:var(--wh);border:1px solid var(--bd);border-radius:12px;font-size:12px;color:var(--gy)">Carregando contas…</div>' +
+        '</div>' +
       '</div>'
     : '';
 
@@ -5162,67 +5162,106 @@ function fenixLimpar(){
   if (box) { box.hidden = true; box.innerHTML = ''; }
 }
 
-// ── Integração Bling (card no painel gerência) ───────────────────
+// ── Integração Bling MULTI-CONTA (card no painel gerência) ───────────────────
+// Renderiza um bloco por conta configurada. Cada bloco tem badge de status +
+// detalhes + botões próprios (Testar, Sync agora, Backfill, Saúde, Renovar,
+// Reconectar, Desconectar). Os IDs dos elementos internos são sufixados com a
+// contaId, ex: "bling-details-prohunters", "bling-actions-calibre".
+
 async function crmBlingRefreshStatus(){
-  const badge = document.getElementById('bling-status-badge');
-  const details = document.getElementById('bling-details');
-  const actions = document.getElementById('bling-actions');
-  if (!badge) return;
+  const container = document.getElementById('bling-contas');
+  if (!container) return;
   try {
     const r = await fetch('/api/bling/status');
     const s = await r.json();
     if (!r.ok) throw new Error(s.error || 'Erro');
-    if (!s.configurado) {
-      badge.textContent = 'não configurado';
-      badge.style.background = '#fbe6e6'; badge.style.color = '#a01818';
-      details.innerHTML = 'Faltam variáveis de ambiente na Vercel: <code>BLING_CLIENT_ID</code>, <code>BLING_CLIENT_SECRET</code>, <code>BLING_REDIRECT_URI</code>. Adicione e faça redeploy.';
-      actions.innerHTML = '';
+    const contas = s.contas || [];
+    if (!contas.length) {
+      container.innerHTML = '<div style="padding:14px;background:var(--wh);border:1px solid var(--bd);border-radius:12px;color:var(--gy);font-size:12px">Nenhuma conta Bling configurada no servidor.</div>';
       return;
     }
-    if (!s.conectado) {
-      badge.textContent = 'desconectado';
-      badge.style.background = '#fef4e7'; badge.style.color = '#a06210';
-      details.innerHTML = 'Nunca conectado ou desconectado. Clique em <strong>Conectar Bling</strong> pra autorizar.';
-      actions.innerHTML = '<a class="crm-btn" href="/api/bling/authorize" target="_blank">Conectar Bling</a>';
-      return;
+    // Renderiza um card por conta
+    container.innerHTML = contas.map(function(c){
+      return crmBlingRenderCardConta(c);
+    }).join('');
+    // Para cada conta, roda o polling de backfill em andamento
+    for (const c of contas) {
+      if (c.ativa && c.conectado) crmBlingBackfillCheckStatus(c.contaId);
     }
-    // Conectado
-    badge.textContent = 'conectado';
-    badge.style.background = '#e7f5ec'; badge.style.color = 'var(--gd)';
-    var expiraMsg;
-    if (s.expira_em_min <= 0) expiraMsg = 'Access token expirado — será renovado automaticamente na próxima chamada.';
-    else if (s.expira_em_min < 15) expiraMsg = 'Access token expira em ' + s.expira_em_min + ' min (refresh automático).';
-    else expiraMsg = 'Access token válido por mais ' + s.expira_em_min + ' min.';
-    var savedAt = s.saved_at ? new Date(s.saved_at).toLocaleString('pt-BR') : '—';
-    details.innerHTML =
-      '<div>Conectado por <strong>' + (s.account_login || '?') + '</strong> em ' + savedAt + '</div>' +
-      '<div style="margin-top:3px">' + expiraMsg + '</div>' +
-      (s.scope ? '<div style="margin-top:3px;font-size:11px">Escopos: <code>' + s.scope + '</code></div>' : '') +
-      (s.tem_refresh ? '' : '<div style="margin-top:3px;color:#a06210">⚠ Sem refresh_token — reconecte assim que possível.</div>');
-    actions.innerHTML =
-      '<button class="crm-btn" onclick="crmBlingTest()">Testar conexão</button>' +
-      '<button class="crm-btn" onclick="crmBlingSyncAgora()">Sync agora (últimos 24h)</button>' +
-      '<button class="crm-btn" onclick="crmBlingBackfillIniciar()">📥 Backfill histórico</button>' +
-      '<button class="crm-btn" onclick="crmVerificarSaude()">🛡 Verificar saúde CRM×Bling</button>' +
-      '<button class="crm-btn" onclick="crmReatribuirVendedores()">🔄 Reatribuir vendedores</button>' +
-      '<button class="crm-btn ghost" onclick="crmBlingRefresh()">Renovar token</button>' +
-      '<a class="crm-btn ghost" href="/api/bling/authorize" target="_blank">Reconectar</a>' +
-      '<button class="crm-btn danger" onclick="crmBlingDisconnect()">Desconectar</button>';
-    // Se tem backfill em andamento, mostra painel de progresso
-    crmBlingBackfillCheckStatus();
   } catch (e) {
-    badge.textContent = 'erro';
-    badge.style.background = '#fbe6e6'; badge.style.color = '#a01818';
-    details.textContent = 'Erro ao carregar status: ' + e.message;
+    container.innerHTML = '<div style="padding:14px;background:#fbe6e6;color:#a01818;border-radius:12px;font-size:12px">Erro ao carregar status: ' + crmEsc(e.message) + '</div>';
   }
 }
 
-// ── Sync incremental manual ──────────────────────────────────────
-async function crmBlingSyncAgora(){
-  const out = document.getElementById('bling-test-result');
-  out.textContent = 'Sincronizando últimos 24h…';
+// Monta o HTML de UM card de conta Bling. Recebe o objeto vindo de listContasInfo:
+// { contaId, nome, ativa, conectado, expires_at?, expira_em_min?, saved_at?, account_login?, scope?, tem_refresh? }
+function crmBlingRenderCardConta(c){
+  const cid = c.contaId;
+  const nome = c.nome || cid;
+  let badgeText, badgeBg, badgeColor;
+  if (!c.ativa) { badgeText = 'não configurado'; badgeBg = '#fbe6e6'; badgeColor = '#a01818'; }
+  else if (!c.conectado) { badgeText = 'desconectado'; badgeBg = '#fef4e7'; badgeColor = '#a06210'; }
+  else { badgeText = 'conectado'; badgeBg = '#e7f5ec'; badgeColor = 'var(--gd)'; }
+
+  let detalhes = '';
+  let actions = '';
+  if (!c.ativa) {
+    const suffix = cid === 'prohunters' ? '' : '_' + cid.toUpperCase();
+    detalhes = 'Faltam variáveis de ambiente na Vercel: <code>BLING_CLIENT_ID' + suffix + '</code>, <code>BLING_CLIENT_SECRET' + suffix + '</code>, <code>BLING_REDIRECT_URI' + suffix + '</code>. Adicione e faça redeploy.';
+    actions = '';
+  } else if (!c.conectado) {
+    detalhes = 'Nunca conectado ou desconectado. Clique em <strong>Conectar</strong> pra autorizar esta empresa.';
+    actions = '<a class="crm-btn" href="/api/bling/authorize?conta=' + encodeURIComponent(cid) + '" target="_blank">Conectar ' + crmEsc(nome) + '</a>';
+  } else {
+    let expiraMsg;
+    if (c.expira_em_min <= 0) expiraMsg = 'Access token expirado — será renovado automaticamente na próxima chamada.';
+    else if (c.expira_em_min < 15) expiraMsg = 'Access token expira em ' + c.expira_em_min + ' min (refresh automático).';
+    else expiraMsg = 'Access token válido por mais ' + c.expira_em_min + ' min.';
+    const savedAt = c.saved_at ? new Date(c.saved_at).toLocaleString('pt-BR') : '—';
+    detalhes =
+      '<div>Conectado por <strong>' + crmEsc(c.account_login || '?') + '</strong> em ' + savedAt + '</div>' +
+      '<div style="margin-top:3px">' + expiraMsg + '</div>' +
+      (c.scope ? '<div style="margin-top:3px;font-size:11px">Escopos: <code>' + crmEsc(c.scope) + '</code></div>' : '') +
+      (c.tem_refresh ? '' : '<div style="margin-top:3px;color:#a06210">⚠ Sem refresh_token — reconecte assim que possível.</div>');
+    const q = "'" + cid + "'";
+    actions =
+      '<button class="crm-btn" onclick="crmBlingTest(' + q + ')">Testar conexão</button>' +
+      '<button class="crm-btn" onclick="crmBlingSyncAgora(' + q + ')">Sync agora (últimos 24h)</button>' +
+      '<button class="crm-btn" onclick="crmBlingBackfillIniciar(' + q + ')">📥 Backfill histórico</button>' +
+      '<button class="crm-btn" onclick="crmVerificarSaude(' + q + ')">🛡 Verificar saúde</button>' +
+      (cid === 'prohunters' ? '<button class="crm-btn" onclick="crmReatribuirVendedores()">🔄 Reatribuir vendedores</button>' : '') +
+      '<button class="crm-btn ghost" onclick="crmBlingRefresh(' + q + ')">Renovar token</button>' +
+      '<a class="crm-btn ghost" href="/api/bling/authorize?conta=' + encodeURIComponent(cid) + '" target="_blank">Reconectar</a>' +
+      '<button class="crm-btn danger" onclick="crmBlingDisconnect(' + q + ')">Desconectar</button>';
+  }
+
+  const iconCor = cid === 'calibre' ? '#7a5cff' : '#0a6e2e';
+  return '' +
+    '<div id="bling-card-' + cid + '" style="padding:16px 18px;background:var(--wh);border:1px solid var(--bd);border-left:4px solid ' + iconCor + ';border-radius:12px;box-shadow:var(--sh-1)">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">' +
+        '<div>' +
+          '<div style="font-weight:700;font-size:14px;color:var(--tx)">🔗 ' + crmEsc(nome) +
+            ' <span style="font-size:10.5px;color:var(--gy);font-weight:500">(' + cid + ')</span>' +
+          '</div>' +
+          '<div style="font-size:11.5px;color:var(--gy)">Sync automática de pedidos, contatos e produtos desta empresa</div>' +
+        '</div>' +
+        '<div id="bling-badge-' + cid + '" style="font-size:10.5px;font-weight:700;letter-spacing:.4px;padding:4px 10px;border-radius:99px;background:' + badgeBg + ';color:' + badgeColor + ';text-transform:uppercase">' + badgeText + '</div>' +
+      '</div>' +
+      '<div id="bling-details-' + cid + '" style="font-size:12px;color:var(--gy);margin:8px 0">' + detalhes + '</div>' +
+      '<div id="bling-actions-' + cid + '" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' + actions + '</div>' +
+      '<div id="bling-test-result-' + cid + '" style="margin-top:10px;font-size:12px"></div>' +
+    '</div>';
+}
+
+// Helper: pega elemento de resultado da conta
+function _blingOut(conta){ return document.getElementById('bling-test-result-' + conta); }
+
+// ── Sync incremental manual (por conta) ──────────────────────────
+async function crmBlingSyncAgora(conta){
+  const out = _blingOut(conta);
+  out.textContent = 'Sincronizando últimos 24h em ' + conta + '…';
   try {
-    const r = await fetch('/api/bling/sync-agora', {
+    const r = await fetch('/api/bling/sync-agora?conta=' + encodeURIComponent(conta), {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ dias: 1 }),
     });
@@ -5237,16 +5276,16 @@ async function crmBlingSyncAgora(){
   }
 }
 
-// ── Backfill de histórico com progresso live ─────────────────────
-async function crmBlingBackfillIniciar(){
-  const meses = prompt('Quantos meses de histórico do Bling você quer puxar?\n(Recomendado: 12. Máximo: 60)', '12');
+// ── Backfill de histórico com progresso live (por conta) ─────────
+async function crmBlingBackfillIniciar(conta){
+  const meses = prompt('Quantos meses de histórico do Bling ' + conta + ' você quer puxar?\n(Recomendado: 12. Máximo: 60)', '12');
   if (!meses) return;
   const n = Math.max(1, Math.min(60, parseInt(meses, 10) || 12));
-  if (!confirm('Iniciar backfill dos últimos ' + n + ' meses?\n\n✓ Você PODE fechar a aba — o backfill continua sozinho no servidor.\n✓ Ao voltar aqui, mostra o progresso atualizado.')) return;
-  const out = document.getElementById('bling-test-result');
-  out.innerHTML = '<span>🔄 Buscando lista de pedidos do Bling…</span>';
+  if (!confirm('Iniciar backfill dos últimos ' + n + ' meses da conta ' + conta + '?\n\n✓ Você PODE fechar a aba — o backfill continua sozinho no servidor.\n✓ Ao voltar aqui, mostra o progresso atualizado.')) return;
+  const out = _blingOut(conta);
+  out.innerHTML = '<span>🔄 Buscando lista de pedidos do Bling ' + conta + '…</span>';
   try {
-    const r = await fetch('/api/bling/backfill/iniciar', {
+    const r = await fetch('/api/bling/backfill/iniciar?conta=' + encodeURIComponent(conta), {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ meses: n, forcar: true }),
     });
@@ -5260,29 +5299,28 @@ async function crmBlingBackfillIniciar(){
       return;
     }
     out.innerHTML = '<span>✓ ' + d.checkpoint.total_original + ' pedidos encontrados. Disparando processamento no servidor…</span>';
-    // Dispara o PRIMEIRO tick — o próprio tick auto-encadeia os próximos
-    try { await fetch('/api/bling/cron/backfill-tick'); } catch (e) {}
-    // Além disso, roda o loop na aba (mais rápido enquanto ela estiver aberta)
-    crmBlingBackfillLoop();
+    // Dispara o PRIMEIRO tick da conta específica — auto-encadeia os próximos
+    try { await fetch('/api/bling/cron/backfill-tick?conta=' + encodeURIComponent(conta)); } catch (e) {}
+    // Loop na aba (mais rápido enquanto ela estiver aberta)
+    crmBlingBackfillLoop(conta);
   } catch (e) {
     out.innerHTML = '<span style="color:var(--r)">✗ ' + crmEsc(e.message) + '</span>';
   }
 }
 
-// Loop que chama /continuar até terminar. Faz polling do status em paralelo.
-async function crmBlingBackfillLoop(){
-  const out = document.getElementById('bling-test-result');
+// Loop que chama /continuar até terminar (por conta). Faz polling do status.
+async function crmBlingBackfillLoop(conta){
+  const out = _blingOut(conta);
   let seguir = true;
-  let ultimoTotal = 0;
   let erros_seguidos = 0;
   while (seguir) {
     try {
-      const r = await fetch('/api/bling/backfill/continuar', { method: 'POST' });
+      const r = await fetch('/api/bling/backfill/continuar?conta=' + encodeURIComponent(conta), { method: 'POST' });
       const d = await r.json();
       if (!r.ok) {
         erros_seguidos++;
         if (erros_seguidos >= 3) { out.innerHTML = '<span style="color:var(--r)">Backfill parou após 3 falhas: ' + crmEsc(d.error || 'erro') + '</span>'; return; }
-        await new Promise(r => setTimeout(r, 3000));
+        await new Promise(rs => setTimeout(rs, 3000));
         continue;
       }
       erros_seguidos = 0;
@@ -5292,7 +5330,7 @@ async function crmBlingBackfillLoop(){
       const pct = Math.round((feito / total) * 100);
       out.innerHTML =
         '<div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px 12px">' +
-          '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><strong>Backfill em andamento</strong><span>' + feito + ' / ' + total + ' pedidos · ' + pct + '%</span></div>' +
+          '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><strong>Backfill em andamento (' + conta + ')</strong><span>' + feito + ' / ' + total + ' pedidos · ' + pct + '%</span></div>' +
           '<div style="height:6px;background:var(--bd);border-radius:99px;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:var(--gd);transition:width .3s"></div></div>' +
           '<div style="margin-top:6px;font-size:11px;color:var(--gy)">' +
             (cp.accounts_criadas || 0) + ' contas · ' + (cp.orders_criadas || 0) + ' pedidos · ' + ((cp.avisos && cp.avisos.length) || 0) + ' avisos' +
@@ -5300,66 +5338,67 @@ async function crmBlingBackfillLoop(){
         '</div>';
       if (d.terminou) {
         out.innerHTML +=
-          '<div style="margin-top:10px;color:var(--gd);font-weight:600">✓ Backfill concluído! ' +
+          '<div style="margin-top:10px;color:var(--gd);font-weight:600">✓ Backfill de ' + conta + ' concluído! ' +
           cp.accounts_criadas + ' contas e ' + cp.orders_criadas + ' pedidos importados.</div>';
         seguir = false;
         break;
       }
-      // Se um lote não avançou (nada processado), espera 2s antes de tentar de novo
-      if (d.processados_neste_lote === 0) await new Promise(r => setTimeout(r, 2000));
-      ultimoTotal = feito;
+      if (d.processados_neste_lote === 0) await new Promise(rs => setTimeout(rs, 2000));
     } catch (e) {
       erros_seguidos++;
       if (erros_seguidos >= 3) { out.innerHTML = '<span style="color:var(--r)">Backfill interrompido: ' + crmEsc(e.message) + '</span>'; return; }
-      await new Promise(r => setTimeout(r, 3000));
+      await new Promise(rs => setTimeout(rs, 3000));
     }
   }
 }
 
-// Verifica se tem backfill em andamento e retoma o loop automaticamente
-async function crmBlingBackfillCheckStatus(){
+// Verifica se tem backfill em andamento pra essa conta e retoma o loop
+async function crmBlingBackfillCheckStatus(conta){
   try {
-    const r = await fetch('/api/bling/backfill/status');
+    const r = await fetch('/api/bling/backfill/status?conta=' + encodeURIComponent(conta));
     if (!r.ok) return;
     const d = await r.json();
     const cp = d.checkpoint;
     if (!cp) return;
     if (cp.status === 'em_andamento' && cp.ids_pendentes && cp.ids_pendentes.length > 0) {
-      const out = document.getElementById('bling-test-result');
-      if (out) out.innerHTML = '<span>🔄 Backfill em andamento detectado. Retomando…</span>';
-      crmBlingBackfillLoop();
+      const out = _blingOut(conta);
+      if (out) out.innerHTML = '<span>🔄 Backfill em andamento detectado (' + conta + '). Retomando…</span>';
+      crmBlingBackfillLoop(conta);
     }
   } catch(e) { /* silencia */ }
 }
-async function crmBlingTest(){
-  const out = document.getElementById('bling-test-result');
-  out.textContent = 'Testando…';
+
+async function crmBlingTest(conta){
+  const out = _blingOut(conta);
+  out.textContent = 'Testando ' + conta + '…';
   try {
-    const r = await fetch('/api/bling/test');
+    const r = await fetch('/api/bling/test?conta=' + encodeURIComponent(conta));
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro');
-    out.innerHTML = '<span style="color:var(--gd)">✓ Conexão OK.</span> <span style="color:var(--gy)">Resposta: <code>' + crmEsc(JSON.stringify(d.resposta).substring(0,120)) + '…</code></span>';
+    out.innerHTML = '<span style="color:var(--gd)">✓ Conexão OK (' + conta + ').</span> <span style="color:var(--gy)">Resposta: <code>' + crmEsc(JSON.stringify(d.resposta).substring(0,120)) + '…</code></span>';
   } catch (e) {
     out.innerHTML = '<span style="color:var(--r)">✗ ' + crmEsc(e.message) + '</span>';
   }
 }
-async function crmBlingRefresh(){
-  const out = document.getElementById('bling-test-result');
-  out.textContent = 'Renovando…';
+
+async function crmBlingRefresh(conta){
+  const out = _blingOut(conta);
+  out.textContent = 'Renovando token de ' + conta + '…';
   try {
-    const r = await fetch('/api/bling/refresh', { method: 'POST' });
+    const r = await fetch('/api/bling/refresh?conta=' + encodeURIComponent(conta), { method: 'POST' });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro');
-    out.innerHTML = '<span style="color:var(--gd)">✓ Token renovado. Expira em ' + d.expira_em_min + ' min.</span>';
+    out.innerHTML = '<span style="color:var(--gd)">✓ Token de ' + conta + ' renovado. Expira em ' + d.expira_em_min + ' min.</span>';
     crmBlingRefreshStatus();
   } catch (e) {
     out.innerHTML = '<span style="color:var(--r)">✗ ' + crmEsc(e.message) + '</span>';
   }
 }
-async function crmBlingDisconnect(){
-  if (!confirm('Desconectar o Bling? Você precisará reconectar depois pra sincronizar de novo.')) return;
+
+async function crmBlingDisconnect(conta){
+  if (!confirm('Desconectar o Bling ' + conta + '? Você precisará reconectar depois pra sincronizar de novo.')) return;
   try {
-    const r = await fetch('/api/bling/disconnect', { method: 'POST' });
+    const r = await fetch('/api/bling/disconnect?conta=' + encodeURIComponent(conta), { method: 'POST' });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro');
     crmBlingRefreshStatus();
@@ -6445,11 +6484,13 @@ function crmAbreFichaProsp(accId){
 // ═══════════════════════════════════════════════════════════════
 // Verifica saúde do CRM comparando com Bling mês a mês
 // ═══════════════════════════════════════════════════════════════
-async function crmVerificarSaude(){
-  var out = document.getElementById('bling-test-result');
-  out.innerHTML = '<span style="color:var(--gd)">🛡 Verificando saúde CRM×Bling…</span> (pode levar ~30-60s)';
+async function crmVerificarSaude(conta){
+  conta = conta || 'prohunters';
+  var out = _blingOut(conta);
+  if (!out) return;
+  out.innerHTML = '<span style="color:var(--gd)">🛡 Verificando saúde CRM×Bling (' + conta + ')…</span> (pode levar ~30-60s)';
   try {
-    var r = await fetch('/api/saude-bling?meses=12');
+    var r = await fetch('/api/saude-bling?conta=' + encodeURIComponent(conta) + '&meses=12');
     var d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro');
     var buracos = d.meses_com_buraco || [];
@@ -6460,11 +6501,11 @@ async function crmVerificarSaude(){
       '<table style="width:100%;font-size:12px;margin-top:6px;border-collapse:collapse">' +
         '<thead><tr style="background:var(--bg)"><th style="text-align:left;padding:4px">Mês</th><th style="text-align:right;padding:4px">CRM</th><th style="text-align:right;padding:4px">Bling</th><th style="text-align:right;padding:4px">Faltando</th></tr></thead>' +
         '<tbody>'+linhasBuraco+'</tbody></table>' +
-        '<div style="margin-top:8px"><button class="crm-btn" onclick="crmBlingBackfillIniciar()">📥 Recuperar buracos (backfill 12 meses)</button></div>'
+        '<div style="margin-top:8px"><button class="crm-btn" onclick="crmBlingBackfillIniciar(\'' + conta + '\')">📥 Recuperar buracos (backfill 12 meses)</button></div>'
       :
-      '<div style="color:var(--gd);font-weight:600;margin-top:6px">✓ Zero buracos detectados. CRM está em dia com o Bling.</div>';
+      '<div style="color:var(--gd);font-weight:600;margin-top:6px">✓ Zero buracos detectados. CRM está em dia com o Bling ' + conta + '.</div>';
     out.innerHTML =
-      '<div style="font-weight:700;margin-bottom:6px">🛡 Diagnóstico de saúde</div>' +
+      '<div style="font-weight:700;margin-bottom:6px">🛡 Diagnóstico de saúde (' + conta + ')</div>' +
       '<div style="font-size:12.5px;line-height:1.6">' +
         '• Total no Bling (12 meses): <b>' + d.total_bling + '</b><br>' +
         '• Total no CRM: <b>' + d.total_crm + '</b><br>' +
@@ -6481,7 +6522,9 @@ async function crmVerificarSaude(){
 // Reatribuição de vendedores nos pedidos (roda em lotes com checkpoint)
 // ═══════════════════════════════════════════════════════════════
 async function crmReatribuirVendedores(){
-  var out = document.getElementById('bling-test-result');
+  // Botão aparece só no card do Bling prohunters (multi-conta)
+  var out = _blingOut('prohunters');
+  if (!out) return;
   if (!confirm('Reatribuir vendedores em todos os pedidos existentes?\n\nVersão robusta v2: com delay de 400ms entre requests + retry automático em rate limit.\n\nDemora ~4-6 minutos pros 529 pedidos. Deixa a aba aberta até terminar.')) return;
   out.innerHTML = '<span style="color:var(--gd)">🔄 Iniciando reatribuição v2…</span>';
   try {
