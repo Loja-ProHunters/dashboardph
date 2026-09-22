@@ -13121,16 +13121,19 @@
     "onboarding_id": null,
     "primeira_compra_em": "2026-07-03",
     "ultima_compra_em": "2026-07-23",
-    "pedidos_count": 2,
-    "valor_total_compras": 837.06,
+    "pedidos_count": 3,
+    "valor_total_compras": 1255.59,
     "categorias_compradas": [],
     "bling_contato_id": "18239950867",
     "tags": [],
     "notas": null,
     "criado_em": "2026-09-22T11:39:10.254Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:50.298Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-09-22T17:33:47.615Z",
+    "atualizado_por": "bling-sync",
+    "bling_contato_id_por_conta": {
+      "prohunters": "18239950867"
+    }
   },
   "acc_77e13f3cd8d288d5": {
     "id": "acc_77e13f3cd8d288d5",
@@ -13147,16 +13150,19 @@
     "onboarding_id": null,
     "primeira_compra_em": "2026-07-03",
     "ultima_compra_em": "2026-07-23",
-    "pedidos_count": 2,
-    "valor_total_compras": 1039.82,
+    "pedidos_count": 3,
+    "valor_total_compras": 1559.73,
     "categorias_compradas": [],
     "bling_contato_id": "15660015139",
     "tags": [],
     "notas": null,
     "criado_em": "2026-09-22T11:39:11.077Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:49.500Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-09-22T17:33:46.821Z",
+    "atualizado_por": "bling-sync",
+    "bling_contato_id_por_conta": {
+      "prohunters": "15660015139"
+    }
   },
   "acc_b6f5b110645e9490": {
     "id": "acc_b6f5b110645e9490",
@@ -13173,16 +13179,19 @@
     "onboarding_id": null,
     "primeira_compra_em": "2026-07-04",
     "ultima_compra_em": "2026-07-23",
-    "pedidos_count": 2,
-    "valor_total_compras": 1732.7,
+    "pedidos_count": 3,
+    "valor_total_compras": 2599.05,
     "categorias_compradas": [],
     "bling_contato_id": "6909273627",
     "tags": [],
     "notas": null,
     "criado_em": "2026-09-22T11:39:12.074Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:46.742Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-09-22T17:33:45.254Z",
+    "atualizado_por": "bling-sync",
+    "bling_contato_id_por_conta": {
+      "prohunters": "6909273627"
+    }
   },
   "acc_199aad9df2936ebe": {
     "id": "acc_199aad9df2936ebe",
@@ -15805,16 +15814,19 @@
     "onboarding_id": null,
     "primeira_compra_em": "2026-06-22",
     "ultima_compra_em": "2026-07-09",
-    "pedidos_count": 3,
-    "valor_total_compras": 4388.95,
+    "pedidos_count": 4,
+    "valor_total_compras": 4753.07,
     "categorias_compradas": [],
     "bling_contato_id": "18218679920",
     "tags": [],
     "notas": null,
     "criado_em": "2026-09-22T11:43:25.402Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:46:52.258Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-09-22T17:33:46.046Z",
+    "atualizado_por": "bling-sync",
+    "bling_contato_id_por_conta": {
+      "prohunters": "18218679920"
+    }
   },
   "acc_781ee7e1c50a8afe": {
     "id": "acc_781ee7e1c50a8afe",
@@ -38961,6 +38973,35 @@
     "criado_em": "2026-09-22T17:33:28.906Z",
     "criado_por": "bling-sync",
     "atualizado_em": "2026-09-22T17:33:28.906Z",
+    "atualizado_por": "bling-sync"
+  },
+  "acc_7797373d02ee6e7c": {
+    "id": "acc_7797373d02ee6e7c",
+    "tipo": "pf",
+    "cpf_cnpj": "00768477999",
+    "nome": "Antonio Krieger",
+    "razao_social": null,
+    "nome_fantasia": null,
+    "email": null,
+    "telefone": null,
+    "endereco": null,
+    "status": "ativo",
+    "owner_id": "gerencia",
+    "onboarding_id": null,
+    "primeira_compra_em": "2026-07-04",
+    "ultima_compra_em": "2026-07-04",
+    "pedidos_count": 1,
+    "valor_total_compras": 615.15,
+    "categorias_compradas": [],
+    "bling_contato_id": "18241639123",
+    "bling_contato_id_por_conta": {
+      "prohunters": "18241639123"
+    },
+    "tags": [],
+    "notas": null,
+    "criado_em": "2026-09-22T17:33:44.479Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T17:33:44.479Z",
     "atualizado_por": "bling-sync"
   }
 }
