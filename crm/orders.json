@@ -55813,5 +55813,681 @@
     "criado_por": "bling-sync",
     "atualizado_em": "2026-09-22T12:00:06.416Z",
     "atualizado_por": "bling-sync"
+  },
+  "ord_4606a2caba23d31a": {
+    "id": "ord_4606a2caba23d31a",
+    "bling_pedido_id": "25657542457",
+    "bling_numero": "25999",
+    "account_id": "acc_241d438d4216fa3e",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1106.67,
+    "itens": [
+      {
+        "sku": "6942870305639",
+        "descricao": "Lanterna Fenix TK25 RED 1000 Lumens Preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 499.25,
+        "valor_total_item": 499.25
+      },
+      {
+        "sku": "6942870306919",
+        "descricao": "Acionador remoto para Lanterna Fenix AER-03 V2.0",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 270,
+        "valor_total_item": 270
+      },
+      {
+        "sku": "6942870307954",
+        "descricao": "Suporte de lanterna,  Fenix, ALG-18",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 292,
+        "valor_total_item": 292
+      }
+    ],
+    "data_pedido": "2026-04-26",
+    "data_pagamento": null,
+    "data_envio": "2026-04-26",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6153\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex",
+    "sincronizado_bling_em": "2026-09-22T12:01:16.120Z",
+    "criado_em": "2026-09-22T12:01:16.120Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:16.120Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_a6f958e4f770ad7f": {
+    "id": "ord_a6f958e4f770ad7f",
+    "bling_pedido_id": "25656879760",
+    "bling_numero": "25998",
+    "account_id": "acc_3060acde408c23eb",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 240.34,
+    "itens": [
+      {
+        "sku": "X-WM03",
+        "descricao": "Suporte de lanterna (mount) Olight X-WM03",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 219.8,
+        "valor_total_item": 219.8
+      }
+    ],
+    "data_pedido": "2026-04-26",
+    "data_pagamento": null,
+    "data_envio": "2026-04-26",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14556\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:01:16.913Z",
+    "criado_em": "2026-09-22T12:01:16.913Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:16.913Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_c25d56b8a63febee": {
+    "id": "ord_c25d56b8a63febee",
+    "bling_pedido_id": "25656223865",
+    "bling_numero": "25997",
+    "account_id": "acc_da1eb09a47bc2e93",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 242.14,
+    "itens": [
+      {
+        "sku": "X-WM03",
+        "descricao": "Suporte de lanterna (mount) Olight X-WM03",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 219.8,
+        "valor_total_item": 219.8
+      }
+    ],
+    "data_pedido": "2026-04-26",
+    "data_pagamento": null,
+    "data_envio": "2026-04-26",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14554\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:01:17.748Z",
+    "criado_em": "2026-09-22T12:01:17.748Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:17.748Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_9cde2c5b103a4e8a": {
+    "id": "ord_9cde2c5b103a4e8a",
+    "bling_pedido_id": "25655362049",
+    "bling_numero": "25996",
+    "account_id": "acc_8d91b7a8be1dd1f9",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 2150.15,
+    "itens": [
+      {
+        "sku": "6942870310305-ID",
+        "descricao": "Lanterna para Camping Fenix CL26R Pro 650 Lumens Cinza (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 919,
+        "valor_total_item": 919
+      },
+      {
+        "sku": "6942870310527-ID",
+        "descricao": "Lanterna Fenix PD36R  V2.0 1700 Lúmens (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 910.8,
+        "valor_total_item": 910.8
+      },
+      {
+        "sku": "6942870304939",
+        "descricao": "Lanterna de Cabeça Fenix HM50R Preta 500 Lúmens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 265.8,
+        "valor_total_item": 265.8
+      }
+    ],
+    "data_pedido": "2026-04-26",
+    "data_pagamento": null,
+    "data_envio": "2026-04-26",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6151\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\nNº de série: 3HQ20Z00522\nNº de série: 25926000548\nNº de série: WUZECK00112",
+    "sincronizado_bling_em": "2026-09-22T12:01:18.523Z",
+    "criado_em": "2026-09-22T12:01:18.523Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:18.523Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_9d4eff43a72365af": {
+    "id": "ord_9d4eff43a72365af",
+    "bling_pedido_id": "25653481476",
+    "bling_numero": "25995",
+    "account_id": "acc_1e579b2ac8b82355",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 265.36,
+    "itens": [
+      {
+        "sku": "6942870303505",
+        "descricao": "Bateria Fenix Recarregável 18650 3500mAh 3.6V 12.6Wh De Íon de Lítio ARB-L18-3500",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 250,
+        "valor_total_item": 250
+      }
+    ],
+    "data_pedido": "2026-04-25",
+    "data_pagamento": null,
+    "data_envio": "2026-04-25",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6149\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:01:19.397Z",
+    "criado_em": "2026-09-22T12:01:19.397Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:19.397Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_a40d6ee38c86d6be": {
+    "id": "ord_a40d6ee38c86d6be",
+    "bling_pedido_id": "25647156134",
+    "bling_numero": "25994",
+    "account_id": "acc_cdd77ee1f35cd495",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 1030.82,
+    "itens": [
+      {
+        "sku": "VEC-SCRD-37",
+        "descricao": "Red Dot Vector Optics  Frenzy 1x22x26, Ref: SCRD-37",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1030.82,
+        "valor_total_item": 1030.82
+      }
+    ],
+    "data_pedido": "2026-04-24",
+    "data_pagamento": null,
+    "data_envio": "2026-04-24",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:01:20.186Z",
+    "criado_em": "2026-09-22T12:01:20.186Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:20.186Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_0b912c06ea6ff384": {
+    "id": "ord_0b912c06ea6ff384",
+    "bling_pedido_id": "25646664490",
+    "bling_numero": "25993",
+    "account_id": "acc_c5d6be87cebbea30",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 5000,
+    "itens": [
+      {
+        "sku": "6942870308067",
+        "descricao": "Lanterna Fenix LR80R, 18000 Lumens preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 4900,
+        "valor_total_item": 4900
+      }
+    ],
+    "data_pedido": "2026-04-24",
+    "data_pagamento": null,
+    "data_envio": "2026-04-24",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:01:20.961Z",
+    "criado_em": "2026-09-22T12:01:20.961Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:20.961Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_eaf5ceedd0983691": {
+    "id": "ord_eaf5ceedd0983691",
+    "bling_pedido_id": "25646564048",
+    "bling_numero": "25992",
+    "account_id": "acc_ca00874338ad70d9",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 305.65,
+    "itens": [
+      {
+        "sku": "0001970.2.40",
+        "descricao": "Calça Bélica Multiforce Masculina Multicam Verde 40",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 305.65,
+        "valor_total_item": 305.65
+      }
+    ],
+    "data_pedido": "2026-04-24",
+    "data_pagamento": null,
+    "data_envio": "2026-04-24",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:01:21.745Z",
+    "criado_em": "2026-09-22T12:01:21.745Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:21.745Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_76cc69ddea11b75d": {
+    "id": "ord_76cc69ddea11b75d",
+    "bling_pedido_id": "25644591726",
+    "bling_numero": "25991",
+    "account_id": "acc_b269ea0737afae9d",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 763.9,
+    "itens": [
+      {
+        "sku": "BALDR RL MINI",
+        "descricao": "Lanterna para armas Olight Baldr RL Mini preta",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 763.9,
+        "valor_total_item": 763.9
+      }
+    ],
+    "data_pedido": "2026-04-24",
+    "data_pagamento": null,
+    "data_envio": "2026-04-24",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:01:24.578Z",
+    "criado_em": "2026-09-22T12:01:24.578Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:24.578Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_bdd8f1332c9223a0": {
+    "id": "ord_bdd8f1332c9223a0",
+    "bling_pedido_id": "25643612625",
+    "bling_numero": "25990",
+    "account_id": "acc_add42d469a6e5097",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 471,
+    "itens": [
+      {
+        "sku": "6942870311005-ID",
+        "descricao": "Lanterna Fenix TK05R, preta 1000 Lumens (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 265,
+        "valor_total_item": 265
+      },
+      {
+        "sku": "6942870308005",
+        "descricao": "Lanterna Fenix E05R - 400 Lúmens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 105,
+        "valor_total_item": 105
+      },
+      {
+        "sku": "RUIKE-P801-SB",
+        "descricao": "Canivete Ruike P801-SB",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 101,
+        "valor_total_item": 101
+      }
+    ],
+    "data_pedido": "2026-04-24",
+    "data_pagamento": null,
+    "data_envio": "2026-04-24",
+    "data_entrega": null,
+    "notas": "Nº de série: 46Z07E00060\nNº de série: 85GEK901530\nNº de série: WBVEKJ00565",
+    "sincronizado_bling_em": "2026-09-22T12:01:26.737Z",
+    "criado_em": "2026-09-22T12:01:26.737Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:26.737Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_9009611434a40197": {
+    "id": "ord_9009611434a40197",
+    "bling_pedido_id": "25639729951",
+    "bling_numero": "25989",
+    "account_id": "acc_5e4cb74036fb5fbf",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 181.71,
+    "itens": [
+      {
+        "sku": "6942870304717",
+        "descricao": "Suporte de lanterna, Fenix, ALG-03 V2",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 157,
+        "valor_total_item": 157
+      }
+    ],
+    "data_pedido": "2026-04-23",
+    "data_pagamento": null,
+    "data_envio": "2026-04-23",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6147\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:01:27.511Z",
+    "criado_em": "2026-09-22T12:01:27.511Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:27.511Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_42c3a29b7499717f": {
+    "id": "ord_42c3a29b7499717f",
+    "bling_pedido_id": "25638796443",
+    "bling_numero": "25988",
+    "account_id": "acc_888b38f33c111e22",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 378.99,
+    "itens": [
+      {
+        "sku": "6942870307602",
+        "descricao": "Lanterna Fenix E35 V3.0 Preta 3000 Lumens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 309.72,
+        "valor_total_item": 309.72
+      }
+    ],
+    "data_pedido": "2026-04-23",
+    "data_pagamento": null,
+    "data_envio": "2026-04-23",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6145\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\nNº de série: 833EKU01555",
+    "sincronizado_bling_em": "2026-09-22T12:01:28.295Z",
+    "criado_em": "2026-09-22T12:01:28.295Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:28.295Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_ab8ba539cd95fa0c": {
+    "id": "ord_ab8ba539cd95fa0c",
+    "bling_pedido_id": "25637986622",
+    "bling_numero": "25987",
+    "account_id": "acc_1087f74baaf7ae64",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 811.02,
+    "itens": [
+      {
+        "sku": "6942870308463",
+        "descricao": "Lanterna para armas Fenix GL19R",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 780.08,
+        "valor_total_item": 780.08
+      }
+    ],
+    "data_pedido": "2026-04-23",
+    "data_pagamento": null,
+    "data_envio": "2026-04-23",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6143\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\nNº de série: 8FNEKU01045",
+    "sincronizado_bling_em": "2026-09-22T12:01:29.042Z",
+    "criado_em": "2026-09-22T12:01:29.042Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:29.042Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_6db4a33040a08a78": {
+    "id": "ord_6db4a33040a08a78",
+    "bling_pedido_id": "25637788919",
+    "bling_numero": "25986",
+    "account_id": "acc_894b1d08e6c87f2b",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 415.44,
+    "itens": [
+      {
+        "sku": "Ruger-90451",
+        "descricao": "Carregador Ruger 10/22, Calibre 22LR, 10 tiros - BX-1",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 387.6,
+        "valor_total_item": 387.6
+      }
+    ],
+    "data_pedido": "2026-04-23",
+    "data_pagamento": null,
+    "data_envio": "2026-04-23",
+    "data_entrega": null,
+    "notas": "Pagamento via pix!\nfrete paclog",
+    "sincronizado_bling_em": "2026-09-22T12:01:29.808Z",
+    "criado_em": "2026-09-22T12:01:29.808Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:29.808Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_be1f713d743096e8": {
+    "id": "ord_be1f713d743096e8",
+    "bling_pedido_id": "25637561693",
+    "bling_numero": "25985",
+    "account_id": "acc_59373357b6bd1567",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "dickmann",
+    "status": "rascunho",
+    "valor_total": 288.45,
+    "itens": [
+      {
+        "sku": "6942870305905",
+        "descricao": "Bateria Fenix Recarregável 16340 700mAh 3.6V 2.52Wh De Íon de Lítio ARB-L16-700UP",
+        "categoria": null,
+        "quantidade": 3,
+        "valor_unitario": 87.3,
+        "valor_total_item": 261.9
+      }
+    ],
+    "data_pedido": "2026-04-23",
+    "data_pagamento": null,
+    "data_envio": "2026-04-23",
+    "data_entrega": null,
+    "notas": null,
+    "sincronizado_bling_em": "2026-09-22T12:01:30.581Z",
+    "criado_em": "2026-09-22T12:01:30.581Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:30.581Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_f6af7a9cfe752350": {
+    "id": "ord_f6af7a9cfe752350",
+    "bling_pedido_id": "25636705154",
+    "bling_numero": "25984",
+    "account_id": "acc_e7a63d1193c75b2a",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 483.67,
+    "itens": [
+      {
+        "sku": "6942870307602",
+        "descricao": "Lanterna Fenix E35 V3.0 Preta 3000 Lumens",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 309.72,
+        "valor_total_item": 309.72
+      },
+      {
+        "sku": "6942870307534",
+        "descricao": "Lanterna Fenix E01 V2.0 100 Lumens (ID) Azul",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 170,
+        "valor_total_item": 170
+      }
+    ],
+    "data_pedido": "2026-04-23",
+    "data_pagamento": null,
+    "data_envio": "2026-04-23",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6141\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:01:32.537Z",
+    "criado_em": "2026-09-22T12:01:32.537Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:32.537Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_bf9b57191e95f469": {
+    "id": "ord_bf9b57191e95f469",
+    "bling_pedido_id": "25636163542",
+    "bling_numero": "25983",
+    "account_id": "acc_995a9410976e1074",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 1461,
+    "itens": [
+      {
+        "sku": "6942870308647-ID",
+        "descricao": "Lanterna Tática Fenix TK20R V2.0 - 3000 Lúmens Preto (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 1461,
+        "valor_total_item": 1461
+      }
+    ],
+    "data_pedido": "2026-04-23",
+    "data_pagamento": null,
+    "data_envio": "2026-04-23",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6139\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC\nNº de série: OBG21301470",
+    "sincronizado_bling_em": "2026-09-22T12:01:33.318Z",
+    "criado_em": "2026-09-22T12:01:33.318Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:33.318Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_dd8381dd1f228dd2": {
+    "id": "ord_dd8381dd1f228dd2",
+    "bling_pedido_id": "25635477795",
+    "bling_numero": "25982",
+    "account_id": "acc_39f7b3166120e37f",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 485.49,
+    "itens": [
+      {
+        "sku": "6942870309057-ID",
+        "descricao": "Fenix T6 Penlight - Preto  (ID)",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 416,
+        "valor_total_item": 416
+      }
+    ],
+    "data_pedido": "2026-04-23",
+    "data_pagamento": null,
+    "data_envio": "2026-04-23",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 6137\nLocal de venda: LOJA VIRTUAL\nTransportadora: Sedex\nNº de série: 0FV20Q00424",
+    "sincronizado_bling_em": "2026-09-22T12:01:34.147Z",
+    "criado_em": "2026-09-22T12:01:34.147Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:34.147Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_053783b519131acd": {
+    "id": "ord_053783b519131acd",
+    "bling_pedido_id": "25633261700",
+    "bling_numero": "25981",
+    "account_id": "acc_0f7c4248df382bde",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "boschetto",
+    "status": "rascunho",
+    "valor_total": 2478.84,
+    "itens": [
+      {
+        "sku": "6942870308173",
+        "descricao": "Lanterna de Cabeça Fenix HP30R V2.0 3000 Lúmens Preto",
+        "categoria": null,
+        "quantidade": 1,
+        "valor_unitario": 2424.6,
+        "valor_total_item": 2424.6
+      }
+    ],
+    "data_pedido": "2026-04-23",
+    "data_pagamento": null,
+    "data_envio": "2026-04-23",
+    "data_entrega": null,
+    "notas": "Nº de série: 8FJERE01749",
+    "sincronizado_bling_em": "2026-09-22T12:01:34.906Z",
+    "criado_em": "2026-09-22T12:01:34.906Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:34.906Z",
+    "atualizado_por": "bling-sync"
+  },
+  "ord_95a0274bbd6cfecc": {
+    "id": "ord_95a0274bbd6cfecc",
+    "bling_pedido_id": "25631561336",
+    "bling_numero": "25980",
+    "account_id": "acc_125640a225ad030c",
+    "opportunity_id": null,
+    "referral_id": null,
+    "vendedor_id": "gerencia",
+    "status": "rascunho",
+    "valor_total": 532.15,
+    "itens": [
+      {
+        "sku": "6942870311098-ID",
+        "descricao": "Bateria Fenix Recarregável 18650 4000mAh 3.6V 14.4Wh De Íon de Lítio ARB-L18-4000 (ID)",
+        "categoria": null,
+        "quantidade": 2,
+        "valor_unitario": 266.67,
+        "valor_total_item": 533.34
+      }
+    ],
+    "data_pedido": "2026-04-23",
+    "data_pagamento": null,
+    "data_envio": "2026-04-23",
+    "data_entrega": null,
+    "notas": "Nº Pedido Loja: 14542\nLocal de venda: LOJA VIRTUAL\nTransportadora: Encomenda PAC",
+    "sincronizado_bling_em": "2026-09-22T12:01:35.680Z",
+    "criado_em": "2026-09-22T12:01:35.680Z",
+    "criado_por": "bling-sync",
+    "atualizado_em": "2026-09-22T12:01:35.680Z",
+    "atualizado_por": "bling-sync"
   }
 }
