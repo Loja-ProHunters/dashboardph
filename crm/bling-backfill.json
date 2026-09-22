@@ -1,22 +1,18 @@
 {
   "contaId": "prohunters",
-  "status": "em_andamento",
+  "status": "concluido",
   "iniciado_em": "2026-09-22T17:21:25.087Z",
   "iniciado_por": "gerencia",
   "desde": "2025-09-22",
   "ate": "2026-09-22",
   "meses": 12,
-  "ids_pendentes": [
-    "23896614560",
-    "23892415572",
-    "25997483614"
-  ],
+  "ids_pendentes": [],
   "total_original": 1962,
-  "processados": 1959,
+  "processados": 1962,
   "accounts_criadas": 17,
   "orders_criadas": 25,
   "orders_atualizadas": 0,
-  "ja_existentes": 1928,
+  "ja_existentes": 1931,
   "rate_limit_perdidos": 0,
   "erros_outros": 1,
   "avisos": [
@@ -29,7 +25,8 @@
     "pedido 23923114912: sem CPF/CNPJ do contato — pulando"
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-09-22T17:57:17.037Z",
+  "ultimo_lote_em": "2026-09-22T17:57:37.631Z",
   "ticks_hoje_data": "2026-09-22",
-  "ticks_hoje_count": 3
+  "ticks_hoje_count": 3,
+  "concluido_em": "2026-09-22T17:57:38.453Z"
 }
