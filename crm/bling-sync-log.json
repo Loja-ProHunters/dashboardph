@@ -1,5 +1,14 @@
 [
   {
+    "ts": "2026-09-22T12:28:58.690Z",
+    "tipo": "backfill_concluido",
+    "pedidos_processados": 1959,
+    "accounts_criadas": 925,
+    "orders_criadas": 1182,
+    "ja_existentes": 771,
+    "rate_limit_perdidos": 0
+  },
+  {
     "ts": "2026-09-22T11:32:49.994Z",
     "tipo": "guardrail_getcollection",
     "msg": "ABORT: getCollection(orders) devolveu 0 mesmo após retry, mas state diz 920. Tenta de novo em alguns segundos."
