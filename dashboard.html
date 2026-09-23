@@ -6719,16 +6719,17 @@ function ctrlRenderRoot(){
   var view = document.getElementById('crm-view');
   view.innerHTML =
     '<div class="ctrl-wrap">' +
-      '<div class="ctrl-header">' +
-        '<div><strong>Operação Controlado</strong>' +
-        '<div class="ctrl-sub-desc">Cotação de frete + fila de envio de controlados. Duas empresas no mesmo Bling.</div></div>' +
+      '<div class="ctrl-hero">' +
+        '<div class="ctrl-hero-badge">🚚 Op. Controlado</div>' +
+        '<h2 class="ctrl-hero-title">Cotação de frete + fila de envio</h2>' +
+        '<div class="ctrl-hero-desc">Duas empresas no mesmo Bling. O sistema cota, sugere a rota e conduz o envio até a coleta.</div>' +
       '</div>' +
       '<div class="ctrl-tabs">' +
-        '<button class="ctrl-tab '+(window.CTRL.subtab==='cotacao'?'on':'')+'" onclick="ctrlGoTab(\'cotacao\')">📦 Cotação</button>' +
-        '<button class="ctrl-tab '+(window.CTRL.subtab==='fila'?'on':'')+'" onclick="ctrlGoTab(\'fila\')">🚚 Fila de envio</button>' +
-        '<button class="ctrl-tab '+(window.CTRL.subtab==='matriz'?'on':'')+'" onclick="ctrlGoTab(\'matriz\')">🗺️ Matriz de cidades</button>' +
+        '<button class="ctrl-tab '+(window.CTRL.subtab==='cotacao'?'on':'')+'" onclick="ctrlGoTab(\'cotacao\')"><span class="ctrl-tab-ic">📦</span> Cotação</button>' +
+        '<button class="ctrl-tab '+(window.CTRL.subtab==='fila'?'on':'')+'" onclick="ctrlGoTab(\'fila\')"><span class="ctrl-tab-ic">🚚</span> Fila de envio</button>' +
+        '<button class="ctrl-tab '+(window.CTRL.subtab==='matriz'?'on':'')+'" onclick="ctrlGoTab(\'matriz\')"><span class="ctrl-tab-ic">🗺️</span> Matriz de cidades</button>' +
       '</div>' +
-      '<div id="ctrl-panel"></div>' +
+      '<div id="ctrl-panel" class="ctrl-panel-fade"></div>' +
     '</div>';
   ctrlRenderPanel();
 }
@@ -6746,49 +6747,73 @@ function ctrlRenderCotacao(){
   var p = document.getElementById('ctrl-panel');
   var itensHtml = window.CTRL.cotacaoItens.map(function(it, i){
     var showValor = it.tipo === 'insumos';
+    var icon = { curta:'🔫', curtaGlock:'🔫', longa:'🎯', insumos:'📦' }[it.tipo] || '📦';
     return '<div class="ctrl-item-row">' +
-      '<div class="crm-fld"><label>Tipo</label>' +
-        '<select onchange="ctrlItemMudou('+i+',\'tipo\',this.value)">' +
+      '<div class="ctrl-item-ic">'+icon+'</div>' +
+      '<div class="ctrl-fld"><label>Tipo</label>' +
+        '<select onchange="ctrlItemMudou('+i+',\'tipo\',this.value); ctrlRenderCotacao();">' +
           '<option value="curta" '+(it.tipo==='curta'?'selected':'')+'>Arma curta</option>' +
           '<option value="curtaGlock" '+(it.tipo==='curtaGlock'?'selected':'')+'>Arma curta (Glock)</option>' +
           '<option value="longa" '+(it.tipo==='longa'?'selected':'')+'>Arma longa</option>' +
           '<option value="insumos" '+(it.tipo==='insumos'?'selected':'')+'>Insumos (munição/acessórios)</option>' +
         '</select></div>' +
+      '<div class="ctrl-fld ctrl-fld-qtd"><label>Quantidade</label><input type="number" value="'+(it.quantidade||1)+'" min="1" onchange="ctrlItemMudou('+i+',\'quantidade\',this.value)" /></div>' +
       (showValor
-        ? '<div class="crm-fld"><label>Qtd</label><input type="number" value="'+(it.quantidade||1)+'" min="1" onchange="ctrlItemMudou('+i+',\'quantidade\',this.value)" /></div>' +
-          '<div class="crm-fld"><label>Valor R$ (insumos)</label><input type="text" value="'+(it.valor||'')+'" placeholder="0,00" onchange="ctrlItemMudou('+i+',\'valor\',this.value)" /></div>'
-        : '<div class="crm-fld"><label>Qtd</label><input type="number" value="'+(it.quantidade||1)+'" min="1" onchange="ctrlItemMudou('+i+',\'quantidade\',this.value)" /></div>' +
-          '<div class="crm-fld"><label>Valor R$</label><input type="text" value="—" disabled /></div>') +
-      '<button class="ctrl-del" title="Remover item" onclick="ctrlItemRemover('+i+')">×</button>' +
+        ? '<div class="ctrl-fld"><label>Valor R$ (mercadoria)</label><input type="text" value="'+(it.valor||'')+'" placeholder="Ex: 2.000,00" onchange="ctrlItemMudou('+i+',\'valor\',this.value)" /></div>'
+        : '<div class="ctrl-fld ctrl-fld-disabled"><label>Valor</label><input type="text" value="cobra por qtd" disabled /></div>') +
+      '<button class="ctrl-del" title="Remover item" onclick="ctrlItemRemover('+i+')" aria-label="Remover">✕</button>' +
     '</div>';
   }).join('');
+
+  var emptyState =
+    '<div class="ctrl-empty">' +
+      '<div class="ctrl-empty-ic">📦</div>' +
+      '<div class="ctrl-empty-title">Comece cotando um frete</div>' +
+      '<div class="ctrl-empty-desc">Preenche o CEP do cliente + os itens do pedido. O sistema consulta Ezequiel, LT e RPA de uma vez e devolve a rota mais indicada.</div>' +
+      '<div class="ctrl-chips-lbl">Ou testa com esses exemplos:</div>' +
+      '<div class="ctrl-chips">' +
+        '<button class="ctrl-chip-btn" onclick="ctrlChip(\'14020-060\',\'Ribeirão Preto\',\'SP\')">📍 Ribeirão Preto/SP</button>' +
+        '<button class="ctrl-chip-btn" onclick="ctrlChip(\'89010-160\',\'Blumenau\',\'SC\')">📍 Blumenau/SC</button>' +
+        '<button class="ctrl-chip-btn" onclick="ctrlChip(\'30140-071\',\'Belo Horizonte\',\'MG\')">📍 Belo Horizonte/MG</button>' +
+        '<button class="ctrl-chip-btn" onclick="ctrlChip(\'69010-050\',\'Manaus\',\'AM\')">✈️ Manaus/AM (aéreo)</button>' +
+      '</div>' +
+    '</div>';
+
   p.innerHTML =
     '<div class="ctrl-cot-grid">' +
-      '<div>' +
-        '<div class="ctrl-card">' +
-          '<h3>Destino</h3>' +
-          '<div class="ctrl-grid-2">' +
-            '<div class="crm-fld"><label>CEP</label><input id="ctrl-cep" type="text" placeholder="00000-000" /></div>' +
-            '<div class="crm-fld"><label>Cidade + UF (opcional)</label>' +
-              '<div style="display:flex;gap:6px"><input id="ctrl-cidade" type="text" placeholder="Cidade" style="flex:1" />' +
-              '<input id="ctrl-uf" type="text" placeholder="UF" style="width:60px;text-transform:uppercase" maxlength="2" /></div></div>' +
+      '<div class="ctrl-col">' +
+        '<div class="ctrl-card ctrl-anim-1">' +
+          '<div class="ctrl-card-head"><span class="ctrl-card-ic">📍</span><div><h3>Destino</h3><div class="ctrl-card-sub">CEP do cliente ou cidade+UF direto</div></div></div>' +
+          '<div class="ctrl-grid-cep">' +
+            '<div class="ctrl-fld"><label>CEP</label><input id="ctrl-cep" type="text" placeholder="00000-000" maxlength="9" /></div>' +
+            '<div class="ctrl-fld"><label>Cidade (opcional)</label><input id="ctrl-cidade" type="text" placeholder="Ex: São Paulo" /></div>' +
+            '<div class="ctrl-fld"><label>UF</label><input id="ctrl-uf" type="text" placeholder="SP" style="text-transform:uppercase" maxlength="2" /></div>' +
           '</div>' +
         '</div>' +
-        '<div class="ctrl-card">' +
-          '<h3>Itens do pedido</h3>' +
+        '<div class="ctrl-card ctrl-anim-2">' +
+          '<div class="ctrl-card-head"><span class="ctrl-card-ic">📋</span><div><h3>Itens do pedido</h3><div class="ctrl-card-sub">A LT cobra por unidade de arma; a Ezequiel cobra também por valor dos insumos</div></div></div>' +
           '<div id="ctrl-itens">'+itensHtml+'</div>' +
-          '<button class="crm-btn ghost" style="margin-top:10px;font-size:12px" onclick="ctrlItemAdd()">+ Adicionar item</button>' +
-          '<div style="display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap">' +
-            '<button class="crm-btn" onclick="ctrlCotar()">Cotar frete</button>' +
-            '<span style="font-size:11.5px;color:var(--gy)">Ezequiel ao vivo · LT por tabela · RPA/Aéreo manual</span>' +
+          '<button class="ctrl-add-item" onclick="ctrlItemAdd()"><span>+</span> Adicionar item</button>' +
+          '<div class="ctrl-cta-row">' +
+            '<button class="ctrl-cta" onclick="ctrlCotar()">' +
+              '<span class="ctrl-cta-ic">⚡</span>' +
+              '<span>Cotar frete agora</span>' +
+            '</button>' +
+            '<div class="ctrl-cta-hint">Ezequiel ao vivo · LT por tabela · RPA/Aéreo manual</div>' +
           '</div>' +
         '</div>' +
       '</div>' +
-      '<div id="ctrl-resultados">' +
-        (window.CTRL.cotacaoResult ? '' : '<div class="ctrl-card" style="color:var(--gy);font-size:13px">Digite o CEP (ou cidade+UF) e clique em <b>Cotar frete</b>. Os resultados aparecem aqui em ordem de prioridade.</div>') +
+      '<div id="ctrl-resultados" class="ctrl-col">' +
+        (window.CTRL.cotacaoResult ? '' : emptyState) +
       '</div>' +
     '</div>';
   if (window.CTRL.cotacaoResult) ctrlRenderResultados(window.CTRL.cotacaoResult);
+}
+function ctrlChip(cep, cidade, uf){
+  var c = document.getElementById('ctrl-cep'); if (c) c.value = cep;
+  var ci = document.getElementById('ctrl-cidade'); if (ci) ci.value = cidade;
+  var u = document.getElementById('ctrl-uf'); if (u) u.value = uf;
+  ctrlCotar();
 }
 function ctrlItemMudou(i, campo, v){
   window.CTRL.cotacaoItens[i][campo] = v;
@@ -6808,7 +6833,14 @@ async function ctrlCotar(){
   var uf = (document.getElementById('ctrl-uf').value||'').trim().toUpperCase();
   if (!cep && (!cidade || !uf)) { alert('Informe o CEP ou cidade+UF'); return; }
   var res = document.getElementById('ctrl-resultados');
-  res.innerHTML = '<div class="ctrl-card"><div class="crm-loading">Cotando…</div></div>';
+  res.innerHTML =
+    '<div class="ctrl-card">' +
+      '<div class="ctrl-skel-head"><div class="ctrl-skel-line" style="width:60%"></div><div class="ctrl-skel-line" style="width:30%"></div></div>' +
+      '<div class="ctrl-skel-card"></div>' +
+      '<div class="ctrl-skel-card"></div>' +
+      '<div class="ctrl-skel-card"></div>' +
+      '<div style="text-align:center;margin-top:14px;color:var(--gy);font-size:12px"><span class="ctrl-spinner"></span> Consultando Ezequiel, LT e RPA…</div>' +
+    '</div>';
   var itens = window.CTRL.cotacaoItens.map(function(i){
     var o = { tipo: i.tipo };
     if (i.tipo === 'insumos') o.valor = Number(String(i.valor||'0').replace(/\./g,'').replace(',','.')) || 0;
@@ -6832,55 +6864,74 @@ function ctrlRenderResultados(d){
   var res = document.getElementById('ctrl-resultados');
   var cidUf = (d.cidade || '—') + '/' + (d.uf || '—');
   var rotaSug = d.rota_sugerida
-    ? '<div class="ctrl-matriz-banner">🗺️ Rota padrão pra <b>'+crmEsc(cidUf)+'</b>: <b>'+crmEsc(ctrlLabelRota(d.rota_sugerida.rota))+'</b> <span style="color:var(--gy)">('+crmEsc(d.rota_sugerida.origem||'?')+')</span></div>'
+    ? '<div class="ctrl-matriz-banner ctrl-anim-1">🗺️ Rota padrão pra <b>'+crmEsc(cidUf)+'</b>: <b>'+crmEsc(ctrlLabelRota(d.rota_sugerida.rota))+'</b><span class="ctrl-mb-tag">'+crmEsc(d.rota_sugerida.origem||'?')+'</span></div>'
     : '';
+  var iconMap = { ezequiel:'🚛', lt:'🚚', rpa:'📦', aereo:'✈️' };
+  var subMap = {
+    ezequiel: 'Cliente paga direto ao motorista na retirada',
+    lt: 'Rodoviário Sul/Sudeste · valor por UF',
+    rpa: 'Valor precisa ser cotado no SSW/RPA',
+    aereo: 'Ezequiel até aeroporto + Gollog no destino',
+  };
   var cardsHtml = (d.resultados||[]).map(function(t, idx){
     var isFirst = idx === 0;
     var priorityCls = (isFirst && t.atendida && t.valor_total) ? 'priority' : (t.valor_manual ? 'manual' : '');
+    var delay = 'style="animation-delay:'+(idx*0.06)+'s"';
     if (t.atendida === false && !t.motivo) return '';
     if (t.atendida === false) {
-      return '<div class="ctrl-frete-card"><div><div class="ctrl-frete-lead">'+ctrlLabelRota(t.transportadora)+' — sem cobertura</div>' +
-        '<div class="ctrl-frete-meta">'+crmEsc(t.motivo || 'sem cobertura')+'</div></div></div>';
+      return '<div class="ctrl-frete-card ctrl-anim-slide off" '+delay+'>' +
+        '<div class="ctrl-frete-ic muted">'+(iconMap[t.transportadora]||'📦')+'</div>' +
+        '<div class="ctrl-frete-body"><div class="ctrl-frete-lead muted">'+ctrlLabelRota(t.transportadora)+' · sem cobertura</div>' +
+        '<div class="ctrl-frete-meta">'+crmEsc(t.motivo || 'Cidade fora da base desta transportadora')+'</div></div></div>';
     }
     var valorHtml;
     if (t.valor_manual) {
-      valorHtml = '<div class="ctrl-frete-valor confirm">a confirmar<span class="ctrl-frete-un">valor manual</span></div>';
+      valorHtml = '<div class="ctrl-frete-valor confirm"><div class="v">valor manual</div><div class="ctrl-frete-un">digite direto no envio</div></div>';
     } else if (t.confirmar) {
-      valorHtml = '<div class="ctrl-frete-valor confirm">a confirmar<span class="ctrl-frete-un">'+crmEsc(t.modalidade||'')+'</span></div>';
+      valorHtml = '<div class="ctrl-frete-valor confirm"><div class="v">a confirmar</div><div class="ctrl-frete-un">'+crmEsc(t.modalidade||'')+'</div></div>';
     } else if (t.valor_total != null) {
-      valorHtml = '<div class="ctrl-frete-valor">'+crmFmtBRL(t.valor_total)+'<span class="ctrl-frete-un">'+crmEsc(t.modalidade||'')+'</span></div>';
+      valorHtml = '<div class="ctrl-frete-valor"><div class="v">'+crmFmtBRL(t.valor_total)+'</div><div class="ctrl-frete-un">'+crmEsc(t.modalidade||'')+'</div></div>';
     } else {
-      valorHtml = '<div class="ctrl-frete-valor confirm">—</div>';
+      valorHtml = '<div class="ctrl-frete-valor confirm"><div class="v">—</div></div>';
     }
-    var prazoTxt = t.prazo_dias_uteis ? ' · '+t.prazo_dias_uteis+' dias úteis' : '';
+    var prazoTxt = t.prazo_dias_uteis ? '<span class="ctrl-tag">⏱ '+t.prazo_dias_uteis+' dias úteis</span>' : '';
     var detalhes = (t.detalhes && Array.isArray(t.detalhes) && t.detalhes.length)
       ? '<div class="ctrl-frete-detalhes">' + t.detalhes.map(function(x){
           if (x.tipo === 'insumos') return 'insumos R$'+(x.base||0)+' → '+crmFmtBRL(x.valor||0);
           return (x.quantidade||1)+'× '+(x.tipo||'')+' → '+crmFmtBRL(x.valor||0);
         }).join(' · ') + '</div>'
-      : (t.detalhes && typeof t.detalhes === 'string' ? '<div class="ctrl-frete-detalhes">'+crmEsc(t.detalhes)+'</div>' : '');
+      : '';
     var aviso = t.aviso ? '<div class="ctrl-aviso">⚠ '+crmEsc(t.aviso)+'</div>' : '';
     var aeroSel = '';
     if (t.transportadora === 'aereo' && t.aeroportos_uf && t.aeroportos_uf.length) {
-      aeroSel = '<div style="margin-top:8px"><b style="font-size:11.5px;color:var(--gy)">Aeroporto de destino:</b> ' +
-        '<select id="ctrl-aero" style="font-size:12px;padding:4px 6px;border:1px solid var(--bd);border-radius:6px;background:var(--wh);color:var(--tx)">' +
+      aeroSel = '<div class="ctrl-aero-sel"><label>Aeroporto destino</label>' +
+        '<select id="ctrl-aero">' +
         t.aeroportos_uf.map(function(a){ return '<option value="'+a.iata+'">'+a.iata+' — '+crmEsc(a.nome)+'</option>'; }).join('') +
         '</select></div>';
     }
-    return '<div class="ctrl-frete-card '+priorityCls+'"><div><div class="ctrl-frete-lead">' +
-      (isFirst && t.atendida && !t.valor_manual ? '✓ ROTA SUGERIDA · ' : '') +
-      ctrlLabelRota(t.transportadora).toUpperCase() +
-      (t.valor_manual ? ' — VALOR MANUAL' : '') +
-      '</div><div class="ctrl-frete-h4">'+crmEsc(t.label||'')+'</div>' +
-      '<div class="ctrl-frete-meta">'+crmEsc(cidUf)+prazoTxt+(t.motivo?' · '+crmEsc(t.motivo):'')+'</div>' +
-      detalhes + aviso + aeroSel +
-      '<div style="margin-top:8px"><button class="crm-btn ghost" style="font-size:11.5px;padding:5px 10px" onclick="ctrlUsarRota(\''+t.transportadora+'\')">Usar '+ctrlLabelRota(t.transportadora)+' neste pedido</button>' +
-      '<button class="crm-btn ghost" style="font-size:11.5px;padding:5px 10px;margin-left:6px" onclick="ctrlCopiaMsg(\''+t.transportadora+'\')">📋 Copiar msg WhatsApp</button></div>' +
+    var badge = (isFirst && t.atendida && !t.valor_manual) ? '<span class="ctrl-badge-priority">✓ Rota sugerida</span>' : '';
+    if (t.valor_manual) badge = '<span class="ctrl-badge-manual">⚠ Valor manual</span>';
+    return '<div class="ctrl-frete-card ctrl-anim-slide '+priorityCls+'" '+delay+'>' +
+      '<div class="ctrl-frete-ic '+(priorityCls==='priority'?'primary':(t.valor_manual?'manual':''))+'">'+(iconMap[t.transportadora]||'📦')+'</div>' +
+      '<div class="ctrl-frete-body">' +
+        '<div class="ctrl-frete-lead">'+badge+'</div>' +
+        '<div class="ctrl-frete-h4">'+crmEsc(t.label||ctrlLabelRota(t.transportadora))+'</div>' +
+        '<div class="ctrl-frete-meta">'+crmEsc(subMap[t.transportadora]||'')+'</div>' +
+        '<div class="ctrl-frete-tags">'+prazoTxt+
+          (t.modalidade&&!t.valor_manual&&!t.confirmar?'<span class="ctrl-tag">'+crmEsc(t.modalidade)+'</span>':'') +
+        '</div>' +
+        detalhes + aviso + aeroSel +
+        '<div class="ctrl-frete-actions">' +
+          '<button class="ctrl-mini-btn primary" onclick="ctrlUsarRota(\''+t.transportadora+'\')">✓ Usar esta rota</button>' +
+          '<button class="ctrl-mini-btn" onclick="ctrlCopiaMsg(\''+t.transportadora+'\')">📋 Copiar msg WhatsApp</button>' +
+        '</div>' +
       '</div>' + valorHtml + '</div>';
   }).join('');
   res.innerHTML = rotaSug +
-    '<div class="ctrl-card"><h3>Resultados <span style="font-size:11px;color:var(--gy);font-weight:400">— em ordem de escolha</span></h3>' +
-    cardsHtml + '</div>';
+    '<div class="ctrl-card ctrl-anim-2">' +
+      '<div class="ctrl-card-head"><span class="ctrl-card-ic">📊</span><div><h3>Resultados da cotação</h3><div class="ctrl-card-sub">Ordem de escolha: Ezequiel → LT → RPA → Aéreo</div></div></div>' +
+      cardsHtml +
+    '</div>';
 }
 function ctrlLabelRota(k){
   return { ezequiel:'Ezequiel', lt:'LT', rpa:'RPA', aereo:'Aéreo (Ezequiel+Gollog)' }[k] || k;
@@ -7213,148 +7264,383 @@ function crmFmtDateTime(s){
 </script>
 
 <style>
-/* ═════ Operação Controlado ═════ */
-.ctrl-wrap { display: flex; flex-direction: column; gap: 16px; }
-.ctrl-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-.ctrl-sub-desc { color: var(--gy); font-size: 12.5px; margin-top: 2px; }
+/* ═════ Operação Controlado — polish v2 ═════ */
+.ctrl-wrap { display: flex; flex-direction: column; gap: 18px; font-family: var(--ff); }
+
+/* Hero header */
+.ctrl-hero {
+  background: linear-gradient(135deg, var(--gl) 0%, #f4fbf5 55%, var(--wh) 100%);
+  border: 1px solid var(--gm); border-radius: var(--r-lg);
+  padding: 22px 26px; box-shadow: var(--sh-1); position: relative; overflow: hidden;
+}
+.ctrl-hero::after {
+  content: '🚚'; position: absolute; right: 24px; top: 50%;
+  transform: translateY(-50%) rotate(-6deg); font-size: 90px; opacity: .07;
+  pointer-events: none;
+}
+.ctrl-hero-badge {
+  display: inline-block; font-size: 11px; font-weight: 700;
+  letter-spacing: .6px; text-transform: uppercase;
+  color: var(--gd); background: var(--wh); border: 1px solid var(--gm);
+  padding: 3px 10px; border-radius: var(--r-full);
+}
+.ctrl-hero-title { margin: 8px 0 4px; font-size: 22px; font-weight: 700; color: var(--k); text-wrap: balance; }
+.ctrl-hero-desc { color: var(--dk); font-size: 13.5px; max-width: 620px; line-height: 1.5; }
+
+/* Tabs — pills */
 .ctrl-tabs {
-  display: flex; gap: 4px; border-bottom: 1px solid var(--bd);
-  overflow-x: auto;
+  display: flex; gap: 6px; padding: 4px;
+  background: var(--wh); border: 1px solid var(--bd); border-radius: var(--r-md);
+  overflow-x: auto; box-shadow: var(--sh-1); width: fit-content; max-width: 100%;
 }
 .ctrl-tab {
-  padding: 10px 16px; background: transparent; border: 0;
-  border-bottom: 2px solid transparent; cursor: pointer;
-  color: var(--gy); font-size: 13px; font-weight: 600;
-  white-space: nowrap; font-family: inherit;
+  padding: 9px 16px; background: transparent; border: 0;
+  cursor: pointer; color: var(--dk); font-size: 13.5px; font-weight: 600;
+  white-space: nowrap; font-family: inherit; border-radius: var(--r-sm);
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all .2s var(--ez);
 }
-.ctrl-tab.on { color: var(--gd); border-bottom-color: var(--gd); }
+.ctrl-tab:hover { background: var(--bg); color: var(--k); }
+.ctrl-tab.on { background: var(--gd); color: var(--wh); box-shadow: 0 4px 12px rgba(61,138,73,.28); }
+.ctrl-tab-ic { font-size: 15px; line-height: 1; }
+
+.ctrl-panel-fade { animation: ctrlFadeIn .3s var(--ez); }
+
+/* Card base */
 .ctrl-card {
-  background: var(--wh); border: 1px solid var(--bd); border-radius: 12px;
-  padding: 16px 18px; box-shadow: var(--sh-1);
+  background: var(--wh); border: 1px solid var(--bd); border-radius: var(--r-md);
+  padding: 20px 22px; box-shadow: var(--sh-1);
+  transition: box-shadow .2s var(--ez);
 }
-.ctrl-card + .ctrl-card, .ctrl-cot-grid > * > .ctrl-card + .ctrl-card { margin-top: 14px; }
-.ctrl-card h3 { margin: 0 0 12px; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
-.ctrl-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media (max-width: 720px) { .ctrl-grid-2 { grid-template-columns: 1fr; } }
-.ctrl-cot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
-@media (max-width: 900px) { .ctrl-cot-grid { grid-template-columns: 1fr; } }
+.ctrl-card + .ctrl-card { margin-top: 14px; }
+.ctrl-card:hover { box-shadow: var(--sh-2); }
+.ctrl-card h3 { margin: 0; font-size: 15px; font-weight: 700; color: var(--k); }
+.ctrl-card-head {
+  display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px;
+}
+.ctrl-card-ic {
+  width: 36px; height: 36px; border-radius: var(--r-sm);
+  background: var(--gl); color: var(--gd);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.ctrl-card-sub { font-size: 12px; color: var(--gy); margin-top: 2px; }
+
+/* Grid destino */
+.ctrl-cot-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.ctrl-col { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+@media (max-width: 960px) { .ctrl-cot-grid { grid-template-columns: 1fr; } }
+.ctrl-grid-cep { display: grid; grid-template-columns: 1fr 1.4fr 70px; gap: 10px; }
+@media (max-width: 620px) { .ctrl-grid-cep { grid-template-columns: 1fr 1fr; } .ctrl-grid-cep .ctrl-fld:nth-child(3) { grid-column: 2; } }
+
+/* Form fields */
+.ctrl-fld { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ctrl-fld label {
+  font-size: 11px; color: var(--gy); font-weight: 700;
+  text-transform: uppercase; letter-spacing: .4px;
+}
+.ctrl-fld input, .ctrl-fld select, .ctrl-fld textarea {
+  background: var(--wh); color: var(--k);
+  border: 1.5px solid var(--bd); border-radius: var(--r-sm);
+  padding: 10px 12px; font-size: 14px; font-family: inherit;
+  transition: border-color .18s var(--ez), box-shadow .18s var(--ez);
+  width: 100%; min-width: 0;
+}
+.ctrl-fld input:hover:not(:disabled), .ctrl-fld select:hover:not(:disabled) { border-color: var(--gm); }
+.ctrl-fld input:focus, .ctrl-fld select:focus, .ctrl-fld textarea:focus {
+  outline: none; border-color: var(--g); box-shadow: var(--ring);
+}
+.ctrl-fld input:disabled { background: var(--bg); color: var(--gy); cursor: not-allowed; }
+.ctrl-fld-disabled label { color: var(--gl2); }
+
+/* Item row */
 .ctrl-item-row {
-  display: grid; grid-template-columns: 1fr 90px 140px 32px; gap: 8px;
-  align-items: end; padding: 8px 0; border-top: 1px dashed var(--bd);
+  display: grid; grid-template-columns: 32px 1.5fr 100px 1fr 32px;
+  gap: 10px; align-items: end;
+  padding: 12px 0; border-top: 1px solid var(--bd);
+  animation: ctrlSlideIn .3s var(--ez);
 }
-.ctrl-item-row:first-child { border-top: 0; padding-top: 0; }
-@media (max-width: 620px) { .ctrl-item-row { grid-template-columns: 1fr 1fr; } .ctrl-item-row .ctrl-del { grid-column: 2; justify-self: end; } }
-.ctrl-del { background: transparent; border: 0; color: var(--gy); cursor: pointer; font-size: 18px; padding: 4px 8px; }
+.ctrl-item-row:first-child { border-top: 0; padding-top: 4px; }
+@media (max-width: 720px) {
+  .ctrl-item-row { grid-template-columns: 32px 1fr 1fr 32px; }
+  .ctrl-item-row .ctrl-fld:nth-child(4) { grid-column: 2 / span 2; }
+}
+.ctrl-item-ic {
+  width: 32px; height: 32px; border-radius: var(--r-sm);
+  background: var(--gl); color: var(--gd);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; align-self: flex-end; margin-bottom: 2px;
+}
+.ctrl-del {
+  background: transparent; border: 1px solid transparent; color: var(--gy);
+  cursor: pointer; font-size: 12px; padding: 8px 10px; border-radius: var(--r-sm);
+  align-self: flex-end; transition: all .18s var(--ez);
+}
+.ctrl-del:hover { background: var(--rl); color: var(--r); border-color: var(--rl); }
+
+/* Add item */
+.ctrl-add-item {
+  margin-top: 12px; padding: 10px 14px; width: 100%;
+  background: var(--wh); border: 1.5px dashed var(--bd); border-radius: var(--r-sm);
+  color: var(--gy); font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: inherit;
+  transition: all .18s var(--ez);
+}
+.ctrl-add-item:hover { border-color: var(--g); color: var(--gd); background: var(--gl); }
+.ctrl-add-item span { display: inline-block; margin-right: 4px; font-size: 15px; }
+
+/* CTA principal */
+.ctrl-cta-row {
+  display: flex; gap: 12px; align-items: center; margin-top: 18px; flex-wrap: wrap;
+}
+.ctrl-cta {
+  background: linear-gradient(135deg, var(--g), var(--gd));
+  color: var(--wh); border: 0; border-radius: var(--r-sm);
+  padding: 12px 20px; font-size: 14px; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 8px;
+  box-shadow: 0 4px 14px rgba(61,138,73,.28);
+  transition: transform .2s var(--ez), box-shadow .2s var(--ez);
+}
+.ctrl-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(61,138,73,.36); }
+.ctrl-cta:active { transform: translateY(0); }
+.ctrl-cta-ic { font-size: 16px; }
+.ctrl-cta-hint { font-size: 12px; color: var(--gy); }
+
+/* Empty state */
+.ctrl-empty {
+  padding: 40px 24px; text-align: center;
+  background: linear-gradient(180deg, var(--wh), var(--bg));
+  border: 1px dashed var(--bd); border-radius: var(--r-md);
+}
+.ctrl-empty-ic { font-size: 48px; margin-bottom: 12px; animation: ctrlBob 3s ease-in-out infinite; }
+.ctrl-empty-title { font-size: 17px; font-weight: 700; color: var(--k); margin-bottom: 6px; }
+.ctrl-empty-desc { font-size: 13px; color: var(--dk); max-width: 380px; margin: 0 auto 20px; line-height: 1.55; }
+.ctrl-chips-lbl { font-size: 11px; font-weight: 700; color: var(--gy); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+.ctrl-chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.ctrl-chip-btn {
+  background: var(--wh); border: 1px solid var(--bd); border-radius: var(--r-full);
+  padding: 7px 14px; font-size: 12.5px; font-weight: 600;
+  color: var(--dk); cursor: pointer; font-family: inherit;
+  transition: all .18s var(--ez); box-shadow: var(--sh-1);
+}
+.ctrl-chip-btn:hover { border-color: var(--g); color: var(--gd); transform: translateY(-1px); box-shadow: var(--sh-2); }
+
+/* Result cards */
+.ctrl-matriz-banner {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: var(--gl); color: var(--gd);
+  padding: 12px 16px; border-radius: var(--r-sm);
+  font-size: 13px; font-weight: 600;
+  margin-bottom: 14px; border: 1px solid var(--gm);
+}
+.ctrl-mb-tag {
+  margin-left: auto; font-size: 10.5px; font-weight: 700;
+  background: var(--wh); color: var(--gd);
+  padding: 3px 8px; border-radius: var(--r-full);
+  text-transform: uppercase; letter-spacing: .3px;
+}
 
 .ctrl-frete-card {
-  border: 1px solid var(--bd); border-radius: 10px; padding: 14px;
-  display: grid; grid-template-columns: 1fr auto; gap: 12px;
-  background: var(--wh); margin-top: 10px;
+  border: 1.5px solid var(--bd); border-radius: var(--r-md); padding: 16px;
+  display: grid; grid-template-columns: 56px 1fr auto; gap: 14px;
+  background: var(--wh); margin-top: 12px; align-items: start;
+  transition: transform .2s var(--ez), box-shadow .2s var(--ez), border-color .2s;
 }
-.ctrl-frete-card.priority { border-color: var(--gd); background: #e7f5ec; }
-.ctrl-frete-card.manual   { background: #fef4e7; border-color: transparent; }
-.ctrl-frete-lead { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; color: var(--gy); }
-.ctrl-frete-card.priority .ctrl-frete-lead { color: var(--gd); }
-.ctrl-frete-card.manual .ctrl-frete-lead   { color: #a06210; }
-.ctrl-frete-h4 { margin: 4px 0 6px; font-size: 16px; font-weight: 700; }
-.ctrl-frete-meta { font-size: 12.5px; color: var(--gy); }
-.ctrl-frete-detalhes { font-size: 11.5px; color: var(--gy); margin-top: 4px; }
-.ctrl-frete-valor {
-  font-size: 22px; font-weight: 700; text-align: right;
-  font-variant-numeric: tabular-nums; white-space: nowrap;
+.ctrl-frete-card:hover { transform: translateY(-2px); box-shadow: var(--sh-2); }
+.ctrl-frete-card.priority {
+  border-color: var(--g);
+  background: linear-gradient(135deg, var(--gl) 0%, var(--wh) 60%);
+  box-shadow: 0 4px 18px rgba(90,170,102,.15);
 }
-.ctrl-frete-valor.confirm { color: #a06210; font-size: 14px; }
+.ctrl-frete-card.manual { background: #fff8ef; border-color: #f0c47a; }
+.ctrl-frete-card.off { opacity: .55; background: var(--bg); }
+.ctrl-frete-ic {
+  width: 56px; height: 56px; border-radius: var(--r-md);
+  background: var(--bg); color: var(--dk);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; flex-shrink: 0;
+}
+.ctrl-frete-ic.primary { background: var(--gd); color: var(--wh); box-shadow: 0 4px 12px rgba(61,138,73,.25); }
+.ctrl-frete-ic.manual { background: #a06210; color: var(--wh); }
+.ctrl-frete-ic.muted { background: transparent; border: 1px dashed var(--bd); }
+.ctrl-frete-body { min-width: 0; }
+.ctrl-frete-lead { display: flex; gap: 6px; align-items: center; min-height: 20px; margin-bottom: 4px; }
+.ctrl-badge-priority {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase;
+  background: var(--gd); color: var(--wh);
+  padding: 3px 8px; border-radius: var(--r-full);
+}
+.ctrl-badge-manual {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase;
+  background: #a06210; color: var(--wh);
+  padding: 3px 8px; border-radius: var(--r-full);
+}
+.ctrl-frete-h4 { margin: 4px 0 4px; font-size: 17px; font-weight: 700; color: var(--k); }
+.ctrl-frete-meta { font-size: 13px; color: var(--dk); line-height: 1.45; }
+.ctrl-frete-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.ctrl-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg); color: var(--dk);
+  padding: 3px 9px; border-radius: var(--r-full);
+  font-size: 11.5px; font-weight: 600;
+}
+.ctrl-frete-detalhes { font-size: 11.5px; color: var(--gy); margin-top: 8px; padding: 8px 10px; background: var(--bg); border-radius: var(--r-sm); }
+.ctrl-frete-valor { text-align: right; white-space: nowrap; }
+.ctrl-frete-valor .v {
+  font-size: 26px; font-weight: 700; color: var(--k);
+  font-variant-numeric: tabular-nums; line-height: 1.1;
+}
+.ctrl-frete-card.priority .ctrl-frete-valor .v { color: var(--gd); }
+.ctrl-frete-valor.confirm .v { font-size: 15px; color: #a06210; }
 .ctrl-frete-un {
-  display: block; font-size: 10.5px; color: var(--gy);
-  text-transform: uppercase; letter-spacing: .3px; font-weight: 600; margin-top: 2px;
+  font-size: 10.5px; color: var(--gy);
+  text-transform: uppercase; letter-spacing: .3px; font-weight: 600; margin-top: 4px;
 }
-@media (max-width: 500px) { .ctrl-frete-card { grid-template-columns: 1fr; } .ctrl-frete-valor { text-align: left; } }
-.ctrl-matriz-banner {
-  background: #e7f5ec; color: var(--gd);
-  padding: 8px 12px; border-radius: 6px;
-  font-size: 12.5px; font-weight: 600;
-  margin-bottom: 12px;
+@media (max-width: 640px) {
+  .ctrl-frete-card { grid-template-columns: 42px 1fr; }
+  .ctrl-frete-ic { width: 42px; height: 42px; font-size: 20px; }
+  .ctrl-frete-valor { grid-column: 2; text-align: left; margin-top: 8px; }
 }
 .ctrl-aviso {
-  background: #fbe6e6; color: #a01818; padding: 6px 10px;
-  border-radius: 6px; font-size: 12px; font-weight: 600; margin-top: 8px;
+  background: var(--rl); color: var(--r);
+  padding: 8px 12px; border-radius: var(--r-sm);
+  font-size: 12px; font-weight: 600; margin-top: 10px;
+}
+.ctrl-frete-actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+.ctrl-mini-btn {
+  background: var(--wh); border: 1px solid var(--bd);
+  color: var(--dk); font-size: 12px; font-weight: 600;
+  padding: 7px 12px; border-radius: var(--r-sm); cursor: pointer;
+  font-family: inherit; transition: all .18s var(--ez);
+}
+.ctrl-mini-btn:hover { border-color: var(--g); color: var(--gd); background: var(--gl); }
+.ctrl-mini-btn.primary { background: var(--gd); color: var(--wh); border-color: var(--gd); }
+.ctrl-mini-btn.primary:hover { background: var(--g); border-color: var(--g); color: var(--wh); }
+.ctrl-aero-sel {
+  margin-top: 10px; padding: 10px 12px; background: var(--gl);
+  border-radius: var(--r-sm); display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+}
+.ctrl-aero-sel label { font-size: 11px; font-weight: 700; color: var(--gd); text-transform: uppercase; letter-spacing: .3px; }
+.ctrl-aero-sel select {
+  background: var(--wh); border: 1px solid var(--gm); border-radius: var(--r-sm);
+  padding: 6px 10px; font-size: 12.5px; font-family: inherit; color: var(--k);
 }
 
-.ctrl-fila-layout { display: grid; grid-template-columns: 340px 1fr; gap: 16px; align-items: start; }
-@media (max-width: 900px) { .ctrl-fila-layout { grid-template-columns: 1fr; } }
-.ctrl-env-card {
-  background: var(--wh); border: 1px solid var(--bd); border-radius: 10px;
-  padding: 12px 14px; cursor: pointer; border-left: 3px solid var(--bd);
-  margin-bottom: 10px;
+/* Skeleton loading */
+.ctrl-skel-head { display: flex; gap: 12px; margin-bottom: 16px; }
+.ctrl-skel-line, .ctrl-skel-card {
+  background: linear-gradient(90deg, var(--bg) 0%, var(--bd) 50%, var(--bg) 100%);
+  background-size: 200% 100%;
+  animation: ctrlShimmer 1.4s infinite;
+  border-radius: var(--r-sm);
 }
-.ctrl-env-card.on { border-color: var(--gd); border-left-color: var(--gd); box-shadow: var(--sh-1); }
+.ctrl-skel-line { height: 12px; }
+.ctrl-skel-card { height: 84px; margin-top: 10px; }
+.ctrl-spinner {
+  display: inline-block; width: 12px; height: 12px;
+  border: 2px solid var(--gm); border-top-color: var(--gd);
+  border-radius: 50%; animation: ctrlSpin .8s linear infinite;
+  vertical-align: -2px; margin-right: 4px;
+}
+
+/* Animations */
+@keyframes ctrlFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes ctrlSlideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+@keyframes ctrlShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@keyframes ctrlSpin { to { transform: rotate(360deg); } }
+@keyframes ctrlBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.ctrl-anim-1 { animation: ctrlFadeIn .4s var(--ez) both; }
+.ctrl-anim-2 { animation: ctrlFadeIn .4s .1s var(--ez) both; }
+.ctrl-anim-slide { animation: ctrlFadeIn .5s var(--ez) both; }
+
+/* ═════ Fila ═════ */
+.ctrl-fila-layout { display: grid; grid-template-columns: 360px minmax(0,1fr); gap: 18px; align-items: start; }
+@media (max-width: 960px) { .ctrl-fila-layout { grid-template-columns: 1fr; } }
+.ctrl-env-card {
+  background: var(--wh); border: 1px solid var(--bd); border-radius: var(--r-md);
+  padding: 14px 16px; cursor: pointer; border-left: 4px solid var(--bd);
+  margin-bottom: 10px; box-shadow: var(--sh-1);
+  transition: all .2s var(--ez);
+  animation: ctrlSlideIn .35s var(--ez);
+}
+.ctrl-env-card:hover { transform: translateX(2px); box-shadow: var(--sh-2); border-color: var(--gm); }
+.ctrl-env-card.on { border-color: var(--g); border-left-color: var(--gd); background: linear-gradient(90deg, var(--gl), var(--wh) 50%); }
 .ctrl-env-card.calibre { border-left-color: #7a5cff; }
-.ctrl-env-card.calibre.on { border-color: #7a5cff; border-left-color: #7a5cff; }
+.ctrl-env-card.calibre.on { border-color: #a189ff; border-left-color: #7a5cff; background: linear-gradient(90deg, #f0eaff, var(--wh) 50%); }
 .ctrl-env-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12px; color: var(--gy); }
-.ctrl-env-cli { font-weight: 700; margin: 4px 0; font-size: 13.5px; }
+.ctrl-env-cli { font-weight: 700; margin: 6px 0 5px; font-size: 14px; color: var(--k); }
 .b-ph { color: var(--gd); font-weight: 700; }
 .b-cr { color: #7a5cff; font-weight: 700; }
+
 .ctrl-chip {
   display: inline-flex; align-items: center; gap: 4px;
-  padding: 2px 8px; border-radius: 99px;
+  padding: 3px 9px; border-radius: var(--r-full);
   font-size: 11px; font-weight: 600;
-  background: var(--bg); color: var(--gy);
-  white-space: nowrap;
+  background: var(--bg); color: var(--gy); white-space: nowrap;
 }
 .ctrl-chip.dot::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.ctrl-chip.ok { background: #e7f5ec; color: var(--gd); }
+.ctrl-chip.ok { background: var(--gl); color: var(--gd); }
 .ctrl-chip.wait { background: #fef4e7; color: #a06210; }
-.ctrl-chip.late { background: #fbe6e6; color: #a01818; }
+.ctrl-chip.late { background: var(--rl); color: var(--r); }
 .ctrl-chip.aereo { background: #f0eaff; color: #7a5cff; }
 
 .ctrl-det-head {
   display: grid; grid-template-columns: 1fr auto; gap: 10px;
-  padding-bottom: 12px; border-bottom: 1px solid var(--bd); margin-bottom: 12px;
+  padding-bottom: 14px; border-bottom: 1px solid var(--bd); margin-bottom: 14px;
 }
 .ctrl-kpi-row {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 8px; margin-bottom: 12px;
+  gap: 10px; margin-bottom: 14px;
 }
-.ctrl-kpi { background: var(--bg); border-radius: 6px; padding: 8px 10px; }
+.ctrl-kpi {
+  background: var(--bg); border-radius: var(--r-sm); padding: 10px 12px;
+  transition: transform .18s var(--ez);
+}
+.ctrl-kpi:hover { transform: translateY(-1px); }
 .ctrl-kpi .k { font-size: 10.5px; color: var(--gy); text-transform: uppercase; letter-spacing: .3px; font-weight: 700; }
-.ctrl-kpi .v { font-size: 14.5px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.ctrl-kpi .v { font-size: 15px; font-weight: 700; margin-top: 3px; font-variant-numeric: tabular-nums; color: var(--k); }
 
 .ctrl-step {
-  display: grid; grid-template-columns: 32px 1fr; gap: 12px;
-  padding: 10px 0; border-top: 1px solid var(--bd); align-items: start;
+  display: grid; grid-template-columns: 36px 1fr; gap: 12px;
+  padding: 12px 0; border-top: 1px solid var(--bd); align-items: start;
 }
 .ctrl-step:first-of-type { border-top: 0; }
 .ctrl-mark {
-  width: 26px; height: 26px; border-radius: 50%;
+  width: 30px; height: 30px; border-radius: 50%;
   border: 2px solid var(--bd); background: var(--wh);
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; color: var(--gy); margin-top: 2px;
+  font-size: 13px; font-weight: 700; color: var(--gy);
+  transition: all .2s var(--ez);
 }
-.ctrl-step.done .ctrl-mark { background: var(--gd); border-color: var(--gd); color: #fff; }
-.ctrl-step.wait .ctrl-mark { border-color: #a06210; color: #a06210; background: #fef4e7; }
-.ctrl-step.travado .ctrl-mark { background: var(--bg); color: var(--gy); }
-.ctrl-step-title { font-weight: 600; font-size: 13.5px; }
-.ctrl-step-meta { font-size: 12px; color: var(--gy); margin-top: 3px; }
+.ctrl-step.done .ctrl-mark { background: var(--gd); border-color: var(--gd); color: var(--wh); box-shadow: 0 3px 8px rgba(61,138,73,.25); }
+.ctrl-step.wait .ctrl-mark { border-color: #d99a2b; color: #a06210; background: #fef4e7; }
+.ctrl-step.travado .ctrl-mark { background: var(--bg); color: var(--gl2); font-size: 11px; }
+.ctrl-step-title { font-weight: 700; font-size: 14px; color: var(--k); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ctrl-step-meta { font-size: 12.5px; color: var(--gy); margin-top: 4px; line-height: 1.5; }
 .ctrl-inline-fields {
-  margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+  margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
 }
 .ctrl-inline-fields input, .ctrl-inline-fields select {
-  background: var(--wh); color: var(--tx); border: 1px solid var(--bd);
-  border-radius: 6px; padding: 6px 8px; font-size: 12.5px; font-family: inherit;
+  background: var(--wh); color: var(--k); border: 1.5px solid var(--bd);
+  border-radius: var(--r-sm); padding: 8px 10px; font-size: 13px; font-family: inherit;
+  transition: border-color .18s var(--ez);
 }
+.ctrl-inline-fields input:focus, .ctrl-inline-fields select:focus { outline: none; border-color: var(--g); box-shadow: var(--ring); }
 
 .ctrl-cond-block {
-  background: #fef4e7; border-left: 3px solid #a06210;
-  padding: 10px 14px; border-radius: 4px; margin: 12px 0;
+  background: linear-gradient(135deg, #fff8ef, var(--wh) 90%);
+  border-left: 4px solid #d99a2b;
+  padding: 12px 16px; border-radius: var(--r-sm); margin: 12px 0;
 }
 .ctrl-cond-lbl {
   font-size: 11px; text-transform: uppercase; letter-spacing: .4px;
-  color: #a06210; font-weight: 700; margin-bottom: 4px;
+  color: #a06210; font-weight: 700; margin-bottom: 6px;
 }
 
 .ctrl-matriz-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.ctrl-matriz-table th { text-align: left; padding: 8px 10px; background: var(--bg); color: var(--gy); font-size: 11px; text-transform: uppercase; letter-spacing: .3px; }
-.ctrl-matriz-table td { padding: 10px; border-top: 1px solid var(--bd); }
+.ctrl-matriz-table th { text-align: left; padding: 10px 12px; background: var(--bg); color: var(--gy); font-size: 11px; text-transform: uppercase; letter-spacing: .3px; }
+.ctrl-matriz-table td { padding: 12px; border-top: 1px solid var(--bd); }
 .crm-btn.small { padding: 6px 10px; font-size: 12px; }
 </style>
 
