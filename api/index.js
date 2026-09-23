@@ -40,6 +40,10 @@ const blingBackfill   = require('../lib/bling/backfill');
 const blingVendedores = require('../lib/bling/vendedores');
 const blingSync       = require('../lib/bling/sync');
 const blingContasReceber = require('../lib/bling/contasReceber');
+const freteCotar    = require('../lib/frete/cotar');
+const freteMatriz   = require('../lib/frete/matriz');
+const freteGollog   = require('../lib/frete/gollog');
+const envios        = require('../lib/crm/envios');
 const { getFile: _ghGet, saveFile: _ghSave } = require('../lib/githubStore');
 
 // Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
@@ -548,7 +552,8 @@ module.exports = async (req, res) => {
   const crmMatch = url.match(/^\/api\/crm\/([a-z_]+)(?:\/([A-Za-z0-9\-_.]+))?$/);
   if (crmMatch && crmMatch[1] !== 'session-info' && crmMatch[1] !== 'migrate-parceiros' && crmMatch[1] !== 'docs' && crmMatch[1] !== 'cron' && crmMatch[1] !== 'fenix'
       && crmMatch[1] !== 'coocorrencia' && crmMatch[1] !== 'sugerir' && crmMatch[1] !== 'tarefas' && crmMatch[1] !== 'ficha'
-      && crmMatch[1] !== 'catalogo' && crmMatch[1] !== 'prospeccao' && crmMatch[1] !== 'vendedores' && crmMatch[1] !== 'bling') {
+      && crmMatch[1] !== 'catalogo' && crmMatch[1] !== 'prospeccao' && crmMatch[1] !== 'vendedores' && crmMatch[1] !== 'bling'
+      && crmMatch[1] !== 'frete' && crmMatch[1] !== 'envios' && crmMatch[1] !== 'controlado') {
     const colName = crmMatch[1];
     const docId = crmMatch[2] || null;
     const reg = crmColl.REGISTRY[colName];
@@ -1755,6 +1760,228 @@ module.exports = async (req, res) => {
       const r = await blingContasReceber.buscarEmAbertoDoCliente({ cpf, idsPorConta });
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ ok: true, account_id: accId, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // OPERAÇÃO CONTROLADO — Cotação de frete + fila de envio
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /api/crm/frete/matriz?cidade=X&uf=Y — rota padrão sugerida
+  if (req.method === 'GET' && url.startsWith('/api/crm/frete/matriz')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const cidade = u.searchParams.get('cidade') || '';
+      const uf = (u.searchParams.get('uf') || '').toUpperCase();
+      const listar = u.searchParams.get('listar') === '1';
+      if (listar) {
+        const l = await freteMatriz.listar();
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, matriz: l }));
+        return;
+      }
+      if (!cidade || !uf) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'cidade+uf obrigatórios'})); return; }
+      const r = await freteMatriz.rotaPadrao(cidade, uf);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/frete/cotar — orquestra as 4 transportadoras
+  //   Body: { cep, cidade?, uf?, itens: [{tipo, quantidade|valor}] }
+  if (req.method === 'POST' && url === '/api/crm/frete/cotar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      const payload = JSON.parse(body || '{}');
+      const r = await freteCotar.cotarTudo({
+        cep: payload.cep,
+        cidade: payload.cidade,
+        uf: payload.uf,
+        itens: payload.itens || [],
+        actor: sess.usuario,
+      });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/frete/matriz/fechar — grava escolha na matriz
+  //   Body: { cidade, uf, rota }
+  if (req.method === 'POST' && url === '/api/crm/frete/matriz/fechar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      const p = JSON.parse(body || '{}');
+      await freteMatriz.registrarEscolha({ cidade: p.cidade, uf: p.uf, rota: p.rota, atualizado_por: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/frete/aeroportos?uf=X — lista aeroportos comerciais da UF (Gollog)
+  if (req.method === 'GET' && url.startsWith('/api/crm/frete/aeroportos')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const uf = (u.searchParams.get('uf') || '').toUpperCase();
+      const lista = uf ? freteGollog.porUf(uf) : freteGollog.AEROPORTOS;
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, aeroportos: lista }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/envios/abrir — cria envio a partir de empresa+número (puxa Bling)
+  //   Body: { empresa: 'prohunters'|'calibre', numero }
+  if (req.method === 'POST' && url === '/api/crm/envios/abrir') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      const { empresa, numero } = JSON.parse(body || '{}');
+      if (!empresa || !numero) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'empresa+numero obrigatórios'})); return; }
+      const emp = String(empresa).toLowerCase().trim();
+      const num = String(numero).trim();
+      const envId = 'env_' + emp + '_' + num;
+      // Já existe?
+      const ja = await crmStore.getDoc('envios', envId);
+      if (ja) { res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, existente: true, envio: ja, checklist: envios.estadoChecklist(ja) })); return; }
+      // Puxa pedido do Bling pela conta
+      let pedido;
+      try {
+        const listaResp = await blingApi.get('/pedidos/vendas', { numero: num, limite: 5 }, emp);
+        const lista = (listaResp && listaResp.data) || [];
+        const bp = lista.find(p => String(p.numero) === num) || lista[0];
+        if (!bp) throw new Error('Nenhum pedido ' + num + ' no Bling da ' + emp);
+        const det = await blingApi.get('/pedidos/vendas/' + bp.id, null, emp);
+        pedido = det.data || det;
+      } catch (e) {
+        res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error: 'Pedido não encontrado no Bling: ' + e.message}));
+        return;
+      }
+      const contato = pedido.contato || pedido.cliente || {};
+      const cpfBruto = contato.numeroDocumento || contato.cpfCnpj || contato.cnpj || contato.cpf || '';
+      const cpf = String(cpfBruto).replace(/\D/g,'');
+      const tipo = cpf.length === 14 ? 'pj' : 'pf';
+      const end = contato.endereco || {};
+      const itens = (Array.isArray(pedido.itens) ? pedido.itens : []).map(it => ({
+        sku: String((it.produto || {}).codigo || it.codigo || ''),
+        descricao: String((it.produto || {}).descricao || it.descricao || ''),
+        quantidade: Number(it.quantidade) || 1,
+      }));
+      const doc = envios.buildEnvio({
+        empresa: emp,
+        numero: num,
+        bling_pedido_id: String(pedido.id),
+        cliente_nome: contato.nome || contato.razao || 'Sem nome',
+        cliente_cpf_cnpj: cpf,
+        cliente_cpf_cnpj_tipo: tipo,
+        cliente_endereco: [end.endereco, end.numero, end.bairro].filter(Boolean).join(', ') || null,
+        cliente_cidade: end.municipio || null,
+        cliente_uf: end.uf || null,
+        cliente_cep: end.cep ? String(end.cep).replace(/\D/g,'') : null,
+        produtos: itens,
+        total_pedido: Number(pedido.total || pedido.totalvenda || 0),
+        observacoes: pedido.observacoes || null,
+        criado_por: sess.usuario,
+      });
+      const salvo = await crmStore.createDoc('envios', doc, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envio: salvo, checklist: envios.estadoChecklist(salvo) }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/envios — fila. Query: status, empresa, dono_proximo, atrasados
+  if (req.method === 'GET' && url.startsWith('/api/crm/envios') && !url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const statusFilter = u.searchParams.get('status') || '';
+      const empresaFilter = (u.searchParams.get('empresa') || '').toLowerCase();
+      const list = await crmStore.listDocs('envios');
+      const enriched = list.map(e => {
+        const est = envios.estadoChecklist(e);
+        return {
+          id: e.id,
+          empresa: e.empresa,
+          numero: e.numero,
+          cliente_nome: e.cliente_nome,
+          cliente_cpf_cnpj_tipo: e.cliente_cpf_cnpj_tipo,
+          cliente_uf: e.cliente_uf,
+          cliente_cidade: e.cliente_cidade,
+          transportadora: e.transportadora,
+          status: e.status,
+          feitos: est.feitos,
+          total: est.total,
+          pronto_coleta: est.pronto_coleta,
+          proximo_passo: est.proximo_passo,
+          aereo: est.aereo,
+          cnpj: est.cnpj,
+          criado_em: e.criado_em,
+          atualizado_em: e.atualizado_em,
+        };
+      });
+      let filtrado = enriched;
+      if (statusFilter) filtrado = filtrado.filter(x => x.status === statusFilter);
+      if (empresaFilter) filtrado = filtrado.filter(x => x.empresa === empresaFilter);
+      // Ordena: prontos por último, resto por atualização desc
+      filtrado.sort((a, b) => {
+        if (a.pronto_coleta !== b.pronto_coleta) return a.pronto_coleta ? 1 : -1;
+        return String(b.atualizado_em || '').localeCompare(String(a.atualizado_em || ''));
+      });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envios: filtrado }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/envios/:id — detalhe do envio + checklist
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const id = url.split('/').pop();
+      const env = await crmStore.getDoc('envios', id);
+      if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio não encontrado'})); return; }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envio: env, checklist: envios.estadoChecklist(env) }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // PATCH /api/crm/envios/:id — atualiza campos do envio (aciona passos)
+  if (req.method === 'PATCH' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const id = url.split('/').pop();
+      const env = await crmStore.getDoc('envios', id);
+      if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio não encontrado'})); return; }
+      const body = await readBody(req);
+      const patch = JSON.parse(body || '{}');
+      const proximo = envios.aplicarPatch(env, patch, sess.usuario);
+      const salvo = await crmStore.updateDoc('envios', id, proximo, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envio: salvo, checklist: envios.estadoChecklist(salvo) }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
