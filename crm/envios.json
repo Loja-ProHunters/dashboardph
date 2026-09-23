@@ -1,0 +1,69 @@
+{
+  "env_prohunters_27076": {
+    "id": "env_prohunters_27076",
+    "empresa": "prohunters",
+    "numero": "27076",
+    "bling_pedido_id": "26945133830",
+    "cliente_nome": "José Edival Ferreira de Menezes",
+    "cliente_cpf_cnpj": "26899140500",
+    "cliente_cpf_cnpj_tipo": "pf",
+    "cliente_endereco": null,
+    "cliente_cidade": null,
+    "cliente_uf": null,
+    "cliente_cep": null,
+    "produtos": [
+      {
+        "sku": "CBC-10002279",
+        "descricao": "Estojo Vazio CBC Presidente Cal 32GA",
+        "quantidade": 60
+      }
+    ],
+    "total_pedido": 1031.7,
+    "observacoes": null,
+    "status": "aberto",
+    "confirmado_bling": true,
+    "volumes_qtd": null,
+    "volumes_por": null,
+    "volumes_em": null,
+    "conferencia_ok": false,
+    "conferencia_por": null,
+    "conferencia_em": null,
+    "conferencia_notas": null,
+    "transportadora": null,
+    "transporte_valor": null,
+    "transporte_por": null,
+    "transporte_em": null,
+    "nf_numero": null,
+    "nf_por": null,
+    "nf_em": null,
+    "gt_numero": null,
+    "gt_por": null,
+    "gt_em": null,
+    "assinatura_ok": false,
+    "assinatura_por": null,
+    "assinatura_em": null,
+    "liberacao_ok": false,
+    "liberacao_por": null,
+    "liberacao_em": null,
+    "anexo_p_link": null,
+    "gru_link": null,
+    "comprovante_pix_link": null,
+    "pix_baixado": false,
+    "peso_kg": null,
+    "dimensoes_cm": null,
+    "minuta_numero": null,
+    "aeroporto_iata": null,
+    "historico": [
+      {
+        "ts": "2026-09-23T20:46:55.403Z",
+        "por": "gerencia",
+        "acao": "envio_criado",
+        "detalhe": "empresa=prohunters numero=27076"
+      }
+    ],
+    "criado_em": "2026-09-23T20:46:55.403Z",
+    "criado_por": "gerencia",
+    "atualizado_em": "2026-09-23T20:46:55.403Z",
+    "atualizado_por": "gerencia"
+  }
+}
