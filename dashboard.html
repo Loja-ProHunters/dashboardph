@@ -4681,6 +4681,7 @@ window.CRM = {
     tarefas:      { tit: '🎯 Minhas Tarefas', subtit: 'Fila de trabalho gerada pelo CRM' },
     ficha:        { tit: '🔍 Buscar Cliente', subtit: 'Ficha completa por nome ou CPF/CNPJ' },
     prospeccao:   { tit: '🎯 Prospecção',  subtit: 'Filtrar clientes por categoria, marca, período e valor' },
+    controlado:   { tit: '🚚 Op. Controlado', subtit: 'Cotação de frete + fila de envio de controlados' },
     accounts:     { tit: 'Contas',        subtit: 'Empresas e pessoas',   coll: 'accounts',     singular: 'Conta' },
     contacts:     { tit: 'Contatos',      subtit: 'Pessoas nas contas',   coll: 'contacts',     singular: 'Contato' },
     leads:        { tit: 'Leads',         subtit: 'Prospecção',            coll: 'leads',        singular: 'Lead' },
@@ -4723,7 +4724,7 @@ async function crmInit(){
 }
 
 function crmRenderSubTabs(){
-  var subs = ['painel','tarefas','ficha','prospeccao','accounts','documentos','armas','leads','opportunities','activities','referrals','orders','onboardings','contacts'];
+  var subs = ['painel','tarefas','ficha','prospeccao','controlado','accounts','documentos','armas','leads','opportunities','activities','referrals','orders','onboardings','contacts'];
   var L = window.CRM.labels;
   var html = subs.map(function(k){
     var cls = k === window.CRM.currentSub ? 'on' : '';
@@ -4771,6 +4772,12 @@ async function crmRenderCurrent(){
     acts.innerHTML = '';
     view.innerHTML = '<div class="crm-loading">Carregando prospecção…</div>';
     crmRenderProspeccao();
+    return;
+  }
+  if (k === 'controlado') {
+    acts.innerHTML = '';
+    view.innerHTML = '<div class="crm-loading">Carregando operação controlado…</div>';
+    ctrlRenderRoot();
     return;
   }
   // Lista de coleção
@@ -6694,7 +6701,663 @@ function crmProspCSV(){
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   OPERAÇÃO CONTROLADO — Cotação de frete + Fila de envio
+   ═══════════════════════════════════════════════════════════════════ */
+window.CTRL = window.CTRL || {
+  subtab: 'cotacao',   // 'cotacao' | 'fila' | 'matriz'
+  cotacaoItens: [ { tipo: 'curta', quantidade: 1 } ],
+  cotacaoResult: null,
+  fila: [],
+  filaFiltro: { status: '', empresa: '' },
+  envioAberto: null,
+  envioChecklist: null,
+};
+
+function ctrlRenderRoot(){
+  var view = document.getElementById('crm-view');
+  view.innerHTML =
+    '<div class="ctrl-wrap">' +
+      '<div class="ctrl-header">' +
+        '<div><strong>Operação Controlado</strong>' +
+        '<div class="ctrl-sub-desc">Cotação de frete + fila de envio de controlados. Duas empresas no mesmo Bling.</div></div>' +
+      '</div>' +
+      '<div class="ctrl-tabs">' +
+        '<button class="ctrl-tab '+(window.CTRL.subtab==='cotacao'?'on':'')+'" onclick="ctrlGoTab(\'cotacao\')">📦 Cotação</button>' +
+        '<button class="ctrl-tab '+(window.CTRL.subtab==='fila'?'on':'')+'" onclick="ctrlGoTab(\'fila\')">🚚 Fila de envio</button>' +
+        '<button class="ctrl-tab '+(window.CTRL.subtab==='matriz'?'on':'')+'" onclick="ctrlGoTab(\'matriz\')">🗺️ Matriz de cidades</button>' +
+      '</div>' +
+      '<div id="ctrl-panel"></div>' +
+    '</div>';
+  ctrlRenderPanel();
+}
+function ctrlGoTab(t){ window.CTRL.subtab = t; ctrlRenderRoot(); }
+function ctrlRenderPanel(){
+  var p = document.getElementById('ctrl-panel');
+  if (!p) return;
+  if (window.CTRL.subtab === 'cotacao') return ctrlRenderCotacao();
+  if (window.CTRL.subtab === 'fila')    return ctrlRenderFila();
+  if (window.CTRL.subtab === 'matriz')  return ctrlRenderMatriz();
+}
+
+/* ── COTAÇÃO ─────────────────────────────────────────────────── */
+function ctrlRenderCotacao(){
+  var p = document.getElementById('ctrl-panel');
+  var itensHtml = window.CTRL.cotacaoItens.map(function(it, i){
+    var showValor = it.tipo === 'insumos';
+    return '<div class="ctrl-item-row">' +
+      '<div class="crm-fld"><label>Tipo</label>' +
+        '<select onchange="ctrlItemMudou('+i+',\'tipo\',this.value)">' +
+          '<option value="curta" '+(it.tipo==='curta'?'selected':'')+'>Arma curta</option>' +
+          '<option value="curtaGlock" '+(it.tipo==='curtaGlock'?'selected':'')+'>Arma curta (Glock)</option>' +
+          '<option value="longa" '+(it.tipo==='longa'?'selected':'')+'>Arma longa</option>' +
+          '<option value="insumos" '+(it.tipo==='insumos'?'selected':'')+'>Insumos (munição/acessórios)</option>' +
+        '</select></div>' +
+      (showValor
+        ? '<div class="crm-fld"><label>Qtd</label><input type="number" value="'+(it.quantidade||1)+'" min="1" onchange="ctrlItemMudou('+i+',\'quantidade\',this.value)" /></div>' +
+          '<div class="crm-fld"><label>Valor R$ (insumos)</label><input type="text" value="'+(it.valor||'')+'" placeholder="0,00" onchange="ctrlItemMudou('+i+',\'valor\',this.value)" /></div>'
+        : '<div class="crm-fld"><label>Qtd</label><input type="number" value="'+(it.quantidade||1)+'" min="1" onchange="ctrlItemMudou('+i+',\'quantidade\',this.value)" /></div>' +
+          '<div class="crm-fld"><label>Valor R$</label><input type="text" value="—" disabled /></div>') +
+      '<button class="ctrl-del" title="Remover item" onclick="ctrlItemRemover('+i+')">×</button>' +
+    '</div>';
+  }).join('');
+  p.innerHTML =
+    '<div class="ctrl-cot-grid">' +
+      '<div>' +
+        '<div class="ctrl-card">' +
+          '<h3>Destino</h3>' +
+          '<div class="ctrl-grid-2">' +
+            '<div class="crm-fld"><label>CEP</label><input id="ctrl-cep" type="text" placeholder="00000-000" /></div>' +
+            '<div class="crm-fld"><label>Cidade + UF (opcional)</label>' +
+              '<div style="display:flex;gap:6px"><input id="ctrl-cidade" type="text" placeholder="Cidade" style="flex:1" />' +
+              '<input id="ctrl-uf" type="text" placeholder="UF" style="width:60px;text-transform:uppercase" maxlength="2" /></div></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="ctrl-card">' +
+          '<h3>Itens do pedido</h3>' +
+          '<div id="ctrl-itens">'+itensHtml+'</div>' +
+          '<button class="crm-btn ghost" style="margin-top:10px;font-size:12px" onclick="ctrlItemAdd()">+ Adicionar item</button>' +
+          '<div style="display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap">' +
+            '<button class="crm-btn" onclick="ctrlCotar()">Cotar frete</button>' +
+            '<span style="font-size:11.5px;color:var(--gy)">Ezequiel ao vivo · LT por tabela · RPA/Aéreo manual</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div id="ctrl-resultados">' +
+        (window.CTRL.cotacaoResult ? '' : '<div class="ctrl-card" style="color:var(--gy);font-size:13px">Digite o CEP (ou cidade+UF) e clique em <b>Cotar frete</b>. Os resultados aparecem aqui em ordem de prioridade.</div>') +
+      '</div>' +
+    '</div>';
+  if (window.CTRL.cotacaoResult) ctrlRenderResultados(window.CTRL.cotacaoResult);
+}
+function ctrlItemMudou(i, campo, v){
+  window.CTRL.cotacaoItens[i][campo] = v;
+}
+function ctrlItemAdd(){
+  window.CTRL.cotacaoItens.push({ tipo: 'insumos', valor: '' });
+  ctrlRenderCotacao();
+}
+function ctrlItemRemover(i){
+  if (window.CTRL.cotacaoItens.length <= 1) return;
+  window.CTRL.cotacaoItens.splice(i, 1);
+  ctrlRenderCotacao();
+}
+async function ctrlCotar(){
+  var cep = (document.getElementById('ctrl-cep').value||'').replace(/\D/g,'');
+  var cidade = (document.getElementById('ctrl-cidade').value||'').trim();
+  var uf = (document.getElementById('ctrl-uf').value||'').trim().toUpperCase();
+  if (!cep && (!cidade || !uf)) { alert('Informe o CEP ou cidade+UF'); return; }
+  var res = document.getElementById('ctrl-resultados');
+  res.innerHTML = '<div class="ctrl-card"><div class="crm-loading">Cotando…</div></div>';
+  var itens = window.CTRL.cotacaoItens.map(function(i){
+    var o = { tipo: i.tipo };
+    if (i.tipo === 'insumos') o.valor = Number(String(i.valor||'0').replace(/\./g,'').replace(',','.')) || 0;
+    else o.quantidade = Number(i.quantidade) || 1;
+    return o;
+  });
+  try {
+    var r = await fetch('/api/crm/frete/cotar', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ cep, cidade, uf, itens }),
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    window.CTRL.cotacaoResult = d;
+    ctrlRenderResultados(d);
+  } catch (e) {
+    res.innerHTML = '<div class="ctrl-card" style="color:var(--r)">Erro: '+crmEsc(e.message)+'</div>';
+  }
+}
+function ctrlRenderResultados(d){
+  var res = document.getElementById('ctrl-resultados');
+  var cidUf = (d.cidade || '—') + '/' + (d.uf || '—');
+  var rotaSug = d.rota_sugerida
+    ? '<div class="ctrl-matriz-banner">🗺️ Rota padrão pra <b>'+crmEsc(cidUf)+'</b>: <b>'+crmEsc(ctrlLabelRota(d.rota_sugerida.rota))+'</b> <span style="color:var(--gy)">('+crmEsc(d.rota_sugerida.origem||'?')+')</span></div>'
+    : '';
+  var cardsHtml = (d.resultados||[]).map(function(t, idx){
+    var isFirst = idx === 0;
+    var priorityCls = (isFirst && t.atendida && t.valor_total) ? 'priority' : (t.valor_manual ? 'manual' : '');
+    if (t.atendida === false && !t.motivo) return '';
+    if (t.atendida === false) {
+      return '<div class="ctrl-frete-card"><div><div class="ctrl-frete-lead">'+ctrlLabelRota(t.transportadora)+' — sem cobertura</div>' +
+        '<div class="ctrl-frete-meta">'+crmEsc(t.motivo || 'sem cobertura')+'</div></div></div>';
+    }
+    var valorHtml;
+    if (t.valor_manual) {
+      valorHtml = '<div class="ctrl-frete-valor confirm">a confirmar<span class="ctrl-frete-un">valor manual</span></div>';
+    } else if (t.confirmar) {
+      valorHtml = '<div class="ctrl-frete-valor confirm">a confirmar<span class="ctrl-frete-un">'+crmEsc(t.modalidade||'')+'</span></div>';
+    } else if (t.valor_total != null) {
+      valorHtml = '<div class="ctrl-frete-valor">'+crmFmtBRL(t.valor_total)+'<span class="ctrl-frete-un">'+crmEsc(t.modalidade||'')+'</span></div>';
+    } else {
+      valorHtml = '<div class="ctrl-frete-valor confirm">—</div>';
+    }
+    var prazoTxt = t.prazo_dias_uteis ? ' · '+t.prazo_dias_uteis+' dias úteis' : '';
+    var detalhes = (t.detalhes && Array.isArray(t.detalhes) && t.detalhes.length)
+      ? '<div class="ctrl-frete-detalhes">' + t.detalhes.map(function(x){
+          if (x.tipo === 'insumos') return 'insumos R$'+(x.base||0)+' → '+crmFmtBRL(x.valor||0);
+          return (x.quantidade||1)+'× '+(x.tipo||'')+' → '+crmFmtBRL(x.valor||0);
+        }).join(' · ') + '</div>'
+      : (t.detalhes && typeof t.detalhes === 'string' ? '<div class="ctrl-frete-detalhes">'+crmEsc(t.detalhes)+'</div>' : '');
+    var aviso = t.aviso ? '<div class="ctrl-aviso">⚠ '+crmEsc(t.aviso)+'</div>' : '';
+    var aeroSel = '';
+    if (t.transportadora === 'aereo' && t.aeroportos_uf && t.aeroportos_uf.length) {
+      aeroSel = '<div style="margin-top:8px"><b style="font-size:11.5px;color:var(--gy)">Aeroporto de destino:</b> ' +
+        '<select id="ctrl-aero" style="font-size:12px;padding:4px 6px;border:1px solid var(--bd);border-radius:6px;background:var(--wh);color:var(--tx)">' +
+        t.aeroportos_uf.map(function(a){ return '<option value="'+a.iata+'">'+a.iata+' — '+crmEsc(a.nome)+'</option>'; }).join('') +
+        '</select></div>';
+    }
+    return '<div class="ctrl-frete-card '+priorityCls+'"><div><div class="ctrl-frete-lead">' +
+      (isFirst && t.atendida && !t.valor_manual ? '✓ ROTA SUGERIDA · ' : '') +
+      ctrlLabelRota(t.transportadora).toUpperCase() +
+      (t.valor_manual ? ' — VALOR MANUAL' : '') +
+      '</div><div class="ctrl-frete-h4">'+crmEsc(t.label||'')+'</div>' +
+      '<div class="ctrl-frete-meta">'+crmEsc(cidUf)+prazoTxt+(t.motivo?' · '+crmEsc(t.motivo):'')+'</div>' +
+      detalhes + aviso + aeroSel +
+      '<div style="margin-top:8px"><button class="crm-btn ghost" style="font-size:11.5px;padding:5px 10px" onclick="ctrlUsarRota(\''+t.transportadora+'\')">Usar '+ctrlLabelRota(t.transportadora)+' neste pedido</button>' +
+      '<button class="crm-btn ghost" style="font-size:11.5px;padding:5px 10px;margin-left:6px" onclick="ctrlCopiaMsg(\''+t.transportadora+'\')">📋 Copiar msg WhatsApp</button></div>' +
+      '</div>' + valorHtml + '</div>';
+  }).join('');
+  res.innerHTML = rotaSug +
+    '<div class="ctrl-card"><h3>Resultados <span style="font-size:11px;color:var(--gy);font-weight:400">— em ordem de escolha</span></h3>' +
+    cardsHtml + '</div>';
+}
+function ctrlLabelRota(k){
+  return { ezequiel:'Ezequiel', lt:'LT', rpa:'RPA', aereo:'Aéreo (Ezequiel+Gollog)' }[k] || k;
+}
+async function ctrlUsarRota(k){
+  var d = window.CTRL.cotacaoResult;
+  if (!d || !d.cidade || !d.uf) { alert('Cote antes de escolher.'); return; }
+  try {
+    await fetch('/api/crm/frete/matriz/fechar', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ cidade: d.cidade, uf: d.uf, rota: k }),
+    });
+    alert('✓ Rota ' + ctrlLabelRota(k) + ' registrada como padrão pra ' + d.cidade + '/' + d.uf + '.');
+  } catch (e) { alert('Erro: ' + e.message); }
+}
+function ctrlCopiaMsg(k){
+  var d = window.CTRL.cotacaoResult;
+  if (!d) return;
+  var t = (d.resultados||[]).find(function(x){ return x.transportadora === k; });
+  var cidade = d.cidade || '—', uf = d.uf || '';
+  var msg;
+  if (k === 'aereo') {
+    msg = 'Olá! Pra ' + cidade + '/' + uf + ' não há cobertura terrestre, o envio vai por Ezequiel + Gollog (aéreo):\n' +
+      '\n✈️ Trecho aéreo Ezequiel → aeroporto de destino\n' +
+      '💰 Frete Ezequiel (Pix antes do envio) + Gollog (na retirada no aeroporto)\n' +
+      '⏱ Prazo depende do voo\n\nPode confirmar que preparo os documentos e envio o Pix pra você.';
+  } else {
+    var valor = (t && t.valor_total != null) ? ('R$ ' + Number(t.valor_total).toFixed(2).replace('.', ',')) : 'a confirmar';
+    var prazo = t && t.prazo_dias_uteis ? (t.prazo_dias_uteis + ' dias úteis') : '3-5 dias úteis (estimado)';
+    msg = 'Olá! O frete pra ' + cidade + '/' + uf + ' fica assim:\n\n' +
+      '🚚 Transportadora: ' + ctrlLabelRota(k) + ' (rota terrestre)\n' +
+      '💰 Valor: ' + valor + '\n' +
+      '⏱ Prazo: ' + prazo + '\n' +
+      '💳 Pagamento: direto ao transportador na retirada\n\n' +
+      'Pode confirmar que fecho o pedido e envio hoje. 🙏';
+  }
+  try {
+    navigator.clipboard.writeText(msg).then(function(){ alert('✓ Mensagem copiada'); }, function(){ prompt('Copie a mensagem:', msg); });
+  } catch (e) { prompt('Copie a mensagem:', msg); }
+}
+
+/* ── FILA ────────────────────────────────────────────────────── */
+async function ctrlRenderFila(){
+  var p = document.getElementById('ctrl-panel');
+  p.innerHTML =
+    '<div class="ctrl-card">' +
+      '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">' +
+        '<div class="crm-fld"><label>Empresa</label>' +
+          '<select id="ctrl-empresa"><option value="prohunters">Pro Hunters</option><option value="calibre">Calibre Restrito</option></select></div>' +
+        '<div class="crm-fld" style="flex:1;min-width:150px"><label>Nº do pedido</label>' +
+          '<input id="ctrl-numero" type="text" placeholder="Ex: 4132" /></div>' +
+        '<button class="crm-btn" onclick="ctrlAbrirEnvio()">Abrir envio</button>' +
+        '<div style="font-size:11.5px;color:var(--gy);align-self:center">Vai puxar cliente, endereço e produtos do Bling.</div>' +
+      '</div>' +
+    '</div>' +
+    '<div id="ctrl-fila-mensagem"></div>' +
+    '<div class="ctrl-fila-layout">' +
+      '<div id="ctrl-fila-list"><div class="crm-loading">Carregando fila…</div></div>' +
+      '<div id="ctrl-fila-detail" class="ctrl-card" style="color:var(--gy);font-size:13px">Selecione um envio à esquerda pra ver o checklist.</div>' +
+    '</div>';
+  await ctrlCarregarFila();
+}
+async function ctrlCarregarFila(){
+  try {
+    var r = await fetch('/api/crm/envios');
+    var d = await r.json();
+    window.CTRL.fila = d.envios || [];
+    ctrlRenderFilaLista();
+  } catch (e) {
+    document.getElementById('ctrl-fila-list').innerHTML = '<div style="color:var(--r);font-size:12px">Erro: '+crmEsc(e.message)+'</div>';
+  }
+}
+function ctrlRenderFilaLista(){
+  var list = document.getElementById('ctrl-fila-list');
+  if (!window.CTRL.fila.length) {
+    list.innerHTML = '<div style="padding:14px;color:var(--gy);font-size:12.5px">Nenhum envio na fila. Digite empresa + número em cima pra abrir o primeiro.</div>';
+    return;
+  }
+  var html = window.CTRL.fila.map(function(e){
+    var empCls = e.empresa === 'calibre' ? 'calibre' : '';
+    var empLbl = e.empresa === 'calibre' ? 'Calibre' : 'Pro Hunters';
+    var empCorCls = e.empresa === 'calibre' ? 'b-cr' : 'b-ph';
+    var statusChip;
+    if (e.pronto_coleta) statusChip = '<span class="ctrl-chip ok">✓ pronto</span>';
+    else if (e.proximo_passo) statusChip = '<span class="ctrl-chip wait dot">'+crmEsc(e.proximo_passo.titulo)+'</span>';
+    else statusChip = '<span class="ctrl-chip">—</span>';
+    var progress = '<span class="ctrl-chip">'+e.feitos+'/'+e.total+'</span>';
+    var extra = [];
+    if (e.aereo) extra.push('<span class="ctrl-chip aereo">✈️ aéreo</span>');
+    if (e.cnpj) extra.push('<span class="ctrl-chip">CNPJ</span>');
+    var cidadeUf = (e.cliente_cidade || '—') + '/' + (e.cliente_uf || '');
+    var isOpen = window.CTRL.envioAberto && window.CTRL.envioAberto.id === e.id;
+    return '<div class="ctrl-env-card '+empCls+(isOpen?' on':'')+'" onclick="ctrlAbrirDetalhe(\''+e.id+'\')">' +
+      '<div class="ctrl-env-head"><div><span class="'+empCorCls+'">'+empLbl+'</span> · <b>#'+crmEsc(e.numero)+'</b></div>'+progress+'</div>' +
+      '<div class="ctrl-env-cli">'+crmEsc(e.cliente_nome||'—')+'</div>' +
+      '<div style="font-size:12px;color:var(--gy);margin-top:2px">'+statusChip+' '+extra.join(' ')+' · '+crmEsc(cidadeUf)+
+      (e.transportadora?' · '+ctrlLabelRota(e.transportadora):'')+'</div>' +
+    '</div>';
+  }).join('');
+  list.innerHTML = html;
+}
+async function ctrlAbrirEnvio(){
+  var empresa = document.getElementById('ctrl-empresa').value;
+  var numero = (document.getElementById('ctrl-numero').value||'').trim();
+  if (!numero) { alert('Digite o número do pedido'); return; }
+  var msg = document.getElementById('ctrl-fila-mensagem');
+  msg.innerHTML = '<div class="ctrl-card" style="font-size:12.5px">Puxando pedido #'+crmEsc(numero)+' do Bling da '+empresa+'…</div>';
+  try {
+    var r = await fetch('/api/crm/envios/abrir', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ empresa, numero }),
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    msg.innerHTML = d.existente
+      ? '<div class="ctrl-card" style="background:var(--gd-bg,#e7f5ec);color:var(--gd);font-size:12.5px">✓ Envio já existia — abrindo</div>'
+      : '<div class="ctrl-card" style="background:var(--gd-bg,#e7f5ec);color:var(--gd);font-size:12.5px">✓ Envio criado</div>';
+    document.getElementById('ctrl-numero').value = '';
+    await ctrlCarregarFila();
+    ctrlAbrirDetalhe(d.envio.id);
+    setTimeout(function(){ msg.innerHTML = ''; }, 3500);
+  } catch (e) {
+    msg.innerHTML = '<div class="ctrl-card" style="color:var(--r);font-size:12.5px">Erro: '+crmEsc(e.message)+'</div>';
+  }
+}
+async function ctrlAbrirDetalhe(id){
+  var det = document.getElementById('ctrl-fila-detail');
+  det.innerHTML = '<div class="crm-loading">Carregando envio…</div>';
+  try {
+    var r = await fetch('/api/crm/envios/'+encodeURIComponent(id));
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    window.CTRL.envioAberto = d.envio;
+    window.CTRL.envioChecklist = d.checklist;
+    ctrlRenderFilaLista();
+    ctrlRenderDetalhe();
+  } catch (e) {
+    det.innerHTML = '<div style="color:var(--r);font-size:12px">Erro: '+crmEsc(e.message)+'</div>';
+  }
+}
+function ctrlRenderDetalhe(){
+  var det = document.getElementById('ctrl-fila-detail');
+  var e = window.CTRL.envioAberto;
+  var cl = window.CTRL.envioChecklist;
+  if (!e || !cl) { det.innerHTML = ''; return; }
+  var empLbl = e.empresa === 'calibre' ? 'Calibre Restrito' : 'Pro Hunters';
+  var produtosTxt = (e.produtos||[]).map(function(p){ return crmEsc((p.descricao||p.sku||'')+' ('+p.quantidade+' un)'); }).join(' · ');
+  var passosHtml = cl.passos.map(function(p){
+    var cls = p.estado === 'done' ? 'done' : (p.estado === 'wait' ? 'wait' : 'travado');
+    var mark = p.estado === 'done' ? '✓' : (p.estado === 'travado' ? '🔒' : p.num);
+    var meta = ctrlMetaPasso(e, p);
+    var fields = ctrlFieldsPasso(e, cl, p);
+    return '<div class="ctrl-step '+cls+'">' +
+      '<div class="ctrl-mark">'+mark+'</div>' +
+      '<div><div class="ctrl-step-title">'+p.num+' · '+crmEsc(p.titulo)+
+        (p.estado === 'travado' ? ' <span class="ctrl-chip late">travado</span>' : '') +
+        '</div><div class="ctrl-step-meta">'+meta+'</div>'+fields+'</div>' +
+    '</div>';
+  }).join('');
+  var condHtml = '';
+  if (cl.cnpj || cl.aereo) {
+    condHtml = '<div style="margin-top:14px"><h4 style="margin:0 0 8px;font-size:13px">Campos condicionais deste envio</h4>';
+    if (cl.cnpj) condHtml += ctrlCondCnpj(e);
+    if (cl.aereo) condHtml += ctrlCondAereo(e);
+    condHtml += '</div>';
+  }
+  var podeLiberar = cl.passos.every(function(p){ return p.id === 'liberacao' || p.estado === 'done'; }) &&
+                    cl.condicionais_pendentes.length === 0;
+  det.innerHTML =
+    '<div class="ctrl-det-head">' +
+      '<div>' +
+        '<div style="font-size:11px;color:var(--gy);font-weight:700;letter-spacing:.3px">'+empLbl.toUpperCase()+' · #'+crmEsc(e.numero)+
+          (e.transportadora?' · '+ctrlLabelRota(e.transportadora):'') +
+          ' · '+crmEsc((e.cliente_cidade||'—')+'/'+(e.cliente_uf||'')) + '</div>' +
+        '<h2 style="margin:2px 0 0;font-size:18px">'+crmEsc(e.cliente_nome||'—')+'</h2>' +
+        '<div style="font-size:12.5px;color:var(--gy);margin-top:2px">'+
+          (e.cliente_cpf_cnpj_tipo==='pj' ? 'CNPJ ' : 'CPF ')+crmEsc(e.cliente_cpf_cnpj||'—')+
+          (e.cliente_cep?' · CEP '+crmEsc(e.cliente_cep):'')+'</div>' +
+      '</div>' +
+      '<div style="text-align:right"><div style="font-size:24px;font-weight:700;color:var(--gd);font-variant-numeric:tabular-nums">'+cl.feitos+'/'+cl.total+'</div>' +
+      '<div style="font-size:11px;color:var(--gy)">passos concluídos</div></div>' +
+    '</div>' +
+    '<div class="ctrl-kpi-row">' +
+      '<div class="ctrl-kpi"><div class="k">Produtos</div><div class="v">'+(e.produtos||[]).length+' SKUs</div></div>' +
+      '<div class="ctrl-kpi"><div class="k">Total pedido</div><div class="v">'+crmFmtBRL(e.total_pedido||0)+'</div></div>' +
+      '<div class="ctrl-kpi"><div class="k">Volumes</div><div class="v">'+(e.volumes_qtd||'—')+'</div></div>' +
+      '<div class="ctrl-kpi"><div class="k">Rota</div><div class="v" style="color:var(--gd)">'+(e.transportadora?ctrlLabelRota(e.transportadora):'—')+'</div></div>' +
+    '</div>' +
+    '<div style="font-size:12.5px;background:var(--bg);border-radius:6px;padding:8px 10px;margin-bottom:14px"><b>Produtos:</b> '+(produtosTxt||'—')+'</div>' +
+    passosHtml + condHtml +
+    '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">' +
+      '<button class="crm-btn" '+(podeLiberar?'':'disabled')+' onclick="ctrlMarcarLiberacao()">'+(e.liberacao_ok?'✓ Já liberado':'Marcar liberação final')+'</button>' +
+      '<button class="crm-btn ghost" onclick="ctrlAbrirDetalhe(\''+e.id+'\')">↻ Recarregar</button>' +
+    '</div>';
+}
+
+function ctrlMetaPasso(e, p) {
+  var por = null, em = null;
+  switch (p.id) {
+    case 'abertura':   por = e.criado_por; em = e.criado_em; break;
+    case 'volumes':    por = e.volumes_por; em = e.volumes_em; break;
+    case 'conferencia':por = e.conferencia_por; em = e.conferencia_em; break;
+    case 'transporte': por = e.transporte_por; em = e.transporte_em; break;
+    case 'faturamento':por = e.nf_por; em = e.nf_em; break;
+    case 'gt':         por = e.gt_por; em = e.gt_em; break;
+    case 'assinatura': por = e.assinatura_por; em = e.assinatura_em; break;
+    case 'liberacao':  por = e.liberacao_por; em = e.liberacao_em; break;
+  }
+  var donoLbl = { auxiliar: 'Auxiliar', expedicao: 'Expedição', vendas: 'Vendedor', financeiro: 'Financeiro', gerencia: 'Gerente/Diretor' }[p.dono] || p.dono;
+  if (por && em) return '<b>' + crmEsc(por) + '</b> em ' + crmFmtDateTime(em);
+  return 'Dono: <b>' + donoLbl + '</b>';
+}
+
+function ctrlFieldsPasso(e, cl, p) {
+  if (p.estado === 'done') return '';
+  if (p.estado === 'travado') return '<div style="font-size:11.5px;color:var(--gy);margin-top:4px">🔒 Aguarda passo anterior</div>';
+  switch (p.id) {
+    case 'volumes':
+      return '<div class="ctrl-inline-fields"><input type="number" min="1" placeholder="Qtd volumes" id="fld-vol"/>' +
+        '<button class="crm-btn small" onclick="ctrlPatch({volumes_qtd: Number(document.getElementById(\'fld-vol\').value)||0})">Salvar</button></div>';
+    case 'conferencia':
+      return '<div class="ctrl-inline-fields"><button class="crm-btn small" onclick="ctrlPatch({conferencia_ok: true})">✓ Confirmar conferência</button></div>';
+    case 'transporte':
+      var rota = window.CTRL.cotacaoResult && window.CTRL.cotacaoResult.rota_sugerida ? window.CTRL.cotacaoResult.rota_sugerida.rota : '';
+      return '<div class="ctrl-inline-fields">' +
+        '<select id="fld-trans"><option value="">Selecionar transportadora…</option>' +
+        '<option value="ezequiel">Ezequiel</option><option value="lt">LT</option><option value="rpa">RPA</option><option value="aereo">Ezequiel + Gollog (aéreo)</option></select>' +
+        '<input type="text" placeholder="Valor R$" id="fld-trans-val"/>' +
+        '<button class="crm-btn small" onclick="ctrlPatch({transportadora: document.getElementById(\'fld-trans\').value, transporte_valor: Number(String(document.getElementById(\'fld-trans-val\').value||\'0\').replace(/\\./g,\'\').replace(\',\',\'.\'))||0})">Salvar</button></div>';
+    case 'faturamento':
+      return '<div class="ctrl-inline-fields"><input type="text" placeholder="Nº da NF" id="fld-nf"/>' +
+        '<button class="crm-btn small" onclick="ctrlPatch({nf_numero: document.getElementById(\'fld-nf\').value})">Salvar</button></div>';
+    case 'gt':
+      return '<div class="ctrl-inline-fields"><input type="text" placeholder="Nº da GT" id="fld-gt"/>' +
+        '<button class="crm-btn small" onclick="ctrlPatch({gt_numero: document.getElementById(\'fld-gt\').value})">Salvar</button></div>';
+    case 'assinatura':
+      return '<div class="ctrl-inline-fields"><button class="crm-btn small" onclick="ctrlPatch({assinatura_ok: true})">✓ Confirmar assinatura</button></div>';
+    case 'liberacao':
+      return '<div class="ctrl-inline-fields"><button class="crm-btn small" onclick="ctrlMarcarLiberacao()">✓ Liberar para coleta</button></div>';
+    default:
+      return '';
+  }
+}
+
+function ctrlCondCnpj(e){
+  return '<div class="ctrl-cond-block">' +
+    '<div class="ctrl-cond-lbl">🏢 Destinatário CNPJ — Anexo P + GRU obrigatórios</div>' +
+    '<div class="ctrl-inline-fields" style="margin-top:8px">' +
+      '<input type="text" placeholder="Link/URL Anexo P" id="fld-anexo-p" value="'+crmEsc(e.anexo_p_link||'')+'"/>' +
+      '<input type="text" placeholder="Link/URL GRU" id="fld-gru" value="'+crmEsc(e.gru_link||'')+'"/>' +
+      '<button class="crm-btn small" onclick="ctrlPatch({anexo_p_link: document.getElementById(\'fld-anexo-p\').value, gru_link: document.getElementById(\'fld-gru\').value})">Salvar</button>' +
+    '</div>' +
+  '</div>';
+}
+function ctrlCondAereo(e){
+  return '<div class="ctrl-cond-block">' +
+    '<div class="ctrl-cond-lbl">✈️ Rota aérea — Pix + peso/medidas + Minuta obrigatórios</div>' +
+    '<div class="ctrl-inline-fields" style="margin-top:8px">' +
+      '<input type="text" placeholder="Link comprovante Pix" id="fld-pix" value="'+crmEsc(e.comprovante_pix_link||'')+'"/>' +
+      '<input type="text" placeholder="Peso (kg)" id="fld-peso" value="'+crmEsc(e.peso_kg||'')+'" style="max-width:100px"/>' +
+      '<input type="text" placeholder="L×A×C cm" id="fld-dim" value="'+crmEsc(e.dimensoes_cm||'')+'" style="max-width:120px"/>' +
+      '<input type="text" placeholder="Nº Minuta" id="fld-minuta" value="'+crmEsc(e.minuta_numero||'')+'" style="max-width:120px"/>' +
+      '<input type="text" placeholder="Aeroporto (IATA)" id="fld-aero" value="'+crmEsc(e.aeroporto_iata||'')+'" style="max-width:100px;text-transform:uppercase"/>' +
+      '<button class="crm-btn small" onclick="ctrlSalvarAereo()">Salvar</button>' +
+      '<label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" id="fld-pix-baixado" '+(e.pix_baixado?'checked':'')+'/> Pix baixado</label>' +
+      '<button class="crm-btn small ghost" onclick="ctrlPatch({pix_baixado: document.getElementById(\'fld-pix-baixado\').checked})">Marcar Pix</button>' +
+    '</div>' +
+  '</div>';
+}
+function ctrlSalvarAereo(){
+  ctrlPatch({
+    comprovante_pix_link: document.getElementById('fld-pix').value,
+    peso_kg: document.getElementById('fld-peso').value,
+    dimensoes_cm: document.getElementById('fld-dim').value,
+    minuta_numero: document.getElementById('fld-minuta').value,
+    aeroporto_iata: (document.getElementById('fld-aero').value||'').toUpperCase(),
+  });
+}
+async function ctrlPatch(patch){
+  if (!window.CTRL.envioAberto) return;
+  var id = window.CTRL.envioAberto.id;
+  try {
+    var r = await fetch('/api/crm/envios/'+encodeURIComponent(id), {
+      method: 'PATCH', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(patch),
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    window.CTRL.envioAberto = d.envio;
+    window.CTRL.envioChecklist = d.checklist;
+    ctrlRenderDetalhe();
+    await ctrlCarregarFila();
+  } catch (e) { alert('Erro: '+e.message); }
+}
+async function ctrlMarcarLiberacao(){
+  if (!confirm('Marcar liberação final? Isso muda o status pra "pronto para coleta".')) return;
+  await ctrlPatch({ liberacao_ok: true });
+}
+
+/* ── MATRIZ ──────────────────────────────────────────────────── */
+async function ctrlRenderMatriz(){
+  var p = document.getElementById('ctrl-panel');
+  p.innerHTML = '<div class="ctrl-card"><h3>Matriz de cidades → rota padrão</h3>' +
+    '<div style="font-size:12.5px;color:var(--gy);margin-bottom:14px">Base inicial: 778 Ezequiel + 4.690 RPA + 2.015 LT. Toda cidade fechada em cotação entra aqui.</div>' +
+    '<div id="ctrl-matriz-lista"><div class="crm-loading">Carregando…</div></div></div>';
+  try {
+    var r = await fetch('/api/crm/frete/matriz?listar=1');
+    var d = await r.json();
+    var linhas = (d.matriz||[]).map(function(m){
+      var rotaCor = m.rota_padrao === 'aereo' ? '#7a5cff' : (m.rota_padrao === 'rpa' ? '#a06210' : 'var(--gd)');
+      return '<tr><td>'+crmEsc(m.cidade)+'</td><td>'+crmEsc(m.uf)+'</td>' +
+        '<td style="font-weight:700;color:'+rotaCor+'">'+ctrlLabelRota(m.rota_padrao)+'</td>' +
+        '<td style="color:var(--gy)">'+crmEsc(m.origem||'—')+'</td>' +
+        '<td style="color:var(--gy);font-size:11.5px">'+(m.atualizado_em?crmFmtDate(m.atualizado_em):'—')+' · '+crmEsc(m.atualizado_por||'—')+'</td></tr>';
+    }).join('');
+    document.getElementById('ctrl-matriz-lista').innerHTML = linhas
+      ? '<div style="overflow-x:auto"><table class="ctrl-matriz-table"><thead><tr><th>Cidade</th><th>UF</th><th>Rota padrão</th><th>Origem</th><th>Última alteração</th></tr></thead><tbody>'+linhas+'</tbody></table></div>'
+      : '<div style="font-size:12.5px;color:var(--gy);padding:20px;text-align:center">Nenhuma cidade fechada ainda. As primeiras cotações vão popular esta lista.</div>';
+  } catch (e) {
+    document.getElementById('ctrl-matriz-lista').innerHTML = '<div style="color:var(--r);font-size:12px">Erro: '+crmEsc(e.message)+'</div>';
+  }
+}
+
+function crmFmtDateTime(s){
+  if (!s) return '—';
+  try { return new Date(s).toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+  catch(e){ return s; }
+}
+
 </script>
+
+<style>
+/* ═════ Operação Controlado ═════ */
+.ctrl-wrap { display: flex; flex-direction: column; gap: 16px; }
+.ctrl-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.ctrl-sub-desc { color: var(--gy); font-size: 12.5px; margin-top: 2px; }
+.ctrl-tabs {
+  display: flex; gap: 4px; border-bottom: 1px solid var(--bd);
+  overflow-x: auto;
+}
+.ctrl-tab {
+  padding: 10px 16px; background: transparent; border: 0;
+  border-bottom: 2px solid transparent; cursor: pointer;
+  color: var(--gy); font-size: 13px; font-weight: 600;
+  white-space: nowrap; font-family: inherit;
+}
+.ctrl-tab.on { color: var(--gd); border-bottom-color: var(--gd); }
+.ctrl-card {
+  background: var(--wh); border: 1px solid var(--bd); border-radius: 12px;
+  padding: 16px 18px; box-shadow: var(--sh-1);
+}
+.ctrl-card + .ctrl-card, .ctrl-cot-grid > * > .ctrl-card + .ctrl-card { margin-top: 14px; }
+.ctrl-card h3 { margin: 0 0 12px; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.ctrl-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 720px) { .ctrl-grid-2 { grid-template-columns: 1fr; } }
+.ctrl-cot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .ctrl-cot-grid { grid-template-columns: 1fr; } }
+.ctrl-item-row {
+  display: grid; grid-template-columns: 1fr 90px 140px 32px; gap: 8px;
+  align-items: end; padding: 8px 0; border-top: 1px dashed var(--bd);
+}
+.ctrl-item-row:first-child { border-top: 0; padding-top: 0; }
+@media (max-width: 620px) { .ctrl-item-row { grid-template-columns: 1fr 1fr; } .ctrl-item-row .ctrl-del { grid-column: 2; justify-self: end; } }
+.ctrl-del { background: transparent; border: 0; color: var(--gy); cursor: pointer; font-size: 18px; padding: 4px 8px; }
+
+.ctrl-frete-card {
+  border: 1px solid var(--bd); border-radius: 10px; padding: 14px;
+  display: grid; grid-template-columns: 1fr auto; gap: 12px;
+  background: var(--wh); margin-top: 10px;
+}
+.ctrl-frete-card.priority { border-color: var(--gd); background: #e7f5ec; }
+.ctrl-frete-card.manual   { background: #fef4e7; border-color: transparent; }
+.ctrl-frete-lead { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; color: var(--gy); }
+.ctrl-frete-card.priority .ctrl-frete-lead { color: var(--gd); }
+.ctrl-frete-card.manual .ctrl-frete-lead   { color: #a06210; }
+.ctrl-frete-h4 { margin: 4px 0 6px; font-size: 16px; font-weight: 700; }
+.ctrl-frete-meta { font-size: 12.5px; color: var(--gy); }
+.ctrl-frete-detalhes { font-size: 11.5px; color: var(--gy); margin-top: 4px; }
+.ctrl-frete-valor {
+  font-size: 22px; font-weight: 700; text-align: right;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.ctrl-frete-valor.confirm { color: #a06210; font-size: 14px; }
+.ctrl-frete-un {
+  display: block; font-size: 10.5px; color: var(--gy);
+  text-transform: uppercase; letter-spacing: .3px; font-weight: 600; margin-top: 2px;
+}
+@media (max-width: 500px) { .ctrl-frete-card { grid-template-columns: 1fr; } .ctrl-frete-valor { text-align: left; } }
+.ctrl-matriz-banner {
+  background: #e7f5ec; color: var(--gd);
+  padding: 8px 12px; border-radius: 6px;
+  font-size: 12.5px; font-weight: 600;
+  margin-bottom: 12px;
+}
+.ctrl-aviso {
+  background: #fbe6e6; color: #a01818; padding: 6px 10px;
+  border-radius: 6px; font-size: 12px; font-weight: 600; margin-top: 8px;
+}
+
+.ctrl-fila-layout { display: grid; grid-template-columns: 340px 1fr; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .ctrl-fila-layout { grid-template-columns: 1fr; } }
+.ctrl-env-card {
+  background: var(--wh); border: 1px solid var(--bd); border-radius: 10px;
+  padding: 12px 14px; cursor: pointer; border-left: 3px solid var(--bd);
+  margin-bottom: 10px;
+}
+.ctrl-env-card.on { border-color: var(--gd); border-left-color: var(--gd); box-shadow: var(--sh-1); }
+.ctrl-env-card.calibre { border-left-color: #7a5cff; }
+.ctrl-env-card.calibre.on { border-color: #7a5cff; border-left-color: #7a5cff; }
+.ctrl-env-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12px; color: var(--gy); }
+.ctrl-env-cli { font-weight: 700; margin: 4px 0; font-size: 13.5px; }
+.b-ph { color: var(--gd); font-weight: 700; }
+.b-cr { color: #7a5cff; font-weight: 700; }
+.ctrl-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 99px;
+  font-size: 11px; font-weight: 600;
+  background: var(--bg); color: var(--gy);
+  white-space: nowrap;
+}
+.ctrl-chip.dot::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.ctrl-chip.ok { background: #e7f5ec; color: var(--gd); }
+.ctrl-chip.wait { background: #fef4e7; color: #a06210; }
+.ctrl-chip.late { background: #fbe6e6; color: #a01818; }
+.ctrl-chip.aereo { background: #f0eaff; color: #7a5cff; }
+
+.ctrl-det-head {
+  display: grid; grid-template-columns: 1fr auto; gap: 10px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--bd); margin-bottom: 12px;
+}
+.ctrl-kpi-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px; margin-bottom: 12px;
+}
+.ctrl-kpi { background: var(--bg); border-radius: 6px; padding: 8px 10px; }
+.ctrl-kpi .k { font-size: 10.5px; color: var(--gy); text-transform: uppercase; letter-spacing: .3px; font-weight: 700; }
+.ctrl-kpi .v { font-size: 14.5px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+.ctrl-step {
+  display: grid; grid-template-columns: 32px 1fr; gap: 12px;
+  padding: 10px 0; border-top: 1px solid var(--bd); align-items: start;
+}
+.ctrl-step:first-of-type { border-top: 0; }
+.ctrl-mark {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid var(--bd); background: var(--wh);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--gy); margin-top: 2px;
+}
+.ctrl-step.done .ctrl-mark { background: var(--gd); border-color: var(--gd); color: #fff; }
+.ctrl-step.wait .ctrl-mark { border-color: #a06210; color: #a06210; background: #fef4e7; }
+.ctrl-step.travado .ctrl-mark { background: var(--bg); color: var(--gy); }
+.ctrl-step-title { font-weight: 600; font-size: 13.5px; }
+.ctrl-step-meta { font-size: 12px; color: var(--gy); margin-top: 3px; }
+.ctrl-inline-fields {
+  margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+}
+.ctrl-inline-fields input, .ctrl-inline-fields select {
+  background: var(--wh); color: var(--tx); border: 1px solid var(--bd);
+  border-radius: 6px; padding: 6px 8px; font-size: 12.5px; font-family: inherit;
+}
+
+.ctrl-cond-block {
+  background: #fef4e7; border-left: 3px solid #a06210;
+  padding: 10px 14px; border-radius: 4px; margin: 12px 0;
+}
+.ctrl-cond-lbl {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .4px;
+  color: #a06210; font-weight: 700; margin-bottom: 4px;
+}
+
+.ctrl-matriz-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ctrl-matriz-table th { text-align: left; padding: 8px 10px; background: var(--bg); color: var(--gy); font-size: 11px; text-transform: uppercase; letter-spacing: .3px; }
+.ctrl-matriz-table td { padding: 10px; border-top: 1px solid var(--bd); }
+.crm-btn.small { padding: 6px 10px; font-size: 12px; }
+</style>
+
 
 </body>
 </html>
