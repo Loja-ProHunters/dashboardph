@@ -1994,6 +1994,32 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // GET /api/crm/envios/prontos-por-transportadora — usado pelo botão "Gerar romaneio"
+  // PRECISA vir antes de /:id porque o regex de id bate com "prontos-por-transportadora".
+  if (req.method === 'GET' && url === '/api/crm/envios/prontos-por-transportadora') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const list = await crmStore.listDocs('envios');
+      const prontos = list.filter(e => (e.status === 'pronto_coleta' || envios.estadoChecklist(e).pronto_coleta) && !e.romaneio_id && e.status !== 'enviado' && e.status !== 'cancelado');
+      const grupos = {};
+      for (const e of prontos) {
+        const t = e.transportadora || 'sem_transportadora';
+        if (!grupos[t]) grupos[t] = [];
+        grupos[t].push({
+          id: e.id, empresa: e.empresa, numero: e.numero,
+          cliente_nome: e.cliente_nome, cliente_cidade: e.cliente_cidade, cliente_uf: e.cliente_uf,
+          nf_numero: e.nf_numero, gt_numero: e.gt_numero,
+          volumes_qtd: e.volumes_qtd || 0,
+        });
+      }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, grupos }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // GET /api/crm/envios/:id — detalhe do envio + checklist
   if (req.method === 'GET' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+$/)) {
     const sess = getSession(req);
@@ -2050,32 +2076,8 @@ module.exports = async (req, res) => {
   // ROMANEIOS — geração e listagem
   // ═════════════════════════════════════════════════════════════
 
-  // GET /api/crm/envios/prontos-por-transportadora
-  // Retorna envios prontos_coleta agrupados por transportadora — usado no
-  // botão "Gerar romaneio" pra o auxiliar escolher.
-  if (req.method === 'GET' && url === '/api/crm/envios/prontos-por-transportadora') {
-    const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
-    try {
-      const list = await crmStore.listDocs('envios');
-      const prontos = list.filter(e => (e.status === 'pronto_coleta' || envios.estadoChecklist(e).pronto_coleta) && !e.romaneio_id);
-      const grupos = {};
-      for (const e of prontos) {
-        const t = e.transportadora || 'sem_transportadora';
-        if (!grupos[t]) grupos[t] = [];
-        grupos[t].push({
-          id: e.id, empresa: e.empresa, numero: e.numero,
-          cliente_nome: e.cliente_nome, cliente_cidade: e.cliente_cidade, cliente_uf: e.cliente_uf,
-          nf_numero: e.nf_numero, gt_numero: e.gt_numero,
-          volumes_qtd: e.volumes_qtd || 0,
-        });
-      }
-      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, grupos }));
-    } catch (e) {
-      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
-    }
-    return;
-  }
+  // (rota "prontos-por-transportadora" foi movida pra cima, antes do handler :id,
+  //  senão o regex do id capturava a string "prontos-por-transportadora")
 
   // POST /api/crm/romaneios — cria um romaneio a partir de uma lista de envios
   //   Body: { transportadora, envio_ids: [...] }
