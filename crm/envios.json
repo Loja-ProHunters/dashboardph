@@ -123,9 +123,9 @@
     "nf_numero": "031416",
     "nf_por": "gerencia",
     "nf_em": "2026-09-24T14:06:17.683Z",
-    "gt_numero": null,
-    "gt_por": null,
-    "gt_em": null,
+    "gt_numero": "202651867731",
+    "gt_por": "gerencia",
+    "gt_em": "2026-09-24T14:06:44.725Z",
     "assinatura_ok": false,
     "assinatura_por": null,
     "assinatura_em": null,
@@ -181,11 +181,18 @@
         "acao": "campo_alterado",
         "campo": "nf_numero",
         "novo": "031416"
+      },
+      {
+        "ts": "2026-09-24T14:06:44.725Z",
+        "por": "gerencia",
+        "acao": "campo_alterado",
+        "campo": "gt_numero",
+        "novo": "202651867731"
       }
     ],
     "criado_em": "2026-09-24T14:05:46.361Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:06:17.683Z",
+    "atualizado_em": "2026-09-24T14:06:44.725Z",
     "atualizado_por": "gerencia"
   }
 }
