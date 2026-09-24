@@ -478,9 +478,9 @@
     "nf_numero": "2868",
     "nf_por": "gerencia",
     "nf_em": "2026-09-24T14:36:23.302Z",
-    "gt_numero": null,
-    "gt_por": null,
-    "gt_em": null,
+    "gt_numero": "202648811088",
+    "gt_por": "gerencia",
+    "gt_em": "2026-09-24T14:36:43.389Z",
     "assinatura_ok": false,
     "assinatura_por": null,
     "assinatura_em": null,
@@ -549,11 +549,19 @@
         "acao": "campo_alterado",
         "campo": "nf_numero",
         "novo": "2868"
+      },
+      {
+        "ts": "2026-09-24T14:36:43.389Z",
+        "por": "gerencia",
+        "ip": "177.67.205.91",
+        "acao": "campo_alterado",
+        "campo": "gt_numero",
+        "novo": "202648811088"
       }
     ],
     "criado_em": "2026-09-24T14:35:41.530Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:36:23.302Z",
+    "atualizado_em": "2026-09-24T14:36:43.389Z",
     "atualizado_por": "gerencia"
   }
 }
