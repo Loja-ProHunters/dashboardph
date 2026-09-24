@@ -827,5 +827,101 @@
     "coletado_motorista": "Rafael",
     "coletado_motorista_cpf": "00712640002",
     "coletado_placa": "SGB5E01"
+  },
+  "env_prohunters_26829": {
+    "id": "env_prohunters_26829",
+    "empresa": "prohunters",
+    "numero": "26829",
+    "bling_pedido_id": "26664206105",
+    "cliente_nome": "Marcus Welber do Nascimento Guimaraes",
+    "cliente_cpf_cnpj": "01996430408",
+    "cliente_cpf_cnpj_tipo": "pf",
+    "cliente_endereco": null,
+    "cliente_cidade": null,
+    "cliente_uf": null,
+    "cliente_cep": null,
+    "produtos": [
+      {
+        "sku": "HORN-86281-ID",
+        "descricao": "Estojo Hornady  Calibre 6.5 Creedmoor Sem Espoleta - Caixa com 50 unidades",
+        "quantidade": 250
+      },
+      {
+        "sku": "HORN-8665B-ID",
+        "descricao": "Estojo Hornady  Calibre 30-06 Springfield  Sem Espoleta - Caixa com 50 unidades",
+        "quantidade": 50
+      },
+      {
+        "sku": "HORN-26335-ID",
+        "descricao": "Projétil Hornady Calibre 6.5mm 140 GR BTHP MATCH™",
+        "quantidade": 400
+      },
+      {
+        "sku": "HORN-30733B-ID",
+        "descricao": "Projétil Hornady Calibre .308 208 GR BTHP MATCH™",
+        "quantidade": 100
+      }
+    ],
+    "total_pedido": 11073.15,
+    "observacoes": null,
+    "status": "aberto",
+    "confirmado_bling": true,
+    "volumes_qtd": null,
+    "volumes_por": null,
+    "volumes_em": null,
+    "conferencia_ok": false,
+    "conferencia_por": null,
+    "conferencia_em": null,
+    "conferencia_notas": null,
+    "transportadora": null,
+    "transporte_valor": null,
+    "transporte_por": null,
+    "transporte_em": null,
+    "nf_numero": null,
+    "nf_por": null,
+    "nf_em": null,
+    "gt_numero": null,
+    "gt_por": null,
+    "gt_em": null,
+    "assinatura_ok": false,
+    "assinatura_por": null,
+    "assinatura_em": null,
+    "liberacao_ok": false,
+    "liberacao_por": null,
+    "liberacao_em": null,
+    "anexo_p_ok": false,
+    "anexo_p_por": null,
+    "anexo_p_em": null,
+    "anexo_p_ip": null,
+    "gru_ok": false,
+    "gru_por": null,
+    "gru_em": null,
+    "gru_ip": null,
+    "anexo_p_link": null,
+    "gru_link": null,
+    "comprovante_pix_link": null,
+    "pix_baixado": false,
+    "peso_kg": null,
+    "dimensoes_cm": null,
+    "minuta_numero": null,
+    "aeroporto_iata": null,
+    "romaneio_id": null,
+    "romaneio_numero": null,
+    "coletado_em": null,
+    "coletado_motorista": null,
+    "coletado_motorista_cpf": null,
+    "coletado_placa": null,
+    "historico": [
+      {
+        "ts": "2026-09-24T18:54:19.398Z",
+        "por": "dickmann",
+        "acao": "envio_criado",
+        "detalhe": "empresa=prohunters numero=26829"
+      }
+    ],
+    "criado_em": "2026-09-24T18:54:19.398Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-09-24T18:54:19.398Z",
+    "atualizado_por": "dickmann"
   }
 }
