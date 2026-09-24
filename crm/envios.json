@@ -20,7 +20,7 @@
     ],
     "total_pedido": 1031.7,
     "observacoes": null,
-    "status": "aberto",
+    "status": "pronto_coleta",
     "confirmado_bling": true,
     "volumes_qtd": 1,
     "volumes_por": "gerencia",
@@ -42,9 +42,9 @@
     "assinatura_ok": true,
     "assinatura_por": "gerencia",
     "assinatura_em": "2026-09-24T14:19:26.692Z",
-    "liberacao_ok": false,
-    "liberacao_por": null,
-    "liberacao_em": null,
+    "liberacao_ok": true,
+    "liberacao_por": "gerencia",
+    "liberacao_em": "2026-09-24T14:19:31.216Z",
     "anexo_p_link": null,
     "gru_link": null,
     "comprovante_pix_link": null,
@@ -115,11 +115,18 @@
         "acao": "campo_alterado",
         "campo": "assinatura_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-09-24T14:19:31.216Z",
+        "por": "gerencia",
+        "acao": "campo_alterado",
+        "campo": "liberacao_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-09-23T20:46:55.403Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:19:26.692Z",
+    "atualizado_em": "2026-09-24T14:19:31.217Z",
     "atualizado_por": "gerencia"
   },
   "env_prohunters_27063": {
