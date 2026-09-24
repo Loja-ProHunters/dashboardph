@@ -20,7 +20,7 @@
     ],
     "total_pedido": 1031.7,
     "observacoes": null,
-    "status": "pronto_coleta",
+    "status": "enviado",
     "confirmado_bling": true,
     "volumes_qtd": 1,
     "volumes_por": "gerencia",
@@ -122,12 +122,47 @@
         "acao": "campo_alterado",
         "campo": "liberacao_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-09-24T18:45:50.216Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "romaneio_id",
+        "novo": "rom_20260924_0002"
+      },
+      {
+        "ts": "2026-09-24T18:45:50.216Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "romaneio_numero",
+        "novo": "0002"
+      },
+      {
+        "ts": "2026-09-24T18:45:50.216Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_em",
+        "novo": "2026-09-24T18:45:50.216Z"
+      },
+      {
+        "ts": "2026-09-24T18:45:50.216Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "status",
+        "novo": "enviado"
       }
     ],
     "criado_em": "2026-09-23T20:46:55.403Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:57:09.139Z",
-    "atualizado_por": "gerencia"
+    "atualizado_em": "2026-09-24T18:45:50.217Z",
+    "atualizado_por": "gerencia",
+    "romaneio_id": "rom_20260924_0002",
+    "romaneio_numero": "0002",
+    "coletado_em": "2026-09-24T18:45:50.216Z"
   },
   "env_prohunters_27063": {
     "id": "env_prohunters_27063",
