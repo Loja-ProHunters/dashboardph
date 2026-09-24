@@ -116,10 +116,10 @@
     "conferencia_por": "gerencia",
     "conferencia_em": "2026-09-24T14:06:01.982Z",
     "conferencia_notas": null,
-    "transportadora": null,
-    "transporte_valor": null,
-    "transporte_por": null,
-    "transporte_em": null,
+    "transportadora": "ezequiel",
+    "transporte_valor": 0,
+    "transporte_por": "gerencia",
+    "transporte_em": "2026-09-24T14:06:09.295Z",
     "nf_numero": null,
     "nf_por": null,
     "nf_em": null,
@@ -160,11 +160,25 @@
         "acao": "campo_alterado",
         "campo": "conferencia_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-09-24T14:06:09.295Z",
+        "por": "gerencia",
+        "acao": "campo_alterado",
+        "campo": "transportadora",
+        "novo": "ezequiel"
+      },
+      {
+        "ts": "2026-09-24T14:06:09.295Z",
+        "por": "gerencia",
+        "acao": "campo_alterado",
+        "campo": "transporte_valor",
+        "novo": 0
       }
     ],
     "criado_em": "2026-09-24T14:05:46.361Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:06:01.983Z",
+    "atualizado_em": "2026-09-24T14:06:09.295Z",
     "atualizado_por": "gerencia"
   }
 }
