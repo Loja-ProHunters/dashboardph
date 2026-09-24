@@ -22,9 +22,9 @@
     "observacoes": null,
     "status": "aberto",
     "confirmado_bling": true,
-    "volumes_qtd": null,
-    "volumes_por": null,
-    "volumes_em": null,
+    "volumes_qtd": 1,
+    "volumes_por": "gerencia",
+    "volumes_em": "2026-09-24T14:18:27.169Z",
     "conferencia_ok": false,
     "conferencia_por": null,
     "conferencia_em": null,
@@ -59,11 +59,18 @@
         "por": "gerencia",
         "acao": "envio_criado",
         "detalhe": "empresa=prohunters numero=27076"
+      },
+      {
+        "ts": "2026-09-24T14:18:27.169Z",
+        "por": "gerencia",
+        "acao": "campo_alterado",
+        "campo": "volumes_qtd",
+        "novo": 1
       }
     ],
     "criado_em": "2026-09-23T20:46:55.403Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-23T20:46:55.403Z",
+    "atualizado_em": "2026-09-24T14:18:27.169Z",
     "atualizado_por": "gerencia"
   },
   "env_prohunters_27063": {
