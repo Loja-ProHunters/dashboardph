@@ -43,7 +43,9 @@ const blingContasReceber = require('../lib/bling/contasReceber');
 const freteCotar    = require('../lib/frete/cotar');
 const freteMatriz   = require('../lib/frete/matriz');
 const freteGollog   = require('../lib/frete/gollog');
+const freteAprendizado = require('../lib/frete/aprendizado');
 const envios        = require('../lib/crm/envios');
+const romaneios     = require('../lib/crm/romaneios');
 const { getFile: _ghGet, saveFile: _ghSave } = require('../lib/githubStore');
 
 // Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
@@ -553,7 +555,7 @@ module.exports = async (req, res) => {
   if (crmMatch && crmMatch[1] !== 'session-info' && crmMatch[1] !== 'migrate-parceiros' && crmMatch[1] !== 'docs' && crmMatch[1] !== 'cron' && crmMatch[1] !== 'fenix'
       && crmMatch[1] !== 'coocorrencia' && crmMatch[1] !== 'sugerir' && crmMatch[1] !== 'tarefas' && crmMatch[1] !== 'ficha'
       && crmMatch[1] !== 'catalogo' && crmMatch[1] !== 'prospeccao' && crmMatch[1] !== 'vendedores' && crmMatch[1] !== 'bling'
-      && crmMatch[1] !== 'frete' && crmMatch[1] !== 'envios' && crmMatch[1] !== 'controlado') {
+      && crmMatch[1] !== 'frete' && crmMatch[1] !== 'envios' && crmMatch[1] !== 'controlado' && crmMatch[1] !== 'romaneios') {
     const colName = crmMatch[1];
     const docId = crmMatch[2] || null;
     const reg = crmColl.REGISTRY[colName];
@@ -1935,6 +1937,10 @@ module.exports = async (req, res) => {
       const statusFilter = u.searchParams.get('status') || '';
       const empresaFilter = (u.searchParams.get('empresa') || '').toLowerCase();
       const list = await crmStore.listDocs('envios');
+      // Filtro especial 'enviados' = status=enviado (sub-aba Enviados)
+      // Filtro especial 'pendentes' (default) = status != enviado E != cancelado (fica na Fila)
+      const modo = (u.searchParams.get('modo') || 'pendentes').toLowerCase();
+      const q = (u.searchParams.get('q') || '').toLowerCase().trim();
       const enriched = list.map(e => {
         const est = envios.estadoChecklist(e);
         return {
@@ -1942,6 +1948,7 @@ module.exports = async (req, res) => {
           empresa: e.empresa,
           numero: e.numero,
           cliente_nome: e.cliente_nome,
+          cliente_cpf_cnpj: e.cliente_cpf_cnpj,
           cliente_cpf_cnpj_tipo: e.cliente_cpf_cnpj_tipo,
           cliente_uf: e.cliente_uf,
           cliente_cidade: e.cliente_cidade,
@@ -1953,15 +1960,30 @@ module.exports = async (req, res) => {
           proximo_passo: est.proximo_passo,
           aereo: est.aereo,
           cnpj: est.cnpj,
+          nf_numero: e.nf_numero,
+          gt_numero: e.gt_numero,
+          volumes_qtd: e.volumes_qtd,
+          romaneio_id: e.romaneio_id,
+          romaneio_numero: e.romaneio_numero,
+          coletado_em: e.coletado_em,
+          coletado_motorista: e.coletado_motorista,
+          coletado_placa: e.coletado_placa,
           criado_em: e.criado_em,
           atualizado_em: e.atualizado_em,
         };
       });
       let filtrado = enriched;
       if (statusFilter) filtrado = filtrado.filter(x => x.status === statusFilter);
+      else if (modo === 'enviados') filtrado = filtrado.filter(x => x.status === 'enviado');
+      else if (modo === 'pendentes') filtrado = filtrado.filter(x => x.status !== 'enviado' && x.status !== 'cancelado');
       if (empresaFilter) filtrado = filtrado.filter(x => x.empresa === empresaFilter);
-      // Ordena: prontos por último, resto por atualização desc
+      if (q) filtrado = filtrado.filter(x => {
+        const hay = ((x.cliente_nome||'') + ' ' + (x.numero||'') + ' ' + (x.cliente_cpf_cnpj||'') + ' ' + (x.cliente_cidade||'') + ' ' + (x.nf_numero||'')).toLowerCase();
+        return hay.indexOf(q) >= 0;
+      });
+      // Ordena: prontos por último, resto por atualização desc; enviados por data de coleta desc
       filtrado.sort((a, b) => {
+        if (modo === 'enviados') return String(b.coletado_em || b.atualizado_em || '').localeCompare(String(a.coletado_em || a.atualizado_em || ''));
         if (a.pronto_coleta !== b.pronto_coleta) return a.pronto_coleta ? 1 : -1;
         return String(b.atualizado_em || '').localeCompare(String(a.atualizado_em || ''));
       });
@@ -2001,7 +2023,188 @@ module.exports = async (req, res) => {
       const ip = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || (req.connection && req.connection.remoteAddress) || '').split(',')[0].trim() || null;
       const proximo = envios.aplicarPatch(env, patch, sess.usuario, ip);
       const salvo = await crmStore.updateDoc('envios', id, proximo, sess.usuario);
+      // ── APRENDIZADO DE VALORES ──────────────────────────────────
+      // Se este PATCH alterou transportadora OU transporte_valor, e ambos existem,
+      // registra a amostra pra próxima cotação do mesmo trecho já vir com valor sugerido.
+      const patchTocouTransp = Object.prototype.hasOwnProperty.call(patch, 'transportadora') || Object.prototype.hasOwnProperty.call(patch, 'transporte_valor');
+      if (patchTocouTransp && salvo.transportadora && salvo.transporte_valor > 0 && salvo.cliente_cidade && salvo.cliente_uf) {
+        try {
+          await freteAprendizado.registrarValor({
+            cidade: salvo.cliente_cidade,
+            uf: salvo.cliente_uf,
+            transportadora: salvo.transportadora,
+            valor: salvo.transporte_valor,
+            envio_id: salvo.id,
+            actor: sess.usuario,
+          });
+        } catch (e) { /* aprendizado é opcional — não bloqueia o save */ }
+      }
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envio: salvo, checklist: envios.estadoChecklist(salvo) }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // ROMANEIOS — geração e listagem
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /api/crm/envios/prontos-por-transportadora
+  // Retorna envios prontos_coleta agrupados por transportadora — usado no
+  // botão "Gerar romaneio" pra o auxiliar escolher.
+  if (req.method === 'GET' && url === '/api/crm/envios/prontos-por-transportadora') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const list = await crmStore.listDocs('envios');
+      const prontos = list.filter(e => (e.status === 'pronto_coleta' || envios.estadoChecklist(e).pronto_coleta) && !e.romaneio_id);
+      const grupos = {};
+      for (const e of prontos) {
+        const t = e.transportadora || 'sem_transportadora';
+        if (!grupos[t]) grupos[t] = [];
+        grupos[t].push({
+          id: e.id, empresa: e.empresa, numero: e.numero,
+          cliente_nome: e.cliente_nome, cliente_cidade: e.cliente_cidade, cliente_uf: e.cliente_uf,
+          nf_numero: e.nf_numero, gt_numero: e.gt_numero,
+          volumes_qtd: e.volumes_qtd || 0,
+        });
+      }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, grupos }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/romaneios — cria um romaneio a partir de uma lista de envios
+  //   Body: { transportadora, envio_ids: [...] }
+  if (req.method === 'POST' && url === '/api/crm/romaneios') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      const { transportadora, envio_ids } = JSON.parse(body || '{}');
+      if (!transportadora || !Array.isArray(envio_ids) || !envio_ids.length) {
+        res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'transportadora + envio_ids obrigatórios'})); return;
+      }
+      // Carrega os envios
+      const envDocs = [];
+      for (const eid of envio_ids) {
+        const e = await crmStore.getDoc('envios', eid);
+        if (!e) throw new Error('Envio não encontrado: ' + eid);
+        envDocs.push(e);
+      }
+      const rom = await romaneios.criar({ envios: envDocs, transportadora, gerado_por: sess.usuario });
+      const salvo = await crmStore.createDoc('romaneios', rom, sess.usuario);
+      // Atualiza os envios: romaneio_id + status='enviado' + coletado_em=now
+      const now = new Date().toISOString();
+      for (const e of envDocs) {
+        const patch = {
+          romaneio_id: rom.id,
+          romaneio_numero: rom.numero,
+          coletado_em: now,
+          status: 'enviado',
+        };
+        const proximo = envios.aplicarPatch(e, patch, sess.usuario, null);
+        proximo.status = 'enviado';
+        proximo.romaneio_id = rom.id;
+        proximo.romaneio_numero = rom.numero;
+        proximo.coletado_em = now;
+        await crmStore.updateDoc('envios', e.id, proximo, sess.usuario);
+      }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, romaneio: salvo }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/romaneios — lista romaneios
+  if (req.method === 'GET' && url === '/api/crm/romaneios') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const list = await crmStore.listDocs('romaneios');
+      list.sort((a, b) => String(b.criado_em || '').localeCompare(String(a.criado_em || '')));
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, romaneios: list }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/romaneios/:id — detalhe do romaneio + envios
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/romaneios\/[a-zA-Z0-9_\-]+$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const id = url.split('/').pop();
+      const rom = await crmStore.getDoc('romaneios', id);
+      if (!rom) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Romaneio não encontrado'})); return; }
+      const envDocs = [];
+      for (const eid of (rom.envio_ids || [])) {
+        const e = await crmStore.getDoc('envios', eid);
+        if (e) envDocs.push(e);
+      }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, romaneio: rom, envios: envDocs }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/romaneios/:id/pdf — HTML print-ready pra impressão
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/romaneios\/[a-zA-Z0-9_\-]+\/pdf$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'text/html'}); res.end('<h2>Sem acesso</h2>'); return; }
+    try {
+      const id = url.split('/')[4];
+      const rom = await crmStore.getDoc('romaneios', id);
+      if (!rom) { res.writeHead(404,{'Content-Type':'text/html'}); res.end('<h2>Romaneio não encontrado</h2>'); return; }
+      const envDocs = [];
+      for (const eid of (rom.envio_ids || [])) {
+        const e = await crmStore.getDoc('envios', eid);
+        if (e) envDocs.push(e);
+      }
+      const html = romaneios.renderHtml(rom, envDocs);
+      res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'}); res.end(html);
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'text/html'}); res.end('<h2>Erro: ' + String(e.message).replace(/</g,'&lt;') + '</h2>');
+    }
+    return;
+  }
+
+  // POST /api/crm/romaneios/:id/assinatura — registra dados do motorista
+  //   Body: { nome, cpf, placa }
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/romaneios\/[a-zA-Z0-9_\-]+\/assinatura$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const id = url.split('/')[4];
+      const rom = await crmStore.getDoc('romaneios', id);
+      if (!rom) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Romaneio não encontrado'})); return; }
+      const body = await readBody(req);
+      const dados = JSON.parse(body || '{}');
+      const proximo = romaneios.registrarAssinatura(rom, dados);
+      const salvo = await crmStore.updateDoc('romaneios', id, proximo, sess.usuario);
+      // Também propaga o nome do motorista pros envios do romaneio (útil pro vendedor consultar)
+      for (const eid of (rom.envio_ids || [])) {
+        const e = await crmStore.getDoc('envios', eid);
+        if (!e) continue;
+        const patch = {
+          coletado_motorista: salvo.motorista_nome,
+          coletado_motorista_cpf: salvo.motorista_cpf,
+          coletado_placa: salvo.motorista_placa,
+        };
+        const p = envios.aplicarPatch(e, patch, sess.usuario, null);
+        // Como aplicarPatch tem whitelist, sobrepõe direto:
+        p.coletado_motorista = salvo.motorista_nome;
+        p.coletado_motorista_cpf = salvo.motorista_cpf;
+        p.coletado_placa = salvo.motorista_placa;
+        await crmStore.updateDoc('envios', eid, p, sess.usuario);
+      }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, romaneio: salvo }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
