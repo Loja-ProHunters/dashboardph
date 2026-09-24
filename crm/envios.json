@@ -109,9 +109,9 @@
     "observacoes": "Aos cuidados de: Lucas Murgo",
     "status": "aberto",
     "confirmado_bling": true,
-    "volumes_qtd": null,
-    "volumes_por": null,
-    "volumes_em": null,
+    "volumes_qtd": 2,
+    "volumes_por": "gerencia",
+    "volumes_em": "2026-09-24T14:05:56.899Z",
     "conferencia_ok": false,
     "conferencia_por": null,
     "conferencia_em": null,
@@ -146,11 +146,18 @@
         "por": "gerencia",
         "acao": "envio_criado",
         "detalhe": "empresa=prohunters numero=27063"
+      },
+      {
+        "ts": "2026-09-24T14:05:56.899Z",
+        "por": "gerencia",
+        "acao": "campo_alterado",
+        "campo": "volumes_qtd",
+        "novo": 2
       }
     ],
     "criado_em": "2026-09-24T14:05:46.361Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:05:46.361Z",
+    "atualizado_em": "2026-09-24T14:05:56.899Z",
     "atualizado_por": "gerencia"
   }
 }
