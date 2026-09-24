@@ -320,9 +320,9 @@
     "observacoes": "Marca: Ruger - Modelo: Precision Rimfire - Calibre: .22LR - Acabamento: Cerakote - Funcionamento: Ferrolho - Carregador: 1 Bifilar - Comprimento Total: 35,13\" - 38,63\" (89,23 cm - 98,12 cm) - Comprimento Cano: 18\" (45,72 cm) - Capacidade: 15 - Raiamento: 6 raias - Peso: 3.084g - País de fabricação: Estados Unidos - Nº de Série: 841-71603",
     "status": "aberto",
     "confirmado_bling": true,
-    "volumes_qtd": null,
-    "volumes_por": null,
-    "volumes_em": null,
+    "volumes_qtd": 1,
+    "volumes_por": "gerencia",
+    "volumes_em": "2026-09-24T14:34:30.273Z",
     "conferencia_ok": false,
     "conferencia_por": null,
     "conferencia_em": null,
@@ -365,11 +365,19 @@
         "por": "gerencia",
         "acao": "envio_criado",
         "detalhe": "empresa=calibre numero=1879"
+      },
+      {
+        "ts": "2026-09-24T14:34:30.273Z",
+        "por": "gerencia",
+        "ip": "177.67.205.91",
+        "acao": "campo_alterado",
+        "campo": "volumes_qtd",
+        "novo": 1
       }
     ],
     "criado_em": "2026-09-24T14:34:22.100Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:34:22.100Z",
+    "atualizado_em": "2026-09-24T14:34:30.273Z",
     "atualizado_por": "gerencia"
   }
 }
