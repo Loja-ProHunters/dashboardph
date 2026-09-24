@@ -6706,7 +6706,7 @@ function crmProspCSV(){
    OPERAÇÃO CONTROLADO — Cotação de frete + Fila de envio
    ═══════════════════════════════════════════════════════════════════ */
 window.CTRL = window.CTRL || {
-  subtab: 'cotacao',   // 'cotacao' | 'fila' | 'matriz'
+  subtab: 'cotacao',   // 'cotacao' | 'fila' | 'enviados' | 'matriz'
   cotacaoItens: [ { tipo: 'curta', quantidade: 1 } ],
   cotacaoDest: { cep: '', cidade: '', uf: '' }, // destino preservado entre re-renders
   cotacaoResult: null,
@@ -6772,6 +6772,7 @@ function ctrlRenderRoot(){
       '<div class="ctrl-tabs">' +
         '<button class="ctrl-tab '+(window.CTRL.subtab==='cotacao'?'on':'')+'" onclick="ctrlGoTab(\'cotacao\')"><span class="ctrl-tab-ic">📦</span> Cotação</button>' +
         '<button class="ctrl-tab '+(window.CTRL.subtab==='fila'?'on':'')+'" onclick="ctrlGoTab(\'fila\')"><span class="ctrl-tab-ic">🚚</span> Fila de envio</button>' +
+        '<button class="ctrl-tab '+(window.CTRL.subtab==='enviados'?'on':'')+'" onclick="ctrlGoTab(\'enviados\')"><span class="ctrl-tab-ic">✅</span> Enviados</button>' +
         '<button class="ctrl-tab '+(window.CTRL.subtab==='matriz'?'on':'')+'" onclick="ctrlGoTab(\'matriz\')"><span class="ctrl-tab-ic">🗺️</span> Matriz de cidades</button>' +
       '</div>' +
       '<div id="ctrl-panel" class="ctrl-panel-fade"></div>' +
@@ -6784,6 +6785,7 @@ function ctrlRenderPanel(){
   if (!p) return;
   if (window.CTRL.subtab === 'cotacao') return ctrlRenderCotacao();
   if (window.CTRL.subtab === 'fila')    return ctrlRenderFila();
+  if (window.CTRL.subtab === 'enviados') return ctrlRenderEnviados();
   if (window.CTRL.subtab === 'matriz')  return ctrlRenderMatriz();
 }
 
@@ -6938,7 +6940,12 @@ function ctrlRenderResultados(d){
         diagBtn + '</div></div>';
     }
     var valorHtml;
-    if (t.valor_manual) {
+    var temHistorico = t.historico && t.historico.amostras_count > 0;
+    // Se veio valor_sugerido do backend (via aprendizado), usa como principal
+    if (t.valor_sugerido != null && t.valor_total == null) {
+      valorHtml = '<div class="ctrl-frete-valor"><div class="v">~'+crmFmtBRL(t.valor_sugerido)+'</div>' +
+        '<div class="ctrl-frete-un">baseado no histórico</div></div>';
+    } else if (t.valor_manual) {
       valorHtml = '<div class="ctrl-frete-valor confirm"><div class="v">valor manual</div><div class="ctrl-frete-un">digite direto no envio</div></div>';
     } else if (t.confirmar) {
       valorHtml = '<div class="ctrl-frete-valor confirm"><div class="v">a confirmar</div><div class="ctrl-frete-un">'+crmEsc(t.modalidade||'')+'</div></div>';
@@ -6946,6 +6953,22 @@ function ctrlRenderResultados(d){
       valorHtml = '<div class="ctrl-frete-valor"><div class="v">'+crmFmtBRL(t.valor_total)+'</div><div class="ctrl-frete-un">'+crmEsc(t.modalidade||'')+'</div></div>';
     } else {
       valorHtml = '<div class="ctrl-frete-valor confirm"><div class="v">—</div></div>';
+    }
+    // Bloco "histórico aprendido" abaixo do card — quando há amostras salvas
+    var histBlock = '';
+    if (temHistorico) {
+      var h = t.historico;
+      var quandoRel = h.ultima_em ? crmFmtDate(h.ultima_em) : '—';
+      var mediaTxt = (h.amostras_count > 1) ? ' · média R$ '+Number(h.media||0).toFixed(0).replace('.',',') : '';
+      var faixaTxt = (h.amostras_count > 1 && h.min && h.max && h.min !== h.max)
+        ? ' <span style="color:var(--gy)">(R$ '+h.min+'-'+h.max+')</span>' : '';
+      histBlock = '<div class="ctrl-hist-block">' +
+        '<span class="ctrl-hist-ic">📊</span> ' +
+        '<b>Histórico:</b> última em ' + crmEsc(quandoRel) +
+        ' foi R$ ' + Number(h.ultimo_valor||0).toFixed(0).replace('.',',') +
+        mediaTxt + faixaTxt +
+        ' · <span style="color:var(--gy)">'+h.amostras_count+' envio'+(h.amostras_count>1?'s':'')+' registrado'+(h.amostras_count>1?'s':'')+'</span>' +
+        '</div>';
     }
     var prazoTxt = t.prazo_dias_uteis ? '<span class="ctrl-tag">⏱ '+t.prazo_dias_uteis+' dias úteis</span>' : '';
     var detalhes = (t.detalhes && Array.isArray(t.detalhes) && t.detalhes.length)
@@ -6973,10 +6996,10 @@ function ctrlRenderResultados(d){
         '<div class="ctrl-frete-tags">'+prazoTxt+
           (t.modalidade&&!t.valor_manual&&!t.confirmar?'<span class="ctrl-tag">'+crmEsc(t.modalidade)+'</span>':'') +
         '</div>' +
-        detalhes + aviso + aeroSel +
+        detalhes + histBlock + aviso + aeroSel +
         '<div class="ctrl-frete-actions">' +
           '<button class="ctrl-mini-btn primary" onclick="ctrlUsarRota(\''+t.transportadora+'\')">✓ Usar esta rota</button>' +
-          '<button class="ctrl-mini-btn" onclick="ctrlCopiaMsg(\''+t.transportadora+'\')">📋 Copiar msg WhatsApp</button>' +
+          '<button class="ctrl-mini-btn" onclick="ctrlCopiaMsg(\''+t.transportadora+'\')">📱 Copiar msg pro cliente</button>' +
         '</div>' +
       '</div>' + valorHtml + '</div>';
   }).join('');
@@ -7039,20 +7062,47 @@ function ctrlCopiaMsg(k){
   var t = (d.resultados||[]).find(function(x){ return x.transportadora === k; });
   var cidade = d.cidade || '—', uf = d.uf || '';
   var msg;
+  // Escolhe o melhor valor pra citar na mensagem:
+  //   - se cotação oficial tem valor, usa
+  //   - se não, mas temos valor histórico aprendido, cita como "aproximadamente"
+  //   - senão, diz "a confirmar com o transportador"
+  var valorPrincipal = (t && t.valor_total != null) ? Number(t.valor_total)
+                     : (t && t.valor_sugerido != null) ? Number(t.valor_sugerido)
+                     : null;
+  var valorEhHistorico = (t && t.valor_total == null && t.valor_sugerido != null);
+  var valorFmt = valorPrincipal != null
+    ? ('~R$ ' + Number(valorPrincipal).toFixed(2).replace('.', ','))
+    : 'a confirmar com o transportador';
+  var prazo = t && t.prazo_dias_uteis ? (t.prazo_dias_uteis + ' dias úteis') : '3-5 dias úteis (estimado)';
+
   if (k === 'aereo') {
-    msg = 'Olá! Pra ' + cidade + '/' + uf + ' não há cobertura terrestre, o envio vai por Ezequiel + Gollog (aéreo):\n' +
-      '\n✈️ Trecho aéreo Ezequiel → aeroporto de destino\n' +
-      '💰 Frete Ezequiel (Pix antes do envio) + Gollog (na retirada no aeroporto)\n' +
-      '⏱ Prazo depende do voo\n\nPode confirmar que preparo os documentos e envio o Pix pra você.';
+    msg =
+      'Olá! Segue a cotação de frete pra ' + cidade + '/' + uf + ':\n\n' +
+      '✈️ Modalidade: Ezequiel + Gollog (rota aérea)\n' +
+      '💰 Valor aproximado: ' + valorFmt + '\n' +
+      '   • Frete Ezequiel: pago por Pix antes do envio\n' +
+      '   • Frete Gollog: pago na retirada no aeroporto\n' +
+      '⏱ Prazo: depende do voo disponível\n\n' +
+      'ℹ️ *Importante:*\n' +
+      '• Este é um valor de referência — pode variar conforme condições do envio (peso, volume, aeroporto).\n' +
+      '• O frete é pago *diretamente ao transportador* — nós não recebemos o valor do frete.\n' +
+      '• O envio precisa passar por trâmites do Exército (Guia de Trânsito, documentação), então não é imediato.\n\n' +
+      'Se concordar com esse valor aproximado, me avisa que damos sequência aos trâmites necessários. 🙏';
   } else {
-    var valor = (t && t.valor_total != null) ? ('R$ ' + Number(t.valor_total).toFixed(2).replace('.', ',')) : 'a confirmar';
-    var prazo = t && t.prazo_dias_uteis ? (t.prazo_dias_uteis + ' dias úteis') : '3-5 dias úteis (estimado)';
-    msg = 'Olá! O frete pra ' + cidade + '/' + uf + ' fica assim:\n\n' +
+    var origemValor = valorEhHistorico
+      ? ' (referência de envios anteriores pra essa cidade)'
+      : '';
+    msg =
+      'Olá! Segue a cotação de frete pra ' + cidade + '/' + uf + ':\n\n' +
       '🚚 Transportadora: ' + ctrlLabelRota(k) + ' (rota terrestre)\n' +
-      '💰 Valor: ' + valor + '\n' +
-      '⏱ Prazo: ' + prazo + '\n' +
-      '💳 Pagamento: direto ao transportador na retirada\n\n' +
-      'Pode confirmar que fecho o pedido e envio hoje. 🙏';
+      '💰 Valor aproximado: ' + valorFmt + origemValor + '\n' +
+      '⏱ Prazo estimado: ' + prazo + '\n' +
+      '💳 Pagamento: *direto ao transportador* na retirada\n\n' +
+      'ℹ️ *Importante:*\n' +
+      '• Este é um valor de cotação — pode variar conforme condições do envio.\n' +
+      '• O frete é pago *diretamente ao transportador* — nós não recebemos esse valor.\n' +
+      '• O envio de controlados exige Guia de Trânsito e documentação do Exército, então não é imediato — leva alguns dias entre o fechamento e a coleta.\n\n' +
+      'Se concordar com esse valor de referência, me avisa que damos sequência aos trâmites. 🙏';
   }
   try {
     navigator.clipboard.writeText(msg).then(function(){ alert('✓ Mensagem copiada'); }, function(){ prompt('Copie a mensagem:', msg); });
@@ -7065,13 +7115,14 @@ async function ctrlRenderFila(){
   p.innerHTML =
     '<div class="ctrl-card">' +
       '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">' +
-        '<div class="crm-fld"><label>Empresa</label>' +
+        '<div class="ctrl-fld"><label>Empresa</label>' +
           '<select id="ctrl-empresa"><option value="prohunters">Pro Hunters</option><option value="calibre">Calibre Restrito</option></select></div>' +
-        '<div class="crm-fld" style="flex:1;min-width:150px"><label>Nº do pedido</label>' +
+        '<div class="ctrl-fld" style="flex:1;min-width:150px"><label>Nº do pedido</label>' +
           '<input id="ctrl-numero" type="text" placeholder="Ex: 4132" /></div>' +
         '<button class="crm-btn" onclick="ctrlAbrirEnvio()">Abrir envio</button>' +
-        '<div style="font-size:11.5px;color:var(--gy);align-self:center">Vai puxar cliente, endereço e produtos do Bling.</div>' +
+        '<button class="crm-btn ghost" onclick="ctrlAbrirRomaneioModal()" style="margin-left:auto">📋 Gerar romaneio</button>' +
       '</div>' +
+      '<div style="font-size:11.5px;color:var(--gy);margin-top:8px">Digite empresa + número — puxa cliente, endereço e produtos do Bling. Após liberação final, aparece o botão "Gerar romaneio" pra montar o pacote da coleta.</div>' +
     '</div>' +
     '<div id="ctrl-fila-mensagem"></div>' +
     '<div class="ctrl-fila-layout">' +
@@ -7082,7 +7133,7 @@ async function ctrlRenderFila(){
 }
 async function ctrlCarregarFila(){
   try {
-    var r = await fetch('/api/crm/envios');
+    var r = await fetch('/api/crm/envios?modo=pendentes');
     var d = await r.json();
     window.CTRL.fila = d.envios || [];
     ctrlRenderFilaLista();
@@ -7399,6 +7450,205 @@ async function ctrlMarcarLiberacao(){
 }
 
 /* ── MATRIZ ──────────────────────────────────────────────────── */
+/* ── ENVIADOS ────────────────────────────────────────────────── */
+async function ctrlRenderEnviados(){
+  var p = document.getElementById('ctrl-panel');
+  p.innerHTML =
+    '<div class="ctrl-card">' +
+      '<div class="ctrl-card-head"><span class="ctrl-card-ic">✅</span><div><h3>Controlados enviados</h3><div class="ctrl-card-sub">Envios coletados pelo motorista. Use aqui pra atualizar o cliente sobre a coleta.</div></div></div>' +
+      '<div class="ctrl-fld" style="max-width:420px"><label>🔎 Buscar (cliente, CPF, nº pedido, cidade, NF)</label>' +
+        '<input id="ctrl-env-q" type="text" placeholder="Digite pra filtrar…" oninput="ctrlEnviadosCarregar(this.value)"/></div>' +
+    '</div>' +
+    '<div id="ctrl-enviados-list"><div class="crm-loading" style="padding:20px">Carregando…</div></div>' +
+    '<div id="ctrl-romaneios-lista"></div>';
+  await ctrlEnviadosCarregar('');
+  ctrlRomaneiosCarregar();
+}
+async function ctrlEnviadosCarregar(q){
+  var box = document.getElementById('ctrl-enviados-list');
+  try {
+    var r = await fetch('/api/crm/envios?modo=enviados' + (q ? '&q='+encodeURIComponent(q) : ''));
+    var d = await r.json();
+    var lista = d.envios || [];
+    if (!lista.length) {
+      box.innerHTML = '<div class="ctrl-card" style="text-align:center;padding:34px;color:var(--gy);font-size:13px">Nenhum envio coletado ainda.</div>';
+      return;
+    }
+    box.innerHTML = '<div class="ctrl-card"><h3 style="margin-bottom:10px">✅ '+lista.length+' envio'+(lista.length>1?'s':'')+' coletado'+(lista.length>1?'s':'')+'</h3>' +
+      lista.map(function(e){
+        var empCorCls = e.empresa === 'calibre' ? 'b-cr' : 'b-ph';
+        var empLbl = e.empresa === 'calibre' ? 'Calibre' : 'Pro Hunters';
+        var colDate = e.coletado_em ? crmFmtDate(e.coletado_em) : '—';
+        var motorista = e.coletado_motorista
+          ? ' · Motorista <b>'+crmEsc(e.coletado_motorista)+'</b>'+(e.coletado_placa?' (placa '+crmEsc(e.coletado_placa)+')':'')
+          : '';
+        var romaneio = e.romaneio_numero ? ' · Romaneio nº <b>'+crmEsc(e.romaneio_numero)+'</b>' : '';
+        var cidUf = (e.cliente_cidade||'—') + '/' + (e.cliente_uf||'');
+        return '<div class="ctrl-enviado-row">' +
+          '<div class="ctrl-enviado-ic">✅</div>' +
+          '<div class="ctrl-enviado-body">' +
+            '<div style="font-weight:700;font-size:13.5px">'+crmEsc(e.cliente_nome||'—')+
+              ' <span class="'+empCorCls+'" style="font-size:11px;margin-left:6px">'+empLbl+' #'+crmEsc(e.numero)+'</span></div>' +
+            '<div style="font-size:12px;color:var(--gy);margin-top:3px">'+crmEsc(cidUf)+' · '+ctrlLabelRota(e.transportadora||'')+' · coletado em <b>'+colDate+'</b>'+romaneio+motorista+'</div>' +
+            (e.nf_numero ? '<div style="font-size:11.5px;color:var(--gy);margin-top:2px">NF '+crmEsc(e.nf_numero)+(e.gt_numero?' · GT '+crmEsc(e.gt_numero):'')+'</div>' : '') +
+          '</div>' +
+        '</div>';
+      }).join('') + '</div>';
+  } catch (e) {
+    box.innerHTML = '<div style="color:var(--r);font-size:12px">Erro: '+crmEsc(e.message)+'</div>';
+  }
+}
+async function ctrlRomaneiosCarregar(){
+  var box = document.getElementById('ctrl-romaneios-lista');
+  try {
+    var r = await fetch('/api/crm/romaneios');
+    var d = await r.json();
+    var lista = d.romaneios || [];
+    if (!lista.length) { box.innerHTML = ''; return; }
+    box.innerHTML = '<div class="ctrl-card"><h3>📋 Romaneios emitidos <span style="font-size:11px;color:var(--gy);font-weight:400">('+lista.length+')</span></h3>' +
+      '<div class="ctrl-rom-grid">' +
+      lista.slice(0, 30).map(function(r){
+        var dataFmt = r.data ? r.data.split('-').reverse().join('/') : '—';
+        var assinado = r.motorista_assinado_em
+          ? '<span class="ctrl-chip ok">assinado</span>'
+          : '<span class="ctrl-chip wait">aguarda assinatura</span>';
+        return '<div class="ctrl-rom-card">' +
+          '<div class="ctrl-rom-num">Nº '+crmEsc(r.numero||'—')+'</div>' +
+          '<div class="ctrl-rom-meta">' +
+            '<b>'+ctrlLabelRota(r.transportadora||'')+'</b> · '+dataFmt+
+            ' · '+(r.envio_ids||[]).length+' envios · '+(r.total_volumes||0)+' volumes</div>' +
+          '<div style="margin-top:4px">'+assinado+'</div>' +
+          '<div class="ctrl-rom-actions">' +
+            '<a class="ctrl-mini-btn primary" href="/api/crm/romaneios/'+encodeURIComponent(r.id)+'/pdf" target="_blank">🖨️ Abrir p/ imprimir</a>' +
+            '<button class="ctrl-mini-btn" onclick="ctrlAssinaturaModal(\''+crmEsc(r.id)+'\')">✍️ Registrar assinatura</button>' +
+          '</div>' +
+        '</div>';
+      }).join('') + '</div></div>';
+  } catch (e) { box.innerHTML = ''; }
+}
+
+/* ── GERAR ROMANEIO ─────────────────────────────────────────────── */
+async function ctrlAbrirRomaneioModal(){
+  try {
+    var r = await fetch('/api/crm/envios/prontos-por-transportadora');
+    var d = await r.json();
+    var grupos = d.grupos || {};
+    var chaves = Object.keys(grupos).filter(function(k){ return k !== 'sem_transportadora'; });
+    if (!chaves.length) {
+      ctrlModal({
+        title: 'Nenhum envio pronto pra romaneio',
+        body: 'Nenhum envio no status "pronto para coleta" ainda.\n\nOs envios precisam ter todos os 8 passos concluídos (Volumes, Conferência, Transporte, NF, GT, Assinatura e Liberação final) pra entrar num romaneio.',
+        okLabel: 'Entendi', okClass: 'ghost', onOk: function(){},
+      });
+      return;
+    }
+    var body = '<div style="margin-bottom:12px">Escolha a transportadora que vai coletar:</div>' +
+      chaves.map(function(k){
+        var envs = grupos[k];
+        var totVol = envs.reduce(function(s,e){ return s + (e.volumes_qtd||0); }, 0);
+        var envsList = envs.map(function(e){
+          var empLbl = e.empresa==='calibre'?'CR':'PH';
+          return '<label class="ctrl-rom-item"><input type="checkbox" checked data-eid="'+crmEsc(e.id)+'"/> '+
+            '<div><div style="font-weight:600">'+empLbl+' #'+crmEsc(e.numero)+' — '+crmEsc(e.cliente_nome||'—')+'</div>' +
+            '<div style="font-size:11.5px;color:var(--gy)">'+crmEsc((e.cliente_cidade||'—')+'/'+(e.cliente_uf||''))+' · '+(e.volumes_qtd||0)+' volumes · NF '+crmEsc(e.nf_numero||'—')+'</div></div></label>';
+        }).join('');
+        return '<div class="ctrl-rom-group" data-trans="'+k+'">' +
+          '<div class="ctrl-rom-group-head">' +
+            '<div><b>'+ctrlLabelRota(k)+'</b> <span style="color:var(--gy);font-size:11.5px">'+envs.length+' envios · '+totVol+' volumes</span></div>' +
+            '<button class="ctrl-mini-btn primary" onclick="ctrlGerarRomaneio(\''+k+'\')">📋 Gerar romaneio '+ctrlLabelRota(k)+'</button>' +
+          '</div>' +
+          '<div class="ctrl-rom-envs">'+envsList+'</div>' +
+        '</div>';
+      }).join('');
+
+    ctrlModalGrande('📋 Gerar romaneio de transporte', body);
+  } catch (e) { alert('Erro: '+e.message); }
+}
+async function ctrlGerarRomaneio(transportadora){
+  // Coleta os envio_ids marcados no grupo dessa transportadora
+  var grupo = document.querySelector('.ctrl-rom-group[data-trans="'+transportadora+'"]');
+  if (!grupo) return;
+  var checks = grupo.querySelectorAll('input[type=checkbox]:checked');
+  var ids = Array.from(checks).map(function(c){ return c.dataset.eid; });
+  if (!ids.length) { alert('Marque pelo menos 1 envio.'); return; }
+  if (!confirm('Gerar romaneio '+ctrlLabelRota(transportadora)+' com '+ids.length+' envios?\n\nDepois disso os envios saem da Fila e vão pra "Enviados".')) return;
+  try {
+    var r = await fetch('/api/crm/romaneios', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ transportadora: transportadora, envio_ids: ids }),
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    // Fecha o modal atual
+    var mw = document.querySelector('.ctrl-modal-wrap'); if (mw) mw.remove();
+    // Abre a página do romaneio pra impressão em nova aba
+    window.open('/api/crm/romaneios/'+encodeURIComponent(d.romaneio.id)+'/pdf', '_blank');
+    // Recarrega a fila
+    await ctrlCarregarFila();
+    alert('✓ Romaneio nº '+d.romaneio.numero+' gerado com '+ids.length+' envios.\n\nA página de impressão foi aberta em nova aba.');
+  } catch (e) { alert('Erro: '+e.message); }
+}
+
+// Modal grande (usa mesmo container, mas com largura maior)
+function ctrlModalGrande(title, bodyHtml){
+  var wrap = document.createElement('div');
+  wrap.className = 'ctrl-modal-wrap';
+  wrap.innerHTML =
+    '<div class="ctrl-modal-bg"></div>' +
+    '<div class="ctrl-modal" style="max-width:680px">' +
+      '<div class="ctrl-modal-head">'+title+'</div>' +
+      '<div class="ctrl-modal-body" style="max-height:65vh;overflow-y:auto">'+bodyHtml+'</div>' +
+      '<div class="ctrl-modal-foot">' +
+        '<button class="ctrl-modal-btn ghost" onclick="this.closest(\'.ctrl-modal-wrap\').remove()">Fechar</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(wrap);
+  requestAnimationFrame(function(){ wrap.classList.add('on'); });
+}
+
+/* ── ASSINATURA DO MOTORISTA ─────────────────────────────────── */
+function ctrlAssinaturaModal(romId){
+  var body =
+    '<div style="margin-bottom:14px;color:var(--dk);font-size:13px">Preencha com os dados do motorista que retirou a mercadoria:</div>' +
+    '<div class="ctrl-fld" style="margin-bottom:10px"><label>Nome completo</label><input id="ass-nome" type="text" /></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+      '<div class="ctrl-fld"><label>CPF</label><input id="ass-cpf" type="text" placeholder="000.000.000-00"/></div>' +
+      '<div class="ctrl-fld"><label>Placa do veículo</label><input id="ass-placa" type="text" placeholder="ABC-1234" style="text-transform:uppercase"/></div>' +
+    '</div>';
+  var wrap = document.createElement('div');
+  wrap.className = 'ctrl-modal-wrap';
+  wrap.innerHTML =
+    '<div class="ctrl-modal-bg"></div>' +
+    '<div class="ctrl-modal">' +
+      '<div class="ctrl-modal-head">✍️ Registrar assinatura do motorista</div>' +
+      '<div class="ctrl-modal-body">'+body+'</div>' +
+      '<div class="ctrl-modal-foot">' +
+        '<button class="ctrl-modal-btn ghost" onclick="this.closest(\'.ctrl-modal-wrap\').remove()">Cancelar</button>' +
+        '<button class="ctrl-modal-btn primary" onclick="ctrlAssinaturaSalvar(\''+romId+'\')">Salvar assinatura</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(wrap);
+  requestAnimationFrame(function(){ wrap.classList.add('on'); });
+}
+async function ctrlAssinaturaSalvar(romId){
+  var nome = document.getElementById('ass-nome').value.trim();
+  var cpf = document.getElementById('ass-cpf').value.trim();
+  var placa = document.getElementById('ass-placa').value.trim().toUpperCase();
+  if (!nome || !cpf) { alert('Nome e CPF são obrigatórios.'); return; }
+  try {
+    var r = await fetch('/api/crm/romaneios/'+encodeURIComponent(romId)+'/assinatura', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ nome: nome, cpf: cpf, placa: placa }),
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    var mw = document.querySelector('.ctrl-modal-wrap'); if (mw) mw.remove();
+    alert('✓ Assinatura registrada. Motorista '+nome);
+    ctrlRomaneiosCarregar();
+    ctrlEnviadosCarregar('');
+  } catch (e) { alert('Erro: '+e.message); }
+}
+
 async function ctrlRenderMatriz(){
   var p = document.getElementById('ctrl-panel');
   p.innerHTML = '<div class="ctrl-card"><h3>Matriz de cidades → rota padrão</h3>' +
@@ -7913,6 +8163,70 @@ function crmFmtDateTime(s){
   width: 2px; background: var(--bd);
 }
 .ctrl-step.done:not(:last-of-type)::before { background: var(--gd); }
+
+/* ═════ Bloco de histórico aprendido no card de cotação ═════ */
+.ctrl-hist-block {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #f0eaff 0%, #fbf9ff 100%);
+  border: 1px solid #d9c8ff;
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  color: var(--dk);
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.ctrl-hist-block b { color: #6b4bff; font-weight: 700; }
+.ctrl-hist-ic { font-size: 14px; flex-shrink: 0; }
+
+/* ═════ Enviados ═════ */
+.ctrl-enviado-row {
+  display: grid; grid-template-columns: 40px 1fr; gap: 12px;
+  padding: 12px; border-top: 1px solid var(--bd);
+  transition: background .18s var(--ez);
+}
+.ctrl-enviado-row:first-child { border-top: 0; padding-top: 0; }
+.ctrl-enviado-row:hover { background: var(--bg); }
+.ctrl-enviado-ic {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--gl); color: var(--gd);
+  display: flex; align-items: center; justify-content: center; font-size: 16px; margin-top: 2px;
+}
+
+/* ═════ Romaneios ═════ */
+.ctrl-rom-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 6px;
+}
+.ctrl-rom-card {
+  padding: 14px 16px; background: var(--wh);
+  border: 1px solid var(--bd); border-radius: var(--r-md);
+  transition: transform .2s var(--ez), box-shadow .2s var(--ez);
+}
+.ctrl-rom-card:hover { transform: translateY(-2px); box-shadow: var(--sh-2); }
+.ctrl-rom-num { font-size: 22px; font-weight: 700; color: var(--gd); font-variant-numeric: tabular-nums; }
+.ctrl-rom-meta { font-size: 12.5px; color: var(--dk); margin-top: 4px; }
+.ctrl-rom-actions { margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap; }
+.ctrl-rom-actions .ctrl-mini-btn { text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+
+/* ═════ Modal grande — grupos e envios ═════ */
+.ctrl-rom-group {
+  margin-bottom: 16px; padding: 14px 16px;
+  background: var(--gl); border: 1px solid var(--gm); border-radius: var(--r-md);
+}
+.ctrl-rom-group-head {
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--gm);
+}
+.ctrl-rom-envs { display: flex; flex-direction: column; gap: 6px; }
+.ctrl-rom-item {
+  display: grid; grid-template-columns: 20px 1fr; gap: 10px; align-items: start;
+  padding: 8px 10px; background: var(--wh); border-radius: var(--r-sm); cursor: pointer;
+  border: 1px solid transparent;
+}
+.ctrl-rom-item:hover { border-color: var(--gm); }
+.ctrl-rom-item input { margin-top: 2px; accent-color: var(--gd); }
 </style>
 
 
