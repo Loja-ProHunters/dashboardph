@@ -33,7 +33,7 @@
     "transporte_valor": 0,
     "transporte_por": "gerencia",
     "transporte_em": "2026-09-24T14:18:34.948Z",
-    "nf_numero": null,
+    "nf_numero": "",
     "nf_por": null,
     "nf_em": null,
     "gt_numero": null,
@@ -87,11 +87,18 @@
         "acao": "campo_alterado",
         "campo": "transporte_valor",
         "novo": 0
+      },
+      {
+        "ts": "2026-09-24T14:18:38.718Z",
+        "por": "gerencia",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": ""
       }
     ],
     "criado_em": "2026-09-23T20:46:55.403Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:18:34.948Z",
+    "atualizado_em": "2026-09-24T14:18:38.718Z",
     "atualizado_por": "gerencia"
   },
   "env_prohunters_27063": {
