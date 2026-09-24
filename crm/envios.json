@@ -337,9 +337,9 @@
     "gt_numero": "202654443714",
     "gt_por": "gerencia",
     "gt_em": "2026-09-24T14:35:17.156Z",
-    "assinatura_ok": false,
-    "assinatura_por": null,
-    "assinatura_em": null,
+    "assinatura_ok": true,
+    "assinatura_por": "gerencia",
+    "assinatura_em": "2026-09-24T14:35:21.918Z",
     "liberacao_ok": false,
     "liberacao_por": null,
     "liberacao_em": null,
@@ -413,11 +413,19 @@
         "acao": "campo_alterado",
         "campo": "gt_numero",
         "novo": "202654443714"
+      },
+      {
+        "ts": "2026-09-24T14:35:21.918Z",
+        "por": "gerencia",
+        "ip": "177.67.205.91",
+        "acao": "campo_alterado",
+        "campo": "assinatura_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-09-24T14:34:22.100Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:35:17.156Z",
+    "atualizado_em": "2026-09-24T14:35:21.919Z",
     "atualizado_por": "gerencia"
   }
 }
