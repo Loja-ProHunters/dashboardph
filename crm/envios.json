@@ -353,7 +353,7 @@
     ],
     "total_pedido": 17100,
     "observacoes": "Marca: Ruger - Modelo: Precision Rimfire - Calibre: .22LR - Acabamento: Cerakote - Funcionamento: Ferrolho - Carregador: 1 Bifilar - Comprimento Total: 35,13\" - 38,63\" (89,23 cm - 98,12 cm) - Comprimento Cano: 18\" (45,72 cm) - Capacidade: 15 - Raiamento: 6 raias - Peso: 3.084g - País de fabricação: Estados Unidos - Nº de Série: 841-71603",
-    "status": "pronto_coleta",
+    "status": "enviado",
     "confirmado_bling": true,
     "volumes_qtd": 1,
     "volumes_por": "gerencia",
@@ -464,12 +464,47 @@
         "acao": "campo_alterado",
         "campo": "liberacao_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-09-24T18:20:28.007Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "romaneio_id",
+        "novo": "rom_20260924_0001"
+      },
+      {
+        "ts": "2026-09-24T18:20:28.007Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "romaneio_numero",
+        "novo": "0001"
+      },
+      {
+        "ts": "2026-09-24T18:20:28.007Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_em",
+        "novo": "2026-09-24T18:20:26.862Z"
+      },
+      {
+        "ts": "2026-09-24T18:20:28.007Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "status",
+        "novo": "enviado"
       }
     ],
     "criado_em": "2026-09-24T14:34:22.100Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:35:27.358Z",
-    "atualizado_por": "gerencia"
+    "atualizado_em": "2026-09-24T18:20:28.007Z",
+    "atualizado_por": "gerencia",
+    "romaneio_id": "rom_20260924_0001",
+    "romaneio_numero": "0001",
+    "coletado_em": "2026-09-24T18:20:26.862Z"
   },
   "env_calibre_1936": {
     "id": "env_calibre_1936",
