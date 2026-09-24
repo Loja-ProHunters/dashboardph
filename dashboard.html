@@ -7610,11 +7610,12 @@ function ctrlModalGrande(title, bodyHtml){
 function ctrlAssinaturaModal(romId){
   var body =
     '<div style="margin-bottom:14px;color:var(--dk);font-size:13px">Preencha com os dados do motorista que retirou a mercadoria:</div>' +
-    '<div class="ctrl-fld" style="margin-bottom:10px"><label>Nome completo</label><input id="ass-nome" type="text" /></div>' +
+    '<div class="ctrl-fld" style="margin-bottom:10px"><label>Nome completo <span class="ctrl-req">*</span></label><input id="ass-nome" type="text" /></div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
-      '<div class="ctrl-fld"><label>CPF</label><input id="ass-cpf" type="text" placeholder="000.000.000-00"/></div>' +
-      '<div class="ctrl-fld"><label>Placa do veículo</label><input id="ass-placa" type="text" placeholder="ABC-1234" style="text-transform:uppercase"/></div>' +
-    '</div>';
+      '<div class="ctrl-fld"><label>CPF <span class="ctrl-req">*</span></label><input id="ass-cpf" type="text" placeholder="000.000.000-00"/></div>' +
+      '<div class="ctrl-fld"><label>Placa do veículo <span class="ctrl-opt">(opcional)</span></label><input id="ass-placa" type="text" placeholder="ABC-1234 · deixe em branco se não souber" style="text-transform:uppercase"/></div>' +
+    '</div>' +
+    '<div style="margin-top:10px;font-size:11.5px;color:var(--gy)">💡 A placa é opcional — se o motorista não souber, você pode dar baixa mesmo assim.</div>';
   var wrap = document.createElement('div');
   wrap.className = 'ctrl-modal-wrap';
   wrap.innerHTML =
@@ -8181,6 +8182,8 @@ function crmFmtDateTime(s){
 }
 .ctrl-hist-block b { color: #6b4bff; font-weight: 700; }
 .ctrl-hist-ic { font-size: 14px; flex-shrink: 0; }
+.ctrl-req { color: var(--r); font-weight: 700; margin-left: 2px; }
+.ctrl-opt { color: var(--gl2); font-weight: 500; font-size: 10.5px; text-transform: none; letter-spacing: 0; }
 
 /* ═════ Enviados ═════ */
 .ctrl-enviado-row {
