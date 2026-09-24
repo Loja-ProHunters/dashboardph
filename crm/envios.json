@@ -29,10 +29,10 @@
     "conferencia_por": "gerencia",
     "conferencia_em": "2026-09-24T14:18:29.139Z",
     "conferencia_notas": null,
-    "transportadora": null,
-    "transporte_valor": null,
-    "transporte_por": null,
-    "transporte_em": null,
+    "transportadora": "rpa",
+    "transporte_valor": 0,
+    "transporte_por": "gerencia",
+    "transporte_em": "2026-09-24T14:18:34.948Z",
     "nf_numero": null,
     "nf_por": null,
     "nf_em": null,
@@ -73,11 +73,25 @@
         "acao": "campo_alterado",
         "campo": "conferencia_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-09-24T14:18:34.948Z",
+        "por": "gerencia",
+        "acao": "campo_alterado",
+        "campo": "transportadora",
+        "novo": "rpa"
+      },
+      {
+        "ts": "2026-09-24T14:18:34.948Z",
+        "por": "gerencia",
+        "acao": "campo_alterado",
+        "campo": "transporte_valor",
+        "novo": 0
       }
     ],
     "criado_em": "2026-09-23T20:46:55.403Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:18:29.139Z",
+    "atualizado_em": "2026-09-24T14:18:34.948Z",
     "atualizado_por": "gerencia"
   },
   "env_prohunters_27063": {
