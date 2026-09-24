@@ -120,9 +120,9 @@
     "transporte_valor": 0,
     "transporte_por": "gerencia",
     "transporte_em": "2026-09-24T14:06:09.295Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "031416",
+    "nf_por": "gerencia",
+    "nf_em": "2026-09-24T14:06:17.683Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -174,11 +174,18 @@
         "acao": "campo_alterado",
         "campo": "transporte_valor",
         "novo": 0
+      },
+      {
+        "ts": "2026-09-24T14:06:17.683Z",
+        "por": "gerencia",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "031416"
       }
     ],
     "criado_em": "2026-09-24T14:05:46.361Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:06:09.295Z",
+    "atualizado_em": "2026-09-24T14:06:17.683Z",
     "atualizado_por": "gerencia"
   }
 }
