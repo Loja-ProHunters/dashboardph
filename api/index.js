@@ -1770,6 +1770,24 @@ module.exports = async (req, res) => {
   // OPERAÇÃO CONTROLADO — Cotação de frete + fila de envio
   // ═════════════════════════════════════════════════════════════
 
+  // GET /api/crm/frete/diag?cidade=X&uf=Y — diagnóstico da matriz
+  // Debug: mostra se cidade+UF bate em cada base (Ezequiel/LT/RPA)
+  if (req.method === 'GET' && url.startsWith('/api/crm/frete/diag')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const cidade = u.searchParams.get('cidade') || '';
+      const uf = (u.searchParams.get('uf') || '').toUpperCase();
+      if (!cidade || !uf) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'cidade+uf obrigatórios'})); return; }
+      const r = await freteMatriz.diagnosticar(cidade, uf);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // GET /api/crm/frete/matriz?cidade=X&uf=Y — rota padrão sugerida
   if (req.method === 'GET' && url.startsWith('/api/crm/frete/matriz')) {
     const sess = getSession(req);
@@ -1979,7 +1997,9 @@ module.exports = async (req, res) => {
       if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio não encontrado'})); return; }
       const body = await readBody(req);
       const patch = JSON.parse(body || '{}');
-      const proximo = envios.aplicarPatch(env, patch, sess.usuario);
+      // Captura IP real do cliente (Vercel usa x-forwarded-for; fallback pra remote address)
+      const ip = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || (req.connection && req.connection.remoteAddress) || '').split(',')[0].trim() || null;
+      const proximo = envios.aplicarPatch(env, patch, sess.usuario, ip);
       const salvo = await crmStore.updateDoc('envios', id, proximo, sess.usuario);
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envio: salvo, checklist: envios.estadoChecklist(salvo) }));
     } catch (e) {
