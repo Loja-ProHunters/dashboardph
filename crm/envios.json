@@ -331,9 +331,9 @@
     "transporte_valor": 0,
     "transporte_por": "gerencia",
     "transporte_em": "2026-09-24T14:34:43.207Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "002874",
+    "nf_por": "gerencia",
+    "nf_em": "2026-09-24T14:34:53.167Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -397,11 +397,19 @@
         "acao": "campo_alterado",
         "campo": "transporte_valor",
         "novo": 0
+      },
+      {
+        "ts": "2026-09-24T14:34:53.167Z",
+        "por": "gerencia",
+        "ip": "177.67.205.91",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "002874"
       }
     ],
     "criado_em": "2026-09-24T14:34:22.100Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:34:43.207Z",
+    "atualizado_em": "2026-09-24T14:34:53.167Z",
     "atualizado_por": "gerencia"
   }
 }
