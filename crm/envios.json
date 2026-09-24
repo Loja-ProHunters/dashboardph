@@ -112,9 +112,9 @@
     "volumes_qtd": 2,
     "volumes_por": "gerencia",
     "volumes_em": "2026-09-24T14:05:56.899Z",
-    "conferencia_ok": false,
-    "conferencia_por": null,
-    "conferencia_em": null,
+    "conferencia_ok": true,
+    "conferencia_por": "gerencia",
+    "conferencia_em": "2026-09-24T14:06:01.982Z",
     "conferencia_notas": null,
     "transportadora": null,
     "transporte_valor": null,
@@ -153,11 +153,18 @@
         "acao": "campo_alterado",
         "campo": "volumes_qtd",
         "novo": 2
+      },
+      {
+        "ts": "2026-09-24T14:06:01.982Z",
+        "por": "gerencia",
+        "acao": "campo_alterado",
+        "campo": "conferencia_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-09-24T14:05:46.361Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T14:05:56.899Z",
+    "atualizado_em": "2026-09-24T14:06:01.983Z",
     "atualizado_por": "gerencia"
   }
 }
