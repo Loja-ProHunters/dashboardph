@@ -523,15 +523,42 @@
         "acao": "campo_alterado",
         "campo": "status",
         "novo": "enviado"
+      },
+      {
+        "ts": "2026-09-24T18:36:36.056Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_motorista",
+        "novo": "Rafael"
+      },
+      {
+        "ts": "2026-09-24T18:36:36.056Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_motorista_cpf",
+        "novo": "00712640002"
+      },
+      {
+        "ts": "2026-09-24T18:36:36.056Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_placa",
+        "novo": "SGB5E01"
       }
     ],
     "criado_em": "2026-09-24T14:34:22.100Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-09-24T18:20:28.007Z",
+    "atualizado_em": "2026-09-24T18:36:36.056Z",
     "atualizado_por": "gerencia",
     "romaneio_id": "rom_20260924_0001",
     "romaneio_numero": "0001",
-    "coletado_em": "2026-09-24T18:20:26.862Z"
+    "coletado_em": "2026-09-24T18:20:26.862Z",
+    "coletado_motorista": "Rafael",
+    "coletado_motorista_cpf": "00712640002",
+    "coletado_placa": "SGB5E01"
   },
   "env_calibre_1936": {
     "id": "env_calibre_1936",
