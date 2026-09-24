@@ -869,9 +869,9 @@
     "volumes_qtd": 2,
     "volumes_por": "dickmann",
     "volumes_em": "2026-09-24T18:55:24.246Z",
-    "conferencia_ok": false,
-    "conferencia_por": null,
-    "conferencia_em": null,
+    "conferencia_ok": true,
+    "conferencia_por": "dickmann",
+    "conferencia_em": "2026-09-24T19:07:14.622Z",
     "conferencia_notas": null,
     "transportadora": null,
     "transporte_valor": null,
@@ -925,11 +925,19 @@
         "acao": "campo_alterado",
         "campo": "volumes_qtd",
         "novo": 2
+      },
+      {
+        "ts": "2026-09-24T19:07:14.622Z",
+        "por": "dickmann",
+        "ip": "177.67.205.91",
+        "acao": "campo_alterado",
+        "campo": "conferencia_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-09-24T18:54:19.398Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-09-24T18:55:24.246Z",
+    "atualizado_em": "2026-09-24T19:07:14.622Z",
     "atualizado_por": "dickmann"
   }
 }
