@@ -332,7 +332,7 @@
   "8abc9882-4e41-46ca-be8a-efeffbda4298": {
     "id": "8abc9882-4e41-46ca-be8a-efeffbda4298",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_49cd6c4fed0189f3",
@@ -355,8 +355,11 @@
     "dono": "mathias",
     "criado_em": "2026-09-25T15:07:04.692Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-09-25T15:07:04.692Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_em": "2026-09-25T15:58:45.920Z",
+    "atualizado_por": "mathias",
+    "resultado": "convertida",
+    "concluida_em": "2026-09-25T15:58:45.920Z",
+    "concluida_por": "mathias"
   },
   "91e79881-61dd-447e-b936-eeffa2b7df2d": {
     "id": "91e79881-61dd-447e-b936-eeffa2b7df2d",
