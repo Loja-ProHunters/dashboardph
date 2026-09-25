@@ -1,6 +1,24 @@
 {
-  "influenciadores": [],
+  "influenciadores": [
+    {
+      "nome": "Delano",
+      "handle": "m3xoutdoor",
+      "cupom": "M3X",
+      "comissaoPct": 5,
+      "pix": "",
+      "telefone": "",
+      "ativo": true,
+      "id": "p_mugwfhum61xpac",
+      "cadastradoEm": "2026-09-25"
+    }
+  ],
   "vendas": [],
   "pagamentos": [],
-  "tray": { "consumer_key": null, "consumer_secret": null, "code": null, "ultimaSync": null, "modoTeste": true }
+  "tray": {
+    "consumer_key": null,
+    "consumer_secret": null,
+    "code": null,
+    "ultimaSync": null,
+    "modoTeste": true
+  }
 }
