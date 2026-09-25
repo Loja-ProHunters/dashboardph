@@ -544,6 +544,7 @@ module.exports = async (req, res) => {
       nome: sess.nome || sess.usuario,
       role: r,
       canAccess: crmUtils.canAccessCRM(sess),
+      canAccessControlado: crmUtils.canAccessControlado(sess),
       canSeeAll: crmUtils.canSeeAll(sess),
       isAdmin: r === 'admin',
     }));
@@ -1777,7 +1778,7 @@ module.exports = async (req, res) => {
   // Debug: mostra se cidade+UF bate em cada base (Ezequiel/LT/RPA)
   if (req.method === 'GET' && url.startsWith('/api/crm/frete/diag')) {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const u = new URL('http://x' + (req.url || ''));
       const cidade = u.searchParams.get('cidade') || '';
@@ -1794,7 +1795,7 @@ module.exports = async (req, res) => {
   // GET /api/crm/frete/matriz?cidade=X&uf=Y — rota padrão sugerida
   if (req.method === 'GET' && url.startsWith('/api/crm/frete/matriz')) {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const u = new URL('http://x' + (req.url || ''));
       const cidade = u.searchParams.get('cidade') || '';
@@ -1818,7 +1819,7 @@ module.exports = async (req, res) => {
   //   Body: { cep, cidade?, uf?, itens: [{tipo, quantidade|valor}] }
   if (req.method === 'POST' && url === '/api/crm/frete/cotar') {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const body = await readBody(req);
       const payload = JSON.parse(body || '{}');
@@ -1840,7 +1841,7 @@ module.exports = async (req, res) => {
   //   Body: { cidade, uf, rota }
   if (req.method === 'POST' && url === '/api/crm/frete/matriz/fechar') {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const body = await readBody(req);
       const p = JSON.parse(body || '{}');
@@ -1855,7 +1856,7 @@ module.exports = async (req, res) => {
   // GET /api/crm/frete/aeroportos?uf=X — lista aeroportos comerciais da UF (Gollog)
   if (req.method === 'GET' && url.startsWith('/api/crm/frete/aeroportos')) {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const u = new URL('http://x' + (req.url || ''));
       const uf = (u.searchParams.get('uf') || '').toUpperCase();
@@ -1871,7 +1872,7 @@ module.exports = async (req, res) => {
   //   Body: { empresa: 'prohunters'|'calibre', numero }
   if (req.method === 'POST' && url === '/api/crm/envios/abrir') {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const body = await readBody(req);
       const { empresa, numero } = JSON.parse(body || '{}');
@@ -1932,7 +1933,7 @@ module.exports = async (req, res) => {
   // GET /api/crm/envios — fila. Query: status, empresa, dono_proximo, atrasados
   if (req.method === 'GET' && url.startsWith('/api/crm/envios') && !url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+/)) {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const u = new URL('http://x' + (req.url || ''));
       const statusFilter = u.searchParams.get('status') || '';
@@ -1999,7 +2000,7 @@ module.exports = async (req, res) => {
   // PRECISA vir antes de /:id porque o regex de id bate com "prontos-por-transportadora".
   if (req.method === 'GET' && url === '/api/crm/envios/prontos-por-transportadora') {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const list = await crmStore.listDocs('envios');
       const prontos = list.filter(e => (e.status === 'pronto_coleta' || envios.estadoChecklist(e).pronto_coleta) && !e.romaneio_id && e.status !== 'enviado' && e.status !== 'cancelado');
@@ -2024,7 +2025,7 @@ module.exports = async (req, res) => {
   // GET /api/crm/envios/:id — detalhe do envio + checklist
   if (req.method === 'GET' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+$/)) {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const id = url.split('/').pop();
       const env = await crmStore.getDoc('envios', id);
@@ -2039,7 +2040,7 @@ module.exports = async (req, res) => {
   // PATCH /api/crm/envios/:id — atualiza campos do envio (aciona passos)
   if (req.method === 'PATCH' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+$/)) {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const id = url.split('/').pop();
       const env = await crmStore.getDoc('envios', id);
@@ -2084,7 +2085,7 @@ module.exports = async (req, res) => {
   //   Body: { transportadora, envio_ids: [...] }
   if (req.method === 'POST' && url === '/api/crm/romaneios') {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const body = await readBody(req);
       const { transportadora, envio_ids } = JSON.parse(body || '{}');
@@ -2126,7 +2127,7 @@ module.exports = async (req, res) => {
   // GET /api/crm/romaneios — lista romaneios
   if (req.method === 'GET' && url === '/api/crm/romaneios') {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const list = await crmStore.listDocs('romaneios');
       list.sort((a, b) => String(b.criado_em || '').localeCompare(String(a.criado_em || '')));
@@ -2140,7 +2141,7 @@ module.exports = async (req, res) => {
   // GET /api/crm/romaneios/:id — detalhe do romaneio + envios
   if (req.method === 'GET' && url.match(/^\/api\/crm\/romaneios\/[a-zA-Z0-9_\-]+$/)) {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const id = url.split('/').pop();
       const rom = await crmStore.getDoc('romaneios', id);
@@ -2160,7 +2161,7 @@ module.exports = async (req, res) => {
   // GET /api/crm/romaneios/:id/pdf — HTML print-ready pra impressão
   if (req.method === 'GET' && url.match(/^\/api\/crm\/romaneios\/[a-zA-Z0-9_\-]+\/pdf$/)) {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'text/html'}); res.end('<h2>Sem acesso</h2>'); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'text/html'}); res.end('<h2>Sem acesso</h2>'); return; }
     try {
       const id = url.split('/')[4];
       const rom = await crmStore.getDoc('romaneios', id);
@@ -2182,7 +2183,7 @@ module.exports = async (req, res) => {
   //   Body: { nome, cpf, placa }
   if (req.method === 'POST' && url.match(/^\/api\/crm\/romaneios\/[a-zA-Z0-9_\-]+\/assinatura$/)) {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const id = url.split('/')[4];
       const rom = await crmStore.getDoc('romaneios', id);
@@ -3658,12 +3659,14 @@ module.exports = async (req, res) => {
     const isAdmin = canEditComercial(sess) ? 'true' : 'false';
     const canViewCom = canViewComercial(sess) ? 'true' : 'false';
     const canEditCom = canEditComercial(sess) ? 'true' : 'false';
+    const canAccessControlado = crmUtils.canAccessControlado(sess) ? 'true' : 'false';
     const usuarioEsc = String(sess.usuario || '').replace(/"/g, '\\"');
     const nomeEsc = String(sess.nome || '').replace(/"/g, '\\"');
     const mustChange = sess.mustChange ? 'true' : 'false';
     html = html.replace('/* %%INJECT%% */',
       'var IS_ADMIN=' + isAdmin + '; var USER_NOME="' + nomeEsc + '"; var USER_USUARIO="' + usuarioEsc + '"; ' +
       'var CAN_VIEW_COMERCIAL=' + canViewCom + '; var CAN_EDIT_COMERCIAL=' + canEditCom + '; ' +
+      'var CAN_ACCESS_CONTROLADO=' + canAccessControlado + '; ' +
       'var MUST_CHANGE_PASSWORD=' + mustChange + ';'
     );
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
