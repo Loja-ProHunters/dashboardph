@@ -12,6 +12,7 @@ const { getContatos, saveContatos } = require('../lib/contatosStore');
 const { getEditorial, saveEditorial } = require('../lib/editorialStore');
 const { getTarifas, saveTarifas } = require('../lib/tarifasStore');
 const { getParceiros, saveParceiros } = require('../lib/parceirosStore');
+const contratos = require('../lib/crm/contratos');
 const { verifyPassword, setPassword, upsertUser, deleteUser, getAllUsers, generateTempPassword, getRoleSync } = require('../lib/usersStore');
 const accessLog = require('../lib/accessLog');
 const { calcularProgressoMeta, getFeriadosCustom, saveFeriadosCustom } = require('../lib/metaDiaria');
@@ -3248,6 +3249,103 @@ module.exports = async (req, res) => {
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Erro: ' + e.message }));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // CONTRATOS — templates .docx com variáveis
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /api/parceiros/contratos/templates — lista modelos disponíveis
+  if (req.method === 'GET' && url === '/api/parceiros/contratos/templates') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissão.'})); return; }
+    try {
+      const templates = contratos.listarTemplates();
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, templates }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/contratos/gerar — gera .docx e devolve pra download
+  //   Body: { template_id, influenciador_id, valores: {...} }
+  if (req.method === 'POST' && url === '/api/parceiros/contratos/gerar') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissão.'})); return; }
+    try {
+      const body = JSON.parse(await readBody(req) || '{}');
+      const { template_id, influenciador_id, valores } = body;
+      if (!template_id) throw new Error('template_id obrigatório');
+      const r = await contratos.gerar({ templateId: template_id, valores: valores || {} });
+      // Registra histórico e salva o arquivo no repo (best-effort)
+      let registro = null;
+      if (influenciador_id) {
+        try {
+          registro = await contratos.registrarNoParceiro({
+            influenciadorId: influenciador_id,
+            templateId: template_id,
+            filename: r.filename,
+            valores: r.valores_final,
+            actor: sess.usuario,
+            buffer: r.buffer,
+          });
+        } catch (e) { /* histórico é opcional */ }
+      }
+      // Envia o arquivo direto pra download
+      res.writeHead(200, {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'Content-Disposition': 'attachment; filename="' + r.filename + '"',
+        'Content-Length': r.buffer.length,
+        'X-Contrato-Id': registro ? registro.id : '',
+      });
+      res.end(r.buffer);
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/parceiros/contratos/historico?influenciador_id=X — histórico de um parceiro
+  if (req.method === 'GET' && url.startsWith('/api/parceiros/contratos/historico')) {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissão.'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const infId = u.searchParams.get('influenciador_id') || '';
+      if (!infId) throw new Error('influenciador_id obrigatório');
+      const d = await getParceiros();
+      const inf = (d.influenciadores || []).find(x => x.id === infId);
+      if (!inf) throw new Error('Influenciador não encontrado');
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, contratos: inf.contratos_gerados || [] }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/parceiros/contratos/download?inf=X&ct=Y — baixa 2ª via do contrato
+  if (req.method === 'GET' && url.startsWith('/api/parceiros/contratos/download')) {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissão.'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const infId = u.searchParams.get('inf') || '';
+      const ctId  = u.searchParams.get('ct') || '';
+      if (!infId || !ctId) throw new Error('inf + ct obrigatórios');
+      const r = await contratos.buscarContratoGerado(infId, ctId);
+      if (!r) throw new Error('Contrato não encontrado ou arquivo removido');
+      res.writeHead(200, {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'Content-Disposition': 'attachment; filename="' + r.registro.filename + '"',
+        'Content-Length': r.buffer.length,
+      });
+      res.end(r.buffer);
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
     return;
   }
