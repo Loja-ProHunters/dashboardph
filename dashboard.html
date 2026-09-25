@@ -3686,6 +3686,34 @@ window.onload = function() {
     // O botão nasce oculto e é revelado aqui.
     var _niCrm = document.getElementById('ni-crm'); if (_niCrm) _niCrm.style.display = '';
   }
+  // Auxiliar não vê o comercial em geral, mas PRECISA da Op. Controlado.
+  // Revela o grupo Comercial (pra o CRM aparecer no menu) e o item CRM.
+  // Ao clicar em CRM, o crmInit() força a sub-aba controlado (única visível pra auxiliar).
+  // Também esconde os outros itens do grupo Comercial (Dashboard Comercial e Parceiros)
+  // pra não confundir o auxiliar com coisas que ele não deve mexer.
+  if (typeof CAN_ACCESS_CONTROLADO !== 'undefined' && CAN_ACCESS_CONTROLADO
+      && !(typeof CAN_VIEW_COMERCIAL !== 'undefined' && CAN_VIEW_COMERCIAL)) {
+    var _grpCom = document.getElementById('grp-comercial');
+    if (_grpCom) {
+      _grpCom.style.display = 'block';
+      // Renomeia a label "Comercial" pra "Operacional" pro auxiliar
+      var lblCom = _grpCom.querySelector('.sb-lbl');
+      if (lblCom) lblCom.textContent = 'Operacional';
+      // Esconde todos os botões do grupo EXCETO o CRM
+      _grpCom.querySelectorAll('button.ni').forEach(function(btn){
+        if (btn.id !== 'ni-crm') btn.style.display = 'none';
+      });
+      // Mostra o CRM
+      var _niCrmAux = document.getElementById('ni-crm');
+      if (_niCrmAux) _niCrmAux.style.display = '';
+      // Troca o texto do botão CRM pra algo mais claro pro auxiliar
+      var lblCrm = _niCrmAux && _niCrmAux.querySelector('.ni-tx');
+      if (lblCrm) lblCrm.textContent = 'Op. Controlado';
+      // Esconde a badge NOVO
+      var badge = _niCrmAux && _niCrmAux.querySelector('.badge');
+      if (badge) badge.style.display = 'none';
+    }
+  }
   if (typeof USER_NOME !== 'undefined' && USER_NOME) {
     document.getElementById('user-pill').textContent = USER_NOME;
   }
@@ -4843,11 +4871,19 @@ async function crmInit(){
       return;
     }
     if (!window.CRM.session.canAccess) {
-      document.getElementById('crm-view').innerHTML =
-        '<div class="crm-empty">Seu usuário não tem acesso ao CRM. Fale com a gerência.</div>';
-      document.getElementById('crm-sub').innerHTML = '';
-      document.getElementById('crm-actions').innerHTML = '';
-      return;
+      // Se o usuário NÃO tem acesso geral ao CRM mas TEM acesso à Op. Controlado
+      // (ex: auxiliar), forçamos ele a entrar diretamente na sub-aba controlado.
+      if (window.CRM.session.canAccessControlado) {
+        window.CRM.session.canAccess = true;
+        window.CRM.session.somenteControlado = true;
+        window.CRM.currentSub = 'controlado';
+      } else {
+        document.getElementById('crm-view').innerHTML =
+          '<div class="crm-empty">Seu usuário não tem acesso ao CRM. Fale com a gerência.</div>';
+        document.getElementById('crm-sub').innerHTML = '';
+        document.getElementById('crm-actions').innerHTML = '';
+        return;
+      }
     }
     window.CRM.loaded = true;
   }
@@ -4857,6 +4893,10 @@ async function crmInit(){
 
 function crmRenderSubTabs(){
   var subs = ['painel','tarefas','ficha','prospeccao','controlado','accounts','documentos','armas','leads','opportunities','activities','referrals','orders','onboardings','contacts'];
+  // Se o usuário só tem acesso à Op. Controlado (ex: auxiliar), esconde as demais sub-abas
+  if (window.CRM.session && window.CRM.session.somenteControlado) {
+    subs = ['controlado'];
+  }
   var L = window.CRM.labels;
   var html = subs.map(function(k){
     var cls = k === window.CRM.currentSub ? 'on' : '';
