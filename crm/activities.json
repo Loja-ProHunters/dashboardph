@@ -76,5 +76,31 @@
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-09-25T14:53:58.749Z",
     "atualizado_por": "cron-oportunidades"
+  },
+  "8c6928b1-1d52-4731-b15f-b59b9af821ae": {
+    "id": "8c6928b1-1d52-4731-b15f-b59b9af821ae",
+    "tipo": "trigger",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_48800551d601200c",
+    "titulo": "🎉 1 ano de cliente — VANDEMBERG VILELA VITORIANO",
+    "descricao": "1 ano da 1a compra (2025-10-03) — retomar contato\n\nCliente: VANDEMBERG VILELA VITORIANO\nUltima compra: 2026-08-17\nPedidos: 8\nValor historico: R$ 16861.23\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-09",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 49,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "aniv_acc_48800551d601200c_2025-10",
+    "gerada_automaticamente": true,
+    "fonte": "aniversario",
+    "account_id": "acc_48800551d601200c",
+    "motivo_curto": "1 ano da 1a compra (2025-10-03) — retomar contato",
+    "dono": "dickmann",
+    "criado_em": "2026-09-25T14:53:59.842Z",
+    "criado_por": "cron-oportunidades",
+    "atualizado_em": "2026-09-25T14:53:59.842Z",
+    "atualizado_por": "cron-oportunidades"
   }
 }
