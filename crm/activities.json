@@ -306,7 +306,7 @@
   "c5fa85cf-1981-4f4f-9867-90b71eed8141": {
     "id": "c5fa85cf-1981-4f4f-9867-90b71eed8141",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_ce1cfec333877c9e",
@@ -326,8 +326,11 @@
     "dono": "mathias",
     "criado_em": "2026-09-25T15:07:04.692Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-09-25T15:07:04.692Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_em": "2026-09-25T16:07:58.572Z",
+    "atualizado_por": "mathias",
+    "resultado": "convertida",
+    "concluida_em": "2026-09-25T16:07:58.572Z",
+    "concluida_por": "mathias"
   },
   "8abc9882-4e41-46ca-be8a-efeffbda4298": {
     "id": "8abc9882-4e41-46ca-be8a-efeffbda4298",
