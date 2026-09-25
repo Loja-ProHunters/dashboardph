@@ -19,10 +19,7 @@
       "path": "/api/crm/coocorrencia/rebuild",
       "schedule": "0 3 * * 0"
     },
-    {
-      "path": "/api/crm/cron/reativacao",
-      "schedule": "0 11 * * 1"
-    },
+      { "path": "/api/crm/cron/reativacao", "schedule": "0 11 * * *" },
     {
       "path": "/api/crm/catalogo/rebuild",
       "schedule": "0 4 * * *"
