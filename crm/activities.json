@@ -102,5 +102,31 @@
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-09-25T14:53:59.842Z",
     "atualizado_por": "cron-oportunidades"
+  },
+  "f8be3eb7-4612-431d-a01d-84d950afe4d2": {
+    "id": "f8be3eb7-4612-431d-a01d-84d950afe4d2",
+    "tipo": "trigger",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_6bd0b3f0692bb8b3",
+    "titulo": "🎉 1 ano de cliente — Thiago Teixeira Bochnia",
+    "descricao": "1 ano da 1a compra (2025-09-22) — retomar contato\n\nCliente: Thiago Teixeira Bochnia\nUltima compra: 2025-09-22\nPedidos: 1\nValor historico: R$ 14418.00\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-09",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 44,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "aniv_acc_6bd0b3f0692bb8b3_2025-09",
+    "gerada_automaticamente": true,
+    "fonte": "aniversario",
+    "account_id": "acc_6bd0b3f0692bb8b3",
+    "motivo_curto": "1 ano da 1a compra (2025-09-22) — retomar contato",
+    "dono": "dickmann",
+    "criado_em": "2026-09-25T14:54:00.939Z",
+    "criado_por": "cron-oportunidades",
+    "atualizado_em": "2026-09-25T14:54:00.939Z",
+    "atualizado_por": "cron-oportunidades"
   }
 }
