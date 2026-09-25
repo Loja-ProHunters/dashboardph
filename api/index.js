@@ -2908,6 +2908,12 @@ module.exports = async (req, res) => {
   }
 
   // POST /api/comercial — salva os dados (somente luis/admin)
+  //
+  // MERGE, nao overwrite. O frontend de vendedores manda so os campos que ele
+  // edita (sellers, dias, mes, history) e NAO manda siteFat/faturamento do
+  // site — esse bucket é lançado por outra rota. Se aqui fizesse overwrite
+  // cru, o siteFat sumia toda vez que alguem salvava outra coisa. Entao
+  // pegamos o estado atual, aplicamos so os campos que vieram, e salvamos.
   if (req.method === 'POST' && url === '/api/comercial') {
     const sess = getSession(req);
     if (!sess || !canEditComercial(sess)) {
@@ -2918,7 +2924,20 @@ module.exports = async (req, res) => {
     const body = await readBody(req);
     try {
       const incoming = JSON.parse(body);
-      await saveComercialData(incoming);
+      const atual = await getComercialData();
+      const merged = {
+        ...atual,
+        ...incoming,
+        // Campos que so a rota especifica de site pode mexer: preserva o valor
+        // atual quando o incoming nao trouxer (ou trouxer undefined/null).
+        siteFat: (incoming.siteFat === undefined || incoming.siteFat === null)
+          ? (Number(atual.siteFat) || 0)
+          : Number(incoming.siteFat) || 0,
+        // history so persiste se veio explicito; senao mantem o do disco pra
+        // nao apagar meses fechados quando o frontend nao carrega historico.
+        history: Array.isArray(incoming.history) ? incoming.history : (atual.history || []),
+      };
+      await saveComercialData(merged);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
     } catch (e) {
