@@ -4897,6 +4897,17 @@ function crmRenderSubTabs(){
   if (window.CRM.session && window.CRM.session.somenteControlado) {
     subs = ['controlado'];
   }
+  // Vendedores veem só as abas do dia-a-dia — o resto (painel, contas, leads,
+  // documentos, armas, oportunidades, atividades cruas, onboardings, contatos)
+  // fica escondido pra evitar sobrecarga visual. Gerência continua vendo tudo.
+  else if (window.CRM.session && window.CRM.session.role === 'vendas') {
+    subs = ['tarefas','ficha','prospeccao','controlado','referrals','orders'];
+  }
+  // Se a sub-aba atual foi cortada pelo filtro (ex: vendedor caiu em 'painel'
+  // no primeiro load), redireciona pra primeira permitida
+  if (subs.indexOf(window.CRM.currentSub) === -1) {
+    window.CRM.currentSub = subs[0];
+  }
   var L = window.CRM.labels;
   var html = subs.map(function(k){
     var cls = k === window.CRM.currentSub ? 'on' : '';
