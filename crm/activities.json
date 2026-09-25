@@ -351,5 +351,31 @@
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-09-25T14:54:08.661Z",
     "atualizado_por": "cron-oportunidades"
+  },
+  "7a653e81-25e8-49c9-9c45-b3706cf3f9ea": {
+    "id": "7a653e81-25e8-49c9-9c45-b3706cf3f9ea",
+    "tipo": "trigger",
+    "status": "pendente",
+    "owner_id": "gerencia",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_432c7e5627c958c2",
+    "titulo": "🎉 1 ano de cliente — Pro Hunters Comércio de Imp. e Exp. Ltda ME",
+    "descricao": "1 ano da 1a compra (2025-10-03) — retomar contato\n\nCliente: Pro Hunters Comércio de Imp. e Exp. Ltda ME\nUltima compra: 2026-07-09\nPedidos: 11\nValor historico: R$ 175875.66\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-09",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 50,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "aniv_acc_432c7e5627c958c2_2025-10",
+    "gerada_automaticamente": true,
+    "fonte": "aniversario",
+    "account_id": "acc_432c7e5627c958c2",
+    "motivo_curto": "1 ano da 1a compra (2025-10-03) — retomar contato",
+    "dono": "gerencia",
+    "criado_em": "2026-09-25T14:54:09.604Z",
+    "criado_por": "cron-oportunidades",
+    "atualizado_em": "2026-09-25T14:54:09.604Z",
+    "atualizado_por": "cron-oportunidades"
   }
 }
