@@ -432,5 +432,31 @@
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-09-25T14:54:11.471Z",
     "atualizado_por": "cron-oportunidades"
+  },
+  "819b2b4c-5558-48f0-a28b-30d0cdb17fe7": {
+    "id": "819b2b4c-5558-48f0-a28b-30d0cdb17fe7",
+    "tipo": "trigger",
+    "status": "pendente",
+    "owner_id": "gerencia",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_ce1cfec333877c9e",
+    "titulo": "🎉 1 ano de cliente — Daniel Marcio de Souza",
+    "descricao": "1 ano da 1a compra (2025-09-23) — retomar contato\n\nCliente: Daniel Marcio de Souza\nUltima compra: 2025-09-23\nPedidos: 1\nValor historico: R$ 11500.00\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-09",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 38,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "aniv_acc_ce1cfec333877c9e_2025-09",
+    "gerada_automaticamente": true,
+    "fonte": "aniversario",
+    "account_id": "acc_ce1cfec333877c9e",
+    "motivo_curto": "1 ano da 1a compra (2025-09-23) — retomar contato",
+    "dono": "gerencia",
+    "criado_em": "2026-09-25T14:54:12.446Z",
+    "criado_por": "cron-oportunidades",
+    "atualizado_em": "2026-09-25T14:54:12.446Z",
+    "atualizado_por": "cron-oportunidades"
   }
 }
