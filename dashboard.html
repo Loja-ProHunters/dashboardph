@@ -2840,6 +2840,7 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
        +'</div>'
        +'<div class="pc-inf-actions">'
        +'<button class="pc-btn pri" onclick="pcPagar(\''+i.id+'\',\''+jsq(i.nome)+'\','+r.saldoAberto+')"'+(r.saldoAberto<=0?' disabled':'')+'>💰 Registrar pagamento</button>'
+       +'<button class="pc-btn ghost" onclick="pcContratoAbrir(\''+i.id+'\')">📄 Contrato</button>'
        +'<button class="pc-btn ghost" onclick="pcEditInf(\''+i.id+'\')">Editar</button>'
        +'</div>'
        +'</div>';
@@ -2934,6 +2935,137 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
         if(res.error){ e.textContent=res.error; e.classList.add('on'); return; }
         pcCloseInf(); pcRefresh();
       });
+  };
+
+  // ─── CONTRATOS — modal de geração + histórico ───────────────────
+  window.pcContratoAbrir = async function(infId){
+    var inf = PC.dados.influenciadores.find(function(x){ return x.id === infId; });
+    if (!inf) return;
+    // Carrega templates + histórico em paralelo
+    var wrap = document.createElement('div');
+    wrap.className = 'ctrl-modal-wrap on';
+    wrap.innerHTML =
+      '<div class="ctrl-modal-bg"></div>' +
+      '<div class="ctrl-modal" style="max-width:640px">' +
+        '<div class="ctrl-modal-head">📄 Gerar contrato — '+esc(inf.nome)+'</div>' +
+        '<div class="ctrl-modal-body" id="pc-ct-body" style="max-height:70vh;overflow-y:auto"><div style="text-align:center;padding:30px;color:var(--gy)">Carregando…</div></div>' +
+        '<div class="ctrl-modal-foot">' +
+          '<button class="ctrl-modal-btn ghost" onclick="this.closest(\'.ctrl-modal-wrap\').remove()">Fechar</button>' +
+          '<button class="ctrl-modal-btn primary" id="pc-ct-gerar" style="display:none" onclick="pcContratoGerar(\''+infId+'\')">📄 Gerar e baixar</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(wrap);
+    try {
+      var tRes = await fetch('/api/parceiros/contratos/templates');
+      var t = await tRes.json();
+      var hRes = await fetch('/api/parceiros/contratos/historico?influenciador_id='+encodeURIComponent(infId));
+      var h = await hRes.json();
+      var templates = t.templates || [];
+      var historico = h.contratos || [];
+      window.PC_CT = { infId: infId, templates: templates };
+      pcContratoRenderBody(inf, historico);
+      document.getElementById('pc-ct-gerar').style.display = '';
+    } catch (e) {
+      document.getElementById('pc-ct-body').innerHTML = '<div style="color:var(--r)">Erro: '+esc(e.message)+'</div>';
+    }
+  };
+
+  function pcContratoRenderBody(inf, historico){
+    var body = document.getElementById('pc-ct-body');
+    var t = (window.PC_CT.templates || [])[0]; // por enquanto só um template
+    if (!t) { body.innerHTML = '<div style="color:var(--r)">Nenhum template configurado</div>'; return; }
+
+    // Pré-preenche do influenciador
+    var pre = {
+      nome_parceiro: inf.nome || '',
+      pct_cupom: inf.comissaoPct || 5,
+      pct_comissao: inf.comissaoPct || 5,
+      tipo_parceiro: 'INFLUENCIADOR',
+    };
+    // Se já tem contrato anterior, herda os dados dele (cpf, endereço etc)
+    var ultimo = (historico || [])[0];
+    if (ultimo && ultimo.valores) {
+      Object.keys(ultimo.valores).forEach(function(k){
+        if (ultimo.valores[k] && !pre[k]) pre[k] = ultimo.valores[k];
+      });
+    }
+
+    var camposHtml = t.variaveis.map(function(v){
+      var val = pre[v.key] || '';
+      var lbl = esc(v.label) + (v.obrigatorio ? ' <span style="color:var(--r)">*</span>' : ' <span style="color:var(--gy);font-weight:500">(opcional)</span>');
+      var hint = v.hint ? '<div style="font-size:11px;color:var(--gy);margin-top:2px">'+esc(v.hint)+'</div>' : '';
+      if (v.tipo === 'select') {
+        var opts = (v.opcoes||[]).map(function(o){ return '<option value="'+o+'"'+(val===o?' selected':'')+'>'+o+'</option>'; }).join('');
+        return '<div class="ctrl-fld" style="margin-bottom:12px"><label>'+lbl+'</label><select data-var="'+v.key+'">'+opts+'</select>'+hint+'</div>';
+      }
+      var suf = v.sufixo ? '<span style="color:var(--gy);margin-left:6px;font-weight:600">'+v.sufixo+'</span>' : '';
+      var type = v.tipo === 'number' ? 'number' : 'text';
+      var mx = v.maxlength ? ' maxlength="'+v.maxlength+'"' : '';
+      var pl = v.placeholder ? ' placeholder="'+esc(v.placeholder)+'"' : '';
+      var st = v.upper ? ' style="text-transform:uppercase"' : '';
+      return '<div class="ctrl-fld" style="margin-bottom:12px"><label>'+lbl+'</label>' +
+        '<div style="display:flex;align-items:center;gap:6px"><input data-var="'+v.key+'" type="'+type+'" value="'+esc(val)+'"'+mx+pl+st+' style="flex:1"/>'+suf+'</div>'+hint+'</div>';
+    }).join('');
+
+    var histHtml = '';
+    if (historico && historico.length) {
+      histHtml = '<div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--bd)">' +
+        '<h4 style="margin:0 0 10px;font-size:13px;color:var(--dk)">📁 Histórico de contratos ('+historico.length+')</h4>' +
+        historico.map(function(c){
+          var d = new Date(c.gerado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+          var link = c.arquivo_path
+            ? '<a class="pc-btn ghost" style="padding:4px 10px;font-size:11.5px;text-decoration:none" href="/api/parceiros/contratos/download?inf='+encodeURIComponent(window.PC_CT.infId)+'&ct='+encodeURIComponent(c.id)+'" target="_blank">⬇ Baixar 2ª via</a>'
+            : '<span style="font-size:11px;color:var(--gy)">arquivo não guardado</span>';
+          return '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border-radius:6px;margin-bottom:6px">' +
+            '<div><div style="font-size:12.5px;font-weight:600">'+esc(c.template_label||c.template_id)+'</div>' +
+            '<div style="font-size:11.5px;color:var(--gy)">Gerado em '+d+' por '+esc(c.gerado_por||'—')+' · '+esc(c.valores.tipo_parceiro||'—')+' · '+(c.valores.pct_cupom||'?')+'% cupom / '+(c.valores.pct_comissao||'?')+'% comissão</div></div>' +
+            link + '</div>';
+        }).join('') + '</div>';
+    }
+
+    body.innerHTML = '<div style="background:var(--gl);border:1px solid var(--gm);border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:12.5px">' +
+      '<b>Modelo:</b> '+esc(t.label)+'<br>' +
+      '<span style="color:var(--gy);font-size:11.5px">Preencha os campos abaixo. Ao gerar, o documento .docx sai pronto pra download e fica salvo no histórico do parceiro.</span></div>' +
+      camposHtml + histHtml;
+  }
+
+  window.pcContratoGerar = async function(infId){
+    var btn = document.getElementById('pc-ct-gerar');
+    var origHtml = btn.innerHTML;
+    btn.disabled = true; btn.innerHTML = '⏳ Gerando…';
+    try {
+      var body = document.getElementById('pc-ct-body');
+      var valores = {};
+      body.querySelectorAll('[data-var]').forEach(function(el){
+        valores[el.dataset.var] = el.value;
+      });
+      var t = (window.PC_CT.templates || [])[0];
+      var r = await fetch('/api/parceiros/contratos/gerar', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ template_id: t.id, influenciador_id: infId, valores: valores }),
+      });
+      if (!r.ok) {
+        var err = await r.json().catch(function(){return {error:'Erro '+r.status};});
+        throw new Error(err.error || 'Erro');
+      }
+      // Baixa o arquivo
+      var blob = await r.blob();
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      var cd = r.headers.get('Content-Disposition') || '';
+      var m = /filename="([^"]+)"/.exec(cd);
+      a.href = url; a.download = m ? m[1] : 'contrato.docx';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      // Fecha modal e recarrega parceiros pra atualizar contador de contratos
+      var mw = document.querySelector('.ctrl-modal-wrap'); if (mw) mw.remove();
+      alert('✓ Contrato gerado e baixado.\nUma cópia foi salva no histórico do parceiro.');
+      pcRefresh();
+    } catch (e) {
+      alert('Erro: ' + e.message);
+    } finally {
+      btn.disabled = false; btn.innerHTML = origHtml;
+    }
   };
 
   window.pcOpenVenda=function(){
