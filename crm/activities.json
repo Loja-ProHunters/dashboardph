@@ -571,5 +571,31 @@
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-09-25T14:54:16.344Z",
     "atualizado_por": "cron-oportunidades"
+  },
+  "f987ca73-7fa6-4c43-aa76-ca075e201976": {
+    "id": "f987ca73-7fa6-4c43-aa76-ca075e201976",
+    "tipo": "trigger",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_cc40691310df8bde",
+    "titulo": "🎉 1 ano de cliente — Marcos Paulo vogel",
+    "descricao": "1 ano da 1a compra (2025-09-28) — retomar contato\n\nCliente: Marcos Paulo vogel\nUltima compra: 2026-07-29\nPedidos: 2\nValor historico: R$ 1559.82\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-09",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 18,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "aniv_acc_cc40691310df8bde_2025-09",
+    "gerada_automaticamente": true,
+    "fonte": "aniversario",
+    "account_id": "acc_cc40691310df8bde",
+    "motivo_curto": "1 ano da 1a compra (2025-09-28) — retomar contato",
+    "dono": "mathias",
+    "criado_em": "2026-09-25T14:54:17.642Z",
+    "criado_por": "cron-oportunidades",
+    "atualizado_em": "2026-09-25T14:54:17.642Z",
+    "atualizado_por": "cron-oportunidades"
   }
 }
