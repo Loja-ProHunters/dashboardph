@@ -963,9 +963,9 @@
     "observacoes": null,
     "status": "aberto",
     "confirmado_bling": true,
-    "volumes_qtd": null,
-    "volumes_por": null,
-    "volumes_em": null,
+    "volumes_qtd": 1,
+    "volumes_por": "auxiliar",
+    "volumes_em": "2026-09-25T13:55:27.317Z",
     "conferencia_ok": false,
     "conferencia_por": null,
     "conferencia_em": null,
@@ -1014,11 +1014,19 @@
         "por": "auxiliar",
         "acao": "envio_criado",
         "detalhe": "empresa=prohunters numero=27089"
+      },
+      {
+        "ts": "2026-09-25T13:55:27.317Z",
+        "por": "auxiliar",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "volumes_qtd",
+        "novo": 1
       }
     ],
     "criado_em": "2026-09-25T13:55:19.201Z",
     "criado_por": "auxiliar",
-    "atualizado_em": "2026-09-25T13:55:19.201Z",
+    "atualizado_em": "2026-09-25T13:55:27.318Z",
     "atualizado_por": "auxiliar"
   }
 }
