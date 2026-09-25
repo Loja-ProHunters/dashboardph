@@ -24,5 +24,31 @@
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-09-25T14:53:56.020Z",
     "atualizado_por": "cron-oportunidades"
+  },
+  "c9f5215a-6a3b-4d2c-a081-bbacbe6ad99d": {
+    "id": "c9f5215a-6a3b-4d2c-a081-bbacbe6ad99d",
+    "tipo": "trigger",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_a594bcd666be292a",
+    "titulo": "🎉 1 ano de cliente — Arles Granhem Brandão",
+    "descricao": "1 ano da 1a compra (2025-09-23) — retomar contato\n\nCliente: Arles Granhem Brandão\nUltima compra: 2025-09-23\nPedidos: 1\nValor historico: R$ 24764.64\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-09",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 50,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "aniv_acc_a594bcd666be292a_2025-09",
+    "gerada_automaticamente": true,
+    "fonte": "aniversario",
+    "account_id": "acc_a594bcd666be292a",
+    "motivo_curto": "1 ano da 1a compra (2025-09-23) — retomar contato",
+    "dono": "dickmann",
+    "criado_em": "2026-09-25T14:53:56.907Z",
+    "criado_por": "cron-oportunidades",
+    "atualizado_em": "2026-09-25T14:53:56.907Z",
+    "atualizado_por": "cron-oportunidades"
   }
 }
