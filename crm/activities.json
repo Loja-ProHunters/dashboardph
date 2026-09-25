@@ -377,5 +377,31 @@
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-09-25T14:54:09.604Z",
     "atualizado_por": "cron-oportunidades"
+  },
+  "7638166e-b87a-44da-b468-375bd4242d52": {
+    "id": "7638166e-b87a-44da-b468-375bd4242d52",
+    "tipo": "trigger",
+    "status": "pendente",
+    "owner_id": "gerencia",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_d6edd309c9dcd1c8",
+    "titulo": "🎉 1 ano de cliente — CAC IMPORTACAO E COMERCIO DE ARMAS MUNICOES E EQUIPAMENTOS L",
+    "descricao": "1 ano da 1a compra (2025-10-03) — retomar contato\n\nCliente: CAC IMPORTACAO E COMERCIO DE ARMAS MUNICOES E EQUIPAMENTOS L\nUltima compra: 2025-11-17\nPedidos: 2\nValor historico: R$ 16710.00\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-09",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 48,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "aniv_acc_d6edd309c9dcd1c8_2025-10",
+    "gerada_automaticamente": true,
+    "fonte": "aniversario",
+    "account_id": "acc_d6edd309c9dcd1c8",
+    "motivo_curto": "1 ano da 1a compra (2025-10-03) — retomar contato",
+    "dono": "gerencia",
+    "criado_em": "2026-09-25T14:54:10.656Z",
+    "criado_por": "cron-oportunidades",
+    "atualizado_em": "2026-09-25T14:54:10.656Z",
+    "atualizado_por": "cron-oportunidades"
   }
 }
