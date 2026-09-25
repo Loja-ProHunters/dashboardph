@@ -487,5 +487,31 @@
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-09-25T14:54:13.364Z",
     "atualizado_por": "cron-oportunidades"
+  },
+  "32d5c3b3-2e5d-450e-b9c1-184490b122b8": {
+    "id": "32d5c3b3-2e5d-450e-b9c1-184490b122b8",
+    "tipo": "trigger",
+    "status": "pendente",
+    "owner_id": "gerencia",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_c36037df28ce48e9",
+    "titulo": "🎉 1 ano de cliente — Hugo Pinto Bustamante",
+    "descricao": "1 ano da 1a compra (2025-09-24) — retomar contato\n\nCliente: Hugo Pinto Bustamante\nUltima compra: 2025-09-24\nPedidos: 1\nValor historico: R$ 10500.00\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-09",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 36,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "aniv_acc_c36037df28ce48e9_2025-09",
+    "gerada_automaticamente": true,
+    "fonte": "aniversario",
+    "account_id": "acc_c36037df28ce48e9",
+    "motivo_curto": "1 ano da 1a compra (2025-09-24) — retomar contato",
+    "dono": "gerencia",
+    "criado_em": "2026-09-25T14:54:14.341Z",
+    "criado_por": "cron-oportunidades",
+    "atualizado_em": "2026-09-25T14:54:14.341Z",
+    "atualizado_por": "cron-oportunidades"
   }
 }
