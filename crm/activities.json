@@ -50,5 +50,31 @@
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-09-25T14:53:56.907Z",
     "atualizado_por": "cron-oportunidades"
+  },
+  "2e0b5a4a-de17-4ae5-a877-f867c6f079e9": {
+    "id": "2e0b5a4a-de17-4ae5-a877-f867c6f079e9",
+    "tipo": "trigger",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_bd87898c1fef3b40",
+    "titulo": "🎉 1 ano de cliente — Elias dos Santos Neto",
+    "descricao": "1 ano da 1a compra (2025-09-26) — retomar contato\n\nCliente: Elias dos Santos Neto\nUltima compra: 2026-05-29\nPedidos: 3\nValor historico: R$ 48661.00\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-09",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 50,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "aniv_acc_bd87898c1fef3b40_2025-09",
+    "gerada_automaticamente": true,
+    "fonte": "aniversario",
+    "account_id": "acc_bd87898c1fef3b40",
+    "motivo_curto": "1 ano da 1a compra (2025-09-26) — retomar contato",
+    "dono": "dickmann",
+    "criado_em": "2026-09-25T14:53:58.749Z",
+    "criado_por": "cron-oportunidades",
+    "atualizado_em": "2026-09-25T14:53:58.749Z",
+    "atualizado_por": "cron-oportunidades"
   }
 }
