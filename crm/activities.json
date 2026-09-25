@@ -1,0 +1,28 @@
+{
+  "2f2226b4-cf42-418d-a604-4749c2700b4d": {
+    "id": "2f2226b4-cf42-418d-a604-4749c2700b4d",
+    "tipo": "trigger",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_547951b2d4dc4de4",
+    "titulo": "🎉 1 ano de cliente — Prime Distribuidora",
+    "descricao": "1 ano da 1a compra (2025-10-03) — retomar contato\n\nCliente: Prime Distribuidora\nUltima compra: 2025-10-03\nPedidos: 1\nValor historico: R$ 216083.70\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-09",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 50,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "aniv_acc_547951b2d4dc4de4_2025-10",
+    "gerada_automaticamente": true,
+    "fonte": "aniversario",
+    "account_id": "acc_547951b2d4dc4de4",
+    "motivo_curto": "1 ano da 1a compra (2025-10-03) — retomar contato",
+    "dono": "dickmann",
+    "criado_em": "2026-09-25T14:53:56.020Z",
+    "criado_por": "cron-oportunidades",
+    "atualizado_em": "2026-09-25T14:53:56.020Z",
+    "atualizado_por": "cron-oportunidades"
+  }
+}
