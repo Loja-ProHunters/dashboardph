@@ -212,5 +212,31 @@
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-09-25T14:54:03.550Z",
     "atualizado_por": "cron-oportunidades"
+  },
+  "ba901e23-7f6b-4aaa-a908-f456c48bc3da": {
+    "id": "ba901e23-7f6b-4aaa-a908-f456c48bc3da",
+    "tipo": "trigger",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_3646b2e53f9711d0",
+    "titulo": "🎉 1 ano de cliente — Marcio Eler da Silva",
+    "descricao": "1 ano da 1a compra (2025-09-22) — retomar contato\n\nCliente: Marcio Eler da Silva\nUltima compra: 2025-09-22\nPedidos: 2\nValor historico: R$ 3634.19\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-09",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 22,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "aniv_acc_3646b2e53f9711d0_2025-09",
+    "gerada_automaticamente": true,
+    "fonte": "aniversario",
+    "account_id": "acc_3646b2e53f9711d0",
+    "motivo_curto": "1 ano da 1a compra (2025-09-22) — retomar contato",
+    "dono": "dickmann",
+    "criado_em": "2026-09-25T14:54:04.525Z",
+    "criado_por": "cron-oportunidades",
+    "atualizado_em": "2026-09-25T14:54:04.525Z",
+    "atualizado_por": "cron-oportunidades"
   }
 }
