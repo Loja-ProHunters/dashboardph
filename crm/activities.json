@@ -238,5 +238,31 @@
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-09-25T14:54:04.525Z",
     "atualizado_por": "cron-oportunidades"
+  },
+  "2f041258-2f01-46ec-a31e-ddec6f0207c8": {
+    "id": "2f041258-2f01-46ec-a31e-ddec6f0207c8",
+    "tipo": "trigger",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_fb699053d7d16e22",
+    "titulo": "🎉 1 ano de cliente — DIVIFLEX SUPRIMENTOS INDUSTRIAIS LTDA",
+    "descricao": "1 ano da 1a compra (2025-09-26) — retomar contato\n\nCliente: DIVIFLEX SUPRIMENTOS INDUSTRIAIS LTDA\nUltima compra: 2026-05-08\nPedidos: 2\nValor historico: R$ 3091.00\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-09",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 21,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "aniv_acc_fb699053d7d16e22_2025-09",
+    "gerada_automaticamente": true,
+    "fonte": "aniversario",
+    "account_id": "acc_fb699053d7d16e22",
+    "motivo_curto": "1 ano da 1a compra (2025-09-26) — retomar contato",
+    "dono": "dickmann",
+    "criado_em": "2026-09-25T14:54:05.568Z",
+    "criado_por": "cron-oportunidades",
+    "atualizado_em": "2026-09-25T14:54:05.568Z",
+    "atualizado_por": "cron-oportunidades"
   }
 }
