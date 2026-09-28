@@ -23,6 +23,25 @@
       "cadastradoEm": "2026-09-28",
       "contratos_gerados": [
         {
+          "id": "ct_1790599336073_fa0is",
+          "template_id": "parceiro-influencer",
+          "template_label": "Contrato de Parceria com Influenciador",
+          "gerado_em": "2026-09-28T12:42:16.073Z",
+          "gerado_por": "gerencia",
+          "filename": "contrato_parceiro-influencer_Joao_Vitor_Bizutti_Rolim_Correa_2026-09-28-12-42-15.docx",
+          "valores": {
+            "nome_parceiro": "João Vitor Bizutti Rolim Corrêa",
+            "cpf_cnpj": "510.094.678-40",
+            "tipo_parceiro": "INFLUENCIADOR",
+            "pct_cupom": "5",
+            "pct_comissao": "5",
+            "endereco": "Rua das Cinco Pontas, 656, Granja Viana 2",
+            "cidade": "Cotia",
+            "uf": "SP"
+          },
+          "arquivo_path": "crm/contratos/gerados/p_mul6y0uwk4uu0h/contrato_parceiro-influencer_Joao_Vitor_Bizutti_Rolim_Correa_2026-09-28-12-42-15.docx"
+        },
+        {
           "id": "ct_1790598910838_bf65n",
           "template_id": "parceiro-influencer",
           "template_label": "Contrato de Parceria com Influenciador",
@@ -61,7 +80,7 @@
           "arquivo_path": "crm/contratos/gerados/p_mul6y0uwk4uu0h/contrato_parceiro-influencer_Joao_Vitor_Bizutti_Rolim_Correa_2026-09-28-11-56-41.docx"
         }
       ],
-      "ultimo_contrato_em": "2026-09-28T12:35:10.838Z"
+      "ultimo_contrato_em": "2026-09-28T12:42:16.073Z"
     }
   ],
   "vendas": [],
