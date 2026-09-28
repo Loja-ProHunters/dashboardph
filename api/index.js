@@ -51,15 +51,44 @@ const { getFile: _ghGet, saveFile: _ghSave } = require('../lib/githubStore');
 
 // Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
 // Fallback pro esquema antigo (baseado no nome do usuário) fica só como safety-net.
+//
+// Roles aceitos:
+//   admin      — gerencia da empresa (Luis). Ve e edita tudo.
+//   diretor    — diretor (Joao). Mesmas permissoes de admin.
+//   vendas     — vendedor comercial (Pedro/Enzo/Wesley). Fila do CRM + Op.Controlado.
+//   auxiliar   — auxiliar administrativo (Maria). Op.Controlado + Dashboard Comercial.
+//   financeiro — gerente financeiro (Nicolay). Ve tudo em leitura exceto Base de
+//                Conhecimento/Linha Editorial/Usuarios. Nao edita tarefas comerciais.
+//   marketing  — time de marketing (Marlon/Pierre). Mesmas permissoes do financeiro.
+//   comex      — comex (Kyra). Somente Inicio, Dashboard Comercial e IA Pro Hunters.
 function getRole(usuario, sess) {
   if (sess && sess.role) return sess.role;
   if (usuario === 'gerencia') return 'admin';
   if (usuario === 'auxiliar') return 'auxiliar';
   return 'vendas';
 }
-function canEditComercial(sess) { return sess && getRole(sess.usuario, sess) === 'admin'; }
-function canViewComercial(sess) { return sess && getRole(sess.usuario, sess) !== 'auxiliar'; }
+// Diretor = admin em capacidade. Mantemos os 2 roles separados pra auditoria
+// (quem fez o que), mas onde a checagem e "pode fazer X operacao restrita",
+// os dois valem igual.
+function isAdminOrDiretor(sess) {
+  if (!sess) return false;
+  const r = getRole(sess.usuario, sess);
+  return r === 'admin' || r === 'diretor';
+}
+function canEditComercial(sess) { return isAdminOrDiretor(sess); }
+// Dashboard Comercial agora e visivel pra TODOS os usuarios logados (inclusive
+// auxiliar e comex) — a ferramenta virou o KPI compartilhado da empresa.
+// Edicao continua so admin/diretor via canEditComercial.
+function canViewComercial(sess) { return !!(sess && sess.usuario); }
 function canUseDocumentos(sess) { return sess && sess.usuario; } // Qualquer usuário logado pode usar Documentos
+// IA Pro Hunters: admin, diretor, vendas, financeiro, marketing, comex. Auxiliar nao.
+function canUseIA(sess) {
+  if (!sess) return false;
+  const r = getRole(sess.usuario, sess);
+  return r !== 'auxiliar';
+}
+// Base de Conhecimento (edita e ve): so admin/diretor.
+function canManageKB(sess) { return isAdminOrDiretor(sess); }
 
 const SESSION_MS = (config.sessionHours || 8) * 60 * 60 * 1000;
 const ROOT       = path.join(__dirname, '..');
@@ -570,6 +599,13 @@ module.exports = async (req, res) => {
     if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
     if (!crmUtils.canAccessCRM(sess)) {
       res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso ao CRM.'})); return;
+    }
+    // Financeiro/marketing sao SOMENTE LEITURA no CRM — bloqueia POST/PUT/DELETE.
+    // GET passa (podem navegar clientes, ver historico, ver oportunidades).
+    if (req.method !== 'GET' && !crmUtils.canEditCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'Seu perfil pode consultar o CRM mas nao editar. Fale com a gerencia.'}));
+      return;
     }
 
     try {
@@ -1255,6 +1291,11 @@ module.exports = async (req, res) => {
   if (req.method === 'POST' && url.match(/^\/api\/crm\/tarefas\/[a-zA-Z0-9_\-]+\/concluir$/)) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!crmUtils.canEditCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'Seu perfil pode consultar mas nao concluir tarefas comerciais.'}));
+      return;
+    }
     try {
       const id = url.split('/')[4];
       const body = await readBody(req);
@@ -3739,17 +3780,26 @@ module.exports = async (req, res) => {
   // Servir dashboard com flags de permissao injetadas
   try {
     let html = fs.readFileSync(path.join(ROOT, 'dashboard.html'), 'utf-8');
-    const isAdmin = canEditComercial(sess) ? 'true' : 'false';
+    const userRole = getRole(sess.usuario, sess);
+    const isAdmin = isAdminOrDiretor(sess) ? 'true' : 'false';
     const canViewCom = canViewComercial(sess) ? 'true' : 'false';
     const canEditCom = canEditComercial(sess) ? 'true' : 'false';
     const canAccessControlado = crmUtils.canAccessControlado(sess) ? 'true' : 'false';
+    const canAccessCrm = crmUtils.canAccessCRM(sess) ? 'true' : 'false';
+    const canEditCrm = crmUtils.canEditCRM(sess) ? 'true' : 'false';
+    const canUseIaFlag = canUseIA(sess) ? 'true' : 'false';
+    const canManageKBFlag = canManageKB(sess) ? 'true' : 'false';
     const usuarioEsc = String(sess.usuario || '').replace(/"/g, '\\"');
     const nomeEsc = String(sess.nome || '').replace(/"/g, '\\"');
+    const roleEsc = String(userRole || '').replace(/"/g, '\\"');
     const mustChange = sess.mustChange ? 'true' : 'false';
     html = html.replace('/* %%INJECT%% */',
       'var IS_ADMIN=' + isAdmin + '; var USER_NOME="' + nomeEsc + '"; var USER_USUARIO="' + usuarioEsc + '"; ' +
+      'var USER_ROLE="' + roleEsc + '"; ' +
       'var CAN_VIEW_COMERCIAL=' + canViewCom + '; var CAN_EDIT_COMERCIAL=' + canEditCom + '; ' +
       'var CAN_ACCESS_CONTROLADO=' + canAccessControlado + '; ' +
+      'var CAN_ACCESS_CRM=' + canAccessCrm + '; var CAN_EDIT_CRM=' + canEditCrm + '; ' +
+      'var CAN_USE_IA=' + canUseIaFlag + '; var CAN_MANAGE_KB=' + canManageKBFlag + '; ' +
       'var MUST_CHANGE_PASSWORD=' + mustChange + ';'
     );
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
