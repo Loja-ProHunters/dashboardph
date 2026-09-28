@@ -7450,10 +7450,19 @@ function ctrlRenderDetalhe(){
     var mark = p.estado === 'done' ? '✓' : (p.estado === 'travado' ? '🔒' : p.num);
     var meta = ctrlMetaPasso(e, p);
     var fields = ctrlFieldsPasso(e, cl, p);
+    // Botao de reverter — so aparece em passos DONE (nao faz sentido em wait/travado)
+    // e nunca no passo 'abertura' (cancelar envio e outro caminho). Se o envio ja foi
+    // enviado ou cancelado, tambem nao aparece.
+    var reverterBtn = '';
+    if (p.estado === 'done' && p.id !== 'abertura' && e.status !== 'enviado' && e.status !== 'cancelado') {
+      reverterBtn = ' <button class="ctrl-reverter-btn" title="Desfazer este passo pra correcao" '+
+        'onclick="ctrlReverterPasso(\''+p.id+'\', \''+crmEsc(p.titulo)+'\')">↶ Reverter</button>';
+    }
     return '<div class="ctrl-step '+cls+'">' +
       '<div class="ctrl-mark">'+mark+'</div>' +
-      '<div><div class="ctrl-step-title">'+p.num+' · '+crmEsc(p.titulo)+
+      '<div style="flex:1"><div class="ctrl-step-title">'+p.num+' · '+crmEsc(p.titulo)+
         (p.estado === 'travado' ? ' <span class="ctrl-chip late">travado</span>' : '') +
+        reverterBtn +
         '</div><div class="ctrl-step-meta">'+meta+'</div>'+fields+'</div>' +
     '</div>';
   }).join('');
@@ -7485,6 +7494,11 @@ function ctrlRenderDetalhe(){
       '<div class="ctrl-kpi"><div class="k">Total pedido</div><div class="v">'+crmFmtBRL(e.total_pedido||0)+'</div></div>' +
       '<div class="ctrl-kpi"><div class="k">Volumes</div><div class="v">'+(e.volumes_qtd||'—')+'</div></div>' +
       '<div class="ctrl-kpi"><div class="k">Rota</div><div class="v" style="color:var(--gd)">'+(e.transportadora?ctrlLabelRota(e.transportadora):'—')+'</div></div>' +
+      // Frete aproximado — valor lancado no passo Transporte. Aparece so quando ja
+      // preenchido, pra nao poluir com "—" antes de escolher a transportadora.
+      (e.transporte_valor > 0
+        ? '<div class="ctrl-kpi"><div class="k">Frete aproximado</div><div class="v" style="color:var(--gd)">'+crmFmtBRL(e.transporte_valor)+'</div></div>'
+        : '<div class="ctrl-kpi"><div class="k">Frete aproximado</div><div class="v" style="color:var(--gy)">—</div></div>') +
     '</div>' +
     '<div style="font-size:12.5px;background:var(--bg);border-radius:6px;padding:8px 10px;margin-bottom:14px"><b>Produtos:</b> '+(produtosTxt||'—')+'</div>' +
     passosHtml + condHtml +
@@ -7676,6 +7690,27 @@ async function ctrlPatch(patch){
 async function ctrlMarcarLiberacao(){
   if (!confirm('Marcar liberação final? Isso muda o status pra "pronto para coleta".')) return;
   await ctrlPatch({ liberacao_ok: true });
+}
+// Reverte um passo do checklist — usado quando algo foi marcado por engano.
+// Confirma com o usuario antes de disparar (perde dados do passo — ex: numero
+// da NF digitado errado, valor do frete). Passos posteriores ficam automaticamente
+// travados ate este passo ser refeito.
+async function ctrlReverterPasso(passoId, titulo){
+  if (!window.CTRL.envioAberto) return;
+  if (!confirm('Reverter o passo "'+titulo+'"?\n\nOs dados desse passo serao apagados e voce vai precisar refazer.\nOs passos posteriores ficam travados ate este ser refeito.')) return;
+  var id = window.CTRL.envioAberto.id;
+  try {
+    var r = await fetch('/api/crm/envios/'+encodeURIComponent(id)+'/reverter-passo', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ passo_id: passoId }),
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    window.CTRL.envioAberto = d.envio;
+    window.CTRL.envioChecklist = d.checklist;
+    ctrlRenderDetalhe();
+    await ctrlCarregarFila();
+  } catch (e) { alert('Erro ao reverter: '+e.message); }
 }
 
 /* ── MATRIZ ──────────────────────────────────────────────────── */
@@ -8231,6 +8266,25 @@ function crmFmtDateTime(s){
 .ctrl-chip.wait { background: #fef4e7; color: #a06210; }
 .ctrl-chip.late { background: var(--rl); color: var(--r); }
 .ctrl-chip.aereo { background: #f0eaff; color: #7a5cff; }
+
+/* Botao de reverter passo — sutil, aparece so em passos DONE. Cor de aviso
+   (amarela/laranja) pra sinalizar acao destrutiva sem ser tao agressiva quanto
+   vermelho. Hover fica mais evidente. */
+.ctrl-reverter-btn {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 8px; margin-left: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--r-full);
+  font-size: 10.5px; font-weight: 600;
+  background: transparent; color: var(--gy);
+  cursor: pointer; opacity: .55;
+  transition: all .15s var(--ez);
+  white-space: nowrap;
+}
+.ctrl-reverter-btn:hover {
+  opacity: 1;
+  background: #fef4e7; color: #a06210; border-color: #f0c66e;
+}
 
 .ctrl-det-head {
   display: grid; grid-template-columns: 1fr auto; gap: 10px;
