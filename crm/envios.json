@@ -873,10 +873,10 @@
     "conferencia_por": "dickmann",
     "conferencia_em": "2026-09-24T19:07:14.622Z",
     "conferencia_notas": null,
-    "transportadora": null,
-    "transporte_valor": null,
-    "transporte_por": null,
-    "transporte_em": null,
+    "transportadora": "rpa",
+    "transporte_valor": 715,
+    "transporte_por": "gerencia",
+    "transporte_em": "2026-09-28T17:32:22.950Z",
     "nf_numero": "31436",
     "nf_por": "dickmann",
     "nf_em": "2026-09-25T16:37:51.246Z",
@@ -981,11 +981,27 @@
         "acao": "passo_revertido",
         "passo": "transporte",
         "titulo": "Transporte"
+      },
+      {
+        "ts": "2026-09-28T17:32:22.950Z",
+        "por": "gerencia",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "transportadora",
+        "novo": "rpa"
+      },
+      {
+        "ts": "2026-09-28T17:32:22.950Z",
+        "por": "gerencia",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "transporte_valor",
+        "novo": 715
       }
     ],
     "criado_em": "2026-09-24T18:54:19.398Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-09-28T17:32:10.036Z",
+    "atualizado_em": "2026-09-28T17:32:22.951Z",
     "atualizado_por": "gerencia"
   },
   "env_prohunters_27089": {
