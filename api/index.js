@@ -2011,6 +2011,13 @@ module.exports = async (req, res) => {
         descricao: String((it.produto || {}).descricao || it.descricao || ''),
         quantidade: Number(it.quantidade) || 1,
       }));
+      // Vendedor responsavel do pedido (Bling v3 traz em pedido.vendedor: {id, nome})
+      // Se vier so id sem nome, guarda o id mesmo — o nome pode ser resolvido depois.
+      const vendBling = pedido.vendedor || pedido.loja || null;
+      const vendedor_bling = vendBling && (vendBling.nome || vendBling.id) ? {
+        id: vendBling.id || null,
+        nome: vendBling.nome || null,
+      } : null;
       const doc = envios.buildEnvio({
         empresa: emp,
         numero: num,
@@ -2025,6 +2032,7 @@ module.exports = async (req, res) => {
         produtos: itens,
         total_pedido: Number(pedido.total || pedido.totalvenda || 0),
         observacoes: pedido.observacoes || null,
+        vendedor_bling,
         criado_por: sess.usuario,
       });
       const salvo = await crmStore.createDoc('envios', doc, sess.usuario);
