@@ -3322,7 +3322,7 @@ window.chpwdSubmit = function(){
       <input type="hidden" id="us-editando">
       <div class="us-mrow">
         <div class="us-fld"><label>Login *</label><input id="us-usuario" placeholder="ex: joao" autocomplete="off"></div>
-        <div class="us-fld"><label>Perfil *</label><select id="us-role"><option value="vendas">Vendas</option><option value="auxiliar">Auxiliar</option><option value="admin">Admin (gerência)</option></select></div>
+        <div class="us-fld"><label>Perfil *</label><select id="us-role"><option value="vendas">Vendas</option><option value="auxiliar">Auxiliar</option><option value="financeiro">Financeiro</option><option value="marketing">Marketing</option><option value="comex">Comex</option><option value="diretor">Diretor</option><option value="admin">Admin (gerência)</option></select></div>
       </div>
       <div class="us-fld"><label>Nome completo *</label><input id="us-nome" placeholder="Nome do usuário"></div>
       <div class="us-fld"><label>Email</label><input id="us-email" type="email" placeholder="opcional"></div>
@@ -3674,46 +3674,86 @@ var tabMeta = {
   crm:       ['CRM','Contas, leads, oportunidades, atividades e pedidos']
 };
 
+// Mapa de permissoes por role — quais abas cada perfil ve.
+// Chaves batem com o onclick="goTab('X',...)" dos botoes do menu.
+// Se uma aba nao aparece na lista, e escondida no menu.
+// 'admin' e 'diretor' veem tudo (nao entram no mapa; passam pela else).
+var TABS_POR_ROLE = {
+  vendas:     ['inicio','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
+  auxiliar:   ['inicio','contratos','contatos','comercial','crm'],
+  financeiro: ['inicio','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
+  marketing:  ['inicio','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
+  comex:      ['inicio','comercial','ia'],
+};
+
+function _abasVisiveis() {
+  var r = (typeof USER_ROLE !== 'undefined') ? USER_ROLE : '';
+  if (r === 'admin' || r === 'diretor' || !r) return null; // null = ve tudo
+  return TABS_POR_ROLE[r] || ['inicio'];
+}
+
 // Mostrar abas condicionais e nome do usuario
 window.onload = function() {
+  var abasOk = _abasVisiveis(); // null = admin/diretor, ve tudo
+
+  // Abas ADMIN-ONLY (Base de Conhecimento, Usuarios, Linha Editorial)
   if (typeof IS_ADMIN !== 'undefined' && IS_ADMIN) {
     document.getElementById('grp-admin').style.display = 'block';
     var _niLE = document.getElementById('ni-linhaeditorial'); if (_niLE) _niLE.style.display = '';
   }
+
+  // Revela o grupo Comercial pra quem tem alguma aba dele
   if (typeof CAN_VIEW_COMERCIAL !== 'undefined' && CAN_VIEW_COMERCIAL) {
     document.getElementById('grp-comercial').style.display = 'block';
-    // O CRM em v1 é liberado pros mesmos usuários que veem o comercial (admin + vendas).
-    // O botão nasce oculto e é revelado aqui.
-    var _niCrm = document.getElementById('ni-crm'); if (_niCrm) _niCrm.style.display = '';
   }
-  // Auxiliar não vê o comercial em geral, mas PRECISA da Op. Controlado.
-  // Revela o grupo Comercial (pra o CRM aparecer no menu) e o item CRM.
-  // Ao clicar em CRM, o crmInit() força a sub-aba controlado (única visível pra auxiliar).
-  // Também esconde os outros itens do grupo Comercial (Dashboard Comercial e Parceiros)
-  // pra não confundir o auxiliar com coisas que ele não deve mexer.
+  // Revela o CRM pra quem tem acesso
+  var _niCrm = document.getElementById('ni-crm');
+  if (_niCrm && typeof CAN_ACCESS_CRM !== 'undefined' && CAN_ACCESS_CRM) {
+    _niCrm.style.display = '';
+    document.getElementById('grp-comercial').style.display = 'block';
+  }
+
+  // Auxiliar: entra no CRM so pra Op. Controlado. Renomeia o botao "CRM" pra
+  // "Op. Controlado" e esconde Dashboard Comercial + Parceiros do grupo.
   if (typeof CAN_ACCESS_CONTROLADO !== 'undefined' && CAN_ACCESS_CONTROLADO
-      && !(typeof CAN_VIEW_COMERCIAL !== 'undefined' && CAN_VIEW_COMERCIAL)) {
+      && (typeof USER_ROLE !== 'undefined') && USER_ROLE === 'auxiliar') {
     var _grpCom = document.getElementById('grp-comercial');
     if (_grpCom) {
       _grpCom.style.display = 'block';
-      // Renomeia a label "Comercial" pra "Operacional" pro auxiliar
       var lblCom = _grpCom.querySelector('.sb-lbl');
       if (lblCom) lblCom.textContent = 'Operacional';
-      // Esconde todos os botões do grupo EXCETO o CRM
-      _grpCom.querySelectorAll('button.ni').forEach(function(btn){
-        if (btn.id !== 'ni-crm') btn.style.display = 'none';
-      });
-      // Mostra o CRM
+      // Auxiliar (Maria) agora VE dashboard comercial tambem — nao esconde mais
       var _niCrmAux = document.getElementById('ni-crm');
-      if (_niCrmAux) _niCrmAux.style.display = '';
-      // Troca o texto do botão CRM pra algo mais claro pro auxiliar
-      var lblCrm = _niCrmAux && _niCrmAux.querySelector('.ni-tx');
-      if (lblCrm) lblCrm.textContent = 'Op. Controlado';
-      // Esconde a badge NOVO
-      var badge = _niCrmAux && _niCrmAux.querySelector('.badge');
-      if (badge) badge.style.display = 'none';
+      if (_niCrmAux) {
+        _niCrmAux.style.display = '';
+        var lblCrm = _niCrmAux.querySelector('.ni-tx');
+        if (lblCrm) lblCrm.textContent = 'Op. Controlado';
+        var badge = _niCrmAux.querySelector('.badge');
+        if (badge) badge.style.display = 'none';
+      }
     }
   }
+
+  // Aplica o filtro de abas por role — passa em TODOS os botoes .ni do menu
+  // lateral e esconde os que nao estao na lista permitida. Admin/diretor pulam.
+  if (abasOk) {
+    var okSet = {}; abasOk.forEach(function(k){ okSet[k] = true; });
+    document.querySelectorAll('.sb .ni').forEach(function(btn){
+      // Extrai o id da aba do onclick="goTab('X',this)"
+      var m = (btn.getAttribute('onclick') || '').match(/goTab\('([^']+)'/);
+      if (!m) return;
+      var tabId = m[1];
+      if (!okSet[tabId]) btn.style.display = 'none';
+    });
+    // Esconde grupos que ficaram totalmente vazios
+    document.querySelectorAll('.sb-grp').forEach(function(grp){
+      var visiveis = Array.from(grp.querySelectorAll('button.ni')).filter(function(b){
+        return b.style.display !== 'none';
+      });
+      if (visiveis.length === 0) grp.style.display = 'none';
+    });
+  }
+
   if (typeof USER_NOME !== 'undefined' && USER_NOME) {
     document.getElementById('user-pill').textContent = USER_NOME;
   }
@@ -4902,6 +4942,12 @@ function crmRenderSubTabs(){
   // fica escondido pra evitar sobrecarga visual. Gerência continua vendo tudo.
   else if (window.CRM.session && window.CRM.session.role === 'vendas') {
     subs = ['tarefas','ficha','prospeccao','controlado','referrals','orders'];
+  }
+  // Financeiro/marketing veem TODAS as sub-abas (igual admin), mas o backend
+  // rejeita acoes de escrita (canEditCRM). Podem navegar, consultar cliente,
+  // ver historico e oportunidades — nao podem criar/editar/concluir nada.
+  else if (window.CRM.session && (window.CRM.session.role === 'financeiro' || window.CRM.session.role === 'marketing')) {
+    // subs continua com o default completo — nao restringe
   }
   // Se a sub-aba atual foi cortada pelo filtro (ex: vendedor caiu em 'painel'
   // no primeiro load), redireciona pra primeira permitida
