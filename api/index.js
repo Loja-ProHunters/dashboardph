@@ -2179,6 +2179,42 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // POST /api/crm/envios/:id/reverter-passo — desfaz um passo especifico do
+  // checklist pra permitir correcao. Body: { passo_id: 'volumes'|'conferencia'|... }.
+  // Nao reverte 'abertura' (pra desfazer criacao, cancele o envio).
+  // Passos posteriores dependentes voltam pra 'travado' automaticamente, sem apagar
+  // seus valores — se o usuario refizer este passo com o mesmo dado, os posteriores
+  // destravam preservando o que ja tinha.
+  //
+  // Permissao: admin, diretor, vendas ou auxiliar (mesmo perfil que edita a fila).
+  // Log com IP na auditoria pra rastrear correcoes indevidas.
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/reverter-passo$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
+    }
+    try {
+      const id = url.split('/')[4];
+      const env = await crmStore.getDoc('envios', id);
+      if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio nao encontrado'})); return; }
+      if (env.status === 'enviado' || env.status === 'cancelado') {
+        res.writeHead(400,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Envio ja ' + env.status + ' — nao pode ser revertido. Fale com a gerencia.'})); return;
+      }
+      const body = await readBody(req);
+      const { passo_id } = JSON.parse(body || '{}');
+      if (!passo_id) throw new Error('passo_id obrigatorio');
+      const ip = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || (req.connection && req.connection.remoteAddress) || '').split(',')[0].trim() || null;
+      const revertido = envios.reverterPasso(env, passo_id, sess.usuario, ip);
+      const salvo = await crmStore.updateDoc('envios', id, revertido, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, envio: salvo, checklist: envios.estadoChecklist(salvo) }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // ═════════════════════════════════════════════════════════════
   // ROMANEIOS — geração e listagem
   // ═════════════════════════════════════════════════════════════
