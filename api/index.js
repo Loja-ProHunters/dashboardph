@@ -1164,15 +1164,79 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // ── GET /api/crm/tarefas/minhas — fila do vendedor (ou de todos, pra admin)
+  // ── POST /api/crm/tarefas/rebalancear-orfas — reatribui tarefas pendentes
+  // com owner_id='gerencia', 'admin', 'auxiliar' ou fora dos vendedores ativos
+  // pro rodizio deterministico (mesmo hash que a cron diaria usa). NAO deleta —
+  // so troca o dono. Idempotente: rodar de novo nao muda nada se ja rebalanceou.
+  // So admin dispara.
+  if (req.method === 'POST' && url === '/api/crm/tarefas/rebalancear-orfas') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin.'})); return;
+    }
+    try {
+      const VENDEDORES_ATIVOS = ['dickmann', 'boschetto', 'mathias'];
+      function rodizio(accountId) {
+        const id = String(accountId || 'x');
+        let h = 0; for (let i = 0; i < id.length; i++) h = (h + id.charCodeAt(i)) | 0;
+        return VENDEDORES_ATIVOS[Math.abs(h) % VENDEDORES_ATIVOS.length];
+      }
+      const ehOrfa = (o) => {
+        const s = String(o || '').toLowerCase();
+        if (!s) return true;
+        if (s === 'gerencia' || s === 'admin' || s === 'auxiliar') return true;
+        return VENDEDORES_ATIVOS.indexOf(s) === -1;
+      };
+      const acts = await crmStore.getCollection('activities');
+      let reatribuidas = 0;
+      for (const id of Object.keys(acts)) {
+        const a = acts[id];
+        if (a.status !== 'pendente') continue;
+        if (ehOrfa(a.owner_id) && ehOrfa(a.dono)) {
+          const accountId = a.account_id || a.entidade_id || id;
+          const novoDono = rodizio(accountId);
+          a.owner_id = novoDono;
+          a.dono = novoDono;
+          a.atualizado_em = new Date().toISOString();
+          a.atualizado_por = 'rebalance-orfas';
+          reatribuidas++;
+        }
+      }
+      if (reatribuidas > 0) {
+        await crmStore.saveCollection('activities', acts, 'Rebalanceia ' + reatribuidas + ' tarefas orfas pro rodizio');
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, reatribuidas }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ── GET /api/crm/tarefas/minhas — fila do PROPRIO usuario logado.
+  // Admin ve so as tarefas dele (login==gerencia). Se quiser ver TODAS as
+  // tarefas de todos os vendedores, passa ?todos=1 na URL — util pra dashboard
+  // de gestao. Isso impede o admin de aparecer com 30 tarefas no painel dele
+  // por default so porque canSeeAll retorna true.
   if (req.method === 'GET' && url.startsWith('/api/crm/tarefas/minhas')) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
+      const u = new URL('http://x' + (req.url || ''));
+      const verTodas = u.searchParams.get('todos') === '1';
       const login = String(sess.usuario || '').toLowerCase();
-      const scopeAll = crmUtils.canSeeAll(sess);
-      const tarefas = await crmStore.listDocs('activities', a =>
-        a.status === 'pendente' && (scopeAll || String(a.owner_id || a.dono || '').toLowerCase() === login));
+      const ehAdmin = crmUtils.canSeeAll(sess);
+      // Admin nao tem "fila propria" — as tarefas sao operacionais, pros
+      // vendedores executarem. Se admin abrir "Minhas Tarefas" sem ?todos=1,
+      // devolve vazio. Com ?todos=1, ve a fila consolidada de todos.
+      let tarefas = [];
+      if (ehAdmin && !verTodas) {
+        tarefas = [];
+      } else {
+        const scopeAll = verTodas && ehAdmin;
+        tarefas = await crmStore.listDocs('activities', a =>
+          a.status === 'pendente' && (scopeAll || String(a.owner_id || a.dono || '').toLowerCase() === login));
+      }
       // Ordena: overdue primeiro, depois por prazo
       const hoje = new Date().toISOString().slice(0, 10);
       tarefas.sort((a, b) => {
