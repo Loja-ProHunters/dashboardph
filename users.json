@@ -43,5 +43,13 @@
     "mustChange": false,
     "criadoEm": "2026-09-11",
     "senhaAlteradaEm": "2026-09-11T17:30:23.056Z"
+  },
+  "joao": {
+    "nome": "João Carlos Redin",
+    "role": "vendas",
+    "email": "jcredin@gmail.com",
+    "hash": "$2b$10$S71RJujyu69kHkS7bM8zlef72ddHpqzpJ87rtfar0ZHxrOx.bpIvK",
+    "mustChange": true,
+    "criadoEm": "2026-09-28"
   }
 }
