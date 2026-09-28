@@ -1034,10 +1034,10 @@
     "conferencia_por": "auxiliar",
     "conferencia_em": "2026-09-25T13:55:42.145Z",
     "conferencia_notas": null,
-    "transportadora": "ezequiel",
-    "transporte_valor": 0,
-    "transporte_por": "auxiliar",
-    "transporte_em": "2026-09-25T13:55:48.779Z",
+    "transportadora": null,
+    "transporte_valor": null,
+    "transporte_por": null,
+    "transporte_em": null,
     "nf_numero": "031437",
     "nf_por": "auxiliar",
     "nf_em": "2026-09-25T13:56:15.344Z",
@@ -1134,11 +1134,19 @@
         "acao": "campo_alterado",
         "campo": "assinatura_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-09-28T17:40:22.140Z",
+        "por": "gerencia",
+        "ip": "200.34.247.72",
+        "acao": "passo_revertido",
+        "passo": "transporte",
+        "titulo": "Transporte"
       }
     ],
     "criado_em": "2026-09-25T13:55:19.201Z",
     "criado_por": "auxiliar",
-    "atualizado_em": "2026-09-28T14:47:20.738Z",
-    "atualizado_por": "auxiliar"
+    "atualizado_em": "2026-09-28T17:40:22.140Z",
+    "atualizado_por": "gerencia"
   }
 }
