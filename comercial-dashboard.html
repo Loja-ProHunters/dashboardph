@@ -2498,8 +2498,35 @@ async function verificarPedidosBling() {
     const r = await fetch('/api/comercial/verificar-pedidos-bling', { method: 'POST' });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro');
-    status.textContent = 'Analisados: ' + d.pedidos_analisados + ' · Novos: ' + d.novos + ' · Já conhecidos: ' + d.ja_conhecidos + (d.erros_bling && d.erros_bling.length ? ' · Erros: ' + d.erros_bling.length : '');
-    status.style.color = d.novos > 0 ? 'var(--green)' : 'var(--gray4)';
+    // Monta mensagem de status detalhada
+    var partes = ['Analisados: ' + d.pedidos_analisados, 'Novos: ' + d.novos];
+    if (d.atribuidos_vendedor > 0) partes.push('Pros vendedores: ' + d.atribuidos_vendedor);
+    if (d.site_somados > 0) partes.push('Site (auto): ' + d.site_somados + ' = ' + fmtBRLNum(d.site_valor_total));
+    if (d.aguardando_atribuicao > 0) partes.push('Aguardando: ' + d.aguardando_atribuicao);
+    if (d.ja_conhecidos > 0) partes.push('Já conhecidos: ' + d.ja_conhecidos);
+    if (d.erros_bling && d.erros_bling.length) partes.push('Erros: ' + d.erros_bling.length);
+    // Se o Bling retornou pedidos brutos mas nada foi analisado, mostra as
+    // situações que apareceram (ajuda a decidir se o filtro está bloqueando).
+    if (d.pedidos_analisados === 0 && d._debug) {
+      var totalBruto = 0;
+      Object.values(d._debug.totais_brutos || {}).forEach(function(n){ totalBruto += n; });
+      if (totalBruto > 0) {
+        var situFmt = [];
+        Object.entries(d._debug.situacoes_vistas || {}).forEach(function(entry){
+          var emp = entry[0], sits = entry[1];
+          Object.entries(sits).forEach(function(s){ situFmt.push(emp + '/' + s[0] + ':' + s[1]); });
+        });
+        partes.push('⚠ ' + totalBruto + ' pedidos no Bling desde ' + d._debug.data_inicial +
+          ', mas nenhum passou no filtro de status. Situações vistas: ' + situFmt.join(', ') +
+          '. Copia isso e me manda que ajusto o filtro.');
+      }
+    }
+    status.textContent = partes.join(' · ');
+    status.style.color = d.novos > 0 ? 'var(--green)' : (d.pedidos_analisados === 0 && d._debug ? '#f5a623' : 'var(--gray4)');
+    // Se somou algo no site, atualiza o placar do site imediatamente
+    if (d.site_somados > 0 && typeof loadData === 'function') {
+      try { await loadData(); if (typeof renderAll === 'function') renderAll(); } catch(e){}
+    }
     await carregarPedidosPendentes();
   } catch (e) {
     status.textContent = 'Falha: ' + e.message;
