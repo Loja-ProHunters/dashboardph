@@ -1082,17 +1082,6 @@ tbody td {
  <div class="podium-stand" id="podium-stand"></div>
  <div class="podium-race" id="podium-race"></div>
 
- <!-- Card de pedidos do Bling pendentes de confirmacao -->
- <div class="registrar-venda-card" id="pedidosBlingCard" style="margin-bottom:14px">
-   <div class="rv-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-     <span>Pedidos do Bling</span>
-     <button onclick="verificarPedidosBling()" id="btnVerifPedidos" style="background:var(--brand2);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">🔄 Verificar meus pedidos</button>
-   </div>
-   <div id="pedidosBlingStatus" style="margin-top:8px;font-size:12px;color:var(--gray4);min-height:14px"></div>
-   <div id="pedidosBlingLista" style="margin-top:12px"></div>
-   <div id="pedidosBlingSemAtribuicao" style="margin-top:16px"></div>
- </div>
-
  <div class="registrar-venda-card">
  <div class="rv-title">Fechou uma venda? Registra aqui</div>
  <div class="rv-row">
@@ -2478,13 +2467,13 @@ async function loadPistaMeta(){
 }
 
 // ═══════════════════════════════════════
-// PEDIDOS DO BLING — verificar / confirmar / rejeitar / atribuir
+// PEDIDOS DO BLING — REMOVIDO (revertido em 29/09/2026)
+// A tentativa de puxar pedidos automaticos do Bling foi descartada pq o
+// Bling v3 nao retorna nomes de situacao de forma confiavel na conta
+// atual. Vendedores voltam a lancar manualmente pelo card "Fechou uma
+// venda? Registra aqui" que continua no dashboard.
 // ═══════════════════════════════════════
-function fmtBRLNum(v) {
-  return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-function pbEsc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-
+/* CODIGO ANTIGO REMOVIDO — deixado apenas o comentario acima como historico.
 async function verificarPedidosBling() {
   const btn = document.getElementById('btnVerifPedidos');
   const status = document.getElementById('pedidosBlingStatus');
@@ -2708,6 +2697,7 @@ if (typeof window !== 'undefined') {
     setTimeout(carregarPedidosPendentes, 500);
   });
 }
+*/
 
 // ═══════════════════════════════════════
 // AUTOLANÇAMENTO DE VENDA (pelo próprio vendedor) + atualização em tempo real
