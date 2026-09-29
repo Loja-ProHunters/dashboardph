@@ -3218,17 +3218,16 @@ module.exports = async (req, res) => {
       const totaisBrutos = {};
       let sampleBruto = null; // guarda 1o pedido bruto pra debug
       let filtradosPorData = 0; // pedidos com data anterior ao corte
-      // Ids de situacao Bling v3 que indicam venda finalizada (padrao):
-      // 9 = Atendido, 4 = Faturado, 15 = Enviado. Contas usam IDs proprios
-      // (ex: 799150, 799436) — descobrimos o nome deles em runtime buscando
-      // o detalhe de 1 pedido por ID e testando se o nome contem palavra-chave.
-      const IDS_FATURADO = [9, 4, 15];
-      const IDS_NAO_FATURADO = [6, 5, 12]; // 6=Em aberto, 5=Em andamento, 12=Cancelado
+      // Palavras que indicam "venda finalizada" no NOME da situacao.
+      // O Bling v3 tem endpoint /situacoes/modulo/98310 que retorna o mapa
+      // completo id→nome pra cada empresa. Buscamos uma vez por empresa e
+      // filtramos por palavras-chave. Muito mais robusto que descobrir por
+      // detalhe de pedido (que nao retorna nome mesmo).
       const PALAVRAS_FATURADO = ['faturad', 'atendid', 'emitid', 'concluid', 'finalizad', 'enviad'];
-      // Cache de nome de situacao por (empresa+situacaoId) descoberto via detalhe.
-      // Evita buscar 100x — busca 1 vez por ID desconhecido.
-      const nomesSitDescobertos = {}; // "emp|id" → nome (ou null se falhou)
-      const situacoesFaturadoDescobertas = {}; // "emp|id" → true/false
+      // Modulo de pedidos de vendas no Bling v3 = 98310
+      const ID_MODULO_VENDAS = 98310;
+      // Cache: mapa[emp] = { id: { nome, faturado } }
+      const mapaSituacoes = {};
       // Descobre "situacao" de um pedido bruto em VARIOS lugares possiveis
       // (Bling v3 mudou o formato ao longo do tempo). Retorna {id, nome, texto}.
       function _extraiSituacao(bp) {
@@ -3239,43 +3238,25 @@ module.exports = async (req, res) => {
           texto: s.nome || s.descricao || s.label || (s.id ? 'id:' + s.id : (s.valor ? 'valor:' + s.valor : '(sem situacao)')),
         };
       }
-      function eStatusFinalizadoDireto(situ) {
-        if (situ.id && IDS_FATURADO.includes(Number(situ.id))) return true;
-        if (situ.nome) {
-          const n = String(situ.nome).toLowerCase();
-          return PALAVRAS_FATURADO.some(p => n.includes(p));
-        }
-        return null; // "nao sei ainda" — precisa descobrir
-      }
-      // Descobre se um ID customizado de situacao e "faturado" ou nao,
-      // buscando o detalhe de UM pedido dessa situacao. Cacheia resultado.
-      async function descobrirSituacao(emp, primeiroPedido) {
-        const situ = _extraiSituacao(primeiroPedido);
-        if (!situ.id) return { id: null, nome: null, faturado: false };
-        const chave = emp + '|' + situ.id;
-        if (situacoesFaturadoDescobertas[chave] !== undefined) {
-          return { id: situ.id, nome: nomesSitDescobertos[chave], faturado: situacoesFaturadoDescobertas[chave] };
-        }
-        // IDs conhecidos "nao faturado" — nao gasta request
-        if (IDS_NAO_FATURADO.includes(Number(situ.id))) {
-          nomesSitDescobertos[chave] = 'id:' + situ.id + ' (nao faturado, id padrao)';
-          situacoesFaturadoDescobertas[chave] = false;
-          return { id: situ.id, nome: nomesSitDescobertos[chave], faturado: false };
-        }
-        // Busca detalhe do 1o pedido pra descobrir nome
+      // Busca o mapa completo de situacoes de uma empresa (chamada 1x por request).
+      // Retorna { id: { nome, faturado } }. Se der erro, retorna {}.
+      async function carregarMapaSituacoes(emp) {
+        if (mapaSituacoes[emp]) return mapaSituacoes[emp];
+        const map = {};
         try {
-          const detResp = await blingApi.get('/pedidos/vendas/' + primeiroPedido.id, null, emp);
-          const det = detResp.data || detResp;
-          const nome = (det.situacao && (det.situacao.nome || det.situacao.descricao)) || null;
-          const faturado = nome ? PALAVRAS_FATURADO.some(p => String(nome).toLowerCase().includes(p)) : false;
-          nomesSitDescobertos[chave] = nome || 'id:' + situ.id + ' (sem nome no detalhe)';
-          situacoesFaturadoDescobertas[chave] = faturado;
-          return { id: situ.id, nome: nomesSitDescobertos[chave], faturado };
+          const resp = await blingApi.get('/situacoes/modulo/' + ID_MODULO_VENDAS, null, emp);
+          const lista = (resp && resp.data) || [];
+          for (const s of lista) {
+            const nome = String(s.nome || s.descricao || '').trim();
+            const faturado = PALAVRAS_FATURADO.some(p => nome.toLowerCase().includes(p));
+            map[s.id] = { nome, faturado };
+          }
         } catch (e) {
-          nomesSitDescobertos[chave] = 'id:' + situ.id + ' (erro ao consultar: ' + e.message + ')';
-          situacoesFaturadoDescobertas[chave] = false;
-          return { id: situ.id, nome: nomesSitDescobertos[chave], faturado: false };
+          // se falhou, mapa fica vazio — nenhum pedido passa e o debug mostra o erro
+          erros.push({ empresa: emp, erro: '/situacoes/modulo: ' + e.message });
         }
+        mapaSituacoes[emp] = map;
+        return map;
       }
       // FASE 1: coleta todos os pedidos brutos por empresa e agrupa por situacao
       const pedidosBrutosPorEmp = {}; // emp → [pedidos]
@@ -3313,20 +3294,23 @@ module.exports = async (req, res) => {
         }
       }
 
-      // FASE 2: descobre "faturado" pra cada situacao encontrada (busca detalhe
-      // de 1 pedido por situacao desconhecida, cacheia no processo).
+      // FASE 2: pra cada empresa que teve pedidos, carrega o mapa de situacoes
+      // do Bling (/situacoes/modulo/98310) — retorna id→nome de TODAS as situacoes.
+      // Depois classifica cada (emp,id) como faturado ou nao.
       const situacoesResumo = {}; // "emp|id" → { nome, faturado, count }
+      for (const emp of Object.keys(pedidosBrutosPorEmp)) {
+        if (pedidosBrutosPorEmp[emp].length > 0) await carregarMapaSituacoes(emp);
+      }
       for (const [chaveSit, listaP] of Object.entries(pedidosPorSituacao)) {
-        const [emp] = chaveSit.split('|');
-        const situ = _extraiSituacao(listaP[0]);
-        const direto = eStatusFinalizadoDireto(situ);
-        if (direto === true || direto === false) {
-          situacoesResumo[chaveSit] = { nome: situ.texto, faturado: direto, count: listaP.length };
-          continue;
+        const [emp, idStr] = chaveSit.split('|');
+        const id = Number(idStr);
+        const map = mapaSituacoes[emp] || {};
+        const info = map[id];
+        if (info) {
+          situacoesResumo[chaveSit] = { nome: info.nome, faturado: info.faturado, count: listaP.length };
+        } else {
+          situacoesResumo[chaveSit] = { nome: 'id:' + idStr + ' (nao encontrado no mapa)', faturado: false, count: listaP.length };
         }
-        // Descobre via detalhe
-        const descoberto = await descobrirSituacao(emp, listaP[0]);
-        situacoesResumo[chaveSit] = { nome: descoberto.nome, faturado: descoberto.faturado, count: listaP.length };
       }
 
       // FASE 3: itera pedidos aceitos e busca detalhe pra pegar vendedor + valor
