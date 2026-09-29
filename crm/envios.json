@@ -1197,9 +1197,9 @@
     },
     "status": "aberto",
     "confirmado_bling": true,
-    "volumes_qtd": null,
-    "volumes_por": null,
-    "volumes_em": null,
+    "volumes_qtd": 1,
+    "volumes_por": "mathias",
+    "volumes_em": "2026-09-29T15:20:11.446Z",
     "conferencia_ok": false,
     "conferencia_por": null,
     "conferencia_em": null,
@@ -1248,11 +1248,19 @@
         "por": "mathias",
         "acao": "envio_criado",
         "detalhe": "empresa=prohunters numero=27109"
+      },
+      {
+        "ts": "2026-09-29T15:20:11.446Z",
+        "por": "mathias",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "volumes_qtd",
+        "novo": 1
       }
     ],
     "criado_em": "2026-09-29T15:19:58.804Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-09-29T15:19:58.804Z",
+    "atualizado_em": "2026-09-29T15:20:11.446Z",
     "atualizado_por": "mathias"
   }
 }
