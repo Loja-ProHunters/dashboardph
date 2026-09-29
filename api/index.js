@@ -3218,12 +3218,17 @@ module.exports = async (req, res) => {
       const totaisBrutos = {};
       let sampleBruto = null; // guarda 1o pedido bruto pra debug
       let filtradosPorData = 0; // pedidos com data anterior ao corte
-      // Ids de situacao Bling v3 que indicam venda finalizada
-      // (podem variar por conta — se seu Bling usa outros, adiciona aqui):
-      // 9 = Atendido, 6 = Em aberto (nao conta), 12 = Cancelado (nao conta)
-      // 4 = Faturado (algumas contas), 15 = Enviado (algumas contas)
+      // Ids de situacao Bling v3 que indicam venda finalizada (padrao):
+      // 9 = Atendido, 4 = Faturado, 15 = Enviado. Contas usam IDs proprios
+      // (ex: 799150, 799436) — descobrimos o nome deles em runtime buscando
+      // o detalhe de 1 pedido por ID e testando se o nome contem palavra-chave.
       const IDS_FATURADO = [9, 4, 15];
+      const IDS_NAO_FATURADO = [6, 5, 12]; // 6=Em aberto, 5=Em andamento, 12=Cancelado
       const PALAVRAS_FATURADO = ['faturad', 'atendid', 'emitid', 'concluid', 'finalizad', 'enviad'];
+      // Cache de nome de situacao por (empresa+situacaoId) descoberto via detalhe.
+      // Evita buscar 100x — busca 1 vez por ID desconhecido.
+      const nomesSitDescobertos = {}; // "emp|id" → nome (ou null se falhou)
+      const situacoesFaturadoDescobertas = {}; // "emp|id" → true/false
       // Descobre "situacao" de um pedido bruto em VARIOS lugares possiveis
       // (Bling v3 mudou o formato ao longo do tempo). Retorna {id, nome, texto}.
       function _extraiSituacao(bp) {
@@ -3234,15 +3239,49 @@ module.exports = async (req, res) => {
           texto: s.nome || s.descricao || s.label || (s.id ? 'id:' + s.id : (s.valor ? 'valor:' + s.valor : '(sem situacao)')),
         };
       }
-      function eStatusFinalizado(situ) {
+      function eStatusFinalizadoDireto(situ) {
         if (situ.id && IDS_FATURADO.includes(Number(situ.id))) return true;
         if (situ.nome) {
           const n = String(situ.nome).toLowerCase();
           return PALAVRAS_FATURADO.some(p => n.includes(p));
         }
-        return false;
+        return null; // "nao sei ainda" — precisa descobrir
       }
+      // Descobre se um ID customizado de situacao e "faturado" ou nao,
+      // buscando o detalhe de UM pedido dessa situacao. Cacheia resultado.
+      async function descobrirSituacao(emp, primeiroPedido) {
+        const situ = _extraiSituacao(primeiroPedido);
+        if (!situ.id) return { id: null, nome: null, faturado: false };
+        const chave = emp + '|' + situ.id;
+        if (situacoesFaturadoDescobertas[chave] !== undefined) {
+          return { id: situ.id, nome: nomesSitDescobertos[chave], faturado: situacoesFaturadoDescobertas[chave] };
+        }
+        // IDs conhecidos "nao faturado" — nao gasta request
+        if (IDS_NAO_FATURADO.includes(Number(situ.id))) {
+          nomesSitDescobertos[chave] = 'id:' + situ.id + ' (nao faturado, id padrao)';
+          situacoesFaturadoDescobertas[chave] = false;
+          return { id: situ.id, nome: nomesSitDescobertos[chave], faturado: false };
+        }
+        // Busca detalhe do 1o pedido pra descobrir nome
+        try {
+          const detResp = await blingApi.get('/pedidos/vendas/' + primeiroPedido.id, null, emp);
+          const det = detResp.data || detResp;
+          const nome = (det.situacao && (det.situacao.nome || det.situacao.descricao)) || null;
+          const faturado = nome ? PALAVRAS_FATURADO.some(p => String(nome).toLowerCase().includes(p)) : false;
+          nomesSitDescobertos[chave] = nome || 'id:' + situ.id + ' (sem nome no detalhe)';
+          situacoesFaturadoDescobertas[chave] = faturado;
+          return { id: situ.id, nome: nomesSitDescobertos[chave], faturado };
+        } catch (e) {
+          nomesSitDescobertos[chave] = 'id:' + situ.id + ' (erro ao consultar: ' + e.message + ')';
+          situacoesFaturadoDescobertas[chave] = false;
+          return { id: situ.id, nome: nomesSitDescobertos[chave], faturado: false };
+        }
+      }
+      // FASE 1: coleta todos os pedidos brutos por empresa e agrupa por situacao
+      const pedidosBrutosPorEmp = {}; // emp → [pedidos]
+      const pedidosPorSituacao = {}; // "emp|id" → [pedidos]
       for (const emp of empresas) {
+        pedidosBrutosPorEmp[emp] = [];
         situacoesVistas[emp] = {};
         totaisBrutos[emp] = 0;
         try {
@@ -3253,41 +3292,19 @@ module.exports = async (req, res) => {
             if (!lista.length) break;
             totaisBrutos[emp] += lista.length;
             for (const bp of lista) {
-              // Guarda 1o pedido bruto pra debug (so os campos principais, evita
-              // response gigante).
+              pedidosBrutosPorEmp[emp].push(bp);
               if (!sampleBruto) {
                 sampleBruto = {
-                  empresa: emp,
-                  id: bp.id, numero: bp.numero,
-                  data: bp.data, dataEmissao: bp.dataEmissao,
-                  situacao: bp.situacao, situacaoId: bp.situacaoId,
-                  total: bp.total,
+                  empresa: emp, id: bp.id, numero: bp.numero,
+                  data: bp.data, situacao: bp.situacao, total: bp.total,
                   contato_nome: bp.contato && (bp.contato.nome || bp.contato.razao),
                   keys: Object.keys(bp).slice(0, 30),
                 };
               }
               const situ = _extraiSituacao(bp);
               situacoesVistas[emp][situ.texto] = (situacoesVistas[emp][situ.texto] || 0) + 1;
-              if (!eStatusFinalizado(situ)) continue;
-              // Filtro de data de corte — pedido antigo (antes do 1o uso do sistema) e ignorado
-              const dataPedido = String(bp.data || bp.dataEmissao || '').slice(0, 10);
-              if (dataPedido && dataPedido < dataCorte) { filtradosPorData++; continue; }
-              let det;
-              try {
-                const detResp = await blingApi.get('/pedidos/vendas/' + bp.id, null, emp);
-                det = detResp.data || detResp;
-              } catch (e) { continue; }
-              const vend = det.vendedor || null;
-              pedidosDetectados.push({
-                bling_pedido_id: String(bp.id),
-                empresa: emp,
-                numero: String(bp.numero || det.numero || ''),
-                cliente_nome: (det.contato && (det.contato.nome || det.contato.razao)) || null,
-                valor: Number(det.total || det.totalvenda || bp.total || 0),
-                data_faturamento: bp.data || bp.dataEmissao || det.data || null,
-                vendedor_bling_nome: vend && vend.nome || null,
-                vendedor_bling_id: vend && vend.id || null,
-              });
+              const chaveSit = emp + '|' + (situ.id || 'none');
+              (pedidosPorSituacao[chaveSit] = pedidosPorSituacao[chaveSit] || []).push(bp);
             }
             if (lista.length < 100) break;
           }
@@ -3295,20 +3312,50 @@ module.exports = async (req, res) => {
           erros.push({ empresa: emp, erro: e.message });
         }
       }
-      const resultado = await pedidosBlingComercial.registrarPedidosDetectados(pedidosDetectados);
-      // Pedidos SITE (sem vendedor OU vendedor "Tray") sao somados
-      // AUTOMATICAMENTE no bucket SITE, sem confirmacao. Roda 1 vez por
-      // pedido novo — o anti-dupe da fila garante que nao soma 2x.
-      let siteSomados = 0, siteValor = 0, siteErros = [];
-      for (const s of (resultado.paraSomarSite || [])) {
-        try {
-          if (s.valor > 0) {
-            await registrarVendaSite(s.valor);
-            siteSomados++;
-            siteValor += s.valor;
-          }
-        } catch (e) { siteErros.push({ id: s.bling_pedido_id, erro: e.message }); }
+
+      // FASE 2: descobre "faturado" pra cada situacao encontrada (busca detalhe
+      // de 1 pedido por situacao desconhecida, cacheia no processo).
+      const situacoesResumo = {}; // "emp|id" → { nome, faturado, count }
+      for (const [chaveSit, listaP] of Object.entries(pedidosPorSituacao)) {
+        const [emp] = chaveSit.split('|');
+        const situ = _extraiSituacao(listaP[0]);
+        const direto = eStatusFinalizadoDireto(situ);
+        if (direto === true || direto === false) {
+          situacoesResumo[chaveSit] = { nome: situ.texto, faturado: direto, count: listaP.length };
+          continue;
+        }
+        // Descobre via detalhe
+        const descoberto = await descobrirSituacao(emp, listaP[0]);
+        situacoesResumo[chaveSit] = { nome: descoberto.nome, faturado: descoberto.faturado, count: listaP.length };
       }
+
+      // FASE 3: itera pedidos aceitos e busca detalhe pra pegar vendedor + valor
+      for (const [chaveSit, listaP] of Object.entries(pedidosPorSituacao)) {
+        const info = situacoesResumo[chaveSit];
+        if (!info.faturado) continue;
+        const [emp] = chaveSit.split('|');
+        for (const bp of listaP) {
+          const dataPedido = String(bp.data || bp.dataEmissao || '').slice(0, 10);
+          if (dataPedido && dataPedido < dataCorte) { filtradosPorData++; continue; }
+          let det;
+          try {
+            const detResp = await blingApi.get('/pedidos/vendas/' + bp.id, null, emp);
+            det = detResp.data || detResp;
+          } catch (e) { continue; }
+          const vend = det.vendedor || null;
+          pedidosDetectados.push({
+            bling_pedido_id: String(bp.id),
+            empresa: emp,
+            numero: String(bp.numero || det.numero || ''),
+            cliente_nome: (det.contato && (det.contato.nome || det.contato.razao)) || null,
+            valor: Number(det.total || det.totalvenda || bp.total || 0),
+            data_faturamento: bp.data || bp.dataEmissao || det.data || null,
+            vendedor_bling_nome: vend && vend.nome || null,
+            vendedor_bling_id: vend && vend.id || null,
+          });
+        }
+      }
+      const resultado = await pedidosBlingComercial.registrarPedidosDetectados(pedidosDetectados);
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({
         ok: true,
@@ -3317,9 +3364,6 @@ module.exports = async (req, res) => {
         ja_conhecidos: resultado.ignorados,
         atribuidos_vendedor: resultado.atribuidos_vendedor,
         atribuidos_site: resultado.atribuidos_site,
-        site_somados: siteSomados,
-        site_valor_total: siteValor,
-        site_erros: siteErros,
         aguardando_atribuicao: resultado.aguardando,
         erros_bling: erros,
         // Debug: quantos pedidos brutos vieram do Bling e quais situacoes
@@ -3331,6 +3375,8 @@ module.exports = async (req, res) => {
           data_inicial_bling: dataInicialBling,
           totais_brutos: totaisBrutos,
           situacoes_vistas: situacoesVistas,
+          // Nomes DESCOBERTOS via detalhe do Bling (soluciona o "id:799150")
+          situacoes_descobertas: situacoesResumo,
           filtrados_por_data_corte: filtradosPorData,
           sample_bruto_1o_pedido: sampleBruto,
         },
@@ -3352,14 +3398,18 @@ module.exports = async (req, res) => {
       const pedidosBlingComercial = require('../lib/pedidosBlingComercial');
       const eAdmin = isAdminOrDiretor(sess);
       const login = String(sess.usuario || '').toLowerCase();
-      const meus = await pedidosBlingComercial.listar({ login, admin: false });
-      let sem_atribuicao = [];
+      // Vendedor ve so os dele. Admin ve so SITE + sem_atribuicao — nao ve os
+      // pedidos que os vendedores tem que confirmar (regra do Luis: gerencia
+      // so mexe com site e atribuicao manual).
+      const meus = eAdmin ? [] : await pedidosBlingComercial.listar({ login, admin: false });
+      let site = [], sem_atribuicao = [];
       if (eAdmin) {
         const todos = await pedidosBlingComercial.listar({ admin: true });
+        site = todos.filter(p => p.status === 'pendente_site');
         sem_atribuicao = todos.filter(p => p.status === 'aguardando_atribuicao');
       }
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ ok: true, meus, sem_atribuicao }));
+      res.end(JSON.stringify({ ok: true, meus, site, sem_atribuicao }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
@@ -3407,6 +3457,49 @@ module.exports = async (req, res) => {
       const { bling_pedido_id } = JSON.parse(body || '{}');
       if (!bling_pedido_id) throw new Error('bling_pedido_id obrigatorio');
       const p = await pedidosBlingComercial.rejeitar(String(bling_pedido_id), String(sess.usuario || '').toLowerCase());
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, pedido: p }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/comercial/pedidos-pendentes/confirmar-site body: { bling_pedido_id }
+  // So admin/diretor. Confirma que o pedido e do site e soma no bucket SITE.
+  if (req.method === 'POST' && url === '/api/comercial/pedidos-pendentes/confirmar-site') {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return;
+    }
+    try {
+      const pedidosBlingComercial = require('../lib/pedidosBlingComercial');
+      const body = await readBody(req);
+      const { bling_pedido_id } = JSON.parse(body || '{}');
+      if (!bling_pedido_id) throw new Error('bling_pedido_id obrigatorio');
+      const pedido = await pedidosBlingComercial.confirmarSite(String(bling_pedido_id), sess.usuario);
+      if (pedido.valor > 0) await registrarVendaSite(pedido.valor);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, pedido, valor_somado_site: pedido.valor }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/comercial/pedidos-pendentes/rejeitar-site body: { bling_pedido_id }
+  // So admin/diretor. Rejeita como pedido do site — vai pra atribuicao.
+  if (req.method === 'POST' && url === '/api/comercial/pedidos-pendentes/rejeitar-site') {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return;
+    }
+    try {
+      const pedidosBlingComercial = require('../lib/pedidosBlingComercial');
+      const body = await readBody(req);
+      const { bling_pedido_id } = JSON.parse(body || '{}');
+      if (!bling_pedido_id) throw new Error('bling_pedido_id obrigatorio');
+      const p = await pedidosBlingComercial.rejeitarSite(String(bling_pedido_id), sess.usuario);
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ ok: true, pedido: p }));
     } catch (e) {
