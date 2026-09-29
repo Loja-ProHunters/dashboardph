@@ -1,0 +1,106 @@
+{
+  "26988900448": {
+    "bling_pedido_id": "26988900448",
+    "empresa": "prohunters",
+    "numero": "27112",
+    "cliente_nome": "Ivan Silva Rodrigues",
+    "valor": 478.02,
+    "data_faturamento": "2026-09-29",
+    "vendedor_bling_nome": null,
+    "vendedor_bling_id": 9744561230,
+    "vendedor_atribuido": null,
+    "status": "aguardando_atribuicao",
+    "detectado_em": "2026-09-29T14:01:19.099Z",
+    "confirmado_por": null,
+    "confirmado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_em": null,
+    "atribuido_manualmente_por": null,
+    "atribuido_manualmente_em": null,
+    "historico": [
+      {
+        "ts": "2026-09-29T14:01:19.099Z",
+        "acao": "detectado_sem_match",
+        "login_match": null
+      }
+    ]
+  },
+  "26988508027": {
+    "bling_pedido_id": "26988508027",
+    "empresa": "prohunters",
+    "numero": "27111",
+    "cliente_nome": "Trajano Motta Paim",
+    "valor": 989.68,
+    "data_faturamento": "2026-09-28",
+    "vendedor_bling_nome": null,
+    "vendedor_bling_id": null,
+    "vendedor_atribuido": null,
+    "status": "aguardando_atribuicao",
+    "detectado_em": "2026-09-29T14:01:19.099Z",
+    "confirmado_por": null,
+    "confirmado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_em": null,
+    "atribuido_manualmente_por": null,
+    "atribuido_manualmente_em": null,
+    "historico": [
+      {
+        "ts": "2026-09-29T14:01:19.099Z",
+        "acao": "detectado_sem_match",
+        "login_match": null
+      }
+    ]
+  },
+  "26988092167": {
+    "bling_pedido_id": "26988092167",
+    "empresa": "prohunters",
+    "numero": "27110",
+    "cliente_nome": "Paulo Garcia",
+    "valor": 1038.85,
+    "data_faturamento": "2026-09-28",
+    "vendedor_bling_nome": null,
+    "vendedor_bling_id": 9744561230,
+    "vendedor_atribuido": null,
+    "status": "aguardando_atribuicao",
+    "detectado_em": "2026-09-29T14:01:19.099Z",
+    "confirmado_por": null,
+    "confirmado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_em": null,
+    "atribuido_manualmente_por": null,
+    "atribuido_manualmente_em": null,
+    "historico": [
+      {
+        "ts": "2026-09-29T14:01:19.099Z",
+        "acao": "detectado_sem_match",
+        "login_match": null
+      }
+    ]
+  },
+  "26786745909": {
+    "bling_pedido_id": "26786745909",
+    "empresa": "calibre",
+    "numero": "1909",
+    "cliente_nome": "Márcio Luís Alexandre Pasquini",
+    "valor": 569.7,
+    "data_faturamento": "2026-09-04",
+    "vendedor_bling_nome": null,
+    "vendedor_bling_id": 15596916109,
+    "vendedor_atribuido": null,
+    "status": "aguardando_atribuicao",
+    "detectado_em": "2026-09-29T14:01:19.099Z",
+    "confirmado_por": null,
+    "confirmado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_em": null,
+    "atribuido_manualmente_por": null,
+    "atribuido_manualmente_em": null,
+    "historico": [
+      {
+        "ts": "2026-09-29T14:01:19.099Z",
+        "acao": "detectado_sem_match",
+        "login_match": null
+      }
+    ]
+  }
+}
