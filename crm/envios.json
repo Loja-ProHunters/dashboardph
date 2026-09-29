@@ -1633,9 +1633,9 @@
     "transporte_valor": 250,
     "transporte_por": "dickmann",
     "transporte_em": "2026-09-29T17:35:33.477Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "031462",
+    "nf_por": "auxiliar",
+    "nf_em": "2026-09-29T18:02:40.845Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -1705,11 +1705,19 @@
         "acao": "campo_alterado",
         "campo": "transporte_valor",
         "novo": 250
+      },
+      {
+        "ts": "2026-09-29T18:02:40.845Z",
+        "por": "auxiliar",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "031462"
       }
     ],
     "criado_em": "2026-09-29T17:30:56.401Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-09-29T17:35:33.477Z",
-    "atualizado_por": "dickmann"
+    "atualizado_em": "2026-09-29T18:02:40.845Z",
+    "atualizado_por": "auxiliar"
   }
 }
