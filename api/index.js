@@ -3189,6 +3189,177 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // ═════════════════════════════════════════════════════════════
+  // FILA DE PEDIDOS DO BLING → COMERCIAL (confirmacao pelo vendedor)
+  // ═════════════════════════════════════════════════════════════
+
+  // POST /api/comercial/verificar-pedidos-bling
+  // Puxa pedidos faturados dos ultimos 30 dias das duas empresas (Bling
+  // Pro Hunters + Bling Calibre), tenta casar cada um com um vendedor via
+  // match de nome. Novos pedidos entram na fila de pendencias. Pedidos ja
+  // conhecidos sao ignorados (anti-dupe). Retorna quantos foram detectados.
+  if (req.method === 'POST' && url === '/api/comercial/verificar-pedidos-bling') {
+    const sess = getSession(req);
+    if (!sess || !canViewComercial(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
+    }
+    try {
+      const pedidosBlingComercial = require('../lib/pedidosBlingComercial');
+      // Ultimos 30 dias
+      const hoje = new Date();
+      const dataInicial = new Date(hoje.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      const empresas = ['prohunters', 'calibre'];
+      const pedidosDetectados = [];
+      const erros = [];
+      for (const emp of empresas) {
+        try {
+          // Bling v3: /pedidos/vendas aceita dataInicial e situacao (id da situacao).
+          // Como o id varia por conta, pegamos todos e filtramos por situacao.nome contendo "faturad" ou "atendid".
+          // Paginacao ate 100 por pagina; buscamos ate 3 paginas (300 pedidos max).
+          for (let pagina = 1; pagina <= 3; pagina++) {
+            const resp = await blingApi.get('/pedidos/vendas',
+              { dataInicial, limite: 100, pagina }, emp);
+            const lista = (resp && resp.data) || [];
+            if (!lista.length) break;
+            for (const bp of lista) {
+              // Filtra por situacao: faturado, atendido ou emitido
+              const situNome = String((bp.situacao && bp.situacao.nome) || '').toLowerCase();
+              const situId = bp.situacao && bp.situacao.id;
+              const eFaturado = situNome.includes('faturad') || situNome.includes('atendid') || situNome.includes('emitid') || situId === 9 || situId === 4;
+              if (!eFaturado) continue;
+              // Puxa detalhe pra pegar vendedor e valor total (nem sempre vem na listagem)
+              let det;
+              try {
+                const detResp = await blingApi.get('/pedidos/vendas/' + bp.id, null, emp);
+                det = detResp.data || detResp;
+              } catch (e) { continue; }
+              const vend = det.vendedor || null;
+              pedidosDetectados.push({
+                bling_pedido_id: String(bp.id),
+                empresa: emp,
+                numero: String(bp.numero || det.numero || ''),
+                cliente_nome: (det.contato && (det.contato.nome || det.contato.razao)) || null,
+                valor: Number(det.total || det.totalvenda || bp.total || 0),
+                data_faturamento: bp.data || bp.dataEmissao || det.data || null,
+                vendedor_bling_nome: vend && vend.nome || null,
+                vendedor_bling_id: vend && vend.id || null,
+              });
+            }
+            if (lista.length < 100) break; // ultima pagina
+          }
+        } catch (e) {
+          erros.push({ empresa: emp, erro: e.message });
+        }
+      }
+      const { novos, ignorados } = await pedidosBlingComercial.registrarPedidosDetectados(pedidosDetectados);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({
+        ok: true,
+        pedidos_analisados: pedidosDetectados.length,
+        novos, ja_conhecidos: ignorados,
+        erros_bling: erros,
+      }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/comercial/pedidos-pendentes — lista pendencias do usuario logado
+  // (ou de todos, pra admin/diretor)
+  if (req.method === 'GET' && url.startsWith('/api/comercial/pedidos-pendentes')) {
+    const sess = getSession(req);
+    if (!sess || !canViewComercial(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
+    }
+    try {
+      const pedidosBlingComercial = require('../lib/pedidosBlingComercial');
+      const eAdmin = isAdminOrDiretor(sess);
+      const login = String(sess.usuario || '').toLowerCase();
+      const meus = await pedidosBlingComercial.listar({ login, admin: false });
+      let sem_atribuicao = [];
+      if (eAdmin) {
+        const todos = await pedidosBlingComercial.listar({ admin: true });
+        sem_atribuicao = todos.filter(p => p.status === 'aguardando_atribuicao');
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, meus, sem_atribuicao }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/comercial/pedidos-pendentes/confirmar body: { bling_pedido_id }
+  // Vendedor confirma que a venda e dele — lanca no fat dele e marca no historico.
+  if (req.method === 'POST' && url === '/api/comercial/pedidos-pendentes/confirmar') {
+    const sess = getSession(req);
+    if (!sess || !canViewComercial(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
+    }
+    try {
+      const pedidosBlingComercial = require('../lib/pedidosBlingComercial');
+      const body = await readBody(req);
+      const { bling_pedido_id } = JSON.parse(body || '{}');
+      if (!bling_pedido_id) throw new Error('bling_pedido_id obrigatorio');
+      const login = String(sess.usuario || '').toLowerCase();
+      // Confirma na fila
+      const pedido = await pedidosBlingComercial.confirmar(String(bling_pedido_id), login);
+      // Achar o seller no dashboard comercial e somar o valor
+      const data = await getComercialData();
+      const meu = (data.sellers || []).find(s => String(s.name || '').toLowerCase().includes(login));
+      if (!meu) throw new Error('Seu login nao esta vinculado a nenhum vendedor cadastrado no Dashboard Comercial.');
+      const atualizado = await registrarVenda(meu.id, pedido.valor);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, pedido, sellers: atualizado.sellers, valor_somado: pedido.valor }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/comercial/pedidos-pendentes/rejeitar body: { bling_pedido_id }
+  // Vendedor diz "nao e meu" — volta pra fila de atribuicao da gerencia.
+  if (req.method === 'POST' && url === '/api/comercial/pedidos-pendentes/rejeitar') {
+    const sess = getSession(req);
+    if (!sess || !canViewComercial(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
+    }
+    try {
+      const pedidosBlingComercial = require('../lib/pedidosBlingComercial');
+      const body = await readBody(req);
+      const { bling_pedido_id } = JSON.parse(body || '{}');
+      if (!bling_pedido_id) throw new Error('bling_pedido_id obrigatorio');
+      const p = await pedidosBlingComercial.rejeitar(String(bling_pedido_id), String(sess.usuario || '').toLowerCase());
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, pedido: p }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/comercial/pedidos-pendentes/atribuir body: { bling_pedido_id, vendedor_login }
+  // Admin/diretor atribui um pedido sem match automatico pra um vendedor.
+  if (req.method === 'POST' && url === '/api/comercial/pedidos-pendentes/atribuir') {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return;
+    }
+    try {
+      const pedidosBlingComercial = require('../lib/pedidosBlingComercial');
+      const body = await readBody(req);
+      const { bling_pedido_id, vendedor_login } = JSON.parse(body || '{}');
+      if (!bling_pedido_id || !vendedor_login) throw new Error('bling_pedido_id e vendedor_login obrigatorios');
+      const p = await pedidosBlingComercial.atribuir(String(bling_pedido_id), String(vendedor_login).toLowerCase(), sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, pedido: p }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // GET /comercial — dashboard comercial (luis e vendas podem ver; auxiliar nao)
   if (req.method === 'GET' && url === '/comercial') {
     const sess = getSession(req);
