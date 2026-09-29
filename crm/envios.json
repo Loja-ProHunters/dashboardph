@@ -1425,9 +1425,9 @@
     },
     "status": "aberto",
     "confirmado_bling": true,
-    "volumes_qtd": 1,
-    "volumes_por": "dickmann",
-    "volumes_em": "2026-09-29T17:28:36.202Z",
+    "volumes_qtd": null,
+    "volumes_por": null,
+    "volumes_em": null,
     "conferencia_ok": false,
     "conferencia_por": null,
     "conferencia_em": null,
@@ -1484,11 +1484,19 @@
         "acao": "campo_alterado",
         "campo": "volumes_qtd",
         "novo": 1
+      },
+      {
+        "ts": "2026-09-29T17:28:41.472Z",
+        "por": "dickmann",
+        "ip": "200.34.247.72",
+        "acao": "passo_revertido",
+        "passo": "volumes",
+        "titulo": "Volumes embalados"
       }
     ],
     "criado_em": "2026-09-29T17:28:30.091Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-09-29T17:28:36.202Z",
+    "atualizado_em": "2026-09-29T17:28:41.472Z",
     "atualizado_por": "dickmann"
   }
 }
