@@ -3211,23 +3211,34 @@ module.exports = async (req, res) => {
       const empresas = ['prohunters', 'calibre'];
       const pedidosDetectados = [];
       const erros = [];
+      // Debug: conta situacoes encontradas por empresa pra ajudar diagnosticar
+      // quando "nao vem nada" — geralmente e porque o filtro de situacao esta
+      // deixando de fora o status do pedido.
+      const situacoesVistas = {}; // empresa → { nomeSituacao: contagem }
+      const totaisBrutos = {}; // empresa → total de pedidos vindos do Bling
+      // Palavras que indicam "venda ja aconteceu" — filtra pedidos em andamento.
+      // Nomes comuns no Bling: "Faturado", "Atendido", "Emitido", "Concluido",
+      // "Finalizado", "Em separacao pra envio" (algumas contas usam), "Enviado".
+      // Se voce quer incluir mais, edita esta lista.
+      const PALAVRAS_FATURADO = ['faturad', 'atendid', 'emitid', 'concluid', 'finalizad', 'enviad'];
+      function eStatusFinalizado(situNome) {
+        const n = String(situNome || '').toLowerCase();
+        return PALAVRAS_FATURADO.some(p => n.includes(p));
+      }
       for (const emp of empresas) {
+        situacoesVistas[emp] = {};
+        totaisBrutos[emp] = 0;
         try {
-          // Bling v3: /pedidos/vendas aceita dataInicial e situacao (id da situacao).
-          // Como o id varia por conta, pegamos todos e filtramos por situacao.nome contendo "faturad" ou "atendid".
-          // Paginacao ate 100 por pagina; buscamos ate 3 paginas (300 pedidos max).
           for (let pagina = 1; pagina <= 3; pagina++) {
             const resp = await blingApi.get('/pedidos/vendas',
               { dataInicial, limite: 100, pagina }, emp);
             const lista = (resp && resp.data) || [];
             if (!lista.length) break;
+            totaisBrutos[emp] += lista.length;
             for (const bp of lista) {
-              // Filtra por situacao: faturado, atendido ou emitido
-              const situNome = String((bp.situacao && bp.situacao.nome) || '').toLowerCase();
-              const situId = bp.situacao && bp.situacao.id;
-              const eFaturado = situNome.includes('faturad') || situNome.includes('atendid') || situNome.includes('emitid') || situId === 9 || situId === 4;
-              if (!eFaturado) continue;
-              // Puxa detalhe pra pegar vendedor e valor total (nem sempre vem na listagem)
+              const situNome = String((bp.situacao && bp.situacao.nome) || '(sem situacao)');
+              situacoesVistas[emp][situNome] = (situacoesVistas[emp][situNome] || 0) + 1;
+              if (!eStatusFinalizado(situNome)) continue;
               let det;
               try {
                 const detResp = await blingApi.get('/pedidos/vendas/' + bp.id, null, emp);
@@ -3245,19 +3256,48 @@ module.exports = async (req, res) => {
                 vendedor_bling_id: vend && vend.id || null,
               });
             }
-            if (lista.length < 100) break; // ultima pagina
+            if (lista.length < 100) break;
           }
         } catch (e) {
           erros.push({ empresa: emp, erro: e.message });
         }
       }
-      const { novos, ignorados } = await pedidosBlingComercial.registrarPedidosDetectados(pedidosDetectados);
+      const resultado = await pedidosBlingComercial.registrarPedidosDetectados(pedidosDetectados);
+      // Pedidos SITE (sem vendedor OU vendedor "Tray") sao somados
+      // AUTOMATICAMENTE no bucket SITE, sem confirmacao. Roda 1 vez por
+      // pedido novo — o anti-dupe da fila garante que nao soma 2x.
+      let siteSomados = 0, siteValor = 0, siteErros = [];
+      for (const s of (resultado.paraSomarSite || [])) {
+        try {
+          if (s.valor > 0) {
+            await registrarVendaSite(s.valor);
+            siteSomados++;
+            siteValor += s.valor;
+          }
+        } catch (e) { siteErros.push({ id: s.bling_pedido_id, erro: e.message }); }
+      }
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({
         ok: true,
         pedidos_analisados: pedidosDetectados.length,
-        novos, ja_conhecidos: ignorados,
+        novos: resultado.novos,
+        ja_conhecidos: resultado.ignorados,
+        atribuidos_vendedor: resultado.atribuidos_vendedor,
+        atribuidos_site: resultado.atribuidos_site,
+        site_somados: siteSomados,
+        site_valor_total: siteValor,
+        site_erros: siteErros,
+        aguardando_atribuicao: resultado.aguardando,
         erros_bling: erros,
+        // Debug: quantos pedidos brutos vieram do Bling e quais situacoes
+        // apareceram. Se pedidos_analisados=0 mas totais_brutos>0, significa
+        // que o filtro de status pulou tudo — a UI mostra pra decidir se
+        // ampliamos a lista de PALAVRAS_FATURADO no backend.
+        _debug: {
+          data_inicial: dataInicial,
+          totais_brutos: totaisBrutos,
+          situacoes_vistas: situacoesVistas,
+        },
       }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
