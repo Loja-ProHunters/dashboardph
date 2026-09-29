@@ -1346,9 +1346,9 @@
     "transporte_valor": 200,
     "transporte_por": "dickmann",
     "transporte_em": "2026-09-29T17:29:55.489Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "031459",
+    "nf_por": "auxiliar",
+    "nf_em": "2026-09-29T17:32:15.546Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -1418,12 +1418,20 @@
         "acao": "campo_alterado",
         "campo": "transporte_valor",
         "novo": 200
+      },
+      {
+        "ts": "2026-09-29T17:32:15.546Z",
+        "por": "auxiliar",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "031459"
       }
     ],
     "criado_em": "2026-09-29T17:25:50.927Z",
     "criado_por": "auxiliar",
-    "atualizado_em": "2026-09-29T17:29:55.489Z",
-    "atualizado_por": "dickmann"
+    "atualizado_em": "2026-09-29T17:32:15.547Z",
+    "atualizado_por": "auxiliar"
   },
   "env_prohunters_27097": {
     "id": "env_prohunters_27097",
