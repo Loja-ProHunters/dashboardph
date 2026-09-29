@@ -1342,10 +1342,10 @@
     "conferencia_por": "dickmann",
     "conferencia_em": "2026-09-29T17:29:45.742Z",
     "conferencia_notas": null,
-    "transportadora": null,
-    "transporte_valor": null,
-    "transporte_por": null,
-    "transporte_em": null,
+    "transportadora": "ezequiel",
+    "transporte_valor": 200,
+    "transporte_por": "dickmann",
+    "transporte_em": "2026-09-29T17:29:55.489Z",
     "nf_numero": null,
     "nf_por": null,
     "nf_em": null,
@@ -1402,11 +1402,27 @@
         "acao": "campo_alterado",
         "campo": "conferencia_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-09-29T17:29:55.489Z",
+        "por": "dickmann",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "transportadora",
+        "novo": "ezequiel"
+      },
+      {
+        "ts": "2026-09-29T17:29:55.489Z",
+        "por": "dickmann",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "transporte_valor",
+        "novo": 200
       }
     ],
     "criado_em": "2026-09-29T17:25:50.927Z",
     "criado_por": "auxiliar",
-    "atualizado_em": "2026-09-29T17:29:45.742Z",
+    "atualizado_em": "2026-09-29T17:29:55.489Z",
     "atualizado_por": "dickmann"
   },
   "env_prohunters_27097": {
