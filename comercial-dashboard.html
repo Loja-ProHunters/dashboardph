@@ -1082,6 +1082,17 @@ tbody td {
  <div class="podium-stand" id="podium-stand"></div>
  <div class="podium-race" id="podium-race"></div>
 
+ <!-- Card de pedidos do Bling pendentes de confirmacao -->
+ <div class="registrar-venda-card" id="pedidosBlingCard" style="margin-bottom:14px">
+   <div class="rv-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+     <span>Pedidos do Bling</span>
+     <button onclick="verificarPedidosBling()" id="btnVerifPedidos" style="background:var(--brand2);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">🔄 Verificar meus pedidos</button>
+   </div>
+   <div id="pedidosBlingStatus" style="margin-top:8px;font-size:12px;color:var(--gray4);min-height:14px"></div>
+   <div id="pedidosBlingLista" style="margin-top:12px"></div>
+   <div id="pedidosBlingSemAtribuicao" style="margin-top:16px"></div>
+ </div>
+
  <div class="registrar-venda-card">
  <div class="rv-title">Fechou uma venda? Registra aqui</div>
  <div class="rv-row">
@@ -2464,6 +2475,154 @@ async function loadPistaMeta(){
     const d = await r.json();
     renderPistaMeta(d);
   } catch (e) { /* silencioso */ }
+}
+
+// ═══════════════════════════════════════
+// PEDIDOS DO BLING — verificar / confirmar / rejeitar / atribuir
+// ═══════════════════════════════════════
+function fmtBRLNum(v) {
+  return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function pbEsc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+async function verificarPedidosBling() {
+  const btn = document.getElementById('btnVerifPedidos');
+  const status = document.getElementById('pedidosBlingStatus');
+  if (!btn || !status) return;
+  btn.disabled = true;
+  const origLabel = btn.textContent;
+  btn.textContent = '⏳ Consultando Bling…';
+  status.textContent = 'Isso pode levar alguns segundos.';
+  status.style.color = 'var(--gray4)';
+  try {
+    const r = await fetch('/api/comercial/verificar-pedidos-bling', { method: 'POST' });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    status.textContent = 'Analisados: ' + d.pedidos_analisados + ' · Novos: ' + d.novos + ' · Já conhecidos: ' + d.ja_conhecidos + (d.erros_bling && d.erros_bling.length ? ' · Erros: ' + d.erros_bling.length : '');
+    status.style.color = d.novos > 0 ? 'var(--green)' : 'var(--gray4)';
+    await carregarPedidosPendentes();
+  } catch (e) {
+    status.textContent = 'Falha: ' + e.message;
+    status.style.color = 'var(--red)';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = origLabel;
+  }
+}
+
+async function carregarPedidosPendentes() {
+  const lista = document.getElementById('pedidosBlingLista');
+  const semAtr = document.getElementById('pedidosBlingSemAtribuicao');
+  if (!lista) return;
+  try {
+    const r = await fetch('/api/comercial/pedidos-pendentes');
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    lista.innerHTML = renderPendentesMeus(d.meus || []);
+    if (semAtr) semAtr.innerHTML = renderSemAtribuicao(d.sem_atribuicao || []);
+  } catch (e) {
+    lista.innerHTML = '<div style="color:var(--red);font-size:12px;padding:8px 0">Erro ao carregar: ' + pbEsc(e.message) + '</div>';
+  }
+}
+
+function renderPendentesMeus(pendentes) {
+  if (!pendentes.length) return '';
+  const rows = pendentes.map(p => {
+    const empLbl = p.empresa === 'calibre' ? 'Calibre' : 'Pro Hunters';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;background:var(--black3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;flex-wrap:wrap">' +
+      '<div style="flex:1;min-width:200px">' +
+        '<div style="font-size:11px;color:var(--gray4);font-weight:700;letter-spacing:.3px">' + pbEsc(empLbl.toUpperCase()) + ' · #' + pbEsc(p.numero) + '</div>' +
+        '<div style="font-size:14px;font-weight:600;color:var(--white);margin:2px 0">' + pbEsc(p.cliente_nome || '—') + '</div>' +
+        '<div style="font-size:11px;color:var(--gray4)">Faturado em ' + pbEsc((p.data_faturamento || '').slice(0,10)) + ' · Vendedor Bling: ' + pbEsc(p.vendedor_bling_nome || '—') + '</div>' +
+      '</div>' +
+      '<div style="font-size:18px;font-weight:700;color:var(--green);white-space:nowrap">' + fmtBRLNum(p.valor) + '</div>' +
+      '<div style="display:flex;gap:6px">' +
+        '<button onclick="confirmarPedidoBling(\'' + pbEsc(p.bling_pedido_id) + '\')" style="background:var(--green);color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">✓ É meu</button>' +
+        '<button onclick="rejeitarPedidoBling(\'' + pbEsc(p.bling_pedido_id) + '\')" style="background:transparent;color:var(--gray4);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer">✗ Não é meu</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  return '<div style="font-size:12px;font-weight:700;color:var(--brand2);letter-spacing:.3px;margin:8px 0 10px">📥 PENDENTES DE CONFIRMAÇÃO (' + pendentes.length + ')</div>' + rows;
+}
+
+function renderSemAtribuicao(lista) {
+  if (!lista.length) return '';
+  const opts = ['dickmann','boschetto','mathias'];
+  const rows = lista.map(p => {
+    const empLbl = p.empresa === 'calibre' ? 'Calibre' : 'Pro Hunters';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;background:var(--black3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;flex-wrap:wrap">' +
+      '<div style="flex:1;min-width:200px">' +
+        '<div style="font-size:11px;color:var(--gray4);font-weight:700;letter-spacing:.3px">' + pbEsc(empLbl.toUpperCase()) + ' · #' + pbEsc(p.numero) + '</div>' +
+        '<div style="font-size:14px;font-weight:600;color:var(--white);margin:2px 0">' + pbEsc(p.cliente_nome || '—') + '</div>' +
+        '<div style="font-size:11px;color:var(--gray4)">Faturado em ' + pbEsc((p.data_faturamento || '').slice(0,10)) + ' · Vendedor Bling: ' + pbEsc(p.vendedor_bling_nome || '(sem vendedor)') + '</div>' +
+      '</div>' +
+      '<div style="font-size:16px;font-weight:700;color:var(--green);white-space:nowrap">' + fmtBRLNum(p.valor) + '</div>' +
+      '<div style="display:flex;gap:6px;align-items:center">' +
+        '<select id="atr-' + pbEsc(p.bling_pedido_id) + '" style="background:var(--black2);color:var(--white);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:12px">' +
+          opts.map(o => '<option value="' + o + '">' + o + '</option>').join('') +
+        '</select>' +
+        '<button onclick="atribuirPedidoBling(\'' + pbEsc(p.bling_pedido_id) + '\')" style="background:var(--brand2);color:#fff;border:none;border-radius:6px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer">Atribuir</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  return '<div style="font-size:12px;font-weight:700;color:#f5a623;letter-spacing:.3px;margin:16px 0 10px">⚙️ AGUARDANDO ATRIBUIÇÃO — só admin/diretor (' + lista.length + ')</div>' + rows;
+}
+
+async function confirmarPedidoBling(id) {
+  if (!confirm('Confirmar que essa venda é sua? O valor será somado ao seu faturamento do mês.')) return;
+  try {
+    const r = await fetch('/api/comercial/pedidos-pendentes/confirmar', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bling_pedido_id: id }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    // Atualiza sellers no local
+    (d.sellers || []).forEach(saved => {
+      const s = sellers.find(x => x.id === saved.id);
+      if (s) s.fat = saved.fat;
+    });
+    if (typeof renderAll === 'function') renderAll();
+    if (typeof playSaleSound === 'function') playSaleSound();
+    await carregarPedidosPendentes();
+    alert('Venda de ' + fmtBRLNum(d.valor_somado) + ' registrada!');
+  } catch (e) { alert('Erro: ' + e.message); }
+}
+
+async function rejeitarPedidoBling(id) {
+  if (!confirm('Marcar como "não é meu"? O pedido vai pra fila da gerência atribuir manualmente.')) return;
+  try {
+    const r = await fetch('/api/comercial/pedidos-pendentes/rejeitar', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bling_pedido_id: id }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    await carregarPedidosPendentes();
+  } catch (e) { alert('Erro: ' + e.message); }
+}
+
+async function atribuirPedidoBling(id) {
+  const sel = document.getElementById('atr-' + id);
+  if (!sel) return;
+  const vendedor = sel.value;
+  if (!confirm('Atribuir esse pedido a "' + vendedor + '"? Ele vai receber a pendência pra confirmar.')) return;
+  try {
+    const r = await fetch('/api/comercial/pedidos-pendentes/atribuir', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bling_pedido_id: id, vendedor_login: vendedor }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    await carregarPedidosPendentes();
+  } catch (e) { alert('Erro: ' + e.message); }
+}
+
+// Carrega pendencias ao entrar na pagina (sem forçar consulta ao Bling)
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', function(){
+    setTimeout(carregarPedidosPendentes, 500);
+  });
 }
 
 // ═══════════════════════════════════════
