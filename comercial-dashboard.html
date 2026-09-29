@@ -2501,7 +2501,7 @@ async function verificarPedidosBling() {
     // Monta mensagem de status detalhada
     var partes = ['Analisados: ' + d.pedidos_analisados, 'Novos: ' + d.novos];
     if (d.atribuidos_vendedor > 0) partes.push('Pros vendedores: ' + d.atribuidos_vendedor);
-    if (d.site_somados > 0) partes.push('Site (auto): ' + d.site_somados + ' = ' + fmtBRLNum(d.site_valor_total));
+    if (d.atribuidos_site > 0) partes.push('Pra gerência confirmar (site): ' + d.atribuidos_site);
     if (d.aguardando_atribuicao > 0) partes.push('Aguardando: ' + d.aguardando_atribuicao);
     if (d.ja_conhecidos > 0) partes.push('Já conhecidos: ' + d.ja_conhecidos);
     if (d.erros_bling && d.erros_bling.length) partes.push('Erros: ' + d.erros_bling.length);
@@ -2531,10 +2531,6 @@ async function verificarPedidosBling() {
     }
     status.textContent = partes.join(' · ');
     status.style.color = d.novos > 0 ? 'var(--green)' : (d.pedidos_analisados === 0 && d._debug ? '#f5a623' : 'var(--gray4)');
-    // Se somou algo no site, atualiza o placar do site imediatamente
-    if (d.site_somados > 0 && typeof loadData === 'function') {
-      try { await loadData(); if (typeof renderAll === 'function') renderAll(); } catch(e){}
-    }
     await carregarPedidosPendentes();
   } catch (e) {
     status.textContent = 'Falha: ' + e.message;
@@ -2553,11 +2549,64 @@ async function carregarPedidosPendentes() {
     const r = await fetch('/api/comercial/pedidos-pendentes');
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro');
-    lista.innerHTML = renderPendentesMeus(d.meus || []);
+    // Vendedor ve so os pedidos dele. Admin ve site + sem_atribuicao
+    // (nunca as duas coisas juntas na pratica).
+    lista.innerHTML = renderPendentesMeus(d.meus || []) + renderPendentesSite(d.site || []);
     if (semAtr) semAtr.innerHTML = renderSemAtribuicao(d.sem_atribuicao || []);
   } catch (e) {
     lista.innerHTML = '<div style="color:var(--red);font-size:12px;padding:8px 0">Erro ao carregar: ' + pbEsc(e.message) + '</div>';
   }
+}
+
+function renderPendentesSite(pendentes) {
+  if (!pendentes.length) return '';
+  const rows = pendentes.map(p => {
+    const empLbl = p.empresa === 'calibre' ? 'Calibre' : 'Pro Hunters';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;background:var(--black3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;flex-wrap:wrap">' +
+      '<div style="flex:1;min-width:200px">' +
+        '<div style="font-size:11px;color:var(--gray4);font-weight:700;letter-spacing:.3px">' + pbEsc(empLbl.toUpperCase()) + ' · #' + pbEsc(p.numero) + '</div>' +
+        '<div style="font-size:14px;font-weight:600;color:var(--white);margin:2px 0">' + pbEsc(p.cliente_nome || '—') + '</div>' +
+        '<div style="font-size:11px;color:var(--gray4)">Faturado em ' + pbEsc((p.data_faturamento || '').slice(0,10)) + ' · Vendedor Bling: ' + pbEsc(p.vendedor_bling_nome || '(sem vendedor)') + '</div>' +
+      '</div>' +
+      '<div style="font-size:18px;font-weight:700;color:var(--green);white-space:nowrap">' + fmtBRLNum(p.valor) + '</div>' +
+      '<div style="display:flex;gap:6px">' +
+        '<button onclick="confirmarSiteBling(\'' + pbEsc(p.bling_pedido_id) + '\')" style="background:var(--green);color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">✓ Somar no site</button>' +
+        '<button onclick="rejeitarSiteBling(\'' + pbEsc(p.bling_pedido_id) + '\')" style="background:transparent;color:var(--gray4);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer">✗ Não é do site</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  return '<div style="font-size:12px;font-weight:700;color:#7a5cff;letter-spacing:.3px;margin:16px 0 10px">🌐 PEDIDOS DO SITE PRA CONFIRMAR — só admin/diretor (' + pendentes.length + ')</div>' + rows;
+}
+
+async function confirmarSiteBling(id) {
+  if (!confirm('Confirmar que essa venda é do site? O valor será somado ao faturamento do site.')) return;
+  try {
+    const r = await fetch('/api/comercial/pedidos-pendentes/confirmar-site', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bling_pedido_id: id }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    // Atualiza placar do site na tela
+    if (typeof loadData === 'function') {
+      try { await loadData(); if (typeof renderAll === 'function') renderAll(); } catch(e){}
+    }
+    await carregarPedidosPendentes();
+    alert('Somado no site: ' + fmtBRLNum(d.valor_somado_site));
+  } catch (e) { alert('Erro: ' + e.message); }
+}
+
+async function rejeitarSiteBling(id) {
+  if (!confirm('Marcar como "não é do site"? O pedido vai pra fila de atribuição.')) return;
+  try {
+    const r = await fetch('/api/comercial/pedidos-pendentes/rejeitar-site', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bling_pedido_id: id }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    await carregarPedidosPendentes();
+  } catch (e) { alert('Erro: ' + e.message); }
 }
 
 function renderPendentesMeus(pendentes) {
