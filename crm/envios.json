@@ -864,7 +864,7 @@
     ],
     "total_pedido": 11073.15,
     "observacoes": null,
-    "status": "aberto",
+    "status": "pronto_coleta",
     "confirmado_bling": true,
     "volumes_qtd": 2,
     "volumes_por": "dickmann",
@@ -886,9 +886,9 @@
     "assinatura_ok": true,
     "assinatura_por": "auxiliar",
     "assinatura_em": "2026-09-28T14:47:15.152Z",
-    "liberacao_ok": false,
-    "liberacao_por": null,
-    "liberacao_em": null,
+    "liberacao_ok": true,
+    "liberacao_por": "auxiliar",
+    "liberacao_em": "2026-09-29T17:27:37.212Z",
     "anexo_p_ok": false,
     "anexo_p_por": null,
     "anexo_p_em": null,
@@ -997,12 +997,20 @@
         "acao": "campo_alterado",
         "campo": "transporte_valor",
         "novo": 715
+      },
+      {
+        "ts": "2026-09-29T17:27:37.212Z",
+        "por": "auxiliar",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "liberacao_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-09-24T18:54:19.398Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-09-28T17:32:22.951Z",
-    "atualizado_por": "gerencia"
+    "atualizado_em": "2026-09-29T17:27:37.212Z",
+    "atualizado_por": "auxiliar"
   },
   "env_prohunters_27089": {
     "id": "env_prohunters_27089",
