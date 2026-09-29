@@ -3205,25 +3205,42 @@ module.exports = async (req, res) => {
     }
     try {
       const pedidosBlingComercial = require('../lib/pedidosBlingComercial');
-      // Ultimos 30 dias
+      // Data de corte — pedidos ANTERIORES sao ignorados. Setada na 1a execucao.
+      const dataCorte = await pedidosBlingComercial.getDataCorte();
+      // Janela do Bling: 7 dias (pra pegar tudo recente sem forçar timeout).
+      // O filtro de data_corte no backend garante que so entram >= data_corte.
       const hoje = new Date();
-      const dataInicial = new Date(hoje.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      const dataInicialBling = new Date(hoje.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
       const empresas = ['prohunters', 'calibre'];
       const pedidosDetectados = [];
       const erros = [];
-      // Debug: conta situacoes encontradas por empresa pra ajudar diagnosticar
-      // quando "nao vem nada" — geralmente e porque o filtro de situacao esta
-      // deixando de fora o status do pedido.
-      const situacoesVistas = {}; // empresa → { nomeSituacao: contagem }
-      const totaisBrutos = {}; // empresa → total de pedidos vindos do Bling
-      // Palavras que indicam "venda ja aconteceu" — filtra pedidos em andamento.
-      // Nomes comuns no Bling: "Faturado", "Atendido", "Emitido", "Concluido",
-      // "Finalizado", "Em separacao pra envio" (algumas contas usam), "Enviado".
-      // Se voce quer incluir mais, edita esta lista.
+      const situacoesVistas = {}; // empresa → { situacao: contagem }
+      const totaisBrutos = {};
+      let sampleBruto = null; // guarda 1o pedido bruto pra debug
+      let filtradosPorData = 0; // pedidos com data anterior ao corte
+      // Ids de situacao Bling v3 que indicam venda finalizada
+      // (podem variar por conta — se seu Bling usa outros, adiciona aqui):
+      // 9 = Atendido, 6 = Em aberto (nao conta), 12 = Cancelado (nao conta)
+      // 4 = Faturado (algumas contas), 15 = Enviado (algumas contas)
+      const IDS_FATURADO = [9, 4, 15];
       const PALAVRAS_FATURADO = ['faturad', 'atendid', 'emitid', 'concluid', 'finalizad', 'enviad'];
-      function eStatusFinalizado(situNome) {
-        const n = String(situNome || '').toLowerCase();
-        return PALAVRAS_FATURADO.some(p => n.includes(p));
+      // Descobre "situacao" de um pedido bruto em VARIOS lugares possiveis
+      // (Bling v3 mudou o formato ao longo do tempo). Retorna {id, nome, texto}.
+      function _extraiSituacao(bp) {
+        const s = bp.situacao || {};
+        return {
+          id: s.id || s.valor || bp.situacaoId || null,
+          nome: s.nome || s.descricao || s.label || null,
+          texto: s.nome || s.descricao || s.label || (s.id ? 'id:' + s.id : (s.valor ? 'valor:' + s.valor : '(sem situacao)')),
+        };
+      }
+      function eStatusFinalizado(situ) {
+        if (situ.id && IDS_FATURADO.includes(Number(situ.id))) return true;
+        if (situ.nome) {
+          const n = String(situ.nome).toLowerCase();
+          return PALAVRAS_FATURADO.some(p => n.includes(p));
+        }
+        return false;
       }
       for (const emp of empresas) {
         situacoesVistas[emp] = {};
@@ -3231,14 +3248,30 @@ module.exports = async (req, res) => {
         try {
           for (let pagina = 1; pagina <= 3; pagina++) {
             const resp = await blingApi.get('/pedidos/vendas',
-              { dataInicial, limite: 100, pagina }, emp);
+              { dataInicial: dataInicialBling, limite: 100, pagina }, emp);
             const lista = (resp && resp.data) || [];
             if (!lista.length) break;
             totaisBrutos[emp] += lista.length;
             for (const bp of lista) {
-              const situNome = String((bp.situacao && bp.situacao.nome) || '(sem situacao)');
-              situacoesVistas[emp][situNome] = (situacoesVistas[emp][situNome] || 0) + 1;
-              if (!eStatusFinalizado(situNome)) continue;
+              // Guarda 1o pedido bruto pra debug (so os campos principais, evita
+              // response gigante).
+              if (!sampleBruto) {
+                sampleBruto = {
+                  empresa: emp,
+                  id: bp.id, numero: bp.numero,
+                  data: bp.data, dataEmissao: bp.dataEmissao,
+                  situacao: bp.situacao, situacaoId: bp.situacaoId,
+                  total: bp.total,
+                  contato_nome: bp.contato && (bp.contato.nome || bp.contato.razao),
+                  keys: Object.keys(bp).slice(0, 30),
+                };
+              }
+              const situ = _extraiSituacao(bp);
+              situacoesVistas[emp][situ.texto] = (situacoesVistas[emp][situ.texto] || 0) + 1;
+              if (!eStatusFinalizado(situ)) continue;
+              // Filtro de data de corte — pedido antigo (antes do 1o uso do sistema) e ignorado
+              const dataPedido = String(bp.data || bp.dataEmissao || '').slice(0, 10);
+              if (dataPedido && dataPedido < dataCorte) { filtradosPorData++; continue; }
               let det;
               try {
                 const detResp = await blingApi.get('/pedidos/vendas/' + bp.id, null, emp);
@@ -3294,9 +3327,12 @@ module.exports = async (req, res) => {
         // que o filtro de status pulou tudo — a UI mostra pra decidir se
         // ampliamos a lista de PALAVRAS_FATURADO no backend.
         _debug: {
-          data_inicial: dataInicial,
+          data_corte: dataCorte,
+          data_inicial_bling: dataInicialBling,
           totais_brutos: totaisBrutos,
           situacoes_vistas: situacoesVistas,
+          filtrados_por_data_corte: filtradosPorData,
+          sample_bruto_1o_pedido: sampleBruto,
         },
       }));
     } catch (e) {
