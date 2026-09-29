@@ -2505,8 +2505,7 @@ async function verificarPedidosBling() {
     if (d.aguardando_atribuicao > 0) partes.push('Aguardando: ' + d.aguardando_atribuicao);
     if (d.ja_conhecidos > 0) partes.push('Já conhecidos: ' + d.ja_conhecidos);
     if (d.erros_bling && d.erros_bling.length) partes.push('Erros: ' + d.erros_bling.length);
-    // Se o Bling retornou pedidos brutos mas nada foi analisado, mostra as
-    // situações que apareceram (ajuda a decidir se o filtro está bloqueando).
+    // Debug quando nada foi analisado: mostra situacoes vistas + amostra bruta
     if (d.pedidos_analisados === 0 && d._debug) {
       var totalBruto = 0;
       Object.values(d._debug.totais_brutos || {}).forEach(function(n){ totalBruto += n; });
@@ -2516,10 +2515,19 @@ async function verificarPedidosBling() {
           var emp = entry[0], sits = entry[1];
           Object.entries(sits).forEach(function(s){ situFmt.push(emp + '/' + s[0] + ':' + s[1]); });
         });
-        partes.push('⚠ ' + totalBruto + ' pedidos no Bling desde ' + d._debug.data_inicial +
-          ', mas nenhum passou no filtro de status. Situações vistas: ' + situFmt.join(', ') +
-          '. Copia isso e me manda que ajusto o filtro.');
+        var msg = '⚠ ' + totalBruto + ' pedidos no Bling desde ' + d._debug.data_inicial_bling +
+          ' (data de corte: ' + d._debug.data_corte + ')';
+        if (d._debug.filtrados_por_data_corte > 0) msg += ' · ' + d._debug.filtrados_por_data_corte + ' descartados por serem anteriores à data de corte';
+        msg += '. Situações vistas: ' + situFmt.join(', ');
+        if (d._debug.sample_bruto_1o_pedido) {
+          msg += '. Amostra do 1º pedido bruto: ' + JSON.stringify(d._debug.sample_bruto_1o_pedido);
+        }
+        msg += '. Copia tudo e me manda pra eu ajustar.';
+        partes.push(msg);
       }
+    }
+    if (d.pedidos_analisados > 0 && d._debug && d._debug.filtrados_por_data_corte > 0) {
+      partes.push('Descartados por data (< ' + d._debug.data_corte + '): ' + d._debug.filtrados_por_data_corte);
     }
     status.textContent = partes.join(' · ');
     status.style.color = d.novos > 0 ? 'var(--green)' : (d.pedidos_analisados === 0 && d._debug ? '#f5a623' : 'var(--gray4)');
