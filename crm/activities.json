@@ -822,7 +822,7 @@
   "2092b389-dc34-4e00-9a38-6b4e1616f072": {
     "id": "2092b389-dc34-4e00-9a38-6b4e1616f072",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_303005c3d61fac14",
@@ -842,7 +842,10 @@
     "dono": "boschetto",
     "criado_em": "2026-09-25T15:07:04.692Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-09-25T15:07:04.692Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_em": "2026-09-29T13:05:48.958Z",
+    "atualizado_por": "boschetto",
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-09-29T13:05:48.958Z",
+    "concluida_por": "boschetto"
   }
 }
