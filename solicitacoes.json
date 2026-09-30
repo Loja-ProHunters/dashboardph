@@ -1,0 +1,27 @@
+{
+  "d39a071c-3710-45ea-ba98-14c57645a5e0": {
+    "id": "d39a071c-3710-45ea-ba98-14c57645a5e0",
+    "de": "gerencia",
+    "para": "dickmann",
+    "categoria": "Comercial",
+    "titulo": "Teste Bling",
+    "descricao": "Faz um pedido e coloca mais desconto do permitido, vai em salvar tira um print e me manda",
+    "prazo": "2026-09-30",
+    "status": "pendente",
+    "criado_em": "2026-09-30T14:08:27.937Z",
+    "executado_em": null,
+    "executado_por": null,
+    "aprovado_em": null,
+    "aprovado_por": null,
+    "rejeitado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_motivo": null,
+    "historico": [
+      {
+        "ts": "2026-09-30T14:08:27.937Z",
+        "acao": "criada",
+        "por": "gerencia"
+      }
+    ]
+  }
+}
