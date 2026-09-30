@@ -1636,9 +1636,9 @@
     "nf_numero": "031462",
     "nf_por": "auxiliar",
     "nf_em": "2026-09-29T18:02:40.845Z",
-    "gt_numero": null,
-    "gt_por": null,
-    "gt_em": null,
+    "gt_numero": "202656135994",
+    "gt_por": "auxiliar",
+    "gt_em": "2026-09-30T11:41:51.313Z",
     "assinatura_ok": false,
     "assinatura_por": null,
     "assinatura_em": null,
@@ -1713,11 +1713,19 @@
         "acao": "campo_alterado",
         "campo": "nf_numero",
         "novo": "031462"
+      },
+      {
+        "ts": "2026-09-30T11:41:51.313Z",
+        "por": "auxiliar",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "gt_numero",
+        "novo": "202656135994"
       }
     ],
     "criado_em": "2026-09-29T17:30:56.401Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-09-29T18:02:40.845Z",
+    "atualizado_em": "2026-09-30T11:41:51.313Z",
     "atualizado_por": "auxiliar"
   }
 }
