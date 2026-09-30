@@ -7,12 +7,12 @@
     "titulo": "Teste Bling",
     "descricao": "Faz um pedido e coloca mais desconto do permitido, vai em salvar tira um print e me manda",
     "prazo": "2026-09-30",
-    "status": "executada",
+    "status": "aprovada",
     "criado_em": "2026-09-30T14:08:27.937Z",
     "executado_em": "2026-09-30T14:11:06.149Z",
     "executado_por": "dickmann",
-    "aprovado_em": null,
-    "aprovado_por": null,
+    "aprovado_em": "2026-09-30T14:14:20.767Z",
+    "aprovado_por": "gerencia",
     "rejeitado_em": null,
     "rejeitado_por": null,
     "rejeitado_motivo": null,
@@ -26,6 +26,11 @@
         "ts": "2026-09-30T14:11:06.149Z",
         "acao": "executada",
         "por": "dickmann"
+      },
+      {
+        "ts": "2026-09-30T14:14:20.767Z",
+        "acao": "aprovada",
+        "por": "gerencia"
       }
     ]
   },
