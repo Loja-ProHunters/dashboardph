@@ -1668,7 +1668,7 @@
       "id": 15596572600,
       "nome": null
     },
-    "status": "aberto",
+    "status": "pronto_coleta",
     "confirmado_bling": true,
     "volumes_qtd": 1,
     "volumes_por": "dickmann",
@@ -1690,9 +1690,9 @@
     "assinatura_ok": true,
     "assinatura_por": "auxiliar",
     "assinatura_em": "2026-09-30T14:30:11.197Z",
-    "liberacao_ok": false,
-    "liberacao_por": null,
-    "liberacao_em": null,
+    "liberacao_ok": true,
+    "liberacao_por": "auxiliar",
+    "liberacao_em": "2026-09-30T14:30:16.090Z",
     "anexo_p_ok": true,
     "anexo_p_por": "auxiliar",
     "anexo_p_em": "2026-09-30T11:42:21.874Z",
@@ -1793,11 +1793,19 @@
         "acao": "campo_alterado",
         "campo": "assinatura_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-09-30T14:30:16.090Z",
+        "por": "auxiliar",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "liberacao_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-09-29T17:30:56.401Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-09-30T14:30:11.197Z",
+    "atualizado_em": "2026-09-30T14:30:16.090Z",
     "atualizado_por": "auxiliar"
   }
 }
