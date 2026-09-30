@@ -40,5 +40,25 @@
     "criado_por": "gerencia",
     "atualizado_em": "2026-09-24T18:46:35.171Z",
     "atualizado_por": "gerencia"
+  },
+  "rom_20260930_0003": {
+    "id": "rom_20260930_0003",
+    "numero": "0003",
+    "data": "2026-09-30",
+    "transportadora": "rpa",
+    "empresa_agrupada": "prohunters",
+    "envio_ids": [
+      "env_prohunters_26829"
+    ],
+    "total_volumes": 2,
+    "motorista_nome": null,
+    "motorista_cpf": null,
+    "motorista_placa": null,
+    "motorista_assinado_em": null,
+    "gerado_por": "auxiliar",
+    "criado_em": "2026-09-30T14:30:52.561Z",
+    "criado_por": "auxiliar",
+    "atualizado_em": "2026-09-30T14:30:52.562Z",
+    "atualizado_por": "auxiliar"
   }
 }
