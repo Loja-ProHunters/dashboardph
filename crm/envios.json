@@ -1224,9 +1224,9 @@
     "transporte_valor": 250,
     "transporte_por": "mathias",
     "transporte_em": "2026-09-29T15:20:38.067Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "031466",
+    "nf_por": "auxiliar",
+    "nf_em": "2026-09-30T13:33:10.065Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -1296,12 +1296,20 @@
         "acao": "campo_alterado",
         "campo": "transporte_valor",
         "novo": 250
+      },
+      {
+        "ts": "2026-09-30T13:33:10.065Z",
+        "por": "auxiliar",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "031466"
       }
     ],
     "criado_em": "2026-09-29T15:19:58.804Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-09-29T15:20:38.068Z",
-    "atualizado_por": "mathias"
+    "atualizado_em": "2026-09-30T13:33:10.066Z",
+    "atualizado_por": "auxiliar"
   },
   "env_prohunters_27091": {
     "id": "env_prohunters_27091",
