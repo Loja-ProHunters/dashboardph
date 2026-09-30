@@ -42,12 +42,12 @@
     "titulo": "Teste",
     "descricao": "teste pro nicobilico",
     "prazo": "2026-09-30",
-    "status": "executada",
+    "status": "aprovada",
     "criado_em": "2026-09-30T14:13:20.503Z",
     "executado_em": "2026-09-30T14:16:28.295Z",
     "executado_por": "nicolay",
-    "aprovado_em": null,
-    "aprovado_por": null,
+    "aprovado_em": "2026-09-30T14:19:31.407Z",
+    "aprovado_por": "dickmann",
     "rejeitado_em": null,
     "rejeitado_por": null,
     "rejeitado_motivo": null,
@@ -61,6 +61,11 @@
         "ts": "2026-09-30T14:16:28.295Z",
         "acao": "executada",
         "por": "nicolay"
+      },
+      {
+        "ts": "2026-09-30T14:19:31.407Z",
+        "acao": "aprovada",
+        "por": "dickmann"
       }
     ]
   }
