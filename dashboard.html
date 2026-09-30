@@ -324,6 +324,12 @@ tbody tr:hover td{background:var(--gl)}
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+<!-- Barra vermelha persistente de solicitacoes pendentes. Fica FIXA no topo
+     em todas as abas ate o usuario zerar as pendencias. Aparece so quando o
+     contador > 0. Clica → vai pra aba Solicitacoes. -->
+<div id="solic-barra-topo" onclick="goTab('solicitacoes', document.querySelector(&quot;.ni[onclick*=solicitacoes]&quot;))" style="display:none;position:sticky;top:0;left:0;right:0;z-index:1000;background:linear-gradient(90deg,#c81f1f,#e03030);color:#fff;padding:10px 20px;font-weight:700;font-size:14px;cursor:pointer;text-align:center;box-shadow:0 2px 8px rgba(224,48,48,.4);letter-spacing:.3px;animation:solicBarraPulso 2.5s ease-in-out infinite">
+  ⚠ Você tem <span id="solic-barra-num">0</span> solicitações pendentes → clique aqui pra resolver
+</div>
 <div class="hbg" onclick="toggleSB()"><span></span><span></span><span></span></div>
 <div class="ovl" id="ovl" onclick="toggleSB()"></div>
 <div class="app">
@@ -338,6 +344,7 @@ tbody tr:hover td{background:var(--gl)}
   <div class="sb-grp">
     <div class="sb-lbl">Principal</div>
     <button class="ni on" onclick="goTab('inicio',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M3 9.6 12 3l9 6.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.7 20v-5.6h4.6V20"/></svg></span><span class="ni-tx">Início</span></button>
+    <button class="ni" onclick="goTab('solicitacoes',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h6M8 17h4"/></svg></span><span class="ni-tx">Solicitações</span><span class="badge" id="solic-badge-menu" style="display:none;background:#e03030;color:#fff">0</span></button>
   </div>
   <div class="sb-grp">
     <div class="sb-lbl">Operacional</div>
@@ -3652,6 +3659,55 @@ window.chpwdSubmit = function(){
       <div id="crm-view"></div>
     </div>
 
+    <!-- SOLICITAÇÕES — hub de tarefas entre colaboradores -->
+    <div class="tab" id="tab-solicitacoes">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="solic-tabs">
+          <button class="solic-tab-btn on" onclick="solicMudarTipo('recebidas')" data-tipo="recebidas">📥 Recebidas <span class="solic-badge" id="solic-count-recebidas" style="display:none">0</span></button>
+          <button class="solic-tab-btn" onclick="solicMudarTipo('enviadas')" data-tipo="enviadas">📤 Enviadas <span class="solic-badge" id="solic-count-enviadas" style="display:none">0</span></button>
+        </div>
+        <button class="solic-btn-nova" onclick="solicAbrirModal()">+ Nova solicitação</button>
+      </div>
+      <div id="solic-lista" style="min-height:200px"><div style="color:#7b8285;padding:20px;text-align:center">Carregando…</div></div>
+    </div>
+
+    <!-- Modal de nova solicitacao -->
+    <div id="solic-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;padding:20px;overflow:auto" onclick="if(event.target===this)solicFecharModal()">
+      <div style="max-width:520px;margin:5vh auto;background:#fff;border-radius:12px;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,.3)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h3 style="margin:0;font-size:18px">Nova solicitação</h3>
+          <button onclick="solicFecharModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#666;padding:0;line-height:1">×</button>
+        </div>
+        <div style="display:grid;gap:12px">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#333">Para quem *</label>
+            <select id="solic-para" style="width:100%;padding:9px 10px;border:1px solid #ccd0d3;border-radius:6px;font-size:14px"><option value="">Carregando…</option></select>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#333">Categoria *</label>
+            <select id="solic-categoria" style="width:100%;padding:9px 10px;border:1px solid #ccd0d3;border-radius:6px;font-size:14px"><option value="">Escolher…</option></select>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#333">Título *</label>
+            <input id="solic-titulo" type="text" maxlength="200" style="width:100%;padding:9px 10px;border:1px solid #ccd0d3;border-radius:6px;font-size:14px" placeholder="Ex: Enviar relatório de agosto"/>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#333">Descrição</label>
+            <textarea id="solic-descricao" rows="4" maxlength="4000" style="width:100%;padding:9px 10px;border:1px solid #ccd0d3;border-radius:6px;font-size:14px;resize:vertical;font-family:inherit" placeholder="Detalhes, contexto, links…"></textarea>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#333">Prazo</label>
+            <input id="solic-prazo" type="date" style="width:100%;padding:9px 10px;border:1px solid #ccd0d3;border-radius:6px;font-size:14px"/>
+          </div>
+          <div id="solic-modal-erro" style="color:#c81f1f;font-size:12.5px;min-height:16px"></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+            <button onclick="solicFecharModal()" style="background:#f2f5f2;color:#333;border:1px solid #ccd0d3;border-radius:6px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer">Cancelar</button>
+            <button onclick="solicEnviar()" id="solic-btn-enviar" style="background:#1db954;color:#fff;border:none;border-radius:6px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer">Enviar solicitação</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </main>
 </div>
@@ -3671,7 +3727,8 @@ var tabMeta = {
   linhaeditorial: ['Linha Editorial','Calendário e estratégia de conteúdo'],
   usuarios:  ['Usuários','Gerenciar acessos e senhas'],
   admin:     ['Base de Conhecimento','Gerenciar o que a IA sabe'],
-  crm:       ['CRM','Contas, leads, oportunidades, atividades e pedidos']
+  crm:       ['CRM','Contas, leads, oportunidades, atividades e pedidos'],
+  solicitacoes: ['Solicitações','Hub de tarefas entre colaboradores']
 };
 
 // Mapa de permissoes por role — quais abas cada perfil ve.
@@ -3679,11 +3736,11 @@ var tabMeta = {
 // Se uma aba nao aparece na lista, e escondida no menu.
 // 'admin' e 'diretor' veem tudo (nao entram no mapa; passam pela else).
 var TABS_POR_ROLE = {
-  vendas:     ['inicio','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
-  auxiliar:   ['inicio','contratos','contatos','comercial','crm'],
-  financeiro: ['inicio','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
-  marketing:  ['inicio','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
-  comex:      ['inicio','comercial','ia'],
+  vendas:     ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
+  auxiliar:   ['inicio','solicitacoes','contratos','contatos','comercial','crm'],
+  financeiro: ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
+  marketing:  ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
+  comex:      ['inicio','solicitacoes','comercial','ia'],
 };
 
 function _abasVisiveis() {
@@ -3791,6 +3848,7 @@ function goTab(id, el) {
   if (id === 'parceiros') parceirosInit();
   if (id === 'usuarios') usuariosInit();
   if (id === 'crm') crmInit();
+  if (id === 'solicitacoes') solicInit();
 }
 
 function toggleSB() {
@@ -7949,6 +8007,249 @@ function crmFmtDateTime(s){
   catch(e){ return s; }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   SOLICITAÇÕES — hub de tarefas entre colaboradores
+═══════════════════════════════════════════════════════════════ */
+window.SOLIC = { tipo: 'recebidas', usuarios: [], carregado: false };
+
+function solicEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function solicFmtData(s){
+  if(!s) return '—';
+  try { return new Date(s).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+  catch(e){ return s; }
+}
+function solicNomeUsuario(login){
+  var u = (window.SOLIC.usuarios || []).find(function(x){ return x.login === login; });
+  return u ? u.nome : login;
+}
+function solicStatusChip(st){
+  var cores = { pendente:'#e5b800', executada:'#1a8bff', aprovada:'#1db954', rejeitada:'#e03030' };
+  var labels = { pendente:'⏳ Pendente', executada:'📤 Executada — aguarda aprovação', aprovada:'✓ Aprovada', rejeitada:'✗ Rejeitada' };
+  var c = cores[st] || '#666', l = labels[st] || st;
+  return '<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:'+c+'22;color:'+c+'">'+l+'</span>';
+}
+
+async function solicInit(){
+  if (!window.SOLIC.carregado) {
+    try {
+      var [rU, rC] = await Promise.all([
+        fetch('/api/solicitacoes/usuarios').then(function(r){return r.json();}),
+        fetch('/api/solicitacoes/categorias').then(function(r){return r.json();})
+      ]);
+      window.SOLIC.usuarios = rU.usuarios || [];
+      window.SOLIC.categorias = rC.categorias || [];
+      window.SOLIC.carregado = true;
+    } catch(e){ console.error('Falha ao carregar solicitacoes', e); }
+  }
+  solicCarregar();
+}
+
+function solicMudarTipo(tipo){
+  window.SOLIC.tipo = tipo;
+  document.querySelectorAll('.solic-tab-btn').forEach(function(b){
+    b.classList.toggle('on', b.dataset.tipo === tipo);
+  });
+  solicCarregar();
+}
+
+async function solicCarregar(){
+  var lista = document.getElementById('solic-lista');
+  if (!lista) return;
+  lista.innerHTML = '<div style="color:#7b8285;padding:20px;text-align:center">Carregando…</div>';
+  try {
+    var r = await fetch('/api/solicitacoes?tipo=' + window.SOLIC.tipo);
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    solicRenderLista(d.solicitacoes || []);
+    // Atualiza badges dos tabs (chama recebidas+enviadas em paralelo pra atualizar contadores)
+    solicAtualizarBadges();
+  } catch(e){
+    lista.innerHTML = '<div style="color:#c81f1f;padding:20px">Erro: '+solicEsc(e.message)+'</div>';
+  }
+}
+
+async function solicAtualizarBadges(){
+  try {
+    var [rR, rE] = await Promise.all([
+      fetch('/api/solicitacoes?tipo=recebidas').then(function(r){return r.json();}),
+      fetch('/api/solicitacoes?tipo=enviadas').then(function(r){return r.json();})
+    ]);
+    var nR = (rR.solicitacoes || []).filter(function(s){ return s.status === 'pendente' || s.status === 'executada'; }).length;
+    var nE = (rE.solicitacoes || []).filter(function(s){ return s.status === 'pendente' || s.status === 'executada'; }).length;
+    var bR = document.getElementById('solic-count-recebidas');
+    var bE = document.getElementById('solic-count-enviadas');
+    if (bR) { bR.textContent = nR; bR.style.display = nR > 0 ? 'inline-block' : 'none'; }
+    if (bE) { bE.textContent = nE; bE.style.display = nE > 0 ? 'inline-block' : 'none'; }
+  } catch(e){}
+}
+
+function solicRenderLista(items){
+  var lista = document.getElementById('solic-lista');
+  if (!items.length) {
+    lista.innerHTML = '<div style="padding:40px;text-align:center;color:#7b8285;background:#fafbfa;border:1px dashed #e0e2e0;border-radius:10px"><div style="font-size:36px;margin-bottom:8px">📭</div>Nenhuma solicitação '+(window.SOLIC.tipo === 'recebidas' ? 'recebida' : 'enviada')+' ainda</div>';
+    return;
+  }
+  var eh = window.SOLIC.tipo === 'recebidas';
+  lista.innerHTML = items.map(function(s){
+    var outro = eh ? s.de : s.para;
+    var label = eh ? 'De' : 'Para';
+    var acoes = solicAcoes(s, eh);
+    var prazoTxt = s.prazo ? ' · Prazo: ' + s.prazo : '';
+    var motivoRej = s.rejeitado_motivo ? '<div style="margin-top:8px;padding:8px 10px;background:#fff3f3;border-left:3px solid #e03030;border-radius:4px;font-size:12.5px"><b style="color:#c81f1f">Rejeitada:</b> '+solicEsc(s.rejeitado_motivo)+'</div>' : '';
+    return '<div style="padding:14px;background:#fff;border:1px solid #e0e2e0;border-radius:10px;margin-bottom:10px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;flex-wrap:wrap">'+
+        '<div style="flex:1;min-width:180px">'+
+          '<div style="font-size:11px;color:#7b8285;font-weight:700;letter-spacing:.3px;text-transform:uppercase">'+solicEsc(s.categoria)+' · '+label+' '+solicEsc(solicNomeUsuario(outro))+prazoTxt+'</div>'+
+          '<div style="font-size:15px;font-weight:600;margin:3px 0 0;color:#1a1d1a">'+solicEsc(s.titulo)+'</div>'+
+        '</div>'+
+        '<div>'+solicStatusChip(s.status)+'</div>'+
+      '</div>'+
+      (s.descricao ? '<div style="font-size:13px;color:#333;white-space:pre-wrap;margin:6px 0 8px">'+solicEsc(s.descricao)+'</div>' : '')+
+      motivoRej +
+      '<div style="font-size:11px;color:#9a9d99;margin-top:6px">Criada em '+solicFmtData(s.criado_em)+
+        (s.executado_em ? ' · Executada em '+solicFmtData(s.executado_em) : '')+
+        (s.aprovado_em ? ' · Aprovada em '+solicFmtData(s.aprovado_em) : '')+
+      '</div>'+
+      (acoes ? '<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">'+acoes+'</div>' : '')+
+    '</div>';
+  }).join('');
+}
+
+function solicAcoes(s, ehRecebida){
+  // Recebida + pendente → destinatario executa
+  if (ehRecebida && s.status === 'pendente') {
+    return '<button onclick="solicExecutar(\''+s.id+'\')" style="background:#1db954;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">✓ Marcar como executada</button>';
+  }
+  // Enviada + executada → criador aprova ou rejeita
+  if (!ehRecebida && s.status === 'executada') {
+    return '<button onclick="solicAprovar(\''+s.id+'\')" style="background:#1db954;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">✓ Aprovar</button>'+
+           '<button onclick="solicRejeitar(\''+s.id+'\')" style="background:transparent;color:#c81f1f;border:1px solid #e03030;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">✗ Rejeitar</button>';
+  }
+  return '';
+}
+
+async function solicExecutar(id){
+  if (!confirm('Marcar essa solicitação como executada? O criador vai receber pra aprovar.')) return;
+  try {
+    var r = await fetch('/api/solicitacoes/'+id+'/executar', {method:'POST'});
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    solicCarregar();
+    solicAtualizarContador();
+  } catch(e){ alert('Erro: '+e.message); }
+}
+async function solicAprovar(id){
+  if (!confirm('Aprovar a execução? A solicitação será finalizada.')) return;
+  try {
+    var r = await fetch('/api/solicitacoes/'+id+'/aprovar', {method:'POST'});
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    solicCarregar();
+  } catch(e){ alert('Erro: '+e.message); }
+}
+async function solicRejeitar(id){
+  var motivo = prompt('Por que você está rejeitando? (opcional, mas ajuda a pessoa a entender o que ajustar)');
+  if (motivo === null) return; // cancelou
+  try {
+    var r = await fetch('/api/solicitacoes/'+id+'/rejeitar', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({motivo: motivo})
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    solicCarregar();
+  } catch(e){ alert('Erro: '+e.message); }
+}
+
+// Modal de nova
+function solicAbrirModal(){
+  if (!window.SOLIC.carregado) { alert('Aguarde carregar…'); return; }
+  var selP = document.getElementById('solic-para');
+  var meu = (typeof USER_USUARIO !== 'undefined') ? USER_USUARIO : '';
+  selP.innerHTML = '<option value="">Escolher…</option>' + (window.SOLIC.usuarios || [])
+    .filter(function(u){ return u.login !== meu; })
+    .map(function(u){ return '<option value="'+solicEsc(u.login)+'">'+solicEsc(u.nome)+' ('+solicEsc(u.role)+')</option>'; }).join('');
+  var selC = document.getElementById('solic-categoria');
+  selC.innerHTML = '<option value="">Escolher…</option>' + (window.SOLIC.categorias || [])
+    .map(function(c){ return '<option value="'+solicEsc(c)+'">'+solicEsc(c)+'</option>'; }).join('');
+  document.getElementById('solic-titulo').value = '';
+  document.getElementById('solic-descricao').value = '';
+  document.getElementById('solic-prazo').value = '';
+  document.getElementById('solic-modal-erro').textContent = '';
+  document.getElementById('solic-modal').style.display = 'block';
+}
+function solicFecharModal(){ document.getElementById('solic-modal').style.display = 'none'; }
+
+async function solicEnviar(){
+  var erro = document.getElementById('solic-modal-erro');
+  var btn = document.getElementById('solic-btn-enviar');
+  erro.textContent = '';
+  var payload = {
+    para: document.getElementById('solic-para').value,
+    categoria: document.getElementById('solic-categoria').value,
+    titulo: document.getElementById('solic-titulo').value.trim(),
+    descricao: document.getElementById('solic-descricao').value.trim(),
+    prazo: document.getElementById('solic-prazo').value || null,
+  };
+  if (!payload.para) { erro.textContent = 'Escolha o destinatário.'; return; }
+  if (!payload.categoria) { erro.textContent = 'Escolha a categoria.'; return; }
+  if (!payload.titulo) { erro.textContent = 'Título obrigatório.'; return; }
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  try {
+    var r = await fetch('/api/solicitacoes', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    solicFecharModal();
+    solicMudarTipo('enviadas');
+  } catch(e){ erro.textContent = 'Erro: ' + e.message; }
+  finally { btn.disabled = false; btn.textContent = 'Enviar solicitação'; }
+}
+
+// ── CONTADOR + BARRA VERMELHA PERSISTENTE ─────────────────────
+// Poll a cada 45s pra atualizar o contador. Aparece quando > 0.
+// Some quando zerar.
+async function solicAtualizarContador(){
+  try {
+    var r = await fetch('/api/solicitacoes/contador');
+    var d = await r.json();
+    if (!r.ok) return;
+    var n = d.pendentes || 0;
+    var barra = document.getElementById('solic-barra-topo');
+    var num = document.getElementById('solic-barra-num');
+    var badge = document.getElementById('solic-badge-menu');
+    if (barra) barra.style.display = n > 0 ? 'block' : 'none';
+    if (num) num.textContent = n;
+    if (badge) {
+      badge.textContent = n;
+      badge.style.display = n > 0 ? 'inline-block' : 'none';
+    }
+    // Toast no PRIMEIRO check (só uma vez por sessão) se houver pendentes
+    if (n > 0 && !window._solicToastMostrado) {
+      window._solicToastMostrado = true;
+      solicMostrarToast(n);
+    }
+  } catch(e){}
+}
+function solicMostrarToast(n){
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#c81f1f;color:#fff;padding:14px 20px;border-radius:8px;font-weight:600;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.3);z-index:3000;cursor:pointer;max-width:340px;animation:slideInRight .3s ease';
+  toast.innerHTML = '⚠ Você tem <b>'+n+'</b> solicitações pendentes.<div style="font-size:11.5px;opacity:.9;margin-top:2px">Clique aqui pra ver.</div>';
+  toast.onclick = function(){
+    goTab('solicitacoes', document.querySelector('.ni[onclick*=solicitacoes]'));
+    toast.remove();
+  };
+  document.body.appendChild(toast);
+  setTimeout(function(){ if (toast.parentNode) toast.style.opacity = '0'; setTimeout(function(){ toast.remove(); }, 500); }, 8000);
+}
+// Inicia polling do contador ao carregar
+window.addEventListener('load', function(){
+  setTimeout(solicAtualizarContador, 1500);
+  setInterval(solicAtualizarContador, 45000);
+});
+
 </script>
 
 <style>
@@ -8519,6 +8820,35 @@ function crmFmtDateTime(s){
 }
 .ctrl-rom-item:hover { border-color: var(--gm); }
 .ctrl-rom-item input { margin-top: 2px; accent-color: var(--gd); }
+
+/* ═════ SOLICITAÇÕES — hub de tarefas + barra vermelha ═════ */
+@keyframes solicBarraPulso {
+  0%, 100% { box-shadow: 0 2px 8px rgba(224,48,48,.4); }
+  50% { box-shadow: 0 2px 20px rgba(224,48,48,.8); }
+}
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.solic-tab-btn {
+  background: #f2f5f2; color: #333; border: 1px solid #ccd0d3;
+  border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 6px;
+}
+.solic-tab-btn:hover { border-color: #999; }
+.solic-tab-btn.on { background: #1db954; color: #fff; border-color: #1db954; }
+.solic-btn-nova {
+  background: linear-gradient(135deg, #1db954, #17a049); color: #fff;
+  border: none; border-radius: 8px; padding: 10px 18px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(29,185,84,.3); transition: transform .12s;
+}
+.solic-btn-nova:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(29,185,84,.4); }
+.solic-badge {
+  display: inline-block; background: #e03030; color: #fff;
+  padding: 2px 7px; border-radius: 10px; font-size: 11px; font-weight: 700;
+  margin-left: 4px;
+}
 </style>
 
 
