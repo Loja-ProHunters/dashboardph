@@ -1649,10 +1649,10 @@
     "anexo_p_por": "auxiliar",
     "anexo_p_em": "2026-09-30T11:42:21.874Z",
     "anexo_p_ip": "200.34.247.72",
-    "gru_ok": false,
-    "gru_por": null,
-    "gru_em": null,
-    "gru_ip": null,
+    "gru_ok": true,
+    "gru_por": "auxiliar",
+    "gru_em": "2026-09-30T11:42:26.881Z",
+    "gru_ip": "200.34.247.72",
     "anexo_p_link": null,
     "gru_link": null,
     "comprovante_pix_link": null,
@@ -1729,11 +1729,19 @@
         "acao": "campo_alterado",
         "campo": "anexo_p_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-09-30T11:42:26.881Z",
+        "por": "auxiliar",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "gru_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-09-29T17:30:56.401Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-09-30T11:42:21.874Z",
+    "atualizado_em": "2026-09-30T11:42:26.882Z",
     "atualizado_por": "auxiliar"
   }
 }
