@@ -622,6 +622,40 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // POST /api/solicitacoes/:id/mensagem body: { texto } — envia msg no chat
+  if (req.method === 'POST' && url.match(/^\/api\/solicitacoes\/[a-zA-Z0-9_\-]+\/mensagem$/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { texto } = JSON.parse(body || '{}');
+      const s = await solic.enviarMensagem(id, sess.usuario, texto);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, mensagens: s.mensagens || [] }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/solicitacoes/:id/mensagens — pra polling leve do chat aberto
+  if (req.method === 'GET' && url.match(/^\/api\/solicitacoes\/[a-zA-Z0-9_\-]+\/mensagens$/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const id = url.split('/')[3];
+      const msgs = await solic.getMensagens(id, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ mensagens: msgs, total: msgs.length }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // POST /api/solicitacoes/:id/rejeitar body: { motivo }
   if (req.method === 'POST' && url.match(/^\/api\/solicitacoes\/[a-zA-Z0-9_\-]+\/rejeitar$/)) {
     const sess = getSession(req);
