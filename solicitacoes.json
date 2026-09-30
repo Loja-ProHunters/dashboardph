@@ -68,5 +68,31 @@
         "por": "dickmann"
       }
     ]
+  },
+  "9ea10496-66be-40d3-b4d2-5ad9d4b704a6": {
+    "id": "9ea10496-66be-40d3-b4d2-5ad9d4b704a6",
+    "de": "dickmann",
+    "para": "nicolay",
+    "categoria": "Financeiro",
+    "titulo": "Estornar cobrança PIX",
+    "descricao": "Estornar o valor de R$706,00 do pedido 27114, referente ao pagamento errado do cliente, para que eu possa cobrar corretamente",
+    "prazo": "2026-09-30",
+    "status": "pendente",
+    "criado_em": "2026-09-30T20:22:14.633Z",
+    "executado_em": null,
+    "executado_por": null,
+    "aprovado_em": null,
+    "aprovado_por": null,
+    "rejeitado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_motivo": null,
+    "mensagens": [],
+    "historico": [
+      {
+        "ts": "2026-09-30T20:22:14.633Z",
+        "acao": "criada",
+        "por": "dickmann"
+      }
+    ]
   }
 }
