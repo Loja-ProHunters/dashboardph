@@ -1645,10 +1645,10 @@
     "liberacao_ok": false,
     "liberacao_por": null,
     "liberacao_em": null,
-    "anexo_p_ok": false,
-    "anexo_p_por": null,
-    "anexo_p_em": null,
-    "anexo_p_ip": null,
+    "anexo_p_ok": true,
+    "anexo_p_por": "auxiliar",
+    "anexo_p_em": "2026-09-30T11:42:21.874Z",
+    "anexo_p_ip": "200.34.247.72",
     "gru_ok": false,
     "gru_por": null,
     "gru_em": null,
@@ -1721,11 +1721,19 @@
         "acao": "campo_alterado",
         "campo": "gt_numero",
         "novo": "202656135994"
+      },
+      {
+        "ts": "2026-09-30T11:42:21.874Z",
+        "por": "auxiliar",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "anexo_p_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-09-29T17:30:56.401Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-09-30T11:41:51.313Z",
+    "atualizado_em": "2026-09-30T11:42:21.874Z",
     "atualizado_por": "auxiliar"
   }
 }
