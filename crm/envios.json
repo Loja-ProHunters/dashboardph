@@ -1349,7 +1349,7 @@
       "id": 15596572600,
       "nome": null
     },
-    "status": "aberto",
+    "status": "pronto_coleta",
     "confirmado_bling": true,
     "volumes_qtd": 1,
     "volumes_por": "dickmann",
@@ -1371,9 +1371,9 @@
     "assinatura_ok": true,
     "assinatura_por": "auxiliar",
     "assinatura_em": "2026-09-30T14:30:01.997Z",
-    "liberacao_ok": false,
-    "liberacao_por": null,
-    "liberacao_em": null,
+    "liberacao_ok": true,
+    "liberacao_por": "auxiliar",
+    "liberacao_em": "2026-09-30T14:30:05.813Z",
     "anexo_p_ok": false,
     "anexo_p_por": null,
     "anexo_p_em": null,
@@ -1458,11 +1458,19 @@
         "acao": "campo_alterado",
         "campo": "assinatura_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-09-30T14:30:05.813Z",
+        "por": "auxiliar",
+        "ip": "200.34.247.72",
+        "acao": "campo_alterado",
+        "campo": "liberacao_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-09-29T17:25:50.927Z",
     "criado_por": "auxiliar",
-    "atualizado_em": "2026-09-30T14:30:01.997Z",
+    "atualizado_em": "2026-09-30T14:30:05.813Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_27097": {
