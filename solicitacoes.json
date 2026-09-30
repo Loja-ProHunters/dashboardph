@@ -28,5 +28,30 @@
         "por": "dickmann"
       }
     ]
+  },
+  "e5611631-0c8f-42b6-ad11-e1eb2a35dc68": {
+    "id": "e5611631-0c8f-42b6-ad11-e1eb2a35dc68",
+    "de": "dickmann",
+    "para": "nicolay",
+    "categoria": "Financeiro",
+    "titulo": "Teste",
+    "descricao": "teste pro nicobilico",
+    "prazo": "2026-09-30",
+    "status": "pendente",
+    "criado_em": "2026-09-30T14:13:20.503Z",
+    "executado_em": null,
+    "executado_por": null,
+    "aprovado_em": null,
+    "aprovado_por": null,
+    "rejeitado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_motivo": null,
+    "historico": [
+      {
+        "ts": "2026-09-30T14:13:20.503Z",
+        "acao": "criada",
+        "por": "dickmann"
+      }
+    ]
   }
 }
