@@ -8116,16 +8116,111 @@ function solicRenderLista(items){
 }
 
 function solicAcoes(s, ehRecebida){
+  var btns = [];
+  // Botao de chat — sempre presente (todo mundo pode conversar sobre a tarefa)
+  var nMsg = (s.mensagens || []).length;
+  var badgeMsg = nMsg > 0 ? ' <span style="background:#1a8bff;color:#fff;padding:1px 7px;border-radius:10px;font-size:10.5px;font-weight:700;margin-left:2px">'+nMsg+'</span>' : '';
+  btns.push('<button onclick="solicToggleChat(\''+s.id+'\')" id="btn-chat-'+s.id+'" style="background:#f2f5f2;color:#333;border:1px solid #ccd0d3;border-radius:6px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer">💬 Chat'+badgeMsg+'</button>');
   // Recebida + pendente → destinatario executa
   if (ehRecebida && s.status === 'pendente') {
-    return '<button onclick="solicExecutar(\''+s.id+'\')" style="background:#1db954;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">✓ Marcar como executada</button>';
+    btns.push('<button onclick="solicExecutar(\''+s.id+'\')" style="background:#1db954;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">✓ Marcar como executada</button>');
   }
   // Enviada + executada → criador aprova ou rejeita
   if (!ehRecebida && s.status === 'executada') {
-    return '<button onclick="solicAprovar(\''+s.id+'\')" style="background:#1db954;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">✓ Aprovar</button>'+
-           '<button onclick="solicRejeitar(\''+s.id+'\')" style="background:transparent;color:#c81f1f;border:1px solid #e03030;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">✗ Rejeitar</button>';
+    btns.push('<button onclick="solicAprovar(\''+s.id+'\')" style="background:#1db954;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">✓ Aprovar</button>');
+    btns.push('<button onclick="solicRejeitar(\''+s.id+'\')" style="background:transparent;color:#c81f1f;border:1px solid #e03030;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">✗ Rejeitar</button>');
   }
-  return '';
+  // Painel de chat oculto por padrao — expande ao clicar em Chat
+  btns.push('<div id="chat-'+s.id+'" style="display:none;width:100%;margin-top:10px"></div>');
+  return btns.join(' ');
+}
+
+// ── CHAT DENTRO DA TAREFA ─────────────────────────────────────
+if (!window.SOLIC_CHAT) window.SOLIC_CHAT = { abertos: {}, polls: {} };
+
+function solicToggleChat(id){
+  var box = document.getElementById('chat-'+id);
+  if (!box) return;
+  if (window.SOLIC_CHAT.abertos[id]) {
+    // Fecha
+    box.style.display = 'none';
+    box.innerHTML = '';
+    delete window.SOLIC_CHAT.abertos[id];
+    if (window.SOLIC_CHAT.polls[id]) { clearInterval(window.SOLIC_CHAT.polls[id]); delete window.SOLIC_CHAT.polls[id]; }
+    return;
+  }
+  // Abre
+  window.SOLIC_CHAT.abertos[id] = true;
+  box.style.display = 'block';
+  box.innerHTML =
+    '<div style="border:1px solid #d0d5d0;border-radius:8px;background:#fafbfa;overflow:hidden">'+
+      '<div id="chat-msgs-'+id+'" style="max-height:260px;overflow-y:auto;padding:12px;background:#fff"><div style="color:#7b8285;font-size:12px;text-align:center;padding:14px">Carregando…</div></div>'+
+      '<div style="display:flex;gap:6px;padding:8px;background:#f2f5f2;border-top:1px solid #d0d5d0">'+
+        '<input id="chat-input-'+id+'" type="text" maxlength="2000" placeholder="Escreva uma mensagem… (Enter pra enviar)" style="flex:1;padding:8px 10px;border:1px solid #ccd0d3;border-radius:6px;font-size:13px;font-family:inherit" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();solicEnviarMsg(\''+id+'\')}"/>'+
+        '<button onclick="solicEnviarMsg(\''+id+'\')" style="background:#1a8bff;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer">Enviar</button>'+
+      '</div>'+
+    '</div>';
+  solicCarregarMsgs(id);
+  window.SOLIC_CHAT.polls[id] = setInterval(function(){ solicCarregarMsgs(id); }, 12000);
+}
+
+async function solicCarregarMsgs(id){
+  try {
+    var r = await fetch('/api/solicitacoes/'+id+'/mensagens');
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    var msgs = d.mensagens || [];
+    var box = document.getElementById('chat-msgs-'+id);
+    if (!box) return;
+    var meu = (typeof USER_USUARIO !== 'undefined') ? USER_USUARIO : '';
+    if (!msgs.length) {
+      box.innerHTML = '<div style="color:#7b8285;font-size:12px;text-align:center;padding:14px">Ainda sem mensagens. Escreva a primeira!</div>';
+      return;
+    }
+    box.innerHTML = msgs.map(function(m){
+      var meu2 = m.de === meu;
+      var align = meu2 ? 'flex-end' : 'flex-start';
+      var bg = meu2 ? '#dcf5e6' : '#f0f2f5';
+      var cor = meu2 ? '#0a5c2a' : '#333';
+      return '<div style="display:flex;justify-content:'+align+';margin-bottom:8px">'+
+        '<div style="max-width:75%;background:'+bg+';color:'+cor+';padding:8px 12px;border-radius:12px">'+
+          '<div style="font-size:10.5px;font-weight:700;color:#666;margin-bottom:2px">'+solicEsc(solicNomeUsuario(m.de))+'</div>'+
+          '<div style="font-size:13px;white-space:pre-wrap;word-break:break-word">'+solicEsc(m.texto)+'</div>'+
+          '<div style="font-size:10px;color:#999;margin-top:3px;text-align:right">'+solicFmtData(m.ts)+'</div>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+    // Atualiza contador no botao Chat sem precisar recarregar a lista toda
+    var btn = document.getElementById('btn-chat-'+id);
+    if (btn) {
+      var badge = btn.querySelector('span');
+      if (badge) badge.textContent = msgs.length;
+      else if (msgs.length > 0) btn.innerHTML = '💬 Chat <span style="background:#1a8bff;color:#fff;padding:1px 7px;border-radius:10px;font-size:10.5px;font-weight:700;margin-left:2px">'+msgs.length+'</span>';
+    }
+  } catch(e){
+    var box = document.getElementById('chat-msgs-'+id);
+    if (box) box.innerHTML = '<div style="color:#c81f1f;font-size:12px;padding:14px">Erro: '+solicEsc(e.message)+'</div>';
+  }
+}
+
+async function solicEnviarMsg(id){
+  var input = document.getElementById('chat-input-'+id);
+  if (!input) return;
+  var texto = input.value.trim();
+  if (!texto) return;
+  input.disabled = true;
+  try {
+    var r = await fetch('/api/solicitacoes/'+id+'/mensagem', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({texto: texto})
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    input.value = '';
+    await solicCarregarMsgs(id);
+  } catch(e){ alert('Erro: '+e.message); }
+  finally { input.disabled = false; input.focus(); }
 }
 
 async function solicExecutar(id){
