@@ -508,6 +508,137 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // ═════════════════════════════════════════════════════════════
+  // SOLICITAÇÕES entre colaboradores (hub de tarefas do dashboard)
+  // Qualquer usuário logado pode criar, ver e responder. Fluxo:
+  //   pendente → executada (destinatário) → aprovada/rejeitada (criador)
+  // ═════════════════════════════════════════════════════════════
+  if (url === '/api/solicitacoes/categorias' && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    const solic = require('../lib/solicitacoes');
+    res.writeHead(200,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({ categorias: solic.CATEGORIAS }));
+    return;
+  }
+
+  // GET /api/solicitacoes/usuarios — lista de usuários pro select "para quem"
+  // (sem hash de senha). Retorna todos os ativos. Qualquer logado pode chamar.
+  if (url === '/api/solicitacoes/usuarios' && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const all = await getAllUsers();
+      const lista = Object.entries(all)
+        .filter(([k, v]) => v.ativo !== false)
+        .map(([k, v]) => ({ login: k, nome: v.nome || k, role: v.role || 'vendas' }))
+        .sort((a, b) => String(a.nome).localeCompare(String(b.nome)));
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ usuarios: lista }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/solicitacoes?tipo=recebidas|enviadas (default: recebidas)
+  if (url.startsWith('/api/solicitacoes') && req.method === 'GET' && !url.match(/\/(contador|categorias|usuarios)(\?|$)/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const tipo = u.searchParams.get('tipo') || 'recebidas';
+      const solic = require('../lib/solicitacoes');
+      const list = await solic.listar({ login: sess.usuario, tipo });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ solicitacoes: list, total: list.length }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/solicitacoes/contador — quantas pendentes pra mim (pra sino/barra)
+  if (url === '/api/solicitacoes/contador' && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const n = await solic.contarPendentes(sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ pendentes: n }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/solicitacoes — cria nova
+  if (url === '/api/solicitacoes' && req.method === 'POST') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const body = await readBody(req);
+      const { para, categoria, titulo, descricao, prazo } = JSON.parse(body || '{}');
+      const nova = await solic.criar({
+        de: sess.usuario, para, categoria, titulo, descricao, prazo,
+      });
+      res.writeHead(201,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, solicitacao: nova }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/solicitacoes/:id/executar — destinatario marca como feita
+  if (req.method === 'POST' && url.match(/^\/api\/solicitacoes\/[a-zA-Z0-9_\-]+\/executar$/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const id = url.split('/')[3];
+      const s = await solic.executar(id, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, solicitacao: s }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/solicitacoes/:id/aprovar — criador aprova a execucao
+  if (req.method === 'POST' && url.match(/^\/api\/solicitacoes\/[a-zA-Z0-9_\-]+\/aprovar$/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const id = url.split('/')[3];
+      const s = await solic.aprovar(id, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, solicitacao: s }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/solicitacoes/:id/rejeitar body: { motivo }
+  if (req.method === 'POST' && url.match(/^\/api\/solicitacoes\/[a-zA-Z0-9_\-]+\/rejeitar$/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { motivo } = JSON.parse(body || '{}');
+      const s = await solic.rejeitar(id, sess.usuario, motivo);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, solicitacao: s }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // GET /api/access-log — últimos eventos (só gerência)
   if (req.method === 'GET' && url === '/api/access-log') {
     const sess = getSession(req);
