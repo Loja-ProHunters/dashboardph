@@ -680,7 +680,7 @@
   "d047e370-87c7-4b25-9baa-25cd2f208661": {
     "id": "d047e370-87c7-4b25-9baa-25cd2f208661",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_044944f4034dd83c",
@@ -703,8 +703,11 @@
     "dono": "boschetto",
     "criado_em": "2026-09-25T15:07:04.692Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-09-25T15:07:04.692Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_em": "2026-09-30T11:12:30.969Z",
+    "atualizado_por": "boschetto",
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-09-30T11:12:30.969Z",
+    "concluida_por": "boschetto"
   },
   "d6d56dd6-5e81-4e6b-b9d0-7259e0c0d039": {
     "id": "d6d56dd6-5e81-4e6b-b9d0-7259e0c0d039",
