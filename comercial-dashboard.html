@@ -1521,8 +1521,10 @@ function calcScore(s) {
  (Math.min(100, s.tarefas) * 1);
  const maxScore = 100 * (3 + 1 + 1);
  const base = Math.round((score / maxScore) * 100);
- // Penalidade pesada: cada advertência reduz 15 pontos do score
- const penalidade = (s.advertencias || 0) * 15;
+ // Penalidade: cada advertência reduz 5 pontos do score (era 15 antes, mas
+ // derrubava vendedor com faturamento alto pra baixo de colega com faturamento
+ // MUITO menor. 5 pts ainda pune sem virar o ranking).
+ const penalidade = (s.advertencias || 0) * 5;
  return Math.max(0, base - penalidade);
 }
 
