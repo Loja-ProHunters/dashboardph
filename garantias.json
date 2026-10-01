@@ -5158,5 +5158,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "5e95d818-a146-4059-9968-ebd7078a345e": {
+    "id": "5e95d818-a146-4059-9968-ebd7078a345e",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "THAIS RIBEIRO DE ALMEIDA",
+      "cpf_cnpj": "299.126.218-40",
+      "whatsapp": "+5517991226200",
+      "email": "thaizalmeida@gmail.com",
+      "cidade": "São José do Rio Preto",
+      "uf": "SP",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030756",
+      "data_compra": "2026-07-17",
+      "data_recebimento": "2026-07-20",
+      "nome_produto": "Lanterna Manual Fenis E CP 1600 LUMENS",
+      "marca": "Fenix",
+      "modelo": "E-CP",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Não funciona. Não liga. Não carrega",
+      "data_percebido_problema": "2026-07-20",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Não liga. Não carrega. Não funciona.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "1784676175190701627503901937389.jpg",
+          "url": "https://storage.tally.so/private/1784676175190701627503901937389.jpg?id=g1kQDM&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Imcxa1FETSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.xqx8jFlcbAJxPB8GYodfO_m10jabUFcvOsqMn-inOp4&signature=c473104ed8b2818a487abbcb04f2e2c56614b162047c47677d1c61d0b5ddcd2e",
+          "mimeType": "image/jpeg",
+          "size": 2988040
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-07-20",
+      "data_percebido_problema": "2026-07-20",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-01T20:21:51.261Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:21:51.261Z",
+    "atualizado_em": "2026-10-01T20:21:51.261Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:21:51.261Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
