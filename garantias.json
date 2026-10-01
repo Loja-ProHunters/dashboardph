@@ -4413,5 +4413,123 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "653cccba-417e-4978-98f4-443941a56013": {
+    "id": "653cccba-417e-4978-98f4-443941a56013",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "JUNIOR DA COSTA MOREIRA",
+      "cpf_cnpj": "61087610249",
+      "whatsapp": "+5568999744064",
+      "email": "moreira_junior@hotmail.com",
+      "cidade": "XAPURI",
+      "uf": "AC",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030599",
+      "data_compra": "2026-06-23",
+      "data_recebimento": "2026-07-03",
+      "nome_produto": "RED DOT",
+      "marca": "VECTOR OPTICS",
+      "modelo": "CENTURION",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "O botão liga/desliga parou de funcionar.\nAo utilizar o produto, percebi que o mesmo não estava ligando, abri o compartimento da bateria, instalei uma nova, então percebi que a LUZ VERMELHA estava funcionando, mas o botão de ajuste (+) de intensidade da luz não estava funcionando, tal botão é o mesmo liga/desliga. O botão de ajuste (-) está funcionando perfeitamente.",
+      "data_percebido_problema": "2026-08-14",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "O produto apresentou defeito após o inicio do uso.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "1WhatsApp Image 2026-08-18 at 15.46.45.jpeg",
+          "url": "https://storage.tally.so/private/1WhatsApp-Image-2026-08-18-at-15.46.45.jpeg?id=0gROB6&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBnUk9CNiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.s5XlQ-6mogf9olyiACs0XDJI0qsoMmHMcWDZs_Sp_wg&signature=710aea85e5d559e38a7ac0b6fd60673a1269b650d15d81d5c4c71a00a12782ab",
+          "mimeType": "image/jpeg",
+          "size": 75119
+        },
+        {
+          "tipo": "foto",
+          "nome": "2WhatsApp Image 2026-08-18 at 15.46.45.jpeg",
+          "url": "https://storage.tally.so/private/2WhatsApp-Image-2026-08-18-at-15.46.45.jpeg?id=OeMG48&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ik9lTUc0OCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.9_JhTFkXK63Z6YLmoQPk0d5KRVsA7HVbJDCuahD4yow&signature=1bf9b5930a529e88a854b349b17c6a592fe93da5d7c03ccf765465639a5dafab",
+          "mimeType": "image/jpeg",
+          "size": 83965
+        },
+        {
+          "tipo": "foto",
+          "nome": "3WhatsApp Image 2026-08-18 at 15.46.46.jpeg",
+          "url": "https://storage.tally.so/private/3WhatsApp-Image-2026-08-18-at-15.46.46.jpeg?id=PWJO1b&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlBXSk8xYiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.XYGpRWfI9OhlR8v-l2C2BVvxJ47uFkns4F2icWa15sM&signature=955281d63c3e113aa0f132bb39c4d03cb0356c879ee1bc7688cbd3516f34ce0a",
+          "mimeType": "image/jpeg",
+          "size": 97476
+        },
+        {
+          "tipo": "foto",
+          "nome": "WhatsApp Image 2026-08-18 at 15.46.45.jpeg",
+          "url": "https://storage.tally.so/private/WhatsApp-Image-2026-08-18-at-15.46.45.jpeg?id=4DVrJO&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjREVnJKTyIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.7jnaRbaPTXpmQze3yUXpmovzCasSzZ7UOgGrN5A-aAY&signature=c37a1ca70a35f334eb764a249b4566d53978afc6c98b903b6ccd2cee85a9a317",
+          "mimeType": "image/jpeg",
+          "size": 93567
+        },
+        {
+          "tipo": "video",
+          "nome": "WhatsApp Video 2026-08-18 at 15.46.45.mp4",
+          "url": "https://storage.tally.so/private/WhatsApp-Video-2026-08-18-at-15.46.45.mp4?id=gx6Gqd&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Imd4NkdxZCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.l_t0IBUSh33FqhIuqIT-T4PhVwAG2fuL4AJDYzJRWo8&signature=74db2c0bb443478c73c0cd8b8029ac7bccfd88727193992deb5f1ccbc27ccd5f",
+          "mimeType": "video/mp4",
+          "size": 6172969
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-07-03",
+      "data_percebido_problema": "2026-08-14",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-01T20:21:38.526Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:21:38.526Z",
+    "atualizado_em": "2026-10-01T20:21:38.526Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:21:38.526Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
