@@ -4205,5 +4205,123 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "68411d88-afce-4a7c-b9db-17668084b93c": {
+    "id": "68411d88-afce-4a7c-b9db-17668084b93c",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "DELEGACIA DE INVESTIGAÇÕES GERAIS DE JAÚ",
+      "cpf_cnpj": "04236548/0064-70",
+      "whatsapp": "+5514997051901",
+      "email": "dig.jau@policiacivil.sp.gov.br",
+      "cidade": "Jaú",
+      "uf": "SP",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "029636",
+      "data_compra": "2025-12-22",
+      "data_recebimento": "2026-02-17",
+      "nome_produto": "Lanterna Tatica",
+      "marca": "Fenix",
+      "modelo": "TK20R V2.0",
+      "numero_serie": "8FZEK401692",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "PRODUTO NÃO REALIZA RECARGA, NÃO SENDO POSSÍVEL SABER SE O PROBLEMA ESTÁ NA LANTERNA, OU NO PLUG DO CARREGADOR. AO ACIONAR O CARREGAMENTO A LUZ VERMELHA IMEDIATAMENTE COMEÇA A PISCAR, NÃO REALIZANDO A RECARGA DA BATERIA.",
+      "data_percebido_problema": "2026-08-19",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "O MOTIVO DA TROCA SERIA POR RAZÃO DE GARANTIA E POR RAZÃO DO PRODUTO NÃO ESTAR FUNCIONANDO ADEQUADAMENTE COMO DEVERIA, NÃO SENDO POSSÍVEL SABER SE O PROBLEMA ESTÁ NO LOCAL DO CARREGAMENTO OU NA PRÓPRIA LANTERNA.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "IMAGEM 01 (1).jpeg",
+          "url": "https://storage.tally.so/private/IMAGEM-01-1-.jpeg?id=YXalVN&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IllYYWxWTiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.FjrFRXK1CZuRineEVlHTPCH0WspxbyiLD_x0VvGyLDA&signature=25a9206c4557c61073461c6a810f7fe68b97c06aa00e5c72f25cf8914211e911",
+          "mimeType": "image/jpeg",
+          "size": 134988
+        },
+        {
+          "tipo": "foto",
+          "nome": "IMAGEM 01 (2).jpeg",
+          "url": "https://storage.tally.so/private/IMAGEM-01-2-.jpeg?id=GalAXe&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkdhbEFYZSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.rmDdV4h37BfVWVHAp8oJNXICdm0_3lBT6IWDmnSW7xw&signature=19e545f9adcc691585356f3977500b0cbdde5248171a9ba9f3aae367d7a65121",
+          "mimeType": "image/jpeg",
+          "size": 75222
+        },
+        {
+          "tipo": "foto",
+          "nome": "IMAGEM 01 (3).jpeg",
+          "url": "https://storage.tally.so/private/IMAGEM-01-3-.jpeg?id=jXPA5Q&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImpYUEE1USIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.reb4-Jkajs4Ja-xZLPA6pzfwh2n8-NSgR5AshP6aIUQ&signature=0af1c5aa6995cf99712c5aa2af46ca47df09b4e2918eebf39bf810d97e49f340",
+          "mimeType": "image/jpeg",
+          "size": 83241
+        },
+        {
+          "tipo": "foto",
+          "nome": "IMAGEM 01 (4).jpeg",
+          "url": "https://storage.tally.so/private/IMAGEM-01-4-.jpeg?id=oYGLKO&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im9ZR0xLTyIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.EjGABAv4wo32gBhPtwhMaF_23i6Q-XqlHlpPoH98MJQ&signature=0a3e7ec1889d1b1fb97c5b72fd37f1a5a84c4f77a32c44c8c6f891d79b18bde6",
+          "mimeType": "image/jpeg",
+          "size": 67120
+        },
+        {
+          "tipo": "video",
+          "nome": "VÍDEO LANTERNA.mp4",
+          "url": "https://storage.tally.so/private/VIDEO-LANTERNA.mp4?id=xEY54v&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InhFWTU0diIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.4CtM9PAVXoevmilMdrCrdBgzgRMMfLoXaqZP7I_trK0&signature=c434681c4744c0494a1c9b88496abaf97a07a4b01e782274d750623f3164b882",
+          "mimeType": "video/mp4",
+          "size": 2958577
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-02-17",
+      "data_percebido_problema": "2026-08-19",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-01T20:21:36.101Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:21:36.101Z",
+    "atualizado_em": "2026-10-01T20:21:36.101Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:21:36.101Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
