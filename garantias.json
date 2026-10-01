@@ -2893,5 +2893,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "6cfee2b7-89d4-4990-afe0-696934af3489": {
+    "id": "6cfee2b7-89d4-4990-afe0-696934af3489",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Everaldo ramos",
+      "cpf_cnpj": "00580750973",
+      "whatsapp": "+5547991163392",
+      "email": "everaldo.ramos@yahoo.com.br",
+      "cidade": "Joinville",
+      "uf": "SC",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030518",
+      "data_compra": "2026-06-05",
+      "data_recebimento": "2026-06-08",
+      "nome_produto": "Red dot vector opctics frenzy",
+      "marca": "Vector",
+      "modelo": "Frenzy scrd-43",
+      "numero_serie": "Na",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Quando recebi já veio usada e eu notifiquei a loja sobre( veio com marcas de uso em ambos parafusos ).  O problema que ela acende e apaga sozinha de tempos em tempos é tbm quando é feito a regulagem. Obs: pilha nova",
+      "data_percebido_problema": "2026-06-20",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Produto recebido veio aberto e com marca de uso em ambos parafusos, no mesmo dia fiz contato com a loja e falei com o Enzo.  No primeiro uso ela acende e apaga sozinha. Na mesma loja tbm comprei um colimador que não da mira com a Red dot.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "266DF77A-D2C6-4582-A67B-10739ED8341E.jpeg",
+          "url": "https://storage.tally.so/private/266DF77A-D2C6-4582-A67B-10739ED8341E.jpeg?id=KgXqE8&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IktnWHFFOCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.rzv228bADPMC_PUvhSzvd1MvxI0ACKEkhBV9zIIymxo&signature=fa4c4359883c55fa9371219bbf355834ca52f54decaff7ddc1632c271a08503f",
+          "mimeType": "image/jpeg",
+          "size": 945865
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-06-08",
+      "data_percebido_problema": "2026-06-20",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "improcedente_prazo",
+      "justificativa_sistema": "Fora do prazo decadencial do CDC Art. 26 (90 dias para produto durável). Já se passaram 115 dias do recebimento (vício aparente).",
+      "score_confianca": "alta",
+      "calculado_em": "2026-10-01T20:05:22.928Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:05:22.928Z",
+    "atualizado_em": "2026-10-01T20:05:22.928Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:05:22.928Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
