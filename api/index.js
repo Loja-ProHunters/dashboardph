@@ -710,6 +710,23 @@ module.exports = async (req, res) => {
   //        → imprime etiqueta A4 pra colar na caixa
   // ═════════════════════════════════════════════════════════════
 
+  // GET /api/garantias/sync-tally/debug — mostra shape bruto da API Tally
+  // pra entender quais campos chegam e ajustar parser. Admin/diretor/auxiliar.
+  if (url.startsWith('/api/garantias/sync-tally/debug')) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const sync = require('../lib/garantiasTallySync');
+      const info = await sync.debugPrimeiraSubmissao({});
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(info, null, 2));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error: e.message}));
+    }
+    return;
+  }
+
   // GET/POST /api/garantias/sync-tally — polling da API Tally pro cron.
   // Protegido pelo CRON_SECRET ja existente (header Authorization: Bearer XXX
   // OU query ?secret=XXX). Pode ser chamado tambem manualmente por admin logado
