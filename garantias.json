@@ -493,5 +493,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "5c5de91f-a21b-4e12-9df5-7a3ae6be7a70": {
+    "id": "5c5de91f-a21b-4e12-9df5-7a3ae6be7a70",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Lucas Martins Mendes",
+      "cpf_cnpj": "05946738950",
+      "whatsapp": "+5548999320473",
+      "email": "lucasm2@hotmail.com",
+      "cidade": "Florianópolis",
+      "uf": "SC",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031273",
+      "data_compra": "2026-09-08",
+      "data_recebimento": "2026-09-11",
+      "nome_produto": "Lanterna para arma",
+      "marca": "Olight",
+      "modelo": "Pl mini 2 Valkyrie",
+      "numero_serie": "L90730834",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Comprei com vocês uma lanterna Olight PL-Mini 2 Valkyrie e estou tendo um problema com a bateria.\n\nApós realizar a carga completa, indicada pelo carregador com a luz verde, a lanterna permanece sem utilização, mas perde a carga em menos de dois dias.",
+      "data_percebido_problema": "2026-09-15",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "Problema na bateria",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "image.jpg",
+          "url": "https://storage.tally.so/private/image.jpg?id=va1vGl&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InZhMXZHbCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.9QkyJi3qXVSzhQK34fhB1wh1nttBJxHPIhe6o7fAurs&signature=7e9ebeee96e08994ab7248e6b60e215146e23d31fb97aeb1894440e6d46f6078",
+          "mimeType": "image/jpeg",
+          "size": 1889635
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-09-11",
+      "data_percebido_problema": "2026-09-15",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-01T20:04:54.915Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:04:54.915Z",
+    "atualizado_em": "2026-10-01T20:04:54.915Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:04:54.915Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
