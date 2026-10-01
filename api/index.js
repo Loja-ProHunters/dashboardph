@@ -710,6 +710,23 @@ module.exports = async (req, res) => {
   //        → imprime etiqueta A4 pra colar na caixa
   // ═════════════════════════════════════════════════════════════
 
+  // POST /api/garantias/deduplicar — remove garantias duplicadas vindas do Tally.
+  // Admin/diretor/auxiliar. Chamar UMA VEZ pra limpar o acumulado.
+  if (url === '/api/garantias/deduplicar' && req.method === 'POST') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const r = await gar.removerDuplicatasTally();
+      console.log('[DEDUP GARANTIAS] ' + JSON.stringify(r));
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // GET /api/garantias/sync-tally/debug — mostra shape bruto da API Tally
   // pra entender quais campos chegam e ajustar parser. Admin/diretor/auxiliar.
   if (url.startsWith('/api/garantias/sync-tally/debug')) {
