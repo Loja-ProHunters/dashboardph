@@ -3163,5 +3163,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "a4e46e1e-7885-41b0-918b-49c008915e69": {
+    "id": "a4e46e1e-7885-41b0-918b-49c008915e69",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Higor Fernandes de Oliveira",
+      "cpf_cnpj": "09061884900",
+      "whatsapp": "+5545999322930",
+      "email": "higor_feroliveira@hotmail.com",
+      "cidade": "Guarapuava",
+      "uf": "PR",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030522",
+      "data_compra": "2026-06-08",
+      "data_recebimento": "2026-06-13",
+      "nome_produto": "Lanterna Olight Baldr Mini preta",
+      "marca": "Olight",
+      "modelo": "Baldr Mini",
+      "numero_serie": "L41302731",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Produto enviado foi errado, comprei o modelo Baldr Mini preta, com laser verde e me enviaram o modelo Baldr RL mini",
+      "data_percebido_problema": "2026-06-15",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Produto enviado foi errado, comprei o modelo Baldr Mini preta, com laser verde e me enviaram o modelo Baldr RL mini, solicito a troca pelo modelo CORRETO",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "WhatsApp Image 2026-06-15 at 10.04.06.jpeg",
+          "url": "https://storage.tally.so/private/WhatsApp-Image-2026-06-15-at-10.04.06.jpeg?id=1xOozg&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjF4T296ZyIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.wo7k2LhcImROUwKULP60Oj2M2Ye6o8Ir2yAX4SCIBhQ&signature=dafbc7687014aace12c60cdbc8332143fa7edb735f75cb5dd0cff0fb5a1891a0",
+          "mimeType": "image/jpeg",
+          "size": 132595
+        }
+      ]
+    },
+    "preferencia_cliente": "troca",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-06-13",
+      "data_percebido_problema": "2026-06-15",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "troca",
+      "sugestao_sistema": "improcedente_prazo",
+      "justificativa_sistema": "Fora do prazo decadencial do CDC Art. 26 (90 dias para produto durável). Já se passaram 110 dias do recebimento (vício aparente).",
+      "score_confianca": "alta",
+      "calculado_em": "2026-10-01T20:05:27.475Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:05:27.475Z",
+    "atualizado_em": "2026-10-01T20:05:27.475Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:05:27.475Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
