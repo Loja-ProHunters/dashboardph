@@ -9120,12 +9120,32 @@ window.GAR = (function(){
   };
 
   async function init(){
-    if (state.inicializado) { recarregar(); return; }
+    if (state.inicializado) { recarregar(); _syncTallySilencioso(); return; }
     state.inicializado = true;
+    // Dispara sync Tally em background ANTES de carregar a lista — se vieram
+    // garantias novas do form, aparecem já na primeira carga. Não bloqueia:
+    // se der erro ou demorar, carrega a lista do que já tem salvo.
+    _syncTallySilencioso();
     await recarregar();
     atualizarContador();
-    // Poll leve a cada 60s pro contador
     setInterval(atualizarContador, 60000);
+  }
+
+  // Chama /api/garantias/sync-tally em background. Se vier garantias novas,
+  // recarrega a lista. Erros silenciados (não aparecem alert) — o endpoint
+  // só funciona pra admin/diretor, usuário auxiliar vê 401 e ignoramos.
+  async function _syncTallySilencioso(){
+    try {
+      var r = await fetch('/api/garantias/sync-tally');
+      if (!r.ok) return;
+      var d = await r.json();
+      if (d.processadas && d.processadas > 0) {
+        console.log('[GAR] Sync Tally pegou ' + d.processadas + ' garantia(s) nova(s)');
+        // Recarrega lista pra mostrar as novas
+        recarregar();
+        atualizarContador();
+      }
+    } catch(_) { /* sync best-effort, nao atrapalha a aba */ }
   }
 
   async function atualizarContador(){
