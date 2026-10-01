@@ -2083,5 +2083,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "8e5d3ff8-8cfa-4db1-820f-ffc0f583017d": {
+    "id": "8e5d3ff8-8cfa-4db1-820f-ffc0f583017d",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Gabriel Cardoso da Silva Souza",
+      "cpf_cnpj": "49687249854",
+      "whatsapp": "+5514998691767",
+      "email": "bielklabok93@gmail.com",
+      "cidade": "Bauru",
+      "uf": "SP",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030743",
+      "data_compra": "2026-07-15",
+      "data_recebimento": "2026-07-20",
+      "nome_produto": "Red Dot Frenzy 1x17x24 - Vector Optics",
+      "marca": "Vector Optics",
+      "modelo": "Frenzy 1x17x24",
+      "numero_serie": "070036621052",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Preciso de um Red Dot Micro, este modelo não é compatível com meu equipamento",
+      "data_percebido_problema": "2026-07-20",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "Preciso de um Red Dot Micro, este modelo não é compatível com meu equipamento",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "IMG_5314.jpeg",
+          "url": "https://storage.tally.so/private/IMG_5314.jpeg?id=5D8Xbv&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVEOFhidiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.x2HInLwyCMABSxJKUQKKkG22m6XkMaxZTU37EgdX-j8&signature=fba376eacfe8a72c856f06dfe83b430b35e9833d5b7a515a486df83659f7bd75",
+          "mimeType": "image/jpeg",
+          "size": 4564118
+        }
+      ]
+    },
+    "preferencia_cliente": "restituicao",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-07-20",
+      "data_percebido_problema": "2026-07-20",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": true,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "restituicao",
+      "sugestao_sistema": "improcedente_prazo",
+      "justificativa_sistema": "Pedido de arrependimento em compra à distância, mas fora do prazo de 7 dias previsto no CDC Art. 49 (73 dias desde o recebimento).",
+      "score_confianca": "alta",
+      "calculado_em": "2026-10-01T20:05:13.547Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:05:13.547Z",
+    "atualizado_em": "2026-10-01T20:05:13.547Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:05:13.547Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
