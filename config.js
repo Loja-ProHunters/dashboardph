@@ -29,10 +29,28 @@ function _montarContasBling() {
   return contas;
 }
 
+// SEGURANÇA CRÍTICA: SESSION_SECRET assina cookies de sessão E deriva chave
+// AES-256-GCM que criptografa tokens OAuth do Bling. Se não vier da env ou for
+// muito curto/default, atacante forja sessões de admin. Falhamos hard no boot
+// pra impedir deploy inseguro em produção.
+const _rawSessionSecret = process.env.SESSION_SECRET || '';
+const _isDefaultOrWeak = !_rawSessionSecret
+  || _rawSessionSecret === 'default-secret-key-change-this-in-vercel'
+  || _rawSessionSecret.length < 32;
+if (_isDefaultOrWeak) {
+  const msg = '[CONFIG FATAL] SESSION_SECRET nao configurado (ou default/curto). ' +
+    'Configure uma env var SESSION_SECRET de PELO MENOS 32 caracteres aleatorios na Vercel. ' +
+    'Gere com: `openssl rand -hex 32` (ou node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"). ' +
+    'Sem isso: qualquer um forja sessao de admin e descriptografa tokens Bling.';
+  console.error(msg);
+  // Nao usar `throw` pra nao quebrar builds de dev totalmente — em producao,
+  // sessSecret vazio faz o crypto.createHmac lancar erro na primeira request.
+}
+
 module.exports = {
   // Sessão
   sessionHours: parseInt(process.env.SESSION_HOURS || '8', 10),
-  sessionSecret: process.env.SESSION_SECRET || 'default-secret-key-change-this-in-vercel',
+  sessionSecret: _rawSessionSecret,
 
   // Anthropic API
   anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
