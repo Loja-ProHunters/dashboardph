@@ -1633,5 +1633,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "fb6b2ac0-e2e3-49e0-911c-db4b71d15276": {
+    "id": "fb6b2ac0-e2e3-49e0-911c-db4b71d15276",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Gabriel Miranda",
+      "cpf_cnpj": "83485317004",
+      "whatsapp": "+5553999490387",
+      "email": "gabrieldosreis.miranda@gmail.com",
+      "cidade": "Dom Pedrito",
+      "uf": "RS",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "027598",
+      "data_compra": "2024-08-06",
+      "data_recebimento": "2024-08-13",
+      "nome_produto": "Lanterna de Cabeca",
+      "marca": "Fênix",
+      "modelo": "HM 71R",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Derretimento da lente do Led",
+      "data_percebido_problema": "2026-07-07",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "Apenas efetuar o reparo, o produto é de excelente qualidade",
+      "uploads": [
+        {
+          "tipo": "video",
+          "nome": "B65F4707-993A-4C8E-AD8E-1328909901C9.mov",
+          "url": "https://storage.tally.so/private/B65F4707-993A-4C8E-AD8E-1328909901C9.mov?id=R6oqVj&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlI2b3FWaiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.0VyJhMocTQW0Gw3k0BeyyRPIj59k6CeWieDy_FYT_e8&signature=7fb13202895c19a43cc8bb7b10d0e7d7975dee09155c4440a5a0cd9a324fd0d9",
+          "mimeType": "video/quicktime",
+          "size": 6850844
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2024-08-13",
+      "data_percebido_problema": "2026-07-07",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-01T20:05:08.575Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:05:08.575Z",
+    "atualizado_em": "2026-10-01T20:05:08.575Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:05:08.575Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
