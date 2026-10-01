@@ -1996,7 +1996,14 @@ function renderPodium() {
  const bFalta = (b.faltas || 0) > 0 ? 1 : 0;
  if (aFalta !== bFalta) return aFalta - bFalta;
  if (b.score !== a.score) return b.score - a.score;
- // Empate: o campeão vigente (vencedor do mês passado) defende a coroa
+ // DESEMPATE 1: quem faturou MAIS fica a frente. Isso resolve o cenario
+ // do inicio do mes em que todos tem Score igual (etiqueta+tarefas dominam
+ // a formula enquanto o faturamento ainda e pequeno). Sem isso, R$ 398 vs
+ // R$ 0 nao movia o ranking porque a diferenca normalizada era desprezivel.
+ const fatA = Number(a.fat) || 0;
+ const fatB = Number(b.fat) || 0;
+ if (fatA !== fatB) return fatB - fatA;
+ // DESEMPATE 2: o campeao vigente (vencedor do mes passado) defende a coroa
  if (lastChampion) {
  if (a.name === lastChampion) return -1;
  if (b.name === lastChampion) return 1;
