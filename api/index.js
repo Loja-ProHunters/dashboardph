@@ -721,11 +721,11 @@ module.exports = async (req, res) => {
       const bearer = auth.startsWith('Bearer ') ? auth.slice(7) : '';
       const tokenPassado = u.searchParams.get('secret') || bearer;
       const sess = getSession(req);
-      const isAdmin = sess && isAdminOrDiretor(sess);
+      const podeOperar = sess && canGerenciarGarantias(sess); // admin + diretor + auxiliar
       const tokenValido = config.cronSecret && tokenPassado === config.cronSecret;
-      if (!isAdmin && !tokenValido) {
+      if (!podeOperar && !tokenValido) {
         res.writeHead(401,{'Content-Type':'application/json'});
-        res.end(JSON.stringify({error:'Nao autorizado. Precisa de admin/diretor logado OU secret correto.'}));
+        res.end(JSON.stringify({error:'Nao autorizado. Precisa de admin/diretor/auxiliar logado OU secret correto.'}));
         return;
       }
       const sync = require('../lib/garantiasTallySync');
