@@ -77,10 +77,10 @@
     "titulo": "Estornar cobrança PIX",
     "descricao": "Estornar o valor de R$706,00 do pedido 27114, referente ao pagamento errado do cliente, para que eu possa cobrar corretamente",
     "prazo": "2026-09-30",
-    "status": "pendente",
+    "status": "executada",
     "criado_em": "2026-09-30T20:22:14.633Z",
-    "executado_em": null,
-    "executado_por": null,
+    "executado_em": "2026-10-01T18:08:45.675Z",
+    "executado_por": "nicolay",
     "aprovado_em": null,
     "aprovado_por": null,
     "rejeitado_em": null,
@@ -113,6 +113,11 @@
         "ts": "2026-09-30T20:22:14.633Z",
         "acao": "criada",
         "por": "dickmann"
+      },
+      {
+        "ts": "2026-10-01T18:08:45.675Z",
+        "acao": "executada",
+        "por": "nicolay"
       }
     ]
   },
