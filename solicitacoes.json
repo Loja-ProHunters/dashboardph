@@ -146,5 +146,31 @@
         "por": "marlon"
       }
     ]
+  },
+  "1bdc2082-101d-49a0-a067-3c1df103a359": {
+    "id": "1bdc2082-101d-49a0-a067-3c1df103a359",
+    "de": "dickmann",
+    "para": "gerencia",
+    "categoria": "Comercial",
+    "titulo": "Rango",
+    "descricao": "O, ve um rango la pros cria",
+    "prazo": "2026-10-01",
+    "status": "pendente",
+    "criado_em": "2026-10-01T18:24:35.611Z",
+    "executado_em": null,
+    "executado_por": null,
+    "aprovado_em": null,
+    "aprovado_por": null,
+    "rejeitado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_motivo": null,
+    "mensagens": [],
+    "historico": [
+      {
+        "ts": "2026-10-01T18:24:35.611Z",
+        "acao": "criada",
+        "por": "dickmann"
+      }
+    ]
   }
 }
