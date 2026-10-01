@@ -908,9 +908,9 @@
     "romaneio_id": "rom_20260930_0003",
     "romaneio_numero": "0003",
     "coletado_em": "2026-09-30T14:30:53.497Z",
-    "coletado_motorista": null,
-    "coletado_motorista_cpf": null,
-    "coletado_placa": null,
+    "coletado_motorista": "Evandro Kaiser",
+    "coletado_motorista_cpf": "46315041884",
+    "coletado_placa": "UDJ8D78",
     "historico": [
       {
         "ts": "2026-09-24T18:54:19.398Z",
@@ -1037,11 +1037,35 @@
         "acao": "campo_alterado",
         "campo": "status",
         "novo": "enviado"
+      },
+      {
+        "ts": "2026-10-01T15:12:49.331Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_motorista",
+        "novo": "Evandro Kaiser"
+      },
+      {
+        "ts": "2026-10-01T15:12:49.331Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_motorista_cpf",
+        "novo": "46315041884"
+      },
+      {
+        "ts": "2026-10-01T15:12:49.331Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_placa",
+        "novo": "UDJ8D78"
       }
     ],
     "criado_em": "2026-09-24T18:54:19.398Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-09-30T14:30:53.497Z",
+    "atualizado_em": "2026-10-01T15:12:49.331Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_27089": {
