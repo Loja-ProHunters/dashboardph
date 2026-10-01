@@ -30,3 +30,7 @@
     }
   ]
 }
+{
+  "path": "/api/garantias/sync-tally?secret=SEU_CRON_SECRET_AQUI",
+  "schedule": "*/5 * * * *"
+}
