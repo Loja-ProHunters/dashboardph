@@ -2263,5 +2263,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "c573c360-4cc0-4b41-8611-870a49b6506b": {
+    "id": "c573c360-4cc0-4b41-8611-870a49b6506b",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Breno Henrique Xavier de Moraes",
+      "cpf_cnpj": "09989955689",
+      "whatsapp": "+5531996224500",
+      "email": "brenohmoraes@gmail.com",
+      "cidade": "Belo Horizonte",
+      "uf": "MG",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030408",
+      "data_compra": "2026-05-26",
+      "data_recebimento": "2026-06-05",
+      "nome_produto": "Lanterna de cabeça",
+      "marca": "Fênix",
+      "modelo": "HM23",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "A lanterna não liga. Testei com a pilha que veio acompanhando e também com outra pilha. Identifiquei dias após receber, mas como eu viajei logo em seguida não abri o chamado antes pois não conseguiria fazer o despacho pelos correios antes",
+      "data_percebido_problema": "2026-06-08",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "A lanterna não liga. Testei com a pilha que veio acompanhando e também com outra pilha. Identifiquei dias após receber, mas como eu viajei logo em seguida não abri o chamado antes pois não conseguiria fazer o despacho pelos correios antes",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "IMG_7123.jpeg",
+          "url": "https://storage.tally.so/private/IMG_7123.jpeg?id=p1GE4b&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InAxR0U0YiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.bkZllbC6KsfJUGb2VDbd_YmT3HdnLUTuz3dEidzNfhk&signature=ad233b242be70baae6d514f78e45c8032b0f94a856b0cf7bd2d4808aedc39337",
+          "mimeType": "image/jpeg",
+          "size": 374058
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-06-05",
+      "data_percebido_problema": "2026-06-08",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "improcedente_prazo",
+      "justificativa_sistema": "Fora do prazo decadencial do CDC Art. 26 (90 dias para produto durável). Já se passaram 118 dias do recebimento (vício aparente).",
+      "score_confianca": "alta",
+      "calculado_em": "2026-10-01T20:05:15.699Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:05:15.699Z",
+    "atualizado_em": "2026-10-01T20:05:15.699Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:05:15.699Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
