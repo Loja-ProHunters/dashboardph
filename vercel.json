@@ -33,7 +33,7 @@
     },
     {
       "path": "/api/garantias/sync-tally",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 7 * * *"
     }
   ]
 }
