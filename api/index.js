@@ -542,7 +542,10 @@ module.exports = async (req, res) => {
   }
 
   // GET /api/solicitacoes?tipo=recebidas|enviadas (default: recebidas)
-  if (url.startsWith('/api/solicitacoes') && req.method === 'GET' && !url.match(/\/(contador|categorias|usuarios)(\?|$)/)) {
+  // Exclui tambem /mensagens — senao o handler generico captura o GET das
+  // mensagens de uma solicitacao especifica (bug: estava retornando a lista
+  // inteira de solicitacoes em vez do array de mensagens, chat ficava vazio).
+  if (url.startsWith('/api/solicitacoes') && req.method === 'GET' && !url.match(/\/(contador|categorias|usuarios|mensagens)(\?|$)/)) {
     const sess = getSession(req);
     if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
     try {
