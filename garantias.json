@@ -3073,5 +3073,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "b2902a24-cf43-4466-81ac-cf6fc73be796": {
+    "id": "b2902a24-cf43-4466-81ac-cf6fc73be796",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Thiago Rodrigues de Almeida",
+      "cpf_cnpj": "31760698806",
+      "whatsapp": "+5515988089474",
+      "email": "thiroal@gmail.com",
+      "cidade": "Tatui",
+      "uf": "SP",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030497",
+      "data_compra": "2026-06-02",
+      "data_recebimento": "2026-06-08",
+      "nome_produto": "Lanterna Fenix E35 V3.0 Preta 3000 Lumens Nº de série: 833EKV01736",
+      "marca": "Fenix",
+      "modelo": "Fenix E35 V3.0 Preta 3000 Lumens",
+      "numero_serie": "833EKV01736",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Devolução por arrependimento de apenas 1 dos itens adquiridos \n\nProduto na embalagem lacrada",
+      "data_percebido_problema": "2026-06-02",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Devolução por arrependimento de apenas 1 dos itens adquiridos \n\nProduto na embalagem lacrada",
+      "uploads": [
+        {
+          "tipo": "video",
+          "nome": "80324161465__91DC0D6E-CEB1-40E6-BEEE-378899EE942C.MOV",
+          "url": "https://storage.tally.so/private/80324161465__91DC0D6E-CEB1-40E6-BEEE-378899EE942C.MOV?id=gppQjO&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImdwcFFqTyIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.RayeEilxJ5cjZ85HdCK4U2wAJVimO22NqiHC55A87O0&signature=a863f6d58bc80398e756d47010e4a428a03b8e75e7b1a989023ffd18986c7646",
+          "mimeType": "video/quicktime",
+          "size": 3299185
+        }
+      ]
+    },
+    "preferencia_cliente": "restituicao",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-06-08",
+      "data_percebido_problema": "2026-06-02",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": true,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "restituicao",
+      "sugestao_sistema": "improcedente_prazo",
+      "justificativa_sistema": "Pedido de arrependimento em compra à distância, mas fora do prazo de 7 dias previsto no CDC Art. 49 (115 dias desde o recebimento).",
+      "score_confianca": "alta",
+      "calculado_em": "2026-10-01T20:05:25.262Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:05:25.262Z",
+    "atualizado_em": "2026-10-01T20:05:25.262Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:05:25.262Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
