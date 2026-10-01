@@ -1538,5 +1538,100 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "c692dc8f-8f6a-4b32-888c-c6d723ffe784": {
+    "id": "c692dc8f-8f6a-4b32-888c-c6d723ffe784",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Marcos Vogel",
+      "cpf_cnpj": "08326631906",
+      "whatsapp": "+5547999194079",
+      "email": "marcospaulovogel@gmail.com",
+      "cidade": "Dona emma",
+      "uf": "SC",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030895",
+      "data_compra": "2026-07-30",
+      "data_recebimento": "2026-08-04",
+      "nome_produto": "Red dot vector optics scrapper 1-29x scrd-47",
+      "marca": "Vector optics",
+      "modelo": "Scrapper 1-29x scrd- 47",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Apenas não  gostei..",
+      "data_percebido_problema": "2026-08-04",
+      "chegou_defeito_ou_depois": "Funcionamento Normal",
+      "motivo_troca_devolucao": "Não me agradei da qualidade...",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "17859640572713819760321044328552.jpg",
+          "url": "https://storage.tally.so/private/17859640572713819760321044328552.jpg?id=LqPy5J&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkxxUHk1SiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.5FVRUsyupjl9BGFK89IGS8Hi2h5ihJ7aVVtTROd-pgw&signature=8ab6d5cefcc58ecfa869177589f35e89f4554319e5e8b8d0016e4a5e45f58f79",
+          "mimeType": "image/jpeg",
+          "size": 2198689
+        }
+      ]
+    },
+    "preferencia_cliente": "restituicao",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-08-04",
+      "data_percebido_problema": "2026-08-04",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": true,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": true
+      },
+      "_override": {
+        "sugestao": "analise_manual",
+        "justificativa": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+        "score_confianca": "baixa"
+      },
+      "preferencia_cliente": "restituicao",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-01T20:05:07.101Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:05:07.101Z",
+    "atualizado_em": "2026-10-01T20:05:07.101Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:05:07.101Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
