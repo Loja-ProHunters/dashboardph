@@ -547,11 +547,30 @@ module.exports = async (req, res) => {
     if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
     try {
       const u = new URL('http://x' + (req.url || ''));
-      const tipo = u.searchParams.get('tipo') || 'recebidas';
+      let tipo = u.searchParams.get('tipo') || 'recebidas';
+      // SEGURANÇA: `tipo=todas` retorna solicitacoes de todo mundo com o chat
+      // completo — antes qualquer usuario logado conseguia ler chats privados
+      // de outros pares. Agora so admin/diretor pode usar 'todas'; qualquer
+      // outro role cai em 'recebidas' silenciosamente.
+      if (tipo === 'todas' && !isAdminOrDiretor(sess)) tipo = 'recebidas';
       const solic = require('../lib/solicitacoes');
       const list = await solic.listar({ login: sess.usuario, tipo });
+      // Camada extra: mesmo em 'todas' (admin), removemos o array mensagens[]
+      // do payload — chat so aparece via GET /api/solicitacoes/:id/mensagens
+      // (que ja checa se e criador/destinatario). Isso impede admin ler chats
+      // sem permissao acidentalmente, e reduz tamanho do payload.
+      const login = String(sess.usuario || '').toLowerCase();
+      const seguro = list.map(s => {
+        const semMsgs = { ...s };
+        // So mantem mensagens se e visualizacao propria (recebidas/enviadas)
+        // ou se o usuario e um dos envolvidos
+        if (tipo === 'todas' && s.de !== login && s.para !== login) {
+          delete semMsgs.mensagens;
+        }
+        return semMsgs;
+      });
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ solicitacoes: list, total: list.length }));
+      res.end(JSON.stringify({ solicitacoes: seguro, total: seguro.length }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
@@ -1469,6 +1488,16 @@ module.exports = async (req, res) => {
       const resultado = payload.resultado;
       const t = await crmStore.getDoc('activities', id);
       if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
+      // SEGURANÇA IDOR: so o DONO da tarefa (ou admin/diretor) pode concluir.
+      // Antes qualquer vendedor podia concluir tarefa alheia via curl, sabotando
+      // o ranking do colega e a automacao de renovacao de docs regulatorios.
+      const meuLogin = String(sess.usuario || '').toLowerCase();
+      const donoTarefa = String(t.owner_id || t.dono || '').toLowerCase();
+      if (!crmUtils.canSeeAll(sess) && donoTarefa !== meuLogin) {
+        res.writeHead(403,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Esta tarefa nao esta atribuida a voce.'}));
+        return;
+      }
       await crmStore.updateDoc('activities', id, {
         ...t, status: 'concluida', resultado: resultado || 'concluida',
         concluida_em: new Date().toISOString(), concluida_por: sess.usuario,
@@ -2005,6 +2034,13 @@ module.exports = async (req, res) => {
       const accId = url.split('/')[4];
       const account = await crmStore.getDoc('accounts', accId);
       if (!account) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Cliente não encontrado'})); return; }
+      // SEGURANÇA IDOR: vendedor so ve ficha das SUAS contas. Admin/diretor
+      // e financeiro/marketing (que tem CRM em leitura mas ampla) veem tudo.
+      if (!crmUtils.canReadDoc(sess, account)) {
+        res.writeHead(403,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Este cliente esta atribuido a outro vendedor.'}));
+        return;
+      }
       const orders = await crmStore.listDocs('orders', o => o.account_id === accId);
       orders.sort((a, b) => String(b.data_pedido || '').localeCompare(String(a.data_pedido || '')));
       const activities = await crmStore.listDocs('activities', a => a.account_id === accId || (a.entidade_tipo === 'account' && a.entidade_id === accId));
@@ -2025,6 +2061,14 @@ module.exports = async (req, res) => {
       const accId = url.split('/')[4];
       const account = await crmStore.getDoc('accounts', accId);
       if (!account) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Cliente não encontrado'})); return; }
+      // SEGURANÇA IDOR: mesma protecao da /ficha. Contas em aberto trazem dados
+      // financeiros sensiveis (dividas do cliente) — nao pode expor pra vendedor
+      // que nao e dono da conta.
+      if (!crmUtils.canReadDoc(sess, account)) {
+        res.writeHead(403,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Este cliente esta atribuido a outro vendedor.'}));
+        return;
+      }
       const cpf = account.cpf_cnpj || null;
       const idsPorConta = account.bling_contato_id_por_conta || {};
       // Fallback: se o account só tem bling_contato_id (legado), aponta ele pra 'prohunters'
