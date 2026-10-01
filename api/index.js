@@ -89,6 +89,12 @@ function canUseIA(sess) {
 }
 // Base de Conhecimento (edita e ve): so admin/diretor.
 function canManageKB(sess) { return isAdminOrDiretor(sess); }
+// Garantias: admin, diretor e auxiliar (Maria). Nenhum outro perfil ve a aba.
+function canGerenciarGarantias(sess) {
+  if (!sess) return false;
+  const r = getRole(sess.usuario, sess);
+  return r === 'admin' || r === 'diretor' || r === 'auxiliar';
+}
 
 const SESSION_MS = (config.sessionHours || 8) * 60 * 60 * 1000;
 const ROOT       = path.join(__dirname, '..');
@@ -689,6 +695,268 @@ module.exports = async (req, res) => {
       const { motivo } = JSON.parse(body || '{}');
       const s = await solic.rejeitar(id, sess.usuario, motivo);
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, solicitacao: s }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // GARANTIAS / TROCAS / DEVOLUÇÕES — admin + diretor + auxiliar
+  // Fluxo: criar → triar (sistema sugere) → decidir (operador aprova/override)
+  //        → status (aberto → em_analise → aguardando_cliente → resolvido)
+  //        → estoque físico (aguardando_chegada → recebido → enviado_fabricante
+  //           → resolvido_fabricante)
+  //        → imprime etiqueta A4 pra colar na caixa
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /api/garantias/contador — pendentes (pra badge do menu)
+  if (url === '/api/garantias/contador' && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const n = await gar.contarPendentes();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ pendentes: n }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/garantias/estoque?status=&marca=&agrupar=
+  if (url.startsWith('/api/garantias/estoque') && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const u = new URL('http://x' + (req.url || ''));
+      const status_produto = u.searchParams.get('status') || null;
+      const marca = u.searchParams.get('marca') || null;
+      const agrupar = u.searchParams.get('agrupar') === '1' || u.searchParams.get('agrupar') === 'true';
+      const r = await gar.listarEstoque({
+        status_produto,
+        marca,
+        agrupar_por_marca: agrupar,
+      });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ resultado: r, agrupado: agrupar }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/etiquetas body: { ids: [...] }
+  // Retorna HTML pronto pra abrir numa aba nova e dar Ctrl+P.
+  if (url === '/api/garantias/etiquetas' && req.method === 'POST') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'text/plain'}); res.end('Sem permissao.'); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const body = await readBody(req);
+      const { ids } = JSON.parse(body || '{}');
+      if (!Array.isArray(ids) || ids.length === 0) {
+        res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Lista de IDs vazia.'}));
+        return;
+      }
+      // Busca as garantias
+      const garantias = [];
+      for (const id of ids) {
+        try { garantias.push(await gar.obter(id)); } catch (_) { /* pula */ }
+      }
+      if (garantias.length === 0) {
+        res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nenhuma garantia encontrada.'}));
+        return;
+      }
+      // Marca a impressao no historico (nao impede reimprimir)
+      try { await gar.registrarImpressaoEtiqueta(garantias.map(g => g.id), sess.usuario); } catch (_) {}
+      const html = gar.gerarFolhaEtiquetasA4(garantias);
+      res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});
+      res.end(html);
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/enviar-fabricante body: { ids, canal, contato, protocolo_rma, rastreio_saida, nota }
+  if (url === '/api/garantias/enviar-fabricante' && req.method === 'POST') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const body = await readBody(req);
+      const payload = JSON.parse(body || '{}');
+      const r = await gar.registrarEnvioFabricante({ ...payload, actor: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, ...r }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/garantias?status=&operador=
+  // Exclui /:id/... (acoes), /contador, /estoque, /etiquetas, /enviar-fabricante.
+  if (url.startsWith('/api/garantias') && req.method === 'GET' && !url.match(/\/(contador|estoque|etiquetas|enviar-fabricante)(\?|$)/) && !url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/[a-z\-]+$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      // Rota /api/garantias/:id (obter uma)
+      const m = url.match(/^\/api\/garantias\/([a-zA-Z0-9_\-]+)(\?|$)/);
+      if (m && m[1] && m[1] !== 'contador' && m[1] !== 'estoque' && m[1] !== 'etiquetas' && m[1] !== 'enviar-fabricante') {
+        const g = await gar.obter(m[1]);
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ garantia: g }));
+        return;
+      }
+      // Lista
+      const u = new URL('http://x' + (req.url || ''));
+      const status = u.searchParams.get('status') || null;
+      const operador = u.searchParams.get('operador') || null;
+      const limite = u.searchParams.get('limite') || null;
+      const lista = await gar.listar({ status, operador, limite });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ garantias: lista, total: lista.length }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias — cria nova
+  if (url === '/api/garantias' && req.method === 'POST') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const body = await readBody(req);
+      const payload = JSON.parse(body || '{}');
+      const nova = await gar.criar({ ...payload, criado_por: sess.usuario });
+      res.writeHead(201,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, garantia: nova }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/decidir body: { valor, justificativa }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/decidir$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { valor, justificativa } = JSON.parse(body || '{}');
+      const g = await gar.registrarDecisao(id, { valor, justificativa, actor: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/reavaliar body: { tipo_produto, forma_compra, ... }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/reavaliar$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const payload = JSON.parse(body || '{}');
+      const g = await gar.reavaliar(id, payload, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/status body: { novoStatus, nota }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/status$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { novoStatus, nota } = JSON.parse(body || '{}');
+      const g = await gar.mudarStatus(id, novoStatus, sess.usuario, nota);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/resolver body: { resultado, nota }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/resolver$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { resultado, nota } = JSON.parse(body || '{}');
+      const g = await gar.resolver(id, { resultado, nota, actor: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/aguardando-chegada body: { rastreio_entrada }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/aguardando-chegada$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { rastreio_entrada } = JSON.parse(body || '{}');
+      const g = await gar.marcarAguardandoChegada(id, { rastreio_entrada, actor: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/receber body: { localizacao_loja, nota }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/receber$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { localizacao_loja, nota } = JSON.parse(body || '{}');
+      const g = await gar.marcarRecebimentoLoja(id, { localizacao_loja, nota, actor: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/resolver-fabricante body: { tipo, nota }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/resolver-fabricante$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { tipo, nota } = JSON.parse(body || '{}');
+      const g = await gar.registrarResolucaoFabricante(id, { tipo, nota, actor: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
     } catch (e) {
       res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
@@ -4054,6 +4322,7 @@ module.exports = async (req, res) => {
     const canEditCrm = crmUtils.canEditCRM(sess) ? 'true' : 'false';
     const canUseIaFlag = canUseIA(sess) ? 'true' : 'false';
     const canManageKBFlag = canManageKB(sess) ? 'true' : 'false';
+    const canGerGar = canGerenciarGarantias(sess) ? 'true' : 'false';
     const usuarioEsc = String(sess.usuario || '').replace(/"/g, '\\"');
     const nomeEsc = String(sess.nome || '').replace(/"/g, '\\"');
     const roleEsc = String(userRole || '').replace(/"/g, '\\"');
@@ -4065,6 +4334,7 @@ module.exports = async (req, res) => {
       'var CAN_ACCESS_CONTROLADO=' + canAccessControlado + '; ' +
       'var CAN_ACCESS_CRM=' + canAccessCrm + '; var CAN_EDIT_CRM=' + canEditCrm + '; ' +
       'var CAN_USE_IA=' + canUseIaFlag + '; var CAN_MANAGE_KB=' + canManageKBFlag + '; ' +
+      'var CAN_GERENCIAR_GARANTIAS=' + canGerGar + '; ' +
       'var MUST_CHANGE_PASSWORD=' + mustChange + ';'
     );
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
