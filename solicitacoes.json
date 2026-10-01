@@ -160,10 +160,10 @@
     "titulo": "Rango",
     "descricao": "O, ve um rango la pros cria",
     "prazo": "2026-10-01",
-    "status": "pendente",
+    "status": "executada",
     "criado_em": "2026-10-01T18:24:35.611Z",
-    "executado_em": null,
-    "executado_por": null,
+    "executado_em": "2026-10-01T18:30:08.163Z",
+    "executado_por": "gerencia",
     "aprovado_em": null,
     "aprovado_por": null,
     "rejeitado_em": null,
@@ -186,6 +186,11 @@
         "ts": "2026-10-01T18:24:35.611Z",
         "acao": "criada",
         "por": "dickmann"
+      },
+      {
+        "ts": "2026-10-01T18:30:08.163Z",
+        "acao": "executada",
+        "por": "gerencia"
       }
     ]
   }
