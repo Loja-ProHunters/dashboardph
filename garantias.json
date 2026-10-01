@@ -1,0 +1,106 @@
+{
+  "da0c9732-a070-4132-aadb-6bb743b055d1": {
+    "id": "da0c9732-a070-4132-aadb-6bb743b055d1",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Claudio Zielinski",
+      "cpf_cnpj": "80937241920",
+      "whatsapp": "+5543999731906",
+      "email": "claudioz@protonmail.com",
+      "cidade": "Rolandia",
+      "uf": "PR",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031346",
+      "data_compra": "2026-09-14",
+      "data_recebimento": "2026-09-17",
+      "nome_produto": "Lanterna bicicleta",
+      "marca": "Fenix",
+      "modelo": "Bcr25r",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Tem um pequeno trincado no plastico proximo a lente.",
+      "data_percebido_problema": "2026-09-23",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Pequeno trincado. \nSó me interessa troca ou conserto. \nNAO quero devolver.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "20260926_081022.jpg",
+          "url": "https://storage.tally.so/private/20260926_081022.jpg?id=8DxGol&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhEeEdvbCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.GrVLRzBcTVTKoC8qHy6xXDApG8Mtz0RbSLxT7HX-toA&signature=7ac738cc51b480b420ab97369e32154b13e64be800142c64fc8d438a3f453579",
+          "mimeType": "image/jpeg",
+          "size": 3026580
+        },
+        {
+          "tipo": "foto",
+          "nome": "20260926_123323.jpg",
+          "url": "https://storage.tally.so/private/20260926_123323.jpg?id=Zkalje&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlprYWxqZSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.NEhWdJniuCaTLRIrjFtfegwXFm_XgkOryFiq9T1gxjY&signature=a7977485da042dbf8a203291b6285e406e4312e3924445bb5165a143f5ebeabc",
+          "mimeType": "image/jpeg",
+          "size": 2672075
+        },
+        {
+          "tipo": "foto",
+          "nome": "20260926_081004.jpg",
+          "url": "https://storage.tally.so/private/20260926_081004.jpg?id=PQOlRB&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlBRT2xSQiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.JpytfCMal1CUiN2ZwWfPjw6PxK3p_5sqV59985d7FU4&signature=46a398e520a212d93c04ce73f43fff95dc73412fb804e547f439399a379df9f2",
+          "mimeType": "image/jpeg",
+          "size": 2534092
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-09-17",
+      "data_percebido_problema": "2026-09-23",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-01T20:04:50.067Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:04:50.067Z",
+    "atualizado_em": "2026-10-01T20:04:50.067Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:04:50.067Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
+  }
+}
