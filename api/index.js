@@ -710,6 +710,37 @@ module.exports = async (req, res) => {
   //        → imprime etiqueta A4 pra colar na caixa
   // ═════════════════════════════════════════════════════════════
 
+  // GET/POST /api/garantias/sync-tally — polling da API Tally pro cron.
+  // Protegido pelo CRON_SECRET ja existente (header Authorization: Bearer XXX
+  // OU query ?secret=XXX). Pode ser chamado tambem manualmente por admin logado
+  // (um clique no dashboard = testa a sync na hora).
+  if (url.startsWith('/api/garantias/sync-tally')) {
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const auth = req.headers['authorization'] || '';
+      const bearer = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+      const tokenPassado = u.searchParams.get('secret') || bearer;
+      const sess = getSession(req);
+      const isAdmin = sess && isAdminOrDiretor(sess);
+      const tokenValido = config.cronSecret && tokenPassado === config.cronSecret;
+      if (!isAdmin && !tokenValido) {
+        res.writeHead(401,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Nao autorizado. Precisa de admin/diretor logado OU secret correto.'}));
+        return;
+      }
+      const sync = require('../lib/garantiasTallySync');
+      const r = await sync.sincronizar({});
+      console.log('[SYNC TALLY] ' + JSON.stringify(r));
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, ...r }));
+    } catch (e) {
+      console.error('[SYNC TALLY] Erro: ' + e.message);
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'Sync falhou: ' + e.message}));
+    }
+    return;
+  }
+
   // POST /api/garantias/webhook?token=XXX — recebe submissao do Tally
   // SEM autenticacao de sessao (publico), MAS validado por token secreto na
   // query string (env var GARANTIAS_WEBHOOK_SECRET). Sem token valido = 401.
