@@ -1448,5 +1448,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "e97d583c-3018-4763-ab2e-c26d3be96798": {
+    "id": "e97d583c-3018-4763-ab2e-c26d3be96798",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Maycon Gasda",
+      "cpf_cnpj": "05639394943",
+      "whatsapp": "+5547996518680",
+      "email": "maycon@gmx.com",
+      "cidade": "Blumenau",
+      "uf": "SC",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "30607",
+      "data_compra": "2026-06-23",
+      "data_recebimento": "2026-06-24",
+      "nome_produto": "Luneta Vector Optics Minotaur 12-60x60mm GNII MFL SFP SCOL-40",
+      "marca": "Vector Optics",
+      "modelo": "Minotaur 12-60x60mm GNII MFL SFP SCOL-40",
+      "numero_serie": "054426122001",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "O reticulo iluminado fica acendendo e apagando sozinho quando efetuados disparos com a carabina. Carabina pcp.",
+      "data_percebido_problema": "2026-07-26",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "Gostaria de ver a possibilidade de reparo. Quase não uso o reticulo iluminado. por isso a demora na constatação do problema. Mas quando o alvo é preto, o reticulo some no alvo, o que torna o uso do reticulo iluminado necessário.",
+      "uploads": [
+        {
+          "tipo": "nota_fiscal",
+          "nome": "41100991eba3cdfba03093cd03f103ce.pdf",
+          "url": "https://storage.tally.so/private/41100991eba3cdfba03093cd03f103ce.pdf?id=jqBjGa&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImpxQmpHYSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.wEjekbfxKx4S3dZaRS6O0LpQ4l09k_isjb8358sE16U&signature=4f21583a379d5885ebb9094743e1a71d3c7729c334a49dc2a6c018159fc802ac",
+          "mimeType": "application/pdf",
+          "size": 112240
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-06-24",
+      "data_percebido_problema": "2026-07-26",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": false,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal e sem indício claro de mau uso, mas o cliente não anexou foto/vídeo do defeito. Solicitar evidência antes de decidir ou avaliar troca mediante inspeção presencial.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-01T20:05:06.129Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:05:06.129Z",
+    "atualizado_em": "2026-10-01T20:05:06.129Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:05:06.129Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
