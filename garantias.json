@@ -1723,5 +1723,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "4515f69a-eb5c-4a33-8229-d5f7ec4c8438": {
+    "id": "4515f69a-eb5c-4a33-8229-d5f7ec4c8438",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "vagner borges da silva",
+      "cpf_cnpj": "02268881008",
+      "whatsapp": "+5555999340223",
+      "email": "vagner_pecuaria@icloud.com",
+      "cidade": "São Gabriel",
+      "uf": "RS",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "25501",
+      "data_compra": "2022-11-22",
+      "data_recebimento": "2022-11-29",
+      "nome_produto": "luneta hawke vantage 30 wa",
+      "marca": "hawke",
+      "modelo": "vantage 30",
+      "numero_serie": "14274",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "umidade dentro da luneta",
+      "data_percebido_problema": "2026-07-25",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "aguardo troca conforme garantia do cliente o produto tem garantia vitalicia",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "d7a9fdf2-5785-4e09-8fa5-9ddb6796ef79.jpg",
+          "url": "https://storage.tally.so/private/d7a9fdf2-5785-4e09-8fa5-9ddb6796ef79.jpg?id=O9xdd7&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ik85eGRkNyIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.n8OQVxre5EIQ0FPsrgqLS7PnLvE2TljCMwUyl5YVENw&signature=568dd2284a4b8795c5589a6ff7c189611d2572c499c80632362f7f43631be036",
+          "mimeType": "image/jpeg",
+          "size": 92299
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2022-11-29",
+      "data_percebido_problema": "2026-07-25",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "sim",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": true,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "improcedente_mau_uso",
+      "justificativa_sistema": "Indício de mau uso: cliente relatou queda, impacto ou exposição a água/umidade. CDC Art. 18 §6º exclui vícios decorrentes de uso inadequado ou alteração do produto pelo consumidor. Recomenda-se laudo técnico se o cliente contestar.",
+      "score_confianca": "media",
+      "calculado_em": "2026-10-01T20:05:09.505Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:05:09.505Z",
+    "atualizado_em": "2026-10-01T20:05:09.505Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:05:09.505Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
