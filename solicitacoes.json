@@ -115,5 +115,31 @@
         "por": "dickmann"
       }
     ]
+  },
+  "8367f056-a2fc-40fe-a616-1d5b9d33ab10": {
+    "id": "8367f056-a2fc-40fe-a616-1d5b9d33ab10",
+    "de": "marlon",
+    "para": "joao",
+    "categoria": "Direção",
+    "titulo": "Valores Aselkon",
+    "descricao": "Identificamos duas espingardas da Aselkon que não estavam cadastradas no site; (Já realizamos o cadastro)\n\nEspingarda Semiautomática Inter Dark Black Cal. 12 GA 28\"\nINT-MML-M55-029\n\nEspingarda Semiautomática Redstone Dark Black Cal. 12 GA 28\"\nRST-MML-M54-031\n\nOs valores no Bling estão incorretos. Preciso saber se o preço segue o mesmo padrão das outras Aselkons ou se seria outro valor.",
+    "prazo": "2026-10-02",
+    "status": "pendente",
+    "criado_em": "2026-10-01T11:33:00.813Z",
+    "executado_em": null,
+    "executado_por": null,
+    "aprovado_em": null,
+    "aprovado_por": null,
+    "rejeitado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_motivo": null,
+    "mensagens": [],
+    "historico": [
+      {
+        "ts": "2026-10-01T11:33:00.813Z",
+        "acao": "criada",
+        "por": "marlon"
+      }
+    ]
   }
 }
