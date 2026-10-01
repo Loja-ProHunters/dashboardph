@@ -3452,5 +3452,109 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "b2835aa4-b073-4c09-9c76-df1aef8468b3": {
+    "id": "b2835aa4-b073-4c09-9c76-df1aef8468b3",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Rubens Ferreira Souza Filho",
+      "cpf_cnpj": "17118248878",
+      "whatsapp": "+5511972301714",
+      "email": "rubensarq@msn.com",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031412",
+      "data_compra": "2026-09-21",
+      "data_recebimento": "2026-09-25",
+      "nome_produto": "ALB-20",
+      "marca": "Fenix",
+      "modelo": "ALB-20",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "O produto aparentemente estava com o lacre violado. A mola de fechamento trva, permanece aberta.",
+      "data_percebido_problema": "2026-09-25",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "A mola de fechamento não funciona corretamente. Trava.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "WhatsApp Image 2026-09-28 at 10.01.18.jpeg",
+          "url": "https://storage.tally.so/private/WhatsApp-Image-2026-09-28-at-10.01.18.jpeg?id=XAxgPY&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlhBeGdQWSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.QpCoQzSvsB72iGkb6J_-nJtCvT2ddhRELI5wUfEbefk&signature=0e0e1eec58276b5a1d5a5782a1496425e14ed7957c2daa060093ed898662cfc2",
+          "mimeType": "image/jpeg",
+          "size": 262199
+        },
+        {
+          "tipo": "foto",
+          "nome": "WhatsApp Image 2026-09-28 at 10.01.19 (1).jpeg",
+          "url": "https://storage.tally.so/private/WhatsApp-Image-2026-09-28-at-10.01.19-1-.jpeg?id=l2b5kv&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImwyYjVrdiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.q0QfQSkCQtka3x-oNSz9uPxhSaTFwujDO35TlYW2Yuk&signature=2dabf30aba475dd36692e2ceaa28ff08c9bcf9f1d3d20208b951890841d53161",
+          "mimeType": "image/jpeg",
+          "size": 159688
+        },
+        {
+          "tipo": "foto",
+          "nome": "WhatsApp Image 2026-09-28 at 10.01.19.jpeg",
+          "url": "https://storage.tally.so/private/WhatsApp-Image-2026-09-28-at-10.01.19.jpeg?id=EVkg7r&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkVWa2c3ciIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NjA3OH0.JrnWsMJSYQnYHmVU--H7vlGlpycYPoGyHUk0W93g17Y&signature=11b87b42785106b353d62e68e048f01ac5cbd6b77f08fdd778fdfc5dbb8f4037",
+          "mimeType": "image/jpeg",
+          "size": 155817
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-09-25",
+      "data_percebido_problema": "2026-09-25",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-01T20:21:21.990Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:21:21.990Z",
+    "atualizado_em": "2026-10-01T20:21:21.990Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:21:21.990Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
