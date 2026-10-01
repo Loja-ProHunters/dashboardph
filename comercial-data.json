@@ -4,10 +4,10 @@
       "id": 1,
       "name": "Pedro Dickmann",
       "foto": "consultor_pedro.jpg",
-      "fat": 162738.73,
-      "etiqueta": 96,
-      "tarefas": 88,
-      "atrasos": 1,
+      "fat": 0,
+      "etiqueta": 100,
+      "tarefas": 100,
+      "atrasos": 0,
       "faltas": 0,
       "advertencias": 2,
       "advertenciasLog": [
@@ -25,10 +25,10 @@
       "id": 2,
       "name": "Enzo Boschetto",
       "foto": "consultor_enzo.jpg",
-      "fat": 97272.68999999999,
-      "etiqueta": 97,
-      "tarefas": 90,
-      "atrasos": 6,
+      "fat": 0,
+      "etiqueta": 100,
+      "tarefas": 100,
+      "atrasos": 0,
       "faltas": 0,
       "advertencias": 1,
       "advertenciasLog": [
@@ -42,10 +42,10 @@
       "id": 3,
       "name": "Wesley Mathias",
       "foto": "consultor_wesley.jpg",
-      "fat": 216768.44999999998,
+      "fat": 0,
       "etiqueta": 100,
-      "tarefas": 96,
-      "atrasos": 2,
+      "tarefas": 100,
+      "atrasos": 0,
       "faltas": 0,
       "advertencias": 1,
       "advertenciasLog": [
@@ -58,8 +58,71 @@
   ],
   "diasCorridos": 30,
   "diasMes": 30,
-  "mesReferencia": "2026-09",
+  "mesReferencia": "2026-10",
   "history": [
+    {
+      "mesReferencia": "2026-09",
+      "vencedor": "Wesley Mathias",
+      "sellers": [
+        {
+          "id": 1,
+          "name": "Pedro Dickmann",
+          "foto": "consultor_pedro.jpg",
+          "fat": 162738.73,
+          "etiqueta": 96,
+          "tarefas": 88,
+          "atrasos": 1,
+          "faltas": 0,
+          "advertencias": 2,
+          "advertenciasLog": [
+            {
+              "data": "01/09/2026",
+              "motivo": "Envio munição sem GT e tentou corrigir sem notificar a Gerência"
+            },
+            {
+              "data": "14/09/2026",
+              "motivo": "Autorizou por conta um desconto acima do permitido, em uma negociação de uma Tanfoglio"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Enzo Boschetto",
+          "foto": "consultor_enzo.jpg",
+          "fat": 97272.68999999999,
+          "etiqueta": 97,
+          "tarefas": 90,
+          "atrasos": 6,
+          "faltas": 0,
+          "advertencias": 1,
+          "advertenciasLog": [
+            {
+              "data": "09/09/2026",
+              "motivo": "Fez o envio errado de produto controlado, cliente comprou uma coisa e lançou outra no pedido"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "Wesley Mathias",
+          "foto": "consultor_wesley.jpg",
+          "fat": 216768.44999999998,
+          "etiqueta": 100,
+          "tarefas": 96,
+          "atrasos": 2,
+          "faltas": 0,
+          "advertencias": 1,
+          "advertenciasLog": [
+            {
+              "data": "11/09/2026",
+              "motivo": "Fez o envio de um pedido de projétil que era para ser retirada"
+            }
+          ]
+        }
+      ],
+      "siteFat": 66998.5,
+      "fechadoEm": "2026-10-01T11:02:47.562Z"
+    },
     {
       "mesReferencia": "2026-08",
       "vencedor": "Wesley Mathias",
@@ -135,6 +198,6 @@
       "fechadoEm": "2026-08-03T11:06:21.307Z"
     }
   ],
-  "savedAt": "2026-09-30T20:35:24.385Z",
-  "siteFat": 66998.5
+  "savedAt": "2026-10-01T11:02:47.562Z",
+  "siteFat": 0
 }
