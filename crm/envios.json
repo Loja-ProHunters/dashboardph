@@ -1367,9 +1367,9 @@
     "romaneio_id": "rom_20260930_0004",
     "romaneio_numero": "0004",
     "coletado_em": "2026-09-30T14:31:08.409Z",
-    "coletado_motorista": null,
-    "coletado_motorista_cpf": null,
-    "coletado_placa": null,
+    "coletado_motorista": "Rafael Nadal",
+    "coletado_motorista_cpf": "00712640002",
+    "coletado_placa": "TRC3D08",
     "historico": [
       {
         "ts": "2026-09-29T15:19:58.804Z",
@@ -1472,12 +1472,36 @@
         "acao": "campo_alterado",
         "campo": "status",
         "novo": "enviado"
+      },
+      {
+        "ts": "2026-10-01T19:12:46.091Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_motorista",
+        "novo": "Rafael Nadal"
+      },
+      {
+        "ts": "2026-10-01T19:12:46.091Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_motorista_cpf",
+        "novo": "00712640002"
+      },
+      {
+        "ts": "2026-10-01T19:12:46.091Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_placa",
+        "novo": "TRC3D08"
       }
     ],
     "criado_em": "2026-09-29T15:19:58.804Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-09-30T14:31:09.624Z",
-    "atualizado_por": "auxiliar"
+    "atualizado_em": "2026-10-01T19:12:46.091Z",
+    "atualizado_por": "gerencia"
   },
   "env_prohunters_27091": {
     "id": "env_prohunters_27091",
