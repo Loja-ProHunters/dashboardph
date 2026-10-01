@@ -2173,5 +2173,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "1b8a861e-0bf8-45c7-9942-710a3a6132ca": {
+    "id": "1b8a861e-0bf8-45c7-9942-710a3a6132ca",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Hideki Haranin",
+      "cpf_cnpj": "09863751448",
+      "whatsapp": "+81986793014",
+      "email": "hideki_haranin@hotmail.com",
+      "cidade": "Rio Formoso",
+      "uf": "PE",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "2703",
+      "data_compra": "2026-07-10",
+      "data_recebimento": "2026-07-17",
+      "nome_produto": "Carregador",
+      "marca": "Taurus",
+      "modelo": "GX4 13 tiros",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "O carregador não encaixa na entrada do carregador. O tamanho do Bumper faz com que o plástico esbarre na entrada do carregador da pistola.",
+      "data_percebido_problema": "2026-07-17",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "O carregador não encaixa na entrada do carregador. O tamanho do Bumper faz com que o plástico esbarre na entrada do carregador da pistola.",
+      "uploads": [
+        {
+          "tipo": "video",
+          "nome": "d23d97cf-7298-43a5-aa09-db2e56ab24d6.mov",
+          "url": "https://storage.tally.so/private/d23d97cf-7298-43a5-aa09-db2e56ab24d6.mov?id=QWBWl8&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlFXQldsOCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.6jveymCdLCFauS3kw6nbo8lEC7bLIEKUid2hJyiGIZM&signature=ba3d1f004229b327eb02c51f302047e329e83ed7ec39714f975327c3b9274cbf",
+          "mimeType": "video/quicktime",
+          "size": 10238028
+        }
+      ]
+    },
+    "preferencia_cliente": "troca",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-07-17",
+      "data_percebido_problema": "2026-07-17",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "troca",
+      "sugestao_sistema": "procedente_troca",
+      "justificativa_sistema": "Dentro do prazo legal (CDC Art. 26), sem indício de mau uso, com evidência anexada. Cliente preferiu troca por produto igual novo (CDC Art. 18 §1º I).",
+      "score_confianca": "media",
+      "calculado_em": "2026-10-01T20:05:14.675Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:05:14.675Z",
+    "atualizado_em": "2026-10-01T20:05:14.675Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:05:14.675Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
