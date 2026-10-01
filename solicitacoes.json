@@ -169,7 +169,13 @@
     "rejeitado_em": null,
     "rejeitado_por": null,
     "rejeitado_motivo": null,
-    "mensagens": [],
+    "mensagens": [
+      {
+        "de": "gerencia",
+        "ts": "2026-10-01T18:25:01.274Z",
+        "texto": "vai se fuder cara"
+      }
+    ],
     "historico": [
       {
         "ts": "2026-10-01T18:24:35.611Z",
