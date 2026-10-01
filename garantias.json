@@ -102,5 +102,100 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "9b09967f-975a-4885-95d1-eeaf8a034685": {
+    "id": "9b09967f-975a-4885-95d1-eeaf8a034685",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Gustavo de Arruda Cardoso",
+      "cpf_cnpj": "35377532848",
+      "whatsapp": "+5511996252058",
+      "email": "gcardosoti@gmail.com",
+      "cidade": "Santo Amaro da Imperatriz",
+      "uf": "SC",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "4226 0912 3042 0700 0139 5500 1000 0314 2314 5003 0426",
+      "data_compra": "2026-09-22",
+      "data_recebimento": "2026-09-25",
+      "nome_produto": "Canivete Dobrável Ruike - P843-B",
+      "marca": "Ruike",
+      "modelo": "P843-B",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Não deu certo a Empunhadura, e abertura é muito dura comparado outros canivetes que eu tenho.",
+      "data_percebido_problema": "2026-09-25",
+      "chegou_defeito_ou_depois": "Funcionamento Normal",
+      "motivo_troca_devolucao": "Não deu certo a Empunhadura, e abertura é muito dura comparado outros canivetes que eu tenho.",
+      "uploads": [
+        {
+          "tipo": "video",
+          "nome": "video-canivete-ruike.mp4",
+          "url": "https://storage.tally.so/private/video-canivete-ruike.mp4?id=Q9eNaX&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlE5ZU5hWCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDg4NTA4OX0.z0xIGqgHCW3JLP3Pch7yu94yQNGDa_bVoGoFfXJRdO4&signature=043c7e80b691da311cc20bb264912427d25339d5c38b2e6ab91c1ff2febfb4e6",
+          "mimeType": "video/mp4",
+          "size": 2989744
+        }
+      ]
+    },
+    "preferencia_cliente": "restituicao",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-09-25",
+      "data_percebido_problema": "2026-09-25",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": true,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": true
+      },
+      "_override": {
+        "sugestao": "analise_manual",
+        "justificativa": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+        "score_confianca": "baixa"
+      },
+      "preferencia_cliente": "restituicao",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-01T20:04:51.085Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-01T20:04:51.085Z",
+    "atualizado_em": "2026-10-01T20:04:51.085Z",
+    "historico": [
+      {
+        "ts": "2026-10-01T20:04:51.085Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
