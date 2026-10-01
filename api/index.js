@@ -710,6 +710,62 @@ module.exports = async (req, res) => {
   //        → imprime etiqueta A4 pra colar na caixa
   // ═════════════════════════════════════════════════════════════
 
+  // POST /api/garantias/webhook?token=XXX — recebe submissao do Tally
+  // SEM autenticacao de sessao (publico), MAS validado por token secreto na
+  // query string (env var GARANTIAS_WEBHOOK_SECRET). Sem token valido = 401.
+  // Fluxo: valida token → parseia payload → mapeia pro formato interno →
+  //        cria garantia (que ja roda triagem CDC automatica).
+  if (url.startsWith('/api/garantias/webhook') && req.method === 'POST') {
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const tokenPassado = u.searchParams.get('token') || '';
+      const tokenEsperado = process.env.GARANTIAS_WEBHOOK_SECRET || '';
+      if (!tokenEsperado || tokenEsperado.length < 16) {
+        console.error('[WEBHOOK GARANTIAS] GARANTIAS_WEBHOOK_SECRET nao configurado ou curto (<16 chars)');
+        res.writeHead(500,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Webhook nao configurado no servidor.'}));
+        return;
+      }
+      // Comparacao tempo-constante pra evitar timing attack
+      const a = Buffer.from(tokenPassado); const b = Buffer.from(tokenEsperado);
+      const matches = a.length === b.length && crypto.timingSafeEqual(a, b);
+      if (!matches) {
+        console.warn('[WEBHOOK GARANTIAS] Token invalido vindo de ' + (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '?'));
+        res.writeHead(401,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Token invalido.'}));
+        return;
+      }
+      const bodyRaw = await readBody(req);
+      let payload;
+      try { payload = JSON.parse(bodyRaw || '{}'); }
+      catch (e) {
+        res.writeHead(400,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Body JSON invalido.'}));
+        return;
+      }
+      // Tally envia eventType='FORM_RESPONSE'. Se vier teste manual sem isso,
+      // ainda processamos (ajuda a debugar na primeira configuracao).
+      if (payload.eventType && payload.eventType !== 'FORM_RESPONSE') {
+        console.log('[WEBHOOK GARANTIAS] Evento ignorado: ' + payload.eventType);
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ok: true, ignored: true, eventType: payload.eventType }));
+        return;
+      }
+      const parser = require('../lib/garantiasTallyWebhook');
+      const gar = require('../lib/garantias');
+      const mapeado = parser.mapearPayloadTally(payload);
+      const nova = await gar.criar(mapeado);
+      console.log('[WEBHOOK GARANTIAS] Nova garantia criada: ' + nova.id + ' (cliente: ' + nova.cliente.nome + ')');
+      res.writeHead(201,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, garantia_id: nova.id, sugestao: nova.avaliacao_cdc && nova.avaliacao_cdc.sugestao_sistema }));
+    } catch (e) {
+      console.error('[WEBHOOK GARANTIAS] Erro: ' + e.message);
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'Erro ao processar webhook: ' + e.message}));
+    }
+    return;
+  }
+
   // GET /api/garantias/contador — pendentes (pra badge do menu)
   if (url === '/api/garantias/contador' && req.method === 'GET') {
     const sess = getSession(req);
