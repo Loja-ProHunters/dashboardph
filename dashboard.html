@@ -352,6 +352,7 @@ tbody tr:hover td{background:var(--gl)}
     <button class="ni" onclick="goTab('contratos',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h5"/></svg></span><span class="ni-tx">Documentos</span></button>
     <button class="ni" onclick="goTab('contatos',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M15.6 21A13.6 13.6 0 0 1 3 8.4 2.4 2.4 0 0 1 5.4 6h2.1L9 9.4 7.5 11a11 11 0 0 0 5.5 5.5L14.6 15l3.4 1.5v2.1A2.4 2.4 0 0 1 15.6 21z"/></svg></span><span class="ni-tx">Contatos Úteis</span></button>
     <button class="ni" onclick="goTab('calculadora',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2.2"/><path d="M8 7.5h8"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/></svg></span><span class="ni-tx">Calculadora de Juros</span></button>
+    <button class="ni" id="ni-garantias" onclick="goTab('garantias',this)" style="display:none"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5 3.5 9.3 8 10 4.5-.7 8-5 8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></span><span class="ni-tx">Garantias</span><span class="badge" id="gar-badge-menu" style="display:none;background:#e03030;color:#fff">0</span></button>
   </div>
   <div class="sb-grp" id="grp-comercial" style="display:none">
     <div class="sb-lbl">Comercial</div>
@@ -3671,6 +3672,33 @@ window.chpwdSubmit = function(){
       <div id="solic-lista" style="min-height:200px"><div style="color:#7b8285;padding:20px;text-align:center">Carregando…</div></div>
     </div>
 
+    <!-- GARANTIAS / TROCAS / DEVOLUÇÕES — admin + diretor + auxiliar -->
+    <div class="tab" id="tab-garantias">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="gar-tab-btn on" data-view="atendimento" onclick="GAR.mudarView('atendimento')">📋 Atendimento</button>
+          <button class="gar-tab-btn" data-view="estoque" onclick="GAR.mudarView('estoque')">📦 Estoque de Garantia</button>
+          <button class="gar-tab-btn" data-view="fabricante" onclick="GAR.mudarView('fabricante')">🏭 Com Fabricante</button>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="gar-btn-sec" onclick="GAR.imprimirSelecionadas()" id="gar-btn-imp" style="display:none">🖨️ Imprimir etiquetas (<span id="gar-sel-count">0</span>)</button>
+          <button class="gar-btn-sec" onclick="GAR.abrirModalEnvio()" id="gar-btn-env" style="display:none">📤 Enviar p/ fabricante (<span id="gar-sel-count-2">0</span>)</button>
+          <button class="gar-btn-nova" onclick="GAR.abrirModalNova()">+ Nova garantia</button>
+        </div>
+      </div>
+      <div id="gar-filtros" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+        <select id="gar-fil-status" onchange="GAR.recarregar()" style="padding:8px 12px;border-radius:6px;border:1px solid #ccc">
+          <option value="">Todos status</option>
+          <option value="aberto">Aberto</option>
+          <option value="em_analise">Em análise</option>
+          <option value="aguardando_cliente">Aguardando cliente</option>
+          <option value="resolvido">Resolvido</option>
+        </select>
+        <input id="gar-fil-busca" placeholder="Buscar por cliente, produto, nº NF…" oninput="GAR.filtrarCliente()" style="padding:8px 12px;border-radius:6px;border:1px solid #ccc;flex:1;min-width:220px"/>
+      </div>
+      <div id="gar-lista" style="min-height:200px"><div style="color:#7b8285;padding:20px;text-align:center">Carregando…</div></div>
+    </div>
+
     <!-- Modal de nova solicitacao -->
     <div id="solic-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;padding:20px;overflow:auto" onclick="if(event.target===this)solicFecharModal()">
       <div style="max-width:520px;margin:5vh auto;background:#fff;border-radius:12px;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,.3)">
@@ -3728,7 +3756,8 @@ var tabMeta = {
   usuarios:  ['Usuários','Gerenciar acessos e senhas'],
   admin:     ['Base de Conhecimento','Gerenciar o que a IA sabe'],
   crm:       ['CRM','Contas, leads, oportunidades, atividades e pedidos'],
-  solicitacoes: ['Solicitações','Hub de tarefas entre colaboradores']
+  solicitacoes: ['Solicitações','Hub de tarefas entre colaboradores'],
+  garantias: ['Garantias, Trocas e Devoluções','Triagem CDC, estoque e envio ao fabricante']
 };
 
 // Mapa de permissoes por role — quais abas cada perfil ve.
@@ -3737,7 +3766,7 @@ var tabMeta = {
 // 'admin' e 'diretor' veem tudo (nao entram no mapa; passam pela else).
 var TABS_POR_ROLE = {
   vendas:     ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
-  auxiliar:   ['inicio','solicitacoes','contratos','contatos','comercial','crm'],
+  auxiliar:   ['inicio','solicitacoes','contratos','contatos','comercial','crm','garantias'],
   financeiro: ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
   marketing:  ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
   comex:      ['inicio','solicitacoes','comercial','ia'],
@@ -3768,6 +3797,13 @@ window.onload = function() {
   if (_niCrm && typeof CAN_ACCESS_CRM !== 'undefined' && CAN_ACCESS_CRM) {
     _niCrm.style.display = '';
     document.getElementById('grp-comercial').style.display = 'block';
+  }
+  // Revela Garantias pra admin, diretor e auxiliar (Maria)
+  var _niGar = document.getElementById('ni-garantias');
+  if (_niGar && typeof CAN_GERENCIAR_GARANTIAS !== 'undefined' && CAN_GERENCIAR_GARANTIAS) {
+    _niGar.style.display = '';
+    // Dispara contador uma vez pro badge
+    try { if (typeof GAR && GAR.atualizarContador) GAR.atualizarContador(); } catch(_){}
   }
 
   // Auxiliar: entra no CRM so pra Op. Controlado. Renomeia o botao "CRM" pra
@@ -3849,6 +3885,7 @@ function goTab(id, el) {
   if (id === 'usuarios') usuariosInit();
   if (id === 'crm') crmInit();
   if (id === 'solicitacoes') solicInit();
+  if (id === 'garantias' && typeof GAR !== 'undefined') GAR.init();
 }
 
 function toggleSB() {
@@ -8944,8 +8981,736 @@ window.addEventListener('load', function(){
   padding: 2px 7px; border-radius: 10px; font-size: 11px; font-weight: 700;
   margin-left: 4px;
 }
+
+/* ──────── GARANTIAS / TROCAS / DEVOLUÇÕES ──────── */
+.gar-tab-btn {
+  background: #f2f5f2; color: #333; border: 1px solid #ccd0d3;
+  border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.gar-tab-btn:hover { border-color: #999; }
+.gar-tab-btn.on { background: #0e4b7a; color: #fff; border-color: #0e4b7a; }
+.gar-btn-nova {
+  background: linear-gradient(135deg, #0e4b7a, #0a3a5e); color: #fff;
+  border: none; border-radius: 8px; padding: 10px 18px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(14,75,122,.3);
+}
+.gar-btn-nova:hover { transform: translateY(-1px); }
+.gar-btn-sec {
+  background: #fff; color: #0e4b7a; border: 1.5px solid #0e4b7a;
+  border-radius: 8px; padding: 9px 14px; font-size: 12.5px; font-weight: 600;
+  cursor: pointer;
+}
+.gar-btn-sec:hover { background: #f0f7ff; }
+.gar-card {
+  background: #fff; border: 1px solid #e0e4e7; border-radius: 10px;
+  padding: 16px; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start;
+  transition: box-shadow .15s;
+}
+.gar-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.gar-card-chk { margin-top: 2px; }
+.gar-card-main { flex: 1; min-width: 0; }
+.gar-card-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; margin-bottom: 6px; }
+.gar-card-id { font-family: ui-monospace, monospace; font-size: 11px; color: #666; font-weight: 600; }
+.gar-card-status {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 4px;
+}
+.gar-st-aberto { background: #fef3c7; color: #92400e; }
+.gar-st-em_analise { background: #dbeafe; color: #1e40af; }
+.gar-st-aguardando_cliente { background: #fce7f3; color: #9d174d; }
+.gar-st-resolvido { background: #d1fae5; color: #065f46; }
+.gar-card-cli { font-weight: 700; font-size: 14.5px; color: #1a1a1a; margin-bottom: 2px; }
+.gar-card-prod { font-size: 13px; color: #4a5057; margin-bottom: 4px; }
+.gar-card-meta { font-size: 11.5px; color: #7b8285; display: flex; gap: 12px; flex-wrap: wrap; }
+.gar-sug {
+  display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px;
+  border-radius: 10px; margin-left: 6px;
+}
+.gar-sug-proc { background: #d1fae5; color: #065f46; }
+.gar-sug-improc { background: #fee2e2; color: #991b1b; }
+.gar-sug-manual { background: #e5e7eb; color: #374151; }
+.gar-modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 10000;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.gar-modal {
+  background: #fff; border-radius: 12px; max-width: 720px; width: 100%;
+  max-height: 90vh; overflow-y: auto; padding: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.3);
+}
+.gar-modal h3 { margin: 0 0 16px; font-size: 18px; color: #0e4b7a; }
+.gar-fs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.gar-fs-1 { grid-column: 1 / -1; }
+.gar-fs label { font-size: 12px; font-weight: 600; color: #4a5057; display: block; margin-bottom: 4px; }
+.gar-fs input, .gar-fs select, .gar-fs textarea {
+  width: 100%; padding: 8px 10px; border: 1px solid #ccd0d3;
+  border-radius: 6px; font-size: 13px; font-family: inherit;
+}
+.gar-fs textarea { min-height: 80px; resize: vertical; }
+.gar-modal-acts { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+.gar-modal-acts button { padding: 10px 18px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 13px; }
+.gar-ok { background: #0e4b7a; color: #fff; }
+.gar-cancel { background: #e5e7eb; color: #374151; }
+.gar-detalhe { padding: 20px; background: #f8f9fa; border-radius: 8px; margin-top: 10px; font-size: 13px; }
+.gar-sug-box {
+  background: #fef9c3; border-left: 4px solid #ca8a04;
+  padding: 12px 14px; border-radius: 6px; margin: 10px 0;
+}
+.gar-sug-box.alta { background: #d1fae5; border-color: #059669; }
+.gar-sug-box.baixa { background: #e0e7ff; border-color: #4f46e5; }
+.gar-timeline { border-left: 2px solid #ccd0d3; padding-left: 14px; margin-top: 14px; }
+.gar-tl-item { position: relative; margin-bottom: 10px; font-size: 12px; }
+.gar-tl-item::before {
+  content: ''; position: absolute; left: -20px; top: 4px;
+  width: 10px; height: 10px; border-radius: 50%; background: #0e4b7a;
+}
+.gar-tl-ts { color: #7b8285; font-size: 11px; }
+.gar-estoque-grupo {
+  background: #fff; border: 1px solid #e0e4e7; border-radius: 10px;
+  padding: 16px; margin-bottom: 14px;
+}
+.gar-estoque-marca { font-size: 16px; font-weight: 700; color: #0e4b7a; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.gar-estoque-marca-cnt { font-size: 11px; background: #0e4b7a; color: #fff; padding: 2px 8px; border-radius: 10px; }
 </style>
 
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// GARANTIAS / TROCAS / DEVOLUÇÕES — módulo frontend
+// ═══════════════════════════════════════════════════════════════
+window.GAR = (function(){
+  var state = {
+    view: 'atendimento', // 'atendimento' | 'estoque' | 'fabricante'
+    lista: [],
+    estoque: [],
+    estoqueAgrupado: {},
+    selecionadas: {}, // id → true
+    detalheAberto: null,
+    busca: '',
+    inicializado: false,
+  };
+
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function fmtDate(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleDateString('pt-BR'); }catch(e){ return iso.slice(0,10); } }
+  function fmtDateTime(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleString('pt-BR'); }catch(e){ return iso; } }
+  function idCurto(id){ return 'GAR-' + String(id||'').replace(/-/g,'').slice(0,8).toUpperCase(); }
+
+  var STATUS_LBL = {
+    aberto: 'Aberto',
+    em_analise: 'Em análise',
+    aguardando_cliente: 'Aguardando cliente',
+    resolvido: 'Resolvido',
+  };
+  var SUGESTAO_LBL = {
+    procedente_troca: ['Troca aprovada', 'proc'],
+    procedente_restituicao: ['Devolução aprovada', 'proc'],
+    improcedente_prazo: ['Fora do prazo', 'improc'],
+    improcedente_mau_uso: ['Mau uso', 'improc'],
+    improcedente_sem_direito: ['Sem direito legal', 'improc'],
+    analise_manual: ['Análise manual', 'manual'],
+  };
+  var STATUS_PRODUTO_LBL = {
+    nao_solicitado: 'Não solicitado',
+    aguardando_chegada: 'Aguardando chegar',
+    recebido_loja: 'Na loja',
+    enviado_fabricante: 'Com fabricante',
+    resolvido_fabricante: 'Resolvido pelo fabricante',
+  };
+
+  async function init(){
+    if (state.inicializado) { recarregar(); return; }
+    state.inicializado = true;
+    await recarregar();
+    atualizarContador();
+    // Poll leve a cada 60s pro contador
+    setInterval(atualizarContador, 60000);
+  }
+
+  async function atualizarContador(){
+    try {
+      var r = await fetch('/api/garantias/contador');
+      if (!r.ok) return;
+      var d = await r.json();
+      var badge = document.getElementById('gar-badge-menu');
+      if (badge) {
+        if (d.pendentes > 0) {
+          badge.textContent = d.pendentes;
+          badge.style.display = '';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    } catch(_) {}
+  }
+
+  async function recarregar(){
+    if (state.view === 'atendimento') return carregarAtendimento();
+    if (state.view === 'estoque') return carregarEstoque();
+    if (state.view === 'fabricante') return carregarComFabricante();
+  }
+
+  async function carregarAtendimento(){
+    var statusSel = (document.getElementById('gar-fil-status')||{}).value || '';
+    var url = '/api/garantias' + (statusSel ? '?status=' + encodeURIComponent(statusSel) : '');
+    try {
+      var r = await fetch(url);
+      var d = await r.json();
+      state.lista = d.garantias || [];
+      renderLista();
+    } catch(e) {
+      document.getElementById('gar-lista').innerHTML = '<div style="padding:20px;color:#c62828">Erro: ' + esc(e.message) + '</div>';
+    }
+  }
+
+  async function carregarEstoque(){
+    try {
+      var r = await fetch('/api/garantias/estoque?agrupar=1');
+      var d = await r.json();
+      state.estoqueAgrupado = d.resultado || {};
+      renderEstoque();
+    } catch(e) {
+      document.getElementById('gar-lista').innerHTML = '<div style="padding:20px;color:#c62828">Erro: ' + esc(e.message) + '</div>';
+    }
+  }
+
+  async function carregarComFabricante(){
+    try {
+      var r = await fetch('/api/garantias/estoque?status=enviado_fabricante&agrupar=1');
+      var d = await r.json();
+      state.estoqueAgrupado = d.resultado || {};
+      renderComFabricante();
+    } catch(e) {
+      document.getElementById('gar-lista').innerHTML = '<div style="padding:20px;color:#c62828">Erro: ' + esc(e.message) + '</div>';
+    }
+  }
+
+  function filtrarCliente(){
+    state.busca = (document.getElementById('gar-fil-busca')||{}).value || '';
+    renderLista();
+  }
+
+  function renderLista(){
+    var lista = state.lista;
+    if (state.busca) {
+      var q = state.busca.toLowerCase();
+      lista = lista.filter(function(g){
+        return (g.cliente.nome||'').toLowerCase().indexOf(q) !== -1
+          || (g.pedido.nome_produto||'').toLowerCase().indexOf(q) !== -1
+          || (g.pedido.nf||'').toLowerCase().indexOf(q) !== -1
+          || (g.cliente.cpf_cnpj||'').indexOf(q) !== -1;
+      });
+    }
+    if (!lista.length) {
+      document.getElementById('gar-lista').innerHTML = '<div style="padding:40px;text-align:center;color:#7b8285">Nenhuma garantia encontrada.</div>';
+      return;
+    }
+    var html = lista.map(cardHtml).join('');
+    document.getElementById('gar-lista').innerHTML = html;
+  }
+
+  function cardHtml(g){
+    var sug = g.avaliacao_cdc && g.avaliacao_cdc.sugestao_sistema;
+    var sugLbl = sug && SUGESTAO_LBL[sug];
+    var sugClass = sugLbl ? ('gar-sug-' + (sugLbl[1]==='proc'?'proc':sugLbl[1]==='improc'?'improc':'manual')) : '';
+    var statusCls = 'gar-st-' + g.status;
+    var statusLbl = STATUS_LBL[g.status] || g.status;
+    var sugHtml = sugLbl ? '<span class="gar-sug ' + sugClass + '">💡 ' + esc(sugLbl[0]) + '</span>' : '';
+    var decHtml = '';
+    if (g.decisao_operador) {
+      var dLbl = SUGESTAO_LBL[g.decisao_operador.valor];
+      decHtml = '<span style="color:#065f46;font-weight:700;font-size:11px">✓ Decidido: ' + esc(dLbl ? dLbl[0] : g.decisao_operador.valor) + '</span>';
+    }
+    return '<div class="gar-card" onclick="GAR.abrirDetalhe(\'' + esc(g.id) + '\')" style="cursor:pointer">' +
+      '<div class="gar-card-main">' +
+        '<div class="gar-card-top">' +
+          '<span class="gar-card-id">' + idCurto(g.id) + '</span>' +
+          '<span class="gar-card-status ' + statusCls + '">' + esc(statusLbl) + '</span>' +
+        '</div>' +
+        '<div class="gar-card-cli">' + esc(g.cliente.nome) + '</div>' +
+        '<div class="gar-card-prod">' + esc(g.pedido.nome_produto || '—') + ' <span style="color:#888">· ' + esc(g.pedido.marca || '—') + '</span></div>' +
+        '<div class="gar-card-meta">' +
+          '<span>NF ' + esc(g.pedido.nf || '—') + '</span>' +
+          '<span>Aberta em ' + fmtDate(g.criado_em) + '</span>' +
+          '<span>Operador: ' + esc(g.criado_por) + '</span>' +
+          sugHtml +
+          decHtml +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  // ──────── NOVA GARANTIA ────────
+  function abrirModalNova(){
+    var html =
+      '<div class="gar-modal-bg" id="gar-mdl-nova" onclick="if(event.target===this)GAR.fecharModal(\'gar-mdl-nova\')">' +
+      '<div class="gar-modal">' +
+        '<h3>Nova garantia (lançamento manual)</h3>' +
+        '<div style="background:#fef3c7;padding:10px 14px;border-radius:6px;font-size:12.5px;color:#92400e;margin-bottom:16px">' +
+          '💡 Dica: Se o cliente preencheu o formulário Tally, o lançamento vai ser automático via webhook (Fase 2). Use este formulário quando a abertura for feita por telefone, loja ou e-mail.' +
+        '</div>' +
+        '<h4 style="font-size:13px;color:#4a5057;margin:16px 0 8px">Cliente</h4>' +
+        '<div class="gar-fs">' +
+          '<div><label>Nome completo *</label><input id="gar-f-nome"/></div>' +
+          '<div><label>CPF/CNPJ *</label><input id="gar-f-cpf"/></div>' +
+          '<div><label>WhatsApp</label><input id="gar-f-tel" placeholder="(47) 99999-9999"/></div>' +
+          '<div><label>E-mail</label><input id="gar-f-email" type="email"/></div>' +
+          '<div><label>Cidade</label><input id="gar-f-cidade"/></div>' +
+          '<div><label>UF</label><input id="gar-f-uf" maxlength="2"/></div>' +
+        '</div>' +
+        '<h4 style="font-size:13px;color:#4a5057;margin:16px 0 8px">Pedido</h4>' +
+        '<div class="gar-fs">' +
+          '<div><label>Nº da NF</label><input id="gar-f-nf"/></div>' +
+          '<div><label>Data da compra</label><input id="gar-f-dtcompra" type="date"/></div>' +
+          '<div class="gar-fs-1"><label>Produto *</label><input id="gar-f-prod"/></div>' +
+          '<div><label>Marca</label><input id="gar-f-marca"/></div>' +
+          '<div><label>Modelo</label><input id="gar-f-modelo"/></div>' +
+          '<div class="gar-fs-1"><label>Nº de série</label><input id="gar-f-serie" placeholder="N/A se não houver"/></div>' +
+        '</div>' +
+        '<h4 style="font-size:13px;color:#4a5057;margin:16px 0 8px">Problema e triagem CDC</h4>' +
+        '<div class="gar-fs">' +
+          '<div class="gar-fs-1"><label>Descrição do problema *</label><textarea id="gar-f-desc"></textarea></div>' +
+          '<div><label>Data do recebimento</label><input id="gar-f-dtrec" type="date"/></div>' +
+          '<div><label>Data em que o problema apareceu</label><input id="gar-f-dtprob" type="date"/></div>' +
+          '<div><label>Tipo de produto</label><select id="gar-f-tipo"><option value="durável">Durável (arma, óptica, acessório)</option><option value="não_durável">Não-durável (munição, descartável)</option></select></div>' +
+          '<div><label>Tipo de vício</label><select id="gar-f-vicio"><option value="aparente">Aparente (visível)</option><option value="oculto">Oculto (apareceu depois)</option></select></div>' +
+          '<div><label>Como foi a compra?</label><select id="gar-f-compra"><option value="presencial">Presencial na loja</option><option value="online">Site Pro Hunters</option><option value="marketplace">Marketplace</option></select></div>' +
+          '<div><label>É arrependimento?</label><select id="gar-f-arr"><option value="false">Não — é defeito</option><option value="true">Sim — desistência</option></select></div>' +
+          '<div><label>Produto sofreu queda/água?</label><select id="gar-f-queda"><option value="nao">Não</option><option value="sim">Sim</option><option value="nao_sei">Não sei</option></select></div>' +
+          '<div><label>Houve modificação?</label><select id="gar-f-mod"><option value="nao">Não</option><option value="sim">Sim</option></select></div>' +
+          '<div><label>Tem foto/vídeo anexado?</label><select id="gar-f-ev"><option value="false">Não</option><option value="true">Sim</option></select></div>' +
+          '<div><label>Preferência do cliente</label><select id="gar-f-pref"><option value="operador_decide">Pro Hunters decide</option><option value="troca">Troca</option><option value="restituicao">Devolução</option></select></div>' +
+        '</div>' +
+        '<div class="gar-modal-acts">' +
+          '<button class="gar-cancel" onclick="GAR.fecharModal(\'gar-mdl-nova\')">Cancelar</button>' +
+          '<button class="gar-ok" onclick="GAR.salvarNova()">Criar e triar</button>' +
+        '</div>' +
+      '</div></div>';
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  async function salvarNova(){
+    function v(id){ var e=document.getElementById(id); return e?e.value:''; }
+    var payload = {
+      fonte: 'manual',
+      cliente: {
+        nome: v('gar-f-nome'), cpf_cnpj: v('gar-f-cpf'),
+        whatsapp: v('gar-f-tel'), email: v('gar-f-email'),
+        cidade: v('gar-f-cidade'), uf: v('gar-f-uf'),
+      },
+      pedido: {
+        nf: v('gar-f-nf'), data_compra: v('gar-f-dtcompra'),
+        data_recebimento: v('gar-f-dtrec'),
+        nome_produto: v('gar-f-prod'), marca: v('gar-f-marca'),
+        modelo: v('gar-f-modelo'), numero_serie: v('gar-f-serie'),
+      },
+      problema: {
+        descricao_cliente: v('gar-f-desc'),
+        data_percebido_problema: v('gar-f-dtprob'),
+      },
+      preferencia_cliente: v('gar-f-pref'),
+      triagemInput: {
+        tipo_produto: v('gar-f-tipo'),
+        data_recebimento: v('gar-f-dtrec'),
+        data_percebido_problema: v('gar-f-dtprob'),
+        tipo_vicio: v('gar-f-vicio'),
+        forma_compra: v('gar-f-compra'),
+        eh_arrependimento: v('gar-f-arr') === 'true',
+        teve_queda_impacto_agua: v('gar-f-queda'),
+        teve_modificacao: v('gar-f-mod'),
+        tem_evidencia: v('gar-f-ev') === 'true',
+      },
+    };
+    try {
+      var r = await fetch('/api/garantias', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error || 'Erro');
+      fecharModal('gar-mdl-nova');
+      await recarregar();
+      // Abre o detalhe pra operador aprovar/override já
+      abrirDetalhe(d.garantia.id);
+      atualizarContador();
+    } catch(e) {
+      alert('Erro: ' + e.message);
+    }
+  }
+
+  // ──────── DETALHE DA GARANTIA ────────
+  async function abrirDetalhe(id){
+    try {
+      var r = await fetch('/api/garantias/' + encodeURIComponent(id));
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      state.detalheAberto = d.garantia;
+      renderDetalhe(d.garantia);
+    } catch(e) {
+      alert('Erro ao carregar garantia: ' + e.message);
+    }
+  }
+
+  function renderDetalhe(g){
+    var sug = g.avaliacao_cdc;
+    var sugBoxCls = '';
+    var sugLblTxt = '';
+    if (sug) {
+      sugBoxCls = sug.score_confianca === 'alta' ? 'alta' : (sug.score_confianca === 'baixa' ? 'baixa' : '');
+      var sl = SUGESTAO_LBL[sug.sugestao_sistema];
+      sugLblTxt = sl ? sl[0] : sug.sugestao_sistema;
+    }
+    var decTxt = '';
+    if (g.decisao_operador) {
+      var dl = SUGESTAO_LBL[g.decisao_operador.valor];
+      decTxt = '<div style="margin-top:10px;padding:10px 14px;background:#dcfce7;border-left:4px solid #16a34a;border-radius:6px">' +
+        '<b>✓ Decisão registrada:</b> ' + esc(dl?dl[0]:g.decisao_operador.valor) +
+        ' por ' + esc(g.decisao_operador.por) + ' em ' + fmtDateTime(g.decisao_operador.em) +
+        (g.decisao_operador.divergiu_do_sistema ? '<br><small>⚠️ Divergiu da sugestão do sistema.</small>' : '') +
+        (g.decisao_operador.justificativa ? '<br><small><i>' + esc(g.decisao_operador.justificativa) + '</i></small>' : '') +
+      '</div>';
+    }
+    var produtoFisicoBox = renderProdutoFisico(g);
+    var timeline = (g.historico||[]).slice().reverse().map(function(h){
+      return '<div class="gar-tl-item"><div class="gar-tl-ts">' + fmtDateTime(h.ts) + ' · ' + esc(h.por||'sistema') + '</div><b>' + esc(h.acao) + '</b>' +
+        (h.nota ? ' — ' + esc(h.nota) : '') +
+        (h.rastreio ? ' · rastreio: ' + esc(h.rastreio) : '') +
+        (h.localizacao ? ' · local: ' + esc(h.localizacao) : '') +
+        '</div>';
+    }).join('');
+
+    var html =
+      '<div class="gar-modal-bg" id="gar-mdl-det" onclick="if(event.target===this)GAR.fecharModal(\'gar-mdl-det\')">' +
+      '<div class="gar-modal" style="max-width:860px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+          '<h3 style="margin:0">' + idCurto(g.id) + ' · ' + esc(g.cliente.nome) + '</h3>' +
+          '<span class="gar-card-status gar-st-' + g.status + '">' + esc(STATUS_LBL[g.status]||g.status) + '</span>' +
+        '</div>' +
+        '<div class="gar-detalhe">' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:12.5px">' +
+            '<div><b>CPF/CNPJ:</b> ' + esc(g.cliente.cpf_cnpj) + '</div>' +
+            '<div><b>WhatsApp:</b> ' + esc(g.cliente.whatsapp||'—') + '</div>' +
+            '<div><b>Produto:</b> ' + esc(g.pedido.nome_produto||'—') + '</div>' +
+            '<div><b>Marca/Modelo:</b> ' + esc(g.pedido.marca||'—') + ' ' + esc(g.pedido.modelo||'') + '</div>' +
+            '<div><b>NF:</b> ' + esc(g.pedido.nf||'—') + '</div>' +
+            '<div><b>Nº série:</b> ' + esc(g.pedido.numero_serie||'N/A') + '</div>' +
+            '<div><b>Compra:</b> ' + fmtDate(g.pedido.data_compra) + '</div>' +
+            '<div><b>Recebimento:</b> ' + fmtDate(g.pedido.data_recebimento) + '</div>' +
+          '</div>' +
+          '<div style="margin-top:12px;padding:10px;background:#fff;border-radius:6px"><b>Problema:</b> ' + esc(g.problema.descricao_cliente) + '</div>' +
+        '</div>' +
+        (sug ? ('<div class="gar-sug-box ' + sugBoxCls + '">' +
+          '<div style="font-size:12px;font-weight:700;margin-bottom:4px">💡 SUGESTÃO DO SISTEMA (confiança: ' + sug.score_confianca + ')</div>' +
+          '<div style="font-weight:700;margin-bottom:6px">' + esc(sugLblTxt) + '</div>' +
+          '<div style="font-size:12.5px">' + esc(sug.justificativa_sistema) + '</div>' +
+        '</div>') : '') +
+        decTxt +
+        (g.status !== 'resolvido' ? renderAcoes(g) : '') +
+        produtoFisicoBox +
+        '<h4 style="margin:20px 0 6px;font-size:13px;color:#4a5057">Histórico</h4>' +
+        '<div class="gar-timeline">' + timeline + '</div>' +
+        '<div class="gar-modal-acts">' +
+          '<button class="gar-cancel" onclick="GAR.fecharModal(\'gar-mdl-det\')">Fechar</button>' +
+        '</div>' +
+      '</div></div>';
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  function renderAcoes(g){
+    var acoes = [];
+    var sug = g.avaliacao_cdc && g.avaliacao_cdc.sugestao_sistema;
+    // Se ainda não decidiu
+    if (!g.decisao_operador) {
+      if (sug) {
+        acoes.push('<button class="gar-ok" onclick="GAR.decidirSugestao(\'' + g.id + '\',\'' + sug + '\')" style="background:#16a34a">✓ Aprovar sugestão</button>');
+      }
+      acoes.push('<button class="gar-btn-sec" onclick="GAR.decidirOverride(\'' + g.id + '\')">↔ Override (decidir diferente)</button>');
+    } else {
+      // Já decidiu — próximas ações dependem do fluxo
+      var dec = g.decisao_operador.valor;
+      var procedente = dec === 'procedente_troca' || dec === 'procedente_restituicao';
+      var pf = (g.produto_fisico && g.produto_fisico.status) || 'nao_solicitado';
+      if (procedente && pf === 'nao_solicitado') {
+        acoes.push('<button class="gar-ok" onclick="GAR.pedirProduto(\'' + g.id + '\')">📬 Pedir produto do cliente</button>');
+      }
+      if (pf === 'aguardando_chegada') {
+        acoes.push('<button class="gar-ok" onclick="GAR.receberProduto(\'' + g.id + '\')">📦 Marcar como recebido</button>');
+      }
+      if (!procedente && g.status !== 'resolvido') {
+        acoes.push('<button class="gar-ok" onclick="GAR.resolverNegada(\'' + g.id + '\')">Finalizar como negada</button>');
+      }
+      // Botão de mudar status
+      if (g.status === 'aberto') acoes.push('<button class="gar-btn-sec" onclick="GAR.mudarStatus(\'' + g.id + '\',\'em_analise\')">→ Em análise</button>');
+      if (g.status === 'em_analise') acoes.push('<button class="gar-btn-sec" onclick="GAR.mudarStatus(\'' + g.id + '\',\'aguardando_cliente\')">→ Aguardando cliente</button>');
+    }
+    if (!acoes.length) return '';
+    return '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">' + acoes.join('') + '</div>';
+  }
+
+  function renderProdutoFisico(g){
+    var pf = g.produto_fisico;
+    if (!pf || pf.status === 'nao_solicitado') return '';
+    var box =
+      '<div style="margin-top:14px;padding:14px;background:#eff6ff;border-left:4px solid #0e4b7a;border-radius:6px">' +
+        '<div style="font-size:12px;font-weight:700;color:#0e4b7a;margin-bottom:8px">📦 ESTOQUE DO PRODUTO FÍSICO</div>' +
+        '<div style="font-size:12.5px"><b>Status:</b> ' + esc(STATUS_PRODUTO_LBL[pf.status]||pf.status) + '</div>' +
+        (pf.rastreio_entrada ? '<div style="font-size:12.5px"><b>Rastreio entrada:</b> ' + esc(pf.rastreio_entrada) + '</div>' : '') +
+        (pf.recebido_em ? '<div style="font-size:12.5px"><b>Recebido:</b> ' + fmtDateTime(pf.recebido_em) + ' por ' + esc(pf.recebido_por||'') + '</div>' : '') +
+        (pf.localizacao_loja ? '<div style="font-size:12.5px"><b>Local na loja:</b> ' + esc(pf.localizacao_loja) + '</div>' : '') +
+        (pf.envio_fabricante ? '<div style="font-size:12.5px;margin-top:6px"><b>Enviado:</b> ' + fmtDateTime(pf.envio_fabricante.data) +
+          ' · ' + esc(pf.envio_fabricante.canal||'—') +
+          (pf.envio_fabricante.protocolo_rma ? ' · RMA: ' + esc(pf.envio_fabricante.protocolo_rma) : '') +
+          '</div>' : '') +
+        (pf.resolucao_fabricante ? '<div style="font-size:12.5px;margin-top:6px;color:#065f46"><b>✓ Fechado:</b> ' + esc(pf.resolucao_fabricante.tipo) +
+          ' em ' + fmtDateTime(pf.resolucao_fabricante.data) + '</div>' : '') +
+      '</div>';
+    return box;
+  }
+
+  async function decidirSugestao(id, valor){
+    if (!confirm('Aprovar a sugestão do sistema (' + valor + ')?')) return;
+    await _postDecidir(id, valor, '');
+  }
+  async function decidirOverride(id){
+    var escolha = prompt('Qual decisão? Digite:\\n- procedente_troca\\n- procedente_restituicao\\n- improcedente_prazo\\n- improcedente_mau_uso\\n- improcedente_sem_direito');
+    if (!escolha) return;
+    var just = prompt('Justificativa (obrigatória para override):');
+    if (!just) { alert('Justificativa obrigatória para override.'); return; }
+    await _postDecidir(id, escolha, just);
+  }
+  async function _postDecidir(id, valor, justificativa){
+    try {
+      var r = await fetch('/api/garantias/' + id + '/decidir', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ valor: valor, justificativa: justificativa })
+      });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      fecharModal('gar-mdl-det');
+      await recarregar();
+      abrirDetalhe(id);
+    } catch(e) { alert('Erro: ' + e.message); }
+  }
+
+  async function pedirProduto(id){
+    var rast = prompt('Código de postagem reversa (ou deixe em branco se o cliente envia por conta):') || '';
+    try {
+      var r = await fetch('/api/garantias/' + id + '/aguardando-chegada', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ rastreio_entrada: rast })
+      });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      fecharModal('gar-mdl-det');
+      recarregar(); abrirDetalhe(id);
+    } catch(e) { alert('Erro: ' + e.message); }
+  }
+
+  async function receberProduto(id){
+    var loc = prompt('Localização na loja (ex: Prateleira G-2, Caixa 5):') || '';
+    try {
+      var r = await fetch('/api/garantias/' + id + '/receber', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ localizacao_loja: loc })
+      });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      fecharModal('gar-mdl-det');
+      recarregar(); abrirDetalhe(id);
+    } catch(e) { alert('Erro: ' + e.message); }
+  }
+
+  async function mudarStatus(id, novo){
+    try {
+      var r = await fetch('/api/garantias/' + id + '/status', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ novoStatus: novo })
+      });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      fecharModal('gar-mdl-det');
+      recarregar(); abrirDetalhe(id);
+    } catch(e) { alert('Erro: ' + e.message); }
+  }
+
+  async function resolverNegada(id){
+    if (!confirm('Finalizar esta garantia como NEGADA?')) return;
+    var nota = prompt('Nota de encerramento (opcional):') || '';
+    try {
+      var r = await fetch('/api/garantias/' + id + '/resolver', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ resultado: 'negada', nota: nota })
+      });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      fecharModal('gar-mdl-det');
+      recarregar();
+    } catch(e) { alert('Erro: ' + e.message); }
+  }
+
+  // ──────── ESTOQUE DE GARANTIAS ────────
+  function mudarView(v){
+    state.view = v;
+    state.selecionadas = {};
+    atualizarBotoesLote();
+    document.querySelectorAll('.gar-tab-btn').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-view') === v);
+    });
+    // Mostra/esconde filtro
+    document.getElementById('gar-filtros').style.display = (v === 'atendimento') ? 'flex' : 'none';
+    document.getElementById('gar-lista').innerHTML = '<div style="color:#7b8285;padding:20px;text-align:center">Carregando…</div>';
+    recarregar();
+  }
+
+  function renderEstoque(){
+    var grupos = state.estoqueAgrupado || {};
+    var marcas = Object.keys(grupos).sort();
+    if (!marcas.length) {
+      document.getElementById('gar-lista').innerHTML = '<div style="padding:40px;text-align:center;color:#7b8285">Nenhum produto no estoque de garantia.<br><small>Quando você aprova uma garantia e pede o produto do cliente, ele aparece aqui.</small></div>';
+      return;
+    }
+    var html = marcas.map(function(marca){
+      var itens = grupos[marca] || [];
+      var itensNaLoja = itens.filter(function(g){ return g.produto_fisico.status === 'recebido_loja'; });
+      var cnt = itens.length;
+      return '<div class="gar-estoque-grupo">' +
+        '<div class="gar-estoque-marca">' +
+          '<span>🏷️ ' + esc(marca) + '</span>' +
+          '<span class="gar-estoque-marca-cnt">' + cnt + ' produto(s) · ' + itensNaLoja.length + ' prontos pra enviar</span>' +
+        '</div>' +
+        itens.map(estoqueItemHtml).join('') +
+      '</div>';
+    }).join('');
+    document.getElementById('gar-lista').innerHTML = html;
+  }
+
+  function estoqueItemHtml(g){
+    var pf = g.produto_fisico;
+    var statusLbl = STATUS_PRODUTO_LBL[pf.status]||pf.status;
+    var cor = pf.status === 'recebido_loja' ? '#16a34a' : (pf.status === 'enviado_fabricante' ? '#0e4b7a' : '#ca8a04');
+    var podeSel = pf.status === 'recebido_loja';
+    var isSel = !!state.selecionadas[g.id];
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px;border-top:1px solid #eef0f1;cursor:pointer" onclick="GAR.abrirDetalhe(\'' + g.id + '\')">' +
+      (podeSel ? '<input type="checkbox" ' + (isSel?'checked':'') + ' onclick="event.stopPropagation();GAR.toggleSel(\'' + g.id + '\')" class="gar-card-chk"/>' : '<span style="width:16px"></span>') +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:13px;font-weight:600">' + esc(g.pedido.nome_produto||'—') + ' <span style="color:#888;font-weight:400">' + esc(g.pedido.modelo||'') + '</span></div>' +
+        '<div style="font-size:11.5px;color:#7b8285">' + esc(g.cliente.nome) + ' · ' + idCurto(g.id) + (pf.localizacao_loja ? ' · 📍 ' + esc(pf.localizacao_loja) : '') + '</div>' +
+      '</div>' +
+      '<span style="font-size:11px;font-weight:700;color:' + cor + ';background:#fff;padding:3px 8px;border-radius:4px;border:1px solid ' + cor + '">' + esc(statusLbl) + '</span>' +
+    '</div>';
+  }
+
+  function renderComFabricante(){
+    renderEstoque(); // mesmo layout, filtrado por status
+  }
+
+  function toggleSel(id){
+    if (state.selecionadas[id]) delete state.selecionadas[id];
+    else state.selecionadas[id] = true;
+    atualizarBotoesLote();
+  }
+
+  function atualizarBotoesLote(){
+    var ids = Object.keys(state.selecionadas);
+    var n = ids.length;
+    var btnImp = document.getElementById('gar-btn-imp');
+    var btnEnv = document.getElementById('gar-btn-env');
+    var c1 = document.getElementById('gar-sel-count');
+    var c2 = document.getElementById('gar-sel-count-2');
+    if (c1) c1.textContent = n;
+    if (c2) c2.textContent = n;
+    if (btnImp) btnImp.style.display = (n > 0 && state.view === 'estoque') ? '' : 'none';
+    if (btnEnv) btnEnv.style.display = (n > 0 && state.view === 'estoque') ? '' : 'none';
+  }
+
+  async function imprimirSelecionadas(){
+    var ids = Object.keys(state.selecionadas);
+    if (!ids.length) return;
+    try {
+      var r = await fetch('/api/garantias/etiquetas', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ ids: ids })
+      });
+      if (!r.ok) {
+        var e = await r.json();
+        throw new Error(e.error);
+      }
+      var html = await r.text();
+      var win = window.open('', '_blank');
+      if (!win) { alert('Permita popups neste site pra abrir as etiquetas.'); return; }
+      win.document.write(html);
+      win.document.close();
+      // Limpa seleção
+      state.selecionadas = {};
+      atualizarBotoesLote();
+    } catch(e) { alert('Erro: ' + e.message); }
+  }
+
+  function abrirModalEnvio(){
+    var ids = Object.keys(state.selecionadas);
+    if (!ids.length) return;
+    var html =
+      '<div class="gar-modal-bg" id="gar-mdl-env" onclick="if(event.target===this)GAR.fecharModal(\'gar-mdl-env\')">' +
+      '<div class="gar-modal">' +
+        '<h3>Enviar ' + ids.length + ' produto(s) pro fabricante</h3>' +
+        '<p style="color:#4a5057;font-size:13px">Registre o canal usado e o protocolo que o fabricante retornar. Os produtos selecionados vão pro status "Com fabricante".</p>' +
+        '<div class="gar-fs">' +
+          '<div><label>Canal usado</label><select id="gar-env-canal"><option value="email">E-mail</option><option value="portal">Portal do fabricante</option><option value="whatsapp">WhatsApp</option><option value="telefone">Telefone</option><option value="outro">Outro</option></select></div>' +
+          '<div><label>Contato (quem recebeu)</label><input id="gar-env-contato" placeholder="Ex: suporte@fenix.com.br, +55 11 99..."/></div>' +
+          '<div><label>Protocolo / RMA</label><input id="gar-env-rma" placeholder="Nº retornado pelo fabricante"/></div>' +
+          '<div><label>Rastreio de saída</label><input id="gar-env-rastreio" placeholder="Código do envio"/></div>' +
+          '<div class="gar-fs-1"><label>Nota (opcional)</label><textarea id="gar-env-nota" style="min-height:60px"></textarea></div>' +
+        '</div>' +
+        '<div class="gar-modal-acts">' +
+          '<button class="gar-cancel" onclick="GAR.fecharModal(\'gar-mdl-env\')">Cancelar</button>' +
+          '<button class="gar-ok" onclick="GAR.confirmarEnvio()">Registrar envio</button>' +
+        '</div>' +
+      '</div></div>';
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  async function confirmarEnvio(){
+    var ids = Object.keys(state.selecionadas);
+    function v(id){ var e=document.getElementById(id); return e?e.value:''; }
+    try {
+      var r = await fetch('/api/garantias/enviar-fabricante', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          ids: ids,
+          canal: v('gar-env-canal'),
+          contato: v('gar-env-contato'),
+          protocolo_rma: v('gar-env-rma'),
+          rastreio_saida: v('gar-env-rastreio'),
+          nota: v('gar-env-nota'),
+        })
+      });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      fecharModal('gar-mdl-env');
+      alert(d.total + ' produto(s) marcados como enviados pro fabricante.');
+      state.selecionadas = {};
+      atualizarBotoesLote();
+      recarregar();
+    } catch(e) { alert('Erro: ' + e.message); }
+  }
+
+  function fecharModal(id){
+    var m = document.getElementById(id);
+    if (m) m.remove();
+  }
+
+  return {
+    init: init, recarregar: recarregar, atualizarContador: atualizarContador,
+    mudarView: mudarView, filtrarCliente: filtrarCliente,
+    abrirModalNova: abrirModalNova, salvarNova: salvarNova,
+    abrirDetalhe: abrirDetalhe,
+    decidirSugestao: decidirSugestao, decidirOverride: decidirOverride,
+    pedirProduto: pedirProduto, receberProduto: receberProduto,
+    mudarStatus: mudarStatus, resolverNegada: resolverNegada,
+    toggleSel: toggleSel, imprimirSelecionadas: imprimirSelecionadas,
+    abrirModalEnvio: abrirModalEnvio, confirmarEnvio: confirmarEnvio,
+    fecharModal: fecharModal,
+  };
+})();
+</script>
 
 </body>
 </html>
