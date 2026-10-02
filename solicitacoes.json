@@ -224,5 +224,31 @@
         "por": "gerencia"
       }
     ]
+  },
+  "076f871f-9c95-464b-aaf6-6cad7e255482": {
+    "id": "076f871f-9c95-464b-aaf6-6cad7e255482",
+    "de": "gerencia",
+    "para": "joao",
+    "categoria": "Direção",
+    "titulo": "Acessos",
+    "descricao": "Criar acessos\n\nVendedor - TRAY Pro Hunters\nVendedor - Blu Pro Hunters / Calibre Restrito",
+    "prazo": "2026-10-14",
+    "status": "pendente",
+    "criado_em": "2026-10-02T13:47:44.863Z",
+    "executado_em": null,
+    "executado_por": null,
+    "aprovado_em": null,
+    "aprovado_por": null,
+    "rejeitado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_motivo": null,
+    "mensagens": [],
+    "historico": [
+      {
+        "ts": "2026-10-02T13:47:44.863Z",
+        "acao": "criada",
+        "por": "gerencia"
+      }
+    ]
   }
 }
