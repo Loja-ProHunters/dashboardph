@@ -60,6 +60,11 @@ module.exports = {
   githubToken: process.env.GITHUB_TOKEN || '',
   githubRepo: process.env.GITHUB_REPO || 'Loja-ProHunters/dashboardph',
   githubBranch: process.env.GITHUB_BRANCH || 'main',
+  // Branch SEPARADA pra dados (JSON de garantias, solicitações, CRM, etc).
+  // Vercel só acompanha githubBranch — writes aqui NÃO geram deploys.
+  // Resolve o estouro de rate limit da Vercel que acontecia com o backend
+  // commitando dados várias vezes por dia no mesmo branch do código.
+  dataBranch: process.env.GITHUB_DATA_BRANCH || 'data',
 
   cronSecret: process.env.CRON_SECRET || '',
 
