@@ -7786,5 +7786,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "d123c8b6-5762-4194-a544-6ae569113f84": {
+    "id": "d123c8b6-5762-4194-a544-6ae569113f84",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Sulivan Hevellin Pimentel de Araujo",
+      "cpf_cnpj": "91481082272",
+      "whatsapp": "+5591988323299",
+      "email": "sulivanpmpa08@gmail.com",
+      "cidade": "Belém",
+      "uf": "PA",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030292",
+      "data_compra": "2026-05-06",
+      "data_recebimento": "2026-05-19",
+      "nome_produto": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+      "marca": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+      "modelo": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "A mira (luz vermelha) não desce de jeito algum, nem com ajuste e cliques do manual.",
+      "data_percebido_problema": "2026-08-07",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "Só quero a regulação da mira ou troca do produto se não for possível regular.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "1001517582.jpg",
+          "url": "https://storage.tally.so/private/1001517582.jpg?id=R6B12v&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlI2QjEydiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDkyNzk2Nn0.iBWzEfwgqjzC_eafVrfW-r7h529G58p4dEIJ7KChBPk&signature=5c3c75ae04fcaea64b49d05c603ca9609ace49c9a1c86985ac5c3422556cf78f",
+          "mimeType": "image/jpeg",
+          "size": 2534176
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-05-19",
+      "data_percebido_problema": "2026-08-07",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-02T07:59:41.366Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T07:59:41.366Z",
+    "atualizado_em": "2026-10-02T07:59:41.366Z",
+    "historico": [
+      {
+        "ts": "2026-10-02T07:59:41.366Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
