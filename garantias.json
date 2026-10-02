@@ -11947,5 +11947,104 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "f0d9682c-2854-4da8-8524-674261a3d25e": {
+    "id": "f0d9682c-2854-4da8-8524-674261a3d25e",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Gustavo de Freitas Baise",
+      "cpf_cnpj": "07001338958",
+      "whatsapp": "+5544988282282",
+      "email": "gustavobaise@hotmail.com",
+      "cidade": "Umuarama",
+      "uf": "PR",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030739",
+      "data_compra": "2026-07-14",
+      "data_recebimento": "2026-07-17",
+      "nome_produto": "Lanterna para arma Fenix GL30R 800 lúmens; Bateria Fenix Recarregavel 18650 4000mAh 3.6V 14.4Wh De Ion de Litio ARB-L18-4000 (ID)",
+      "marca": "Fenix",
+      "modelo": "Lanterna GL30R; Bateria recarregavel 18650 4000mAh",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Insatisfeito com o produto",
+      "data_percebido_problema": "2026-07-17",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "PRODUTO NÃO ESTÁ COM DEFEITO!!! Quero trocar por outro modelo, pois esse modelo não atendeu minhas necessidades",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "IMG_0295.png",
+          "url": "https://storage.tally.so/private/IMG_0295.png?id=9yo9jQ&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijl5bzlqUSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDk0MDczM30.Ae7_MZF3_R2B9P3EghcxqvI-fhaIYUiS2f80M6V-j5s&signature=737be9ae3403bf2bfdf83ab21edc00191ebcfb354b1b2693c834b2c6cba56e6c",
+          "mimeType": "image/png",
+          "size": 1301440
+        }
+      ]
+    },
+    "preferencia_cliente": "troca",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-07-17",
+      "data_percebido_problema": "2026-07-17",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "troca",
+      "sugestao_sistema": "procedente_troca",
+      "justificativa_sistema": "Dentro do prazo legal (CDC Art. 26), sem indício de mau uso, com evidência anexada. Cliente preferiu troca por produto igual novo (CDC Art. 18 §1º I).",
+      "score_confianca": "media",
+      "calculado_em": "2026-10-02T11:32:40.250Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T11:32:40.250Z",
+    "atualizado_em": "2026-10-02T11:32:40.250Z",
+    "tally_meta": {
+      "eventId": "sync_xV0AzNE",
+      "responseId": "xV0AzNE",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-07-21T19:06:54.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Troca (produto errado ou insatisfação)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-02T11:32:40.250Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
