@@ -10402,5 +10402,104 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "6c292ea5-164e-49bc-87b3-1357d65a7585": {
+    "id": "6c292ea5-164e-49bc-87b3-1357d65a7585",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Rômulo Araújo Alencar",
+      "cpf_cnpj": "073.364.493-79",
+      "whatsapp": "+5588981463053",
+      "email": "romimestourado001@gmail.com",
+      "cidade": "Tauá",
+      "uf": "CE",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "31252",
+      "data_compra": "2026-09-01",
+      "data_recebimento": "2026-09-15",
+      "nome_produto": "Lanterna para armas",
+      "marca": "Olight",
+      "modelo": "Baldr rl mini preta",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "O laser está muito fraco, impossibilitando o uso e a visualização. A lanterna está excelente, muito boa por sinal, mas o laser, fraco fraco. Testando no quarto escuro mal da pra ver, no claro então se some. É como se estivesse descarregando, mas não é, pq a lanterna está bem forte, inclusive coloquei várias vezes para carregar e nada de melhorar. Tbm mexi na regularem dele, mas sem sucesso.",
+      "data_percebido_problema": "2026-09-15",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Quero trocar por outra lanterna/laser, pois essa veio com defeito no laser",
+      "uploads": [
+        {
+          "tipo": "video",
+          "nome": "1000758816.mp4",
+          "url": "https://storage.tally.so/private/1000758816.mp4?id=Ybz8dv&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlliejhkdiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDk0MDczM30.Fob_YZUQ8-wZwl9068t2pwYOH4ZSXAA4SOGq4JDFWkk&signature=86736c8975ff20724ed3a4acc0d691bfe540cb3cfc3461c072afed0d4e37c372",
+          "mimeType": "video/mp4",
+          "size": 3665411
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-09-15",
+      "data_percebido_problema": "2026-09-15",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-02T11:32:21.096Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T11:32:21.096Z",
+    "atualizado_em": "2026-10-02T11:32:21.096Z",
+    "tally_meta": {
+      "eventId": "sync_DqYbvdN",
+      "responseId": "DqYbvdN",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-09-16T17:08:01.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Garantia (produto com defeito)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-02T11:32:21.096Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
