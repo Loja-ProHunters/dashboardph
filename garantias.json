@@ -12541,5 +12541,104 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "e665d05b-c647-40ce-afaa-4a8a9b16cf2a": {
+    "id": "e665d05b-c647-40ce-afaa-4a8a9b16cf2a",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Diógenes Câmara",
+      "cpf_cnpj": "84056479615",
+      "whatsapp": "+5522988161856",
+      "email": "diogenescamara@gmail.com",
+      "cidade": "Nova Friburgo",
+      "uf": "RJ",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030585",
+      "data_compra": "2026-06-19",
+      "data_recebimento": "2026-07-07",
+      "nome_produto": "Red dot",
+      "marca": "Victoptics 1x18",
+      "modelo": "VEC RDSL01",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Devolução por arrependimento.",
+      "data_percebido_problema": "2026-07-07",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Devolução por arrependimento.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "17838959420862394921488467065785.jpg",
+          "url": "https://storage.tally.so/private/17838959420862394921488467065785.jpg?id=0y7q0N&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjB5N3EwTiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDk0MDczM30.TLJCFvspaipXfCUHQyhX29eXfc023JMAHGgdjqnNP7s&signature=ada115363f359ea4c9c3b902c15f76695ca367ec102ed2ba322c2bb5e861f19e",
+          "mimeType": "image/jpeg",
+          "size": 1517797
+        }
+      ]
+    },
+    "preferencia_cliente": "restituicao",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-07-07",
+      "data_percebido_problema": "2026-07-07",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": true,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "restituicao",
+      "sugestao_sistema": "improcedente_prazo",
+      "justificativa_sistema": "Pedido de arrependimento em compra à distância, mas fora do prazo de 7 dias previsto no CDC Art. 49 (87 dias desde o recebimento).",
+      "score_confianca": "alta",
+      "calculado_em": "2026-10-02T11:32:47.746Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T11:32:47.746Z",
+    "atualizado_em": "2026-10-02T11:32:47.746Z",
+    "tally_meta": {
+      "eventId": "sync_Vp1Bdky",
+      "responseId": "Vp1Bdky",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-07-12T22:40:26.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Devolução (arrependimento de compra)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-02T11:32:47.746Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
