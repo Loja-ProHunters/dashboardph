@@ -710,6 +710,22 @@ module.exports = async (req, res) => {
   //        → imprime etiqueta A4 pra colar na caixa
   // ═════════════════════════════════════════════════════════════
 
+  // GET /api/crm/produtividade — métricas de produtividade dos vendedores.
+  // Admin/diretor only. Retorna { equipe, vendedores:[{login,nome,...,lista_atrasadas}] }
+  if (url === '/api/crm/produtividade' && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
+    try {
+      const prod = require('../lib/crm/produtividade');
+      const r = await prod.calcularProdutividade();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // POST /api/garantias/deduplicar — remove garantias duplicadas vindas do Tally.
   // Admin/diretor/auxiliar. Chamar UMA VEZ pra limpar o acumulado.
   if (url === '/api/garantias/deduplicar' && req.method === 'POST') {
@@ -4444,6 +4460,7 @@ module.exports = async (req, res) => {
     const canUseIaFlag = canUseIA(sess) ? 'true' : 'false';
     const canManageKBFlag = canManageKB(sess) ? 'true' : 'false';
     const canGerGar = canGerenciarGarantias(sess) ? 'true' : 'false';
+    const canVerProd = isAdminOrDiretor(sess) ? 'true' : 'false';
     const usuarioEsc = String(sess.usuario || '').replace(/"/g, '\\"');
     const nomeEsc = String(sess.nome || '').replace(/"/g, '\\"');
     const roleEsc = String(userRole || '').replace(/"/g, '\\"');
@@ -4456,6 +4473,7 @@ module.exports = async (req, res) => {
       'var CAN_ACCESS_CRM=' + canAccessCrm + '; var CAN_EDIT_CRM=' + canEditCrm + '; ' +
       'var CAN_USE_IA=' + canUseIaFlag + '; var CAN_MANAGE_KB=' + canManageKBFlag + '; ' +
       'var CAN_GERENCIAR_GARANTIAS=' + canGerGar + '; ' +
+      'var CAN_VER_PRODUTIVIDADE=' + canVerProd + '; ' +
       'var MUST_CHANGE_PASSWORD=' + mustChange + ';'
     );
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
