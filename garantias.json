@@ -9223,5 +9223,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "ce1a8f55-b2ed-41fc-8893-f3b1e8c1fb0a": {
+    "id": "ce1a8f55-b2ed-41fc-8893-f3b1e8c1fb0a",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Júlio Sérgio Pimentel",
+      "cpf_cnpj": "27449104814",
+      "whatsapp": "+5511975927838",
+      "email": "pimenteljs@hotmail.com",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030600",
+      "data_compra": "2026-06-23",
+      "data_recebimento": "2026-06-24",
+      "nome_produto": "Red Dot Frenzy 1x17x24 - Vector Optics",
+      "marca": "Vector Optics",
+      "modelo": "Red Dot Frenzy 1x17x24",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "O produto não tem nenhum problema. Está em perfeitas condições. Eu que comprei o modelo errado. Este red dot não encaixa no meu plate e gostaria de fazer a troca para um que encaixe. Pagarei a diferença por pix.",
+      "data_percebido_problema": "2026-06-26",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "O produto não tem nenhum problema. Está em perfeitas condições. Eu que comprei o modelo errado. Este red dot não encaixa no meu plate e gostaria de fazer a troca para um que encaixe. Pagarei a diferença por pix.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "PHOTO-2026-06-29-10-50-07.jpg",
+          "url": "https://storage.tally.so/private/PHOTO-2026-06-29-10-50-07.jpg?id=xBYq4o&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InhCWXE0byIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDkyNzk2Nn0.CzukYnVSTw4dHjVo0OnywiX42I4nofb1r3NGUfY7-eE&signature=1c5499bdabc77acc994aec31912a869d2d99482285da1ace2bbddb235c001f80",
+          "mimeType": "image/jpeg",
+          "size": 213461
+        }
+      ]
+    },
+    "preferencia_cliente": "troca",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-06-24",
+      "data_percebido_problema": "2026-06-26",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "troca",
+      "sugestao_sistema": "improcedente_prazo",
+      "justificativa_sistema": "Fora do prazo decadencial do CDC Art. 26 (90 dias para produto durável). Já se passaram 98 dias da data em que o defeito apareceu (vício oculto).",
+      "score_confianca": "alta",
+      "calculado_em": "2026-10-02T08:00:03.270Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T08:00:03.270Z",
+    "atualizado_em": "2026-10-02T08:00:03.270Z",
+    "historico": [
+      {
+        "ts": "2026-10-02T08:00:03.270Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
