@@ -10932,5 +10932,104 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "6257027a-8a21-44f4-94ab-e1cd98584427": {
+    "id": "6257027a-8a21-44f4-94ab-e1cd98584427",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Joao Bruno Freitas",
+      "cpf_cnpj": "06345529613",
+      "whatsapp": "+5531986391004",
+      "email": "joaobrunoaf@hotmail.com",
+      "cidade": "Belo Horizonte",
+      "uf": "MG",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "31037",
+      "data_compra": "2026-08-15",
+      "data_recebimento": "2026-08-21",
+      "nome_produto": "Luneta Vector Optics Minotaur 12-60x60mm GNII MFL SFP SCOL-40",
+      "marca": "Vector Optics",
+      "modelo": "Minotaur 12-60x60mm GNII MFL SFP SCOL-40",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "A luneta esta com arranhados na lente proximal. Ela estava com o que parecia ser\numa borracha solta, mas desapareceu apos girar a lente de grau.",
+      "data_percebido_problema": "2026-08-21",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "A luneta esta com arranhados na lente proximal. Ela estava com o que parecia ser\numa borracha solta, mas desapareceu apos girar a lente de grau.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "WhatsApp Image 2026-08-24 at 18.52.34.jpeg",
+          "url": "https://storage.tally.so/private/WhatsApp-Image-2026-08-24-at-18.52.34.jpeg?id=9P9AvK&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlQOUF2SyIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDk0MDczM30.lVtrJgLWpTrT5ADqr0tprgKrcKB40Y27mEQ2UbzRG9c&signature=238b631d4d19a2c0e6e24224d48a34aa4b842c5efec38976a2bb36361edc229f",
+          "mimeType": "image/jpeg",
+          "size": 138862
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-08-21",
+      "data_percebido_problema": "2026-08-21",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-02T11:32:27.947Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T11:32:27.947Z",
+    "atualizado_em": "2026-10-02T11:32:27.947Z",
+    "tally_meta": {
+      "eventId": "sync_vXKlyN4",
+      "responseId": "vXKlyN4",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-08-25T15:05:17.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Garantia (produto com defeito)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-02T11:32:27.947Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
