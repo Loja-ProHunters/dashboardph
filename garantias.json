@@ -7183,5 +7183,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "5f849c57-2b31-40e4-a4a2-1cf84546e274": {
+    "id": "5f849c57-2b31-40e4-a4a2-1cf84546e274",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Charles Adriano Meneses",
+      "cpf_cnpj": "82774340659",
+      "whatsapp": "+5534992089103",
+      "email": "charlesameneses@hotmail.com",
+      "cidade": "Ibiá",
+      "uf": "MG",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031278",
+      "data_compra": "2026-09-08",
+      "data_recebimento": "2026-09-07",
+      "nome_produto": "Red dot",
+      "marca": "Vector optics",
+      "modelo": "Frenzy SCRD1911",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Parafuso de elevação da mira está com defeito",
+      "data_percebido_problema": "2026-09-15",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "Gostei muito do produto, mas gostaria de adquirir um que não esteja com defeito.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "image.jpg",
+          "url": "https://storage.tally.so/private/image.jpg?id=DovY8l&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkRvdlk4bCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDkyNzk2Nn0.MbbRjCqHZ9EjsANj8NEXcR7xzMrThY_eDqYxDGX-oQY&signature=a246d34f85a6207710496f629e01282b06a15a268385343c2352ff9c5c2e11ee",
+          "mimeType": "image/jpeg",
+          "size": 4867333
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-09-07",
+      "data_percebido_problema": "2026-09-15",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-02T07:59:34.343Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T07:59:34.343Z",
+    "atualizado_em": "2026-10-02T07:59:34.343Z",
+    "historico": [
+      {
+        "ts": "2026-10-02T07:59:34.343Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
