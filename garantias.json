@@ -7273,5 +7273,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "290a347a-bc49-449a-9410-f7f6bbf38b1f": {
+    "id": "290a347a-bc49-449a-9410-f7f6bbf38b1f",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Cassius Panice",
+      "cpf_cnpj": "14578119874",
+      "whatsapp": "+5514997757881",
+      "email": "cassiuspanice@gmail.com",
+      "cidade": "Bauru",
+      "uf": "SP",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "000.193.319",
+      "data_compra": "2026-08-17",
+      "data_recebimento": "2026-09-30",
+      "nome_produto": "Trilho de Aço Picatinny Long 20MOA - Vector Optics (Ref. VEC-SCRA-63) - Marca : Vector Optics - Modelo : SCRA-63",
+      "marca": "vector optics",
+      "modelo": "- Modelo : SCRA-63",
+      "numero_serie": "n.a",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Eu medi corretamente o tamanho externo e as distâncias do furos com o anúncio antes de comprar estava tudo ok . Mas a posição dos furos da peça que recebi é diferente",
+      "data_percebido_problema": "2026-09-01",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Eu medi corretamente o tamanho externo e as distâncias do furos com o anúncio antes de comprar estava tudo ok . Mas a posição dos furos é diferente",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "prohunters trilho 3.jpg",
+          "url": "https://storage.tally.so/private/prohunters-trilho-3.jpg?id=gX1aYP&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImdYMWFZUCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDkyNzk2Nn0.-jj3blUmCblgaW1BBHpr6Pb-k8R8BQ9lOz6Grc8U8S0&signature=0f9e5456aefe8b98dd6e192500ebd4130f179cf2d4a491ec189e52902ca18ecf",
+          "mimeType": "image/jpeg",
+          "size": 742704
+        }
+      ]
+    },
+    "preferencia_cliente": "troca",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-09-30",
+      "data_percebido_problema": "2026-09-01",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "troca",
+      "sugestao_sistema": "procedente_troca",
+      "justificativa_sistema": "Dentro do prazo legal (CDC Art. 26), sem indício de mau uso, com evidência anexada. Cliente preferiu troca por produto igual novo (CDC Art. 18 §1º I).",
+      "score_confianca": "media",
+      "calculado_em": "2026-10-02T07:59:35.691Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T07:59:35.691Z",
+    "atualizado_em": "2026-10-02T07:59:35.691Z",
+    "historico": [
+      {
+        "ts": "2026-10-02T07:59:35.691Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
