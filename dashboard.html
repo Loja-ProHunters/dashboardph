@@ -358,6 +358,7 @@ tbody tr:hover td{background:var(--gl)}
     <div class="sb-lbl">Comercial</div>
     <button class="ni" onclick="goTab('comercial',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><rect x="5" y="11" width="3.6" height="7" rx="1"/><rect x="10.2" y="6" width="3.6" height="12" rx="1"/><rect x="15.4" y="14" width="3.6" height="4" rx="1"/></svg></span><span class="ni-tx">Dashboard Comercial</span></button>
     <button class="ni" id="ni-crm" onclick="goTab('crm',this)" style="display:none"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M4 5h16v4H4z"/><path d="M4 11h16v4H4z"/><path d="M4 17h16v2H4z"/><circle cx="7.5" cy="7" r="1" fill="currentColor"/><circle cx="7.5" cy="13" r="1" fill="currentColor"/></svg></span><span class="ni-tx">CRM</span><span class="badge">NOVO</span></button>
+    <button class="ni" id="ni-produtividade" onclick="goTab('produtividade',this)" style="display:none"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V10"/><path d="M12 21V3"/><path d="M19 21v-7"/><circle cx="5" cy="10" r="1.5" fill="currentColor"/><circle cx="12" cy="3" r="1.5" fill="currentColor"/><circle cx="19" cy="14" r="1.5" fill="currentColor"/></svg></span><span class="ni-tx">Produtividade</span><span class="badge-admin">ADMIN</span></button>
     <button class="ni" onclick="goTab('parceiros',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.6"/><path d="M2.6 20c0-3.5 2.9-6.2 6.4-6.2s6.4 2.7 6.4 6.2"/><circle cx="17" cy="7" r="2.6"/><path d="M15.5 14.2c2.7.4 4.7 2.7 4.7 5.4"/></svg></span><span class="ni-tx">Parceiros</span></button>
   </div>
   <div class="sb-grp">
@@ -3699,6 +3700,20 @@ window.chpwdSubmit = function(){
       <div id="gar-lista" style="min-height:200px"><div style="color:#7b8285;padding:20px;text-align:center">Carregando…</div></div>
     </div>
 
+    <!-- PRODUTIVIDADE DA EQUIPE — admin + diretor -->
+    <div class="tab" id="tab-produtividade">
+      <div id="prod-equipe-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px">
+        <!-- cards agregados vêm do JS -->
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="margin:0;color:#1a1a1a;font-size:16px">Por vendedor</h3>
+        <button class="gar-btn-sec" onclick="PROD.recarregar()" style="padding:6px 12px">↻ Recarregar</button>
+      </div>
+      <div id="prod-vendedores" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px">
+        <div style="color:#7b8285;padding:20px;text-align:center;grid-column:1/-1">Carregando…</div>
+      </div>
+    </div>
+
     <!-- Modal de nova solicitacao -->
     <div id="solic-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;padding:20px;overflow:auto" onclick="if(event.target===this)solicFecharModal()">
       <div style="max-width:520px;margin:5vh auto;background:#fff;border-radius:12px;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,.3)">
@@ -3757,7 +3772,8 @@ var tabMeta = {
   admin:     ['Base de Conhecimento','Gerenciar o que a IA sabe'],
   crm:       ['CRM','Contas, leads, oportunidades, atividades e pedidos'],
   solicitacoes: ['Solicitações','Hub de tarefas entre colaboradores'],
-  garantias: ['Garantias, Trocas e Devoluções','Triagem CDC, estoque e envio ao fabricante']
+  garantias: ['Garantias, Trocas e Devoluções','Triagem CDC, estoque e envio ao fabricante'],
+  produtividade: ['Produtividade da Equipe','Tarefas em dia e atrasadas por vendedor']
 };
 
 // Mapa de permissoes por role — quais abas cada perfil ve.
@@ -3804,6 +3820,12 @@ window.onload = function() {
     _niGar.style.display = '';
     // Dispara contador uma vez pro badge
     try { if (typeof GAR && GAR.atualizarContador) GAR.atualizarContador(); } catch(_){}
+  }
+  // Revela Produtividade (admin + diretor) — mesma visibilidade do grp-comercial
+  var _niProd = document.getElementById('ni-produtividade');
+  if (_niProd && typeof CAN_VER_PRODUTIVIDADE !== 'undefined' && CAN_VER_PRODUTIVIDADE) {
+    _niProd.style.display = '';
+    document.getElementById('grp-comercial').style.display = 'block';
   }
 
   // Auxiliar: entra no CRM so pra Op. Controlado. Renomeia o botao "CRM" pra
@@ -3886,6 +3908,7 @@ function goTab(id, el) {
   if (id === 'crm') crmInit();
   if (id === 'solicitacoes') solicInit();
   if (id === 'garantias' && typeof GAR !== 'undefined') GAR.init();
+  if (id === 'produtividade' && typeof PROD !== 'undefined') PROD.init();
 }
 
 function toggleSB() {
@@ -9073,6 +9096,59 @@ window.addEventListener('load', function(){
 }
 .gar-estoque-marca { font-size: 16px; font-weight: 700; color: #0e4b7a; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
 .gar-estoque-marca-cnt { font-size: 11px; background: #0e4b7a; color: #fff; padding: 2px 8px; border-radius: 10px; }
+
+/* ──────── PRODUTIVIDADE DA EQUIPE ──────── */
+.prod-kpi {
+  background: #fff; border: 1px solid #e0e4e7; border-radius: 10px;
+  padding: 14px 16px; text-align: center;
+}
+.prod-kpi-label { font-size: 11px; color: #7b8285; text-transform: uppercase; letter-spacing: .4px; font-weight: 600; margin-bottom: 6px; }
+.prod-kpi-value { font-size: 28px; font-weight: 800; color: #1a1a1a; line-height: 1; }
+.prod-kpi.alerta .prod-kpi-value { color: #c62828; }
+.prod-kpi.bom .prod-kpi-value { color: #16a34a; }
+
+.prod-card {
+  background: #fff; border: 1px solid #e0e4e7; border-radius: 10px;
+  padding: 16px; transition: box-shadow .15s;
+}
+.prod-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.prod-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.prod-card-nome { font-weight: 700; font-size: 15px; color: #1a1a1a; }
+.prod-card-login { font-size: 11px; color: #7b8285; font-family: ui-monospace, monospace; }
+.prod-card-taxa { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
+.prod-card-taxa.alta { background: #d1fae5; color: #065f46; }
+.prod-card-taxa.media { background: #fef3c7; color: #92400e; }
+.prod-card-taxa.baixa { background: #fee2e2; color: #991b1b; }
+.prod-card-taxa.na { background: #e5e7eb; color: #4a5057; }
+.prod-mini-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+.prod-mini { background: #f8f9fa; border-radius: 6px; padding: 8px; text-align: center; }
+.prod-mini-lbl { font-size: 10px; color: #7b8285; text-transform: uppercase; letter-spacing: .3px; font-weight: 600; }
+.prod-mini-val { font-size: 20px; font-weight: 700; margin-top: 2px; color: #1a1a1a; }
+.prod-mini.danger .prod-mini-val { color: #c62828; }
+.prod-mini.sucess .prod-mini-val { color: #16a34a; }
+.prod-mini.sucess { background: #ecfdf5; }
+.prod-mini.danger { background: #fef2f2; }
+.prod-atrasadas-toggle {
+  cursor: pointer; font-size: 12px; color: #c62828; font-weight: 600;
+  background: #fef2f2; border: 1px dashed #fca5a5; border-radius: 6px;
+  padding: 8px 12px; text-align: center; margin-top: 8px;
+  transition: background .15s;
+}
+.prod-atrasadas-toggle:hover { background: #fee2e2; }
+.prod-atrasadas-toggle.aberto { background: #fee2e2; }
+.prod-atrasadas-lista {
+  margin-top: 10px; display: none; max-height: 300px; overflow-y: auto;
+  border: 1px solid #fecaca; border-radius: 6px;
+}
+.prod-atrasadas-lista.aberto { display: block; }
+.prod-atrasada-item {
+  padding: 10px 12px; border-bottom: 1px solid #fef2f2;
+  display: flex; justify-content: space-between; align-items: start; gap: 10px; font-size: 12px;
+}
+.prod-atrasada-item:last-child { border-bottom: 0; }
+.prod-atrasada-titulo { font-weight: 600; color: #1a1a1a; }
+.prod-atrasada-cli { color: #7b8285; font-size: 11px; margin-top: 2px; }
+.prod-atrasada-dias { color: #c62828; font-weight: 700; font-size: 12px; white-space: nowrap; }
 </style>
 
 
@@ -9729,6 +9805,141 @@ window.GAR = (function(){
     abrirModalEnvio: abrirModalEnvio, confirmarEnvio: confirmarEnvio,
     fecharModal: fecharModal,
   };
+})();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// PRODUTIVIDADE DA EQUIPE — admin + diretor
+// ═══════════════════════════════════════════════════════════════
+window.PROD = (function(){
+  var state = { dados: null, inicializado: false };
+
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function fmtDate(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleDateString('pt-BR'); }catch(e){ return String(iso).slice(0,10); } }
+
+  async function init(){
+    if (state.inicializado) { recarregar(); return; }
+    state.inicializado = true;
+    await recarregar();
+  }
+
+  async function recarregar(){
+    try {
+      var r = await fetch('/api/crm/produtividade');
+      if (!r.ok) {
+        var e = await r.json();
+        throw new Error(e.error || r.status);
+      }
+      state.dados = await r.json();
+      render();
+    } catch(e) {
+      document.getElementById('prod-vendedores').innerHTML =
+        '<div style="padding:20px;color:#c62828;grid-column:1/-1">Erro: ' + esc(e.message) + '</div>';
+    }
+  }
+
+  function render(){
+    renderEquipe();
+    renderVendedores();
+  }
+
+  function renderEquipe(){
+    var eq = state.dados.equipe;
+    var kpis = [
+      { lbl: 'Pendentes em dia', val: eq.pendentes_em_dia, cls: '' },
+      { lbl: 'Atrasadas', val: eq.atrasadas, cls: eq.atrasadas > 0 ? 'alerta' : 'bom' },
+      { lbl: 'Concluídas hoje', val: eq.concluidas_hoje, cls: eq.concluidas_hoje > 0 ? 'bom' : '' },
+      { lbl: 'Últimos 7 dias', val: eq.concluidas_7d, cls: '' },
+      { lbl: 'Mês atual', val: eq.concluidas_mes, cls: '' },
+    ];
+    var html = kpis.map(function(k){
+      return '<div class="prod-kpi ' + k.cls + '">' +
+        '<div class="prod-kpi-label">' + esc(k.lbl) + '</div>' +
+        '<div class="prod-kpi-value">' + esc(k.val) + '</div>' +
+      '</div>';
+    }).join('');
+    document.getElementById('prod-equipe-row').innerHTML = html;
+  }
+
+  function renderVendedores(){
+    var vendedores = state.dados.vendedores || [];
+    if (!vendedores.length) {
+      document.getElementById('prod-vendedores').innerHTML =
+        '<div style="padding:20px;color:#7b8285;grid-column:1/-1">Nenhum vendedor ativo encontrado.</div>';
+      return;
+    }
+    var html = vendedores.map(cardVendedor).join('');
+    document.getElementById('prod-vendedores').innerHTML = html;
+  }
+
+  function cardVendedor(v){
+    var taxaCls = 'na', taxaTxt = '—';
+    if (v.taxa_conclusao != null) {
+      taxaCls = v.taxa_conclusao >= 80 ? 'alta' : (v.taxa_conclusao >= 50 ? 'media' : 'baixa');
+      taxaTxt = v.taxa_conclusao + '% conclusão';
+    }
+    var listaId = 'prod-atr-' + v.login;
+    var atrasadasHtml = '';
+    if (v.lista_atrasadas && v.lista_atrasadas.length) {
+      atrasadasHtml =
+        '<div class="prod-atrasadas-toggle" onclick="PROD.toggleAtrasadas(\'' + v.login + '\')" id="' + listaId + '-tog">' +
+          '▼ Ver ' + v.lista_atrasadas.length + ' tarefa(s) atrasada(s)' +
+        '</div>' +
+        '<div class="prod-atrasadas-lista" id="' + listaId + '">' +
+          v.lista_atrasadas.map(function(t){
+            return '<div class="prod-atrasada-item">' +
+              '<div style="flex:1;min-width:0">' +
+                '<div class="prod-atrasada-titulo">' + esc(t.titulo || t.tipo) + '</div>' +
+                '<div class="prod-atrasada-cli">' + (t.cliente_nome ? esc(t.cliente_nome) + ' · ' : '') +
+                  'prazo ' + fmtDate(t.prazo) +
+                '</div>' +
+              '</div>' +
+              '<div class="prod-atrasada-dias">' + t.dias_atraso + 'd</div>' +
+            '</div>';
+          }).join('') +
+        '</div>';
+    } else if (v.atrasadas > 0) {
+      atrasadasHtml =
+        '<div style="color:#7b8285;font-size:11px;text-align:center;padding:6px;background:#f8f9fa;border-radius:6px;margin-top:8px">' +
+          v.atrasadas + ' atrasada(s) sem detalhes de cliente' +
+        '</div>';
+    }
+
+    return '<div class="prod-card">' +
+      '<div class="prod-card-top">' +
+        '<div>' +
+          '<div class="prod-card-nome">' + esc(v.nome) + '</div>' +
+          '<div class="prod-card-login">@' + esc(v.login) + '</div>' +
+        '</div>' +
+        '<span class="prod-card-taxa ' + taxaCls + '">' + esc(taxaTxt) + '</span>' +
+      '</div>' +
+      '<div class="prod-mini-row">' +
+        '<div class="prod-mini"><div class="prod-mini-lbl">Em dia</div><div class="prod-mini-val">' + v.pendentes_em_dia + '</div></div>' +
+        '<div class="prod-mini ' + (v.atrasadas > 0 ? 'danger' : '') + '"><div class="prod-mini-lbl">Atrasadas</div><div class="prod-mini-val">' + v.atrasadas + '</div></div>' +
+        '<div class="prod-mini ' + (v.concluidas_hoje > 0 ? 'sucess' : '') + '"><div class="prod-mini-lbl">Hoje</div><div class="prod-mini-val">' + v.concluidas_hoje + '</div></div>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:space-between;font-size:11px;color:#7b8285;padding:6px 0;border-top:1px solid #eef0f1">' +
+        '<span>7 dias: <b style="color:#1a1a1a">' + v.concluidas_7d + '</b></span>' +
+        '<span>mês: <b style="color:#1a1a1a">' + v.concluidas_mes + '</b></span>' +
+      '</div>' +
+      atrasadasHtml +
+    '</div>';
+  }
+
+  function toggleAtrasadas(login){
+    var el = document.getElementById('prod-atr-' + login);
+    var tog = document.getElementById('prod-atr-' + login + '-tog');
+    if (!el) return;
+    var aberto = el.classList.toggle('aberto');
+    if (tog) {
+      tog.classList.toggle('aberto', aberto);
+      tog.textContent = (aberto ? '▲ Ocultar' : '▼ Ver') + ' ' +
+        (el.querySelectorAll('.prod-atrasada-item').length) + ' tarefa(s) atrasada(s)';
+    }
+  }
+
+  return { init: init, recarregar: recarregar, toggleAtrasadas: toggleAtrasadas };
 })();
 </script>
 
