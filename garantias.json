@@ -10699,5 +10699,111 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "bcc99897-7970-405a-8ec7-aebc7fe317ac": {
+    "id": "bcc99897-7970-405a-8ec7-aebc7fe317ac",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "SANDROMAR VIANA",
+      "cpf_cnpj": "024.086.859-58",
+      "whatsapp": "+5541984061682",
+      "email": "sdrviana@hotmail.com",
+      "cidade": "Curitiba",
+      "uf": "PR",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031042",
+      "data_compra": "2026-08-17",
+      "data_recebimento": "2026-08-18",
+      "nome_produto": "Lanterna para armas",
+      "marca": "Olight",
+      "modelo": "Baldr mini RL",
+      "numero_serie": "L41309741",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "A lanterna só funciona com o cabo carregador conectado.",
+      "data_percebido_problema": "2026-09-27",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Produto com defeito",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "1000361039.jpg",
+          "url": "https://storage.tally.so/private/1000361039.jpg?id=KAyNpA&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IktBeU5wQSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDk0MDczM30.jrAlSTs9Z2obmI6Lt-uTiPN49flF7nbdRPacMsYT-co&signature=e68db2a503c6a9c07d2a3870ef9995c73f440abb0d5804d01e3c961e35d33d2e",
+          "mimeType": "image/jpeg",
+          "size": 3000303
+        },
+        {
+          "tipo": "foto",
+          "nome": "1000361040.jpg",
+          "url": "https://storage.tally.so/private/1000361040.jpg?id=dXV4Eq&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRYVjRFcSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDk0MDczM30.Czbt2jEzpVs990ESC8uevTKBGfNIefjxQGqTaJzcVM8&signature=d32f64aeb3ea82e94d37d4100990abfb8006794485a7bdd860a417e8637b7618",
+          "mimeType": "image/jpeg",
+          "size": 4358852
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-08-18",
+      "data_percebido_problema": "2026-09-27",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-02T11:32:24.744Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T11:32:24.744Z",
+    "atualizado_em": "2026-10-02T11:32:24.744Z",
+    "tally_meta": {
+      "eventId": "sync_7XP97V9",
+      "responseId": "7XP97V9",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-09-03T15:15:57.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Garantia (produto com defeito)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-02T11:32:24.744Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
