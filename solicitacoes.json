@@ -250,5 +250,31 @@
         "por": "gerencia"
       }
     ]
+  },
+  "c17fbf3f-b65b-4343-972c-1e20a73408ce": {
+    "id": "c17fbf3f-b65b-4343-972c-1e20a73408ce",
+    "de": "gerencia",
+    "para": "joao",
+    "categoria": "Direção",
+    "titulo": "Condição Comercial para Force 22",
+    "descricao": "Precisamos de uma condição e preço diferenciado para esse equipamento, é uma arma interessante temos bastante mas não vende. Pensei em criarmos uma condição especial e começar a falar dela com frequência nas redes. \n\nPensei em montar um kit, uma condição diferente e vender ela com um pote de munição da CBC",
+    "prazo": "2026-10-20",
+    "status": "pendente",
+    "criado_em": "2026-10-02T13:50:13.038Z",
+    "executado_em": null,
+    "executado_por": null,
+    "aprovado_em": null,
+    "aprovado_por": null,
+    "rejeitado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_motivo": null,
+    "mensagens": [],
+    "historico": [
+      {
+        "ts": "2026-10-02T13:50:13.038Z",
+        "acao": "criada",
+        "por": "gerencia"
+      }
+    ]
   }
 }
