@@ -9313,5 +9313,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "c9fb7393-0bc3-4f45-9bf1-eac828975a24": {
+    "id": "c9fb7393-0bc3-4f45-9bf1-eac828975a24",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Marcelo Feitosa da silva",
+      "cpf_cnpj": "35780675805",
+      "whatsapp": "+5512991402105",
+      "email": "marceloedc@icloud.com",
+      "cidade": "Taubate",
+      "uf": "SP",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030004",
+      "data_compra": "2026-03-23",
+      "data_recebimento": "2026-06-27",
+      "nome_produto": "E18r",
+      "marca": "Fenix",
+      "modelo": "E18r",
+      "numero_serie": "WHDEZV01254",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Bateria ponto solto",
+      "data_percebido_problema": "2026-06-24",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Ateria com defeito de fabricacao",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "IMG_0200.png",
+          "url": "https://storage.tally.so/private/IMG_0200.png?id=qead7d&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InFlYWQ3ZCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDkyNzk2Nn0.-DtvdkygAUw0uWCjkZZ6BI6Jq_5sYkkydgLREMwFJbA&signature=2356b6f2f3931e7eadec0113d7acaf50f8141fbe0dbf6fed70ae54d9d3909f7c",
+          "mimeType": "image/png",
+          "size": 1799099
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-06-27",
+      "data_percebido_problema": "2026-06-24",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "improcedente_prazo",
+      "justificativa_sistema": "Fora do prazo decadencial do CDC Art. 26 (90 dias para produto durável). Já se passaram 97 dias do recebimento (vício aparente).",
+      "score_confianca": "alta",
+      "calculado_em": "2026-10-02T08:00:04.574Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T08:00:04.574Z",
+    "atualizado_em": "2026-10-02T08:00:04.574Z",
+    "historico": [
+      {
+        "ts": "2026-10-02T08:00:04.574Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
