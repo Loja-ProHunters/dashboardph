@@ -11447,5 +11447,109 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "489c6244-dd67-48be-9c54-8a754a457a9c": {
+    "id": "489c6244-dd67-48be-9c54-8a754a457a9c",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Marcos Vogel",
+      "cpf_cnpj": "08326631906",
+      "whatsapp": "+5547999194079",
+      "email": "marcospaulovogel@gmail.com",
+      "cidade": "Dona emma",
+      "uf": "SC",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030895",
+      "data_compra": "2026-07-30",
+      "data_recebimento": "2026-08-04",
+      "nome_produto": "Red dot vector optics scrapper 1-29x scrd-47",
+      "marca": "Vector optics",
+      "modelo": "Scrapper 1-29x scrd- 47",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Apenas não  gostei..",
+      "data_percebido_problema": "2026-08-04",
+      "chegou_defeito_ou_depois": "Funcionamento Normal",
+      "motivo_troca_devolucao": "Não me agradei da qualidade...",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "17859640572713819760321044328552.jpg",
+          "url": "https://storage.tally.so/private/17859640572713819760321044328552.jpg?id=LqPy5J&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkxxUHk1SiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDk0MDczM30.A0Fu-9s_cjjT36gbcg5cjM98viiral5SykyaVnxmq68&signature=65fa7c3c4451fe0284166cea4951627a00d8b29bce54f64ce6aea72a548a5db3",
+          "mimeType": "image/jpeg",
+          "size": 2198689
+        }
+      ]
+    },
+    "preferencia_cliente": "restituicao",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-08-04",
+      "data_percebido_problema": "2026-08-04",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": true,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": true
+      },
+      "_override": {
+        "sugestao": "analise_manual",
+        "justificativa": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+        "score_confianca": "baixa"
+      },
+      "preferencia_cliente": "restituicao",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-02T11:32:34.039Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T11:32:34.039Z",
+    "atualizado_em": "2026-10-02T11:32:34.039Z",
+    "tally_meta": {
+      "eventId": "sync_q5o6QMk",
+      "responseId": "q5o6QMk",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-08-05T21:09:07.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Devolução (arrependimento de compra)",
+      "raw_momento": "Funcionamento Normal"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-02T11:32:34.039Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
