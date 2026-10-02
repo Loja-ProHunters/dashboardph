@@ -7093,5 +7093,95 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "b911cc37-7a6d-490d-a2e2-a4c8a2762fec": {
+    "id": "b911cc37-7a6d-490d-a2e2-a4c8a2762fec",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Rômulo Araújo Alencar",
+      "cpf_cnpj": "073.364.493-79",
+      "whatsapp": "+5588981463053",
+      "email": "romimestourado001@gmail.com",
+      "cidade": "Tauá",
+      "uf": "CE",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "31252",
+      "data_compra": "2026-09-01",
+      "data_recebimento": "2026-09-15",
+      "nome_produto": "Lanterna para armas",
+      "marca": "Olight",
+      "modelo": "Baldr rl mini preta",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "O laser está muito fraco, impossibilitando o uso e a visualização. A lanterna está excelente, muito boa por sinal, mas o laser, fraco fraco. Testando no quarto escuro mal da pra ver, no claro então se some. É como se estivesse descarregando, mas não é, pq a lanterna está bem forte, inclusive coloquei várias vezes para carregar e nada de melhorar. Tbm mexi na regularem dele, mas sem sucesso.",
+      "data_percebido_problema": "2026-09-15",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Quero trocar por outra lanterna/laser, pois essa veio com defeito no laser",
+      "uploads": [
+        {
+          "tipo": "video",
+          "nome": "1000758816.mp4",
+          "url": "https://storage.tally.so/private/1000758816.mp4?id=Ybz8dv&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlliejhkdiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDkyNzk2Nn0.yiV9FiTrWisleHnql9r00gUf0OjdBscAaToCWtxTyAA&signature=6411eed93c59be21148f012e0ff8f5a5d0473bdf28140deda51501ebc3d881da",
+          "mimeType": "video/mp4",
+          "size": 3665411
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-09-15",
+      "data_percebido_problema": "2026-09-15",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-02T07:59:33.281Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T07:59:33.281Z",
+    "atualizado_em": "2026-10-02T07:59:33.281Z",
+    "historico": [
+      {
+        "ts": "2026-10-02T07:59:33.281Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
