@@ -6908,5 +6908,100 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "ec21fb4d-d6e0-4b6b-9167-b583addf2f5c": {
+    "id": "ec21fb4d-d6e0-4b6b-9167-b583addf2f5c",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Rodrigo Pinto Barreto Vinhaes",
+      "cpf_cnpj": "09596436724",
+      "whatsapp": "+5524998151305",
+      "email": "rvinhaes@ymail.com",
+      "cidade": "Petropolis",
+      "uf": "RJ",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031321",
+      "data_compra": "2026-09-10",
+      "data_recebimento": "2026-09-22",
+      "nome_produto": "rilho com anel para acoplar Luneta/RedDot 30mm",
+      "marca": "- Vector Optics",
+      "modelo": "VEC-SCACD 16",
+      "numero_serie": "NA",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Não serviu no trilho",
+      "data_percebido_problema": "2026-09-22",
+      "chegou_defeito_ou_depois": "Funcionamento Normal",
+      "motivo_troca_devolucao": "Não serviu no trilho",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "WhatsApp Image 2026-09-22 at 16.55.09.jpeg",
+          "url": "https://storage.tally.so/private/WhatsApp-Image-2026-09-22-at-16.55.09.jpeg?id=oZZADO&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im9aWkFETyIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDkyNzk2Nn0.9oQBGUVot0h7cn_q2wMXHJI0hcbf-y0bf3jp8i5QWQY&signature=9e0d52ebdf875c94b011275c90a8e57d32d917faccef4c08050bec02000748d7",
+          "mimeType": "image/jpeg",
+          "size": 181739
+        }
+      ]
+    },
+    "preferencia_cliente": "troca",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-09-22",
+      "data_percebido_problema": "2026-09-22",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": true
+      },
+      "_override": {
+        "sugestao": "analise_manual",
+        "justificativa": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+        "score_confianca": "baixa"
+      },
+      "preferencia_cliente": "troca",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-02T07:59:30.949Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T07:59:30.949Z",
+    "atualizado_em": "2026-10-02T07:59:30.949Z",
+    "historico": [
+      {
+        "ts": "2026-10-02T07:59:30.949Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
