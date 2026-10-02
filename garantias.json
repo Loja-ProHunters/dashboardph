@@ -9763,5 +9763,118 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "2b38ec36-6752-4dd3-a807-4ed1d90b0b5e": {
+    "id": "2b38ec36-6752-4dd3-a807-4ed1d90b0b5e",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Claudio Zielinski",
+      "cpf_cnpj": "80937241920",
+      "whatsapp": "+5543999731906",
+      "email": "claudioz@protonmail.com",
+      "cidade": "Rolandia",
+      "uf": "PR",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031346",
+      "data_compra": "2026-09-14",
+      "data_recebimento": "2026-09-17",
+      "nome_produto": "Lanterna bicicleta",
+      "marca": "Fenix",
+      "modelo": "Bcr25r",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Tem um pequeno trincado no plastico proximo a lente.",
+      "data_percebido_problema": "2026-09-23",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Pequeno trincado. \nSó me interessa troca ou conserto. \nNAO quero devolver.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "20260926_081022.jpg",
+          "url": "https://storage.tally.so/private/20260926_081022.jpg?id=8DxGol&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhEeEdvbCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDk0MDczM30.ObW1KfNQQHWxtEt7TlDyuMJiwJZ2rdM293e9Am7DQRc&signature=a8782897e490811a945eb4a51414280e5c3232ebcd6cdf113f8af9166d395bc3",
+          "mimeType": "image/jpeg",
+          "size": 3026580
+        },
+        {
+          "tipo": "foto",
+          "nome": "20260926_123323.jpg",
+          "url": "https://storage.tally.so/private/20260926_123323.jpg?id=Zkalje&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlprYWxqZSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDk0MDczM30.HeNodfdQHj66XiZMFUn29CvS2fGeS8BvFe4r8sgSdHs&signature=40daa652e663554a66e72a0dcc9858b66a43bcb6410a8c4ac19eb410f8718f4b",
+          "mimeType": "image/jpeg",
+          "size": 2672075
+        },
+        {
+          "tipo": "foto",
+          "nome": "20260926_081004.jpg",
+          "url": "https://storage.tally.so/private/20260926_081004.jpg?id=PQOlRB&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlBRT2xSQiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MDk0MDczM30.cCL7m8uasD1u59P2kSrYR3noZ9s_YukBOiN3TZenxCU&signature=ed9ff4ab10234c18e91cd54abd52bc121346dc898ba8636005c647364f959ad2",
+          "mimeType": "image/jpeg",
+          "size": 2534092
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-09-17",
+      "data_percebido_problema": "2026-09-23",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-02T11:32:13.604Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-02T11:32:13.604Z",
+    "atualizado_em": "2026-10-02T11:32:13.604Z",
+    "tally_meta": {
+      "eventId": "sync_xV1EB99",
+      "responseId": "xV1EB99",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-09-30T16:27:33.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Garantia (produto com defeito)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-02T11:32:13.604Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
