@@ -274,7 +274,13 @@
     "rejeitado_em": null,
     "rejeitado_por": null,
     "rejeitado_motivo": null,
-    "mensagens": [],
+    "mensagens": [
+      {
+        "de": "joao",
+        "ts": "2026-10-02T14:38:25.324Z",
+        "texto": "O preço dela está super defasado, não tem como vender por menos. Podemos criar conteúdo com ela. Hoje não vende porque o cliente não quer queimar uma posição no acervo."
+      }
+    ],
     "historico": [
       {
         "ts": "2026-10-02T13:50:13.038Z",
