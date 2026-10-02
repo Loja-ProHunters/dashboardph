@@ -143,7 +143,13 @@
     "rejeitado_em": null,
     "rejeitado_por": null,
     "rejeitado_motivo": null,
-    "mensagens": [],
+    "mensagens": [
+      {
+        "de": "joao",
+        "ts": "2026-10-02T14:35:38.849Z",
+        "texto": "Já passei para o Marlon"
+      }
+    ],
     "historico": [
       {
         "ts": "2026-10-01T11:33:00.813Z",
