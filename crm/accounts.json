@@ -24469,7 +24469,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "boschetto",
     "onboarding_id": null,
     "primeira_compra_em": "2026-04-26",
     "ultima_compra_em": "2026-04-26",
@@ -24481,8 +24481,14 @@
     "notas": null,
     "criado_em": "2026-09-22T12:02:21.935Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T12:02:21.935Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-05T19:44:19.806Z",
+    "atualizado_por": "reparo-retroativo",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "boschetto",
+      "em": "2026-10-05T19:44:19.806Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_43aa9997ebf21a74": {
     "id": "acc_43aa9997ebf21a74",
