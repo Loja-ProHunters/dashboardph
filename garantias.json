@@ -627,7 +627,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:04.003Z",
-    "atualizado_em": "2026-10-05T16:15:41.756Z",
+    "atualizado_em": "2026-10-05T16:15:44.675Z",
     "tally_meta": {
       "eventId": "sync_2j5vRjV",
       "responseId": "2j5vRjV",
@@ -663,6 +663,14 @@
         "acao": "status_mudou",
         "por": "auxiliar",
         "de": "em_analise",
+        "para": "aguardando_cliente",
+        "nota": null
+      },
+      {
+        "ts": "2026-10-05T16:15:44.675Z",
+        "acao": "status_mudou",
+        "por": "auxiliar",
+        "de": "aguardando_cliente",
         "para": "aguardando_cliente",
         "nota": null
       }
