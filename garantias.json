@@ -2875,5 +2875,104 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "35c944b3-c1cf-4dbc-a371-dc998b43e779": {
+    "id": "35c944b3-c1cf-4dbc-a371-dc998b43e779",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Marcelo Haruo sakuma",
+      "cpf_cnpj": "27869322890",
+      "whatsapp": "+5518991440104",
+      "email": "marcelosakuma40@gmail.com",
+      "cidade": "Araçatuba",
+      "uf": "SP",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030566",
+      "data_compra": "2026-06-16",
+      "data_recebimento": "2026-06-22",
+      "nome_produto": "Compacto and ultra light headlamp",
+      "marca": "Fênix",
+      "modelo": "HM23",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Não liga, comprei outra bateria não funcionou.  Eu não estou vendo o led na lente",
+      "data_percebido_problema": "2026-06-22",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Não liga, não funciona",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "17828430572133684868424723266287.jpg",
+          "url": "https://storage.tally.so/private/17828430572133684868424723266287.jpg?id=254Zyp&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjI1NFp5cCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTE5OTY3OX0.kv9gg6XJDETZ4RDtxQ3AYTVtJu4H5c3LN2pvr41pJH4&signature=1fcc57d58e4b6f67cde8739bd6b2e47df878d83f9dd51a517bf2dd29a1c3c7b5",
+          "mimeType": "image/jpeg",
+          "size": 4077685
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-06-22",
+      "data_percebido_problema": "2026-06-22",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "improcedente_prazo",
+      "justificativa_sistema": "Fora do prazo decadencial do CDC Art. 26 (90 dias para produto durável). Já se passaram 105 dias do recebimento (vício aparente).",
+      "score_confianca": "alta",
+      "calculado_em": "2026-10-05T11:28:29.556Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-05T11:28:29.556Z",
+    "atualizado_em": "2026-10-05T11:28:29.556Z",
+    "tally_meta": {
+      "eventId": "sync_xVyox8r",
+      "responseId": "xVyox8r",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-06-30T18:11:33.000Z",
+      "raw_onde_comprou": "Site da Fenix Store Brasil",
+      "raw_desejo": "Garantia (produto com defeito)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-05T11:28:29.556Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
