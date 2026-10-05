@@ -2307,9 +2307,9 @@
     "volumes_qtd": 1,
     "volumes_por": "gerencia",
     "volumes_em": "2026-10-05T20:31:59.421Z",
-    "conferencia_ok": false,
-    "conferencia_por": null,
-    "conferencia_em": null,
+    "conferencia_ok": true,
+    "conferencia_por": "gerencia",
+    "conferencia_em": "2026-10-05T20:32:04.018Z",
     "conferencia_notas": null,
     "transportadora": null,
     "transporte_valor": null,
@@ -2363,11 +2363,19 @@
         "acao": "campo_alterado",
         "campo": "volumes_qtd",
         "novo": 1
+      },
+      {
+        "ts": "2026-10-05T20:32:04.018Z",
+        "por": "gerencia",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "conferencia_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-05T20:31:51.657Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-10-05T20:31:59.421Z",
+    "atualizado_em": "2026-10-05T20:32:04.018Z",
     "atualizado_por": "gerencia"
   }
 }
