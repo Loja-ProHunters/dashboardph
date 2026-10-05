@@ -1896,6 +1896,24 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // ── POST /api/crm/reparar-donos — varre activities pendentes e transfere
+  // os accounts/orders órfãos (owner=gerencia/tray/vazio) pros vendedores que
+  // já receberam tarefas via rodízio. Resolve "cliente não lhe pertence"
+  // retroativamente. Só admin/diretor.
+  if (req.method === 'POST' && url === '/api/crm/reparar-donos') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
+    try {
+      const auto = require('../lib/crm/automacaoUpsell');
+      const r = await auto.repararAccountsOrfaosDeTarefas();
+      console.log('[REPARAR DONOS] ' + JSON.stringify({ac:r.accounts_transferidos, or:r.orders_transferidos}));
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // ── GET /api/crm/tarefas/minhas — fila do PROPRIO usuario logado.
   // Admin ve so as tarefas dele (login==gerencia). Se quiser ver TODAS as
   // tarefas de todos os vendedores, passa ?todos=1 na URL — util pra dashboard
