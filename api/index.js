@@ -726,6 +726,24 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // POST /api/garantias/limpar-tally — DESTRUTIVO: apaga TODAS as garantias com
+  // fonte='tally_webhook'. Preserva as manuais. Usado quando acumulou lixo e
+  // queremos re-importar do zero. Admin/diretor/auxiliar.
+  if (url === '/api/garantias/limpar-tally' && req.method === 'POST') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const r = await gar.limparTodasTally();
+      console.log('[LIMPAR TALLY] ' + JSON.stringify(r));
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // POST /api/garantias/deduplicar — remove garantias duplicadas vindas do Tally.
   // Admin/diretor/auxiliar. Chamar UMA VEZ pra limpar o acumulado.
   if (url === '/api/garantias/deduplicar' && req.method === 'POST') {
