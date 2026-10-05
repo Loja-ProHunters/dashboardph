@@ -2578,5 +2578,104 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "f2c6903a-e57c-4930-b628-7fe23f484c78": {
+    "id": "f2c6903a-e57c-4930-b628-7fe23f484c78",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "João Paulo Pereira da Silva",
+      "cpf_cnpj": "04055342489",
+      "whatsapp": "+5583999319912",
+      "email": "assessoria@jplicitacoes.com.br",
+      "cidade": "São Sebastião do Umbuzeiro",
+      "uf": "PB",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030662",
+      "data_compra": "2026-07-03",
+      "data_recebimento": "2026-07-13",
+      "nome_produto": "Red Dot Frenzy 1x17x24 - Vector Optics",
+      "marca": "Red Dot Frenzy 1x17x24 - Vector Optics",
+      "modelo": "Red Dot Frenzy 1x17x24 - Vector Optics",
+      "numero_serie": "90131010",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Solicito apenas a substituição do produto, não havendo alegação de vício ou defeito de fabricação",
+      "data_percebido_problema": "2026-07-13",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "O produto não apresentou compatibilidade com a pistola, em razão de suas dimensões serem superiores às especificações necessárias, motivo pelo qual solicito a sua substituição.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "Imagem.jpeg",
+          "url": "https://storage.tally.so/private/Imagem.jpeg?id=QWVJM7&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlFXVkpNNyIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTE5OTY3OX0.2FOxxDCIwwDb98pJu20zzSMwSvk2uoDPzSsFXIfxGfw&signature=b7fbf499ee7bc2d711ba05f87698256b68169fdb8e1a0567e48b9688002baef7",
+          "mimeType": "image/jpeg",
+          "size": 157325
+        }
+      ]
+    },
+    "preferencia_cliente": "troca",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-07-13",
+      "data_percebido_problema": "2026-07-13",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "sim",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": false,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "troca",
+      "sugestao_sistema": "improcedente_mau_uso",
+      "justificativa_sistema": "Indício de mau uso: cliente relatou modificação/customização no produto. CDC Art. 18 §6º exclui vícios decorrentes de uso inadequado ou alteração do produto pelo consumidor. Recomenda-se laudo técnico se o cliente contestar.",
+      "score_confianca": "media",
+      "calculado_em": "2026-10-05T11:28:26.274Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-05T11:28:26.274Z",
+    "atualizado_em": "2026-10-05T11:28:26.274Z",
+    "tally_meta": {
+      "eventId": "sync_o9VXRRX",
+      "responseId": "o9VXRRX",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-07-14T14:55:06.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Troca (produto errado ou insatisfação)",
+      "raw_momento": "Apareceu após o uso"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-05T11:28:26.274Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
