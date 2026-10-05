@@ -2083,5 +2083,104 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "fb3ca4d8-2a11-427c-bc4e-b0cacce2e0a6": {
+    "id": "fb3ca4d8-2a11-427c-bc4e-b0cacce2e0a6",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "THAIS RIBEIRO DE ALMEIDA",
+      "cpf_cnpj": "299.126.218-40",
+      "whatsapp": "+5517991226200",
+      "email": "thaizalmeida@gmail.com",
+      "cidade": "São José do Rio Preto",
+      "uf": "SP",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030756",
+      "data_compra": "2026-07-17",
+      "data_recebimento": "2026-07-20",
+      "nome_produto": "Lanterna Manual Fenis E CP 1600 LUMENS",
+      "marca": "Fenix",
+      "modelo": "E-CP",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Não funciona. Não liga. Não carrega",
+      "data_percebido_problema": "2026-07-20",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Não liga. Não carrega. Não funciona.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "1784676175190701627503901937389.jpg",
+          "url": "https://storage.tally.so/private/1784676175190701627503901937389.jpg?id=g1kQDM&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Imcxa1FETSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTE5OTY3OH0.PwL5IMO0dOQgEtPm6pYHUFEHp7Y05knoetY8kNFWV6k&signature=7f04593ef8dd5845a522f97fb8b96c367816338646e3adaa0d1417fcac94c4c3",
+          "mimeType": "image/jpeg",
+          "size": 2988040
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-07-20",
+      "data_percebido_problema": "2026-07-20",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-05T11:28:20.455Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-05T11:28:20.455Z",
+    "atualizado_em": "2026-10-05T11:28:20.455Z",
+    "tally_meta": {
+      "eventId": "sync_je0KzgR",
+      "responseId": "je0KzgR",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-07-21T23:23:12.000Z",
+      "raw_onde_comprou": "Site da Fenix Store Brasil",
+      "raw_desejo": "Garantia (produto com defeito)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-05T11:28:20.455Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
