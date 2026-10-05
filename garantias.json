@@ -1984,5 +1984,104 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "b5bd7535-8b0a-40cb-ada2-519839a5821d": {
+    "id": "b5bd7535-8b0a-40cb-ada2-519839a5821d",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Babington roberto Vieira da costa",
+      "cpf_cnpj": "69803145134",
+      "whatsapp": "+5567992550626",
+      "email": "babingtonvieira@gmail.com",
+      "cidade": "Campo Grande",
+      "uf": "MS",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "14794",
+      "data_compra": "2026-06-08",
+      "data_recebimento": "2026-07-16",
+      "nome_produto": "Acionador remoto para lanterna fênix aer-03",
+      "marca": "Fenix",
+      "modelo": "Aer03",
+      "numero_serie": "6942870306919",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Veio tamanho não deu certo",
+      "data_percebido_problema": "2026-06-16",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "Tamanho diferente da lanterna",
+      "uploads": [
+        {
+          "tipo": "video",
+          "nome": "80654297223__570114F7-05D4-469A-9708-9044154EDB95.MOV",
+          "url": "https://storage.tally.so/private/80654297223__570114F7-05D4-469A-9708-9044154EDB95.MOV?id=Ra2r7l&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlJhMnI3bCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTE5OTY3OH0.fh5woKDyp6e7g7baIPN_AYsfYMuqvYOw15F0zUZXxvQ&signature=ddc371fc53b2277689314243afcc204b96d8c0772de4b5d993cea15cd1708800",
+          "mimeType": "video/quicktime",
+          "size": 5487415
+        }
+      ]
+    },
+    "preferencia_cliente": "troca",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-07-16",
+      "data_percebido_problema": "2026-06-16",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "troca",
+      "sugestao_sistema": "improcedente_prazo",
+      "justificativa_sistema": "Fora do prazo decadencial do CDC Art. 26 (90 dias para produto durável). Já se passaram 111 dias da data em que o defeito apareceu (vício oculto).",
+      "score_confianca": "alta",
+      "calculado_em": "2026-10-05T11:28:19.303Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-05T11:28:19.303Z",
+    "atualizado_em": "2026-10-05T11:28:19.303Z",
+    "tally_meta": {
+      "eventId": "sync_GeYdz5e",
+      "responseId": "GeYdz5e",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-07-23T23:43:40.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Troca (produto errado ou insatisfação)",
+      "raw_momento": "Apareceu após o uso"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-05T11:28:19.303Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
