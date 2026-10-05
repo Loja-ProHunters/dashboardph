@@ -215,5 +215,118 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "4fe8a8c1-d89d-4f2d-931d-9646c580ca83": {
+    "id": "4fe8a8c1-d89d-4f2d-931d-9646c580ca83",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Rubens Ferreira Souza Filho",
+      "cpf_cnpj": "17118248878",
+      "whatsapp": "+5511972301714",
+      "email": "rubensarq@msn.com",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031412",
+      "data_compra": "2026-09-21",
+      "data_recebimento": "2026-09-25",
+      "nome_produto": "ALB-20",
+      "marca": "Fenix",
+      "modelo": "ALB-20",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "O produto aparentemente estava com o lacre violado. A mola de fechamento trva, permanece aberta.",
+      "data_percebido_problema": "2026-09-25",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "A mola de fechamento não funciona corretamente. Trava.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "WhatsApp Image 2026-09-28 at 10.01.18.jpeg",
+          "url": "https://storage.tally.so/private/WhatsApp-Image-2026-09-28-at-10.01.18.jpeg?id=XAxgPY&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IlhBeGdQWSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTE5OTY3OH0.8tzaeuGHfvsU1bBnPrcl4onIo2bXTl4soVM_FXHTfeg&signature=748864a763222de338d7f2bb637a72d8f3bff8f7affd4a48bce122f8dfe55287",
+          "mimeType": "image/jpeg",
+          "size": 262199
+        },
+        {
+          "tipo": "foto",
+          "nome": "WhatsApp Image 2026-09-28 at 10.01.19 (1).jpeg",
+          "url": "https://storage.tally.so/private/WhatsApp-Image-2026-09-28-at-10.01.19-1-.jpeg?id=l2b5kv&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImwyYjVrdiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTE5OTY3OH0.K3xBB4xw3s_sh_SACOttEFkxz0mhsy8VJ_4RQ-xHIcU&signature=8d708806c1ad468c2ab2210574f3f71eeaba23c3def53f03203f32e201b12e2d",
+          "mimeType": "image/jpeg",
+          "size": 159688
+        },
+        {
+          "tipo": "foto",
+          "nome": "WhatsApp Image 2026-09-28 at 10.01.19.jpeg",
+          "url": "https://storage.tally.so/private/WhatsApp-Image-2026-09-28-at-10.01.19.jpeg?id=EVkg7r&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkVWa2c3ciIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTE5OTY3OH0.PL1tPn82adn8t8KyTlApHUj_hrx8BzJY2Tg5Mdwmb2w&signature=5a84f440497cdfc60fc3c952ba6ab7a1d1b33e1ae10105ce8cca790aa4e1e903",
+          "mimeType": "image/jpeg",
+          "size": 155817
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-09-25",
+      "data_percebido_problema": "2026-09-25",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-05T11:28:01.116Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-05T11:28:01.116Z",
+    "atualizado_em": "2026-10-05T11:28:01.116Z",
+    "tally_meta": {
+      "eventId": "sync_rD1Lvdp",
+      "responseId": "rD1Lvdp",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-09-28T13:02:07.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Garantia (produto com defeito)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-05T11:28:01.116Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
