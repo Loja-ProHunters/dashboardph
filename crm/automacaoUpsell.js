@@ -1,158 +1,776 @@
 // lib/crm/automacaoUpsell.js
-// Camada 4 do "cérebro" do CRM: automação proativa de upsell.
+// Motor de oportunidades comerciais — Camada 4 do "cerebro" do CRM.
 //
-// Toda vez que um Order novo entra em `crm/orders.json` (via sync do Bling),
-// esse módulo chama a Camada 3.2 (motor de sugestão) e, para cada sugestão
-// com confiança ≥ threshold, cria automaticamente:
-//   - 1 Opportunity vinculada à Account (valor estimado, produtos, motivo)
-//   - 1 Activity (tarefa) atribuída ao vendedor que fez a venda original,
-//     tipo="sugestao_upsell", prazo D+5 (cliente ainda "quente")
+// Duas frentes:
 //
-// Idempotência: cada Order gera no MÁXIMO 1 rodada (trigger_id).
-// Rate-limit: fire-and-forget do sync — não bloqueia o import.
+//   1) processarOrderNovo(orderId, vendedor) — disparado LOGO APOS um pedido
+//      novo entrar no CRM (via sync do Bling). Gera 1 tarefa "upsell pos-venda"
+//      pro vendedor original abordar o cliente enquanto ele ainda esta quente.
 //
-// Também exporta função `disparaReativacao()` pra cron semanal que roda
-// sugestões para clientes parados >90 dias.
+//   2) gerarTarefasDiarias() — cron diaria. Analisa TODA a base de clientes e
+//      gera ate 10 tarefas/dia por vendedor, distribuidas por 3 fontes:
+//
+//        a) Reativacao com match (60-180 dias sumido + coocorrencia forte)
+//        b) Cross-sell (comprou algo ha >=30 dias e nao levou complemento obvio)
+//        c) Aniversario (355-380 dias da primeira compra)
+//
+//      Se sobrar folga, completa com candidatos de menor score (nao deixa dia
+//      vazio pro vendedor). Dono da tarefa = vendedor da ultima venda do
+//      cliente (fallback: account.owner_id, depois "gerencia").
+//
+// Anti-duplicata: trigger_id "<fonte>_<accountId>_<semana>" evita gerar a
+// mesma tarefa duas vezes na semana.
+//
+// Ranking e pitch: usa heuristica pura (rapida, sem custo). O pitch com IA
+// (via sugerirParaCliente) fica sob demanda no endpoint /api/crm/sugerir,
+// disparado quando o vendedor abre a tarefa no dashboard.
 
-const crmStore = require('./store');
-const crmUtils = require('./utils');
+const crmStore     = require('./store');
+const crmColl      = require('./collections');
+const { uuid }     = require('./utils');
+const coocorrencia = require('./coocorrencia');
 const { sugerirParaCliente } = require('./sugerir');
 
-const THRESHOLD_CONFIANCA = 0.6;   // só cria tarefa se IA passar disso
-const PRAZO_DIAS_UPSELL = 5;       // D+5 (cliente ainda "quente")
-const DIAS_REATIVACAO   = 90;      // cliente parado há X dias → reativa
+// ─── Parametros ─────────────────────────────────────────────────
+const TAREFAS_POR_VENDEDOR   = 10;
+const REATIVACAO_MIN_DIAS    = 60;
+const REATIVACAO_MAX_DIAS    = 180;
+const CROSSSELL_MIN_DIAS     = 30;   // ultima compra ≥ 30d atras
+const CROSSSELL_CONF_MIN     = 0.20; // so cross-sell com coocorrencia razoavel
+const REATIVACAO_CONF_MIN    = 0.10; // reativacao aceita coocorrencia mais fraca
+const ANIVERSARIO_MIN_DIAS   = 355;
+const ANIVERSARIO_MAX_DIAS   = 380;
+const PRAZO_TAREFA_DIAS      = 5;
+const PRAZO_ANIVERSARIO_DIAS = 14;
 
-// ── Roda a automação para 1 Order (chamada logo após criar o pedido) ─
-// Não lança — se falhar, loga e segue (não pode quebrar o sync do Bling).
+// Pos-venda (processarOrderNovo)
+const POSVENDA_PRAZO_DIAS    = 5;
+const POSVENDA_CONF_MIN      = 0.30;
+
+// Vendedores ativos — pool pra rodizio quando conta nao tem vendedor definido.
+// Cada login DEVE bater exatamente com sess.usuario (case-insensitive) do CRM.
+// Se sair vendedor / entrar novo, editar aqui.
+const VENDEDORES_ATIVOS = ['dickmann', 'boschetto', 'mathias'];
+
+// ═══════════════════════════════════════════════════════════════
+// FRENTE 1 — Pos-venda (por pedido)
+// ═══════════════════════════════════════════════════════════════
+
 async function processarOrderNovo(orderId, ownerVendedor) {
   try {
     const order = await crmStore.getDoc('orders', orderId);
-    if (!order) return { ok: false, motivo: 'order não achado' };
+    if (!order) return { ok: false, motivo: 'order nao encontrado' };
 
-    // Idempotência: se já rodou pra este order, não roda de novo
-    const triggerId = 'auto_upsell_' + orderId;
+    // Idempotencia: se ja rodou pra este order, nao roda de novo
+    const triggerId = 'posvenda_' + orderId;
     const jaFeitas = await crmStore.listDocs('activities', a => a.trigger_id === triggerId);
-    if (jaFeitas.length) return { ok: true, motivo: 'já processado', tarefas: 0 };
+    if (jaFeitas.length) return { ok: true, motivo: 'ja processado', tarefas: 0 };
 
     const r = await sugerirParaCliente({ accountId: order.account_id, orderId });
-    const sugestoesFortes = (r.sugestoes || []).filter(s => (s.confianca || 0) >= THRESHOLD_CONFIANCA);
-    if (!sugestoesFortes.length) return { ok: true, motivo: 'sem sugestões fortes', tarefas: 0 };
+    const sugestoesFortes = (r.sugestoes || []).filter(s => (s.confianca || 0) >= POSVENDA_CONF_MIN);
+    if (!sugestoesFortes.length) return { ok: true, motivo: 'sem sugestoes fortes', tarefas: 0 };
 
     const account = await crmStore.getDoc('accounts', order.account_id);
-    const vendedor = ownerVendedor || order.vendedor_id || (account && account.owner_id) || 'gerencia';
+    // Aplica a mesma logica do motor diario: so aceita como dono quem esta em
+    // VENDEDORES_ATIVOS. Caso contrario, cai no rodizio deterministico. Isso
+    // impede que tarefas de pos-venda parem em 'gerencia' quando o Bling nao
+    // trouxe vendedor mapeado — antes ficavam empilhadas pro admin resolver.
+    // Prioridade: owner explicito > vendedor do pedido > owner da conta.
+    // _resolverDonoFinal aplica rodizio só pra pseudo-vendedor (tray/gerencia)
+    // ou vazio, e aplica mapeamento (jonatas→mathias) quando aplicável.
+    const bruto = _normLogin(ownerVendedor || order.vendedor_id || (account && account.owner_id));
+    const vendedor = _resolverDonoFinal(bruto, order.account_id);
+    const brutoDiferente = bruto !== vendedor;
 
-    // Cria 1 Opportunity agregando as sugestões
-    const opId = await crmStore.createDoc('opportunities', {
-      account_id: order.account_id,
-      origem_id: orderId,
-      origem_tipo: 'automacao_pos_venda',
-      status: 'aberta',
-      estagio: 'sugerida',
-      valor_estimado: null,
-      produtos_sugeridos: sugestoesFortes.map(s => ({ sku: s.sku_bling, nome: s.nome, motivo: s.motivo })),
-      dono: vendedor,
-      criado_em: new Date().toISOString(),
-      criado_por: 'automacao',
-    }, 'automacao');
+    // Realoca account + order pro novo dono SÓ se mudamos de vendedor
+    // (seja via rodizio por pseudo-vendedor, seja via mapeamento de desligado).
+    // Isso resolve "cliente nao lhe pertence" — vendedor precisa ser owner_id
+    // do account pra abrir a ficha e evoluir tarefa.
+    if (brutoDiferente) {
+      await _realocarAccountSeOrfao(order.account_id, vendedor, 'automacao-posvenda');
+      await _realocarOrderSeOrfao(orderId, vendedor, 'automacao-posvenda');
+    }
 
-    // Cria 1 Activity única com checklist das sugestões (evita spam de N tarefas)
-    const prazo = _hojeMais(PRAZO_DIAS_UPSELL);
-    const descricao = _montarDescricaoUpsell(account, order, sugestoesFortes);
-    const actId = await crmStore.createDoc('activities', {
-      account_id: order.account_id,
-      opportunity_id: opId,
-      order_id: orderId,
-      tipo: 'sugestao_upsell',
-      status: 'pendente',
-      titulo: 'Upsell pós-venda — ' + (account ? account.nome : order.account_id),
-      descricao,
-      dono: vendedor,
-      prazo,
+    // Cria 1 activity unica agregando as sugestoes (evita spam)
+    const doc = _buildAct({
+      tipo: 'trigger',
+      owner_id: vendedor,
+      entidade_id: order.account_id,
+      titulo: '💰 Upsell pos-venda — ' + ((account && account.nome) || order.account_id),
+      descricao: _descricaoPosVenda(account, order, sugestoesFortes),
+      prazo: _hojeMais(POSVENDA_PRAZO_DIAS),
+      pontos_base: 20,
       trigger_id: triggerId,
-      gerada_automaticamente: true,
-      pitch_pronto: sugestoesFortes[0] ? sugestoesFortes[0].pitch : null,
-      criado_em: new Date().toISOString(),
-      criado_por: 'automacao',
-    }, 'automacao');
+      // Campos extras (nao no schema, mas persistem):
+      fonte: 'posvenda',
+      account_id: order.account_id,
+      order_id: orderId,
+      sku_sugerido: sugestoesFortes[0].sku_bling,
+      sku_sugerido_descricao: sugestoesFortes[0].nome,
+      motivo_curto: sugestoesFortes[0].motivo,
+      pitch_pronto: sugestoesFortes[0].pitch || null,
+      sugestoes_json: sugestoesFortes,
+      dono: vendedor, // retrocompat: o filtro do /tarefas/minhas aceita 'dono' OU 'owner_id'
+    });
 
-    return { ok: true, tarefas: 1, opportunity_id: opId, activity_id: actId, sugestoes: sugestoesFortes.length };
+    await crmStore.createDoc('activities', doc, 'automacao-posvenda');
+    return { ok: true, tarefas: 1, activity_id: doc.id, sugestoes: sugestoesFortes.length };
   } catch (e) {
     return { ok: false, motivo: (e.message || String(e)).slice(0, 200) };
   }
 }
 
-// ── Cron semanal de REATIVAÇÃO ────────────────────────────────
-// Para cada conta que não compra há >90 dias, gera 1 tarefa de reativação
-// (com sugestões baseadas em coocorrência do histórico).
-async function disparaReativacao({ diasParado = DIAS_REATIVACAO, limite = 50 } = {}) {
-  const hoje = new Date().toISOString().slice(0, 10);
-  const cutoff = _hojeMenos(diasParado);
+// ═══════════════════════════════════════════════════════════════
+// FRENTE 2 — Motor diario de oportunidades
+// ═══════════════════════════════════════════════════════════════
 
-  const accounts = await crmStore.listDocs('accounts', a => a.status === 'ativo' && a.ultima_compra_em && a.ultima_compra_em < cutoff);
-  // Ordena: quem gastou mais primeiro (mais valor a recuperar)
-  accounts.sort((a, b) => (b.valor_total_compras || 0) - (a.valor_total_compras || 0));
+async function gerarTarefasDiarias() {
+  const inicio = Date.now();
+  const hoje = _hojeISO();
+  const semanaTag = _semanaTag(hoje);
 
-  const alvos = accounts.slice(0, limite);
-  let criadas = 0, puladas = 0, erros = 0;
+  // Carrega dados de uma vez (cache do store agrupa)
+  const accounts = await crmStore.listDocs('accounts',
+    a => a.status !== 'inativo' && a.status !== 'bloqueado');
+  const orders = await crmStore.listDocs('orders',
+    o => o.status !== 'cancelado' && o.status !== 'devolvido');
+  const activitiesPendentes = await crmStore.listDocs('activities',
+    a => a.status === 'pendente' && a.gerada_automaticamente);
 
-  for (const acc of alvos) {
-    try {
-      const triggerId = 'reativacao_' + acc.id + '_' + hoje.slice(0, 7); // 1 por mês por cliente
-      const ja = await crmStore.listDocs('activities', a => a.trigger_id === triggerId);
-      if (ja.length) { puladas++; continue; }
+  // Triggers ja em uso na semana (anti-dupe)
+  const triggersUsados = new Set(activitiesPendentes.map(a => a.trigger_id).filter(Boolean));
 
-      const r = await sugerirParaCliente({ accountId: acc.id });
-      const sugestoes = (r.sugestoes || []).filter(s => (s.confianca || 0) >= 0.5);
-      if (!sugestoes.length) { puladas++; continue; }
+  // Agrupa pedidos por account, ordenados do mais novo pro mais velho
+  const ordersPorAccount = {};
+  for (const o of orders) {
+    if (!o.account_id) continue;
+    (ordersPorAccount[o.account_id] = ordersPorAccount[o.account_id] || []).push(o);
+  }
+  for (const acc of Object.keys(ordersPorAccount)) {
+    ordersPorAccount[acc].sort((a, b) =>
+      String(b.data_pedido || '').localeCompare(String(a.data_pedido || '')));
+  }
 
-      const descricao = 'Cliente parado há ' + _diffDias(acc.ultima_compra_em, hoje) + ' dias. Última compra: ' + acc.ultima_compra_em + '. Sugestões pra reativação:\n' +
-        sugestoes.map((s, i) => (i + 1) + '. ' + (s.nome || s.sku_bling) + ' — ' + s.motivo).join('\n');
+  // Coleta candidatos das 3 fontes
+  const candidatos = [];
+  for (const acc of accounts) {
+    const meusPeds = ordersPorAccount[acc.id] || [];
+    if (!meusPeds.length && !acc.ultima_compra_em) continue;
 
-      await crmStore.createDoc('activities', {
-        account_id: acc.id,
-        tipo: 'reativacao',
-        status: 'pendente',
-        titulo: 'Reativar cliente — ' + acc.nome,
-        descricao,
-        dono: acc.owner_id || 'gerencia',
-        prazo: _hojeMais(7),
-        trigger_id: triggerId,
-        gerada_automaticamente: true,
-        pitch_pronto: sugestoes[0] ? sugestoes[0].pitch : null,
-        criado_em: new Date().toISOString(),
-        criado_por: 'cron-reativacao',
-      }, 'cron-reativacao');
-      criadas++;
-    } catch (e) {
-      erros++;
+    const ultimaData = acc.ultima_compra_em || (meusPeds[0] && meusPeds[0].data_pedido);
+    if (!ultimaData) continue;
+    const primeiraData = acc.primeira_compra_em || (meusPeds[meusPeds.length - 1] && meusPeds[meusPeds.length - 1].data_pedido);
+
+    const diasUltima = _diasEntre(ultimaData, hoje);
+    const diasPrimeira = primeiraData ? _diasEntre(primeiraData, hoje) : null;
+    const skusJa = _skusUnicos(meusPeds);
+    const pedRef = meusPeds[0]; // pedido de referencia (mais recente)
+
+    // Fonte 1 — Reativacao com match
+    if (diasUltima >= REATIVACAO_MIN_DIAS && diasUltima <= REATIVACAO_MAX_DIAS) {
+      const sug = await _melhorSugestaoCooc(pedRef, skusJa, REATIVACAO_CONF_MIN);
+      if (sug) {
+        candidatos.push({
+          accountId: acc.id, account: acc,
+          fonte: 'reativacao_match',
+          motivoCurto: 'Sumido ha ' + diasUltima + 'd — ideal p/ ' + _corta(sug.descricao, 40),
+          sku_sugerido: sug.sku, sku_desc: sug.descricao, sug_confianca: sug.confianca,
+          score: _scoreReativacao(acc, diasUltima, sug.confianca),
+          triggerId: 'reativ_' + acc.id + '_' + semanaTag,
+          pedRef,
+        });
+      }
+    }
+
+    // Fonte 2 — Cross-sell (comprou ha >=30d e tem cooc forte)
+    if (diasUltima >= CROSSSELL_MIN_DIAS && diasUltima < REATIVACAO_MIN_DIAS) {
+      const sug = await _melhorSugestaoCooc(pedRef, skusJa, CROSSSELL_CONF_MIN);
+      if (sug) {
+        const itemBase = pedRef && pedRef.itens && pedRef.itens[0];
+        const nomeBase = itemBase ? (itemBase.descricao || itemBase.sku) : 'ultima compra';
+        candidatos.push({
+          accountId: acc.id, account: acc,
+          fonte: 'cross_sell',
+          motivoCurto: 'Comprou ' + _corta(nomeBase, 25) + ' — completa c/ ' + _corta(sug.descricao, 30),
+          sku_sugerido: sug.sku, sku_desc: sug.descricao, sug_confianca: sug.confianca,
+          score: _scoreCrossSell(acc, sug.confianca),
+          triggerId: 'xsell_' + acc.id + '_' + sug.sku + '_' + semanaTag,
+          pedRef,
+        });
+      }
+    }
+
+    // Fonte 3 — Aniversario de 1 ano
+    if (diasPrimeira !== null && diasPrimeira >= ANIVERSARIO_MIN_DIAS && diasPrimeira <= ANIVERSARIO_MAX_DIAS) {
+      candidatos.push({
+        accountId: acc.id, account: acc,
+        fonte: 'aniversario',
+        motivoCurto: '1 ano da 1a compra (' + primeiraData + ') — retomar contato',
+        sku_sugerido: null, sku_desc: null, sug_confianca: null,
+        score: _scoreAniversario(acc),
+        triggerId: 'aniv_' + acc.id + '_' + (primeiraData || '').slice(0, 7),
+        pedRef,
+      });
     }
   }
 
-  return { ok: true, contas_analisadas: alvos.length, criadas, puladas, erros };
+  // Filtra triggers ja usados
+  const novos = candidatos.filter(c => !triggersUsados.has(c.triggerId));
+
+  // Dedupe por account: se um cliente aparece em 2 fontes, fica com a de maior score
+  const melhorPorAccount = {};
+  for (const c of novos) {
+    const atual = melhorPorAccount[c.accountId];
+    if (!atual || atual.score < c.score) melhorPorAccount[c.accountId] = c;
+  }
+  const dedupados = Object.values(melhorPorAccount);
+
+  // Agrupa por vendedor (dono da tarefa). Realoca account/orders órfãos
+  // pro vendedor do rodizio no MESMO passo — evita bug "cliente nao lhe pertence".
+  const porOwner = {};
+  for (const c of dedupados) {
+    const owner = _resolverVendedor(c.account, ordersPorAccount[c.accountId]);
+    // Se account tava órfão (gerencia/tray/vendedor fora da lista), transfere
+    const ownerOriginal = _normLogin(c.account && c.account.owner_id);
+    if (!_isVendedorReal(ownerOriginal)) {
+      await _realocarAccountSeOrfao(c.accountId, owner, 'automacao-cron-diario');
+      // Também realoca orders dessa conta que estavam órfãos
+      const peds = ordersPorAccount[c.accountId] || [];
+      for (const p of peds) {
+        if (!_isVendedorReal(_normLogin(p.vendedor_id))) {
+          await _realocarOrderSeOrfao(p.id, owner, 'automacao-cron-diario');
+        }
+      }
+    }
+    (porOwner[owner] = porOwner[owner] || []).push({ ...c, owner_id: owner });
+  }
+
+  // Pega top TAREFAS_POR_VENDEDOR por vendedor (menor score completa a cota)
+  const finais = [];
+  for (const owner of Object.keys(porOwner)) {
+    porOwner[owner].sort((a, b) => b.score - a.score);
+    finais.push(...porOwner[owner].slice(0, TAREFAS_POR_VENDEDOR));
+  }
+
+  // Cria as activities em BULK — carrega a colecao uma vez, adiciona todas
+  // em memoria, salva uma vez. Isso reduz drasticamente o tempo (era 25s+
+  // com 30 escritas serializadas) e elimina o 409 (race condition entre
+  // requests concorrentes na mesma cron ou entre cron+outros writes).
+  let criadas = 0, erros = 0;
+  const errosDetalhe = [];
+  let acts;
+  try {
+    acts = await crmStore.getCollection('activities');
+  } catch (e) {
+    return {
+      ok: false,
+      duracao_ms: Date.now() - inicio,
+      erro: 'Falha ao carregar activities: ' + (e.message || String(e)),
+      contas_analisadas: accounts.length,
+      candidatos_gerados: candidatos.length,
+    };
+  }
+
+  const nowIso = new Date().toISOString();
+  for (const c of finais) {
+    try {
+      const prazo = c.fonte === 'aniversario'
+        ? _hojeMais(PRAZO_ANIVERSARIO_DIAS)
+        : _hojeMais(PRAZO_TAREFA_DIAS);
+      const doc = _buildAct({
+        tipo: c.fonte === 'reativacao_match' ? 'reativacao' : 'trigger',
+        owner_id: c.owner_id,
+        entidade_id: c.accountId,
+        titulo: _titulo(c),
+        descricao: _descricao(c),
+        prazo,
+        pontos_base: Math.round(c.score),
+        trigger_id: c.triggerId,
+        fonte: c.fonte,
+        account_id: c.accountId,
+        sku_sugerido: c.sku_sugerido,
+        sku_sugerido_descricao: c.sku_desc,
+        motivo_curto: c.motivoCurto,
+        sug_confianca: c.sug_confianca,
+        dono: c.owner_id, // retrocompat filtro
+      });
+      // Meta que o createDoc normalmente injeta
+      doc.criado_em = nowIso;
+      doc.criado_por = 'cron-oportunidades';
+      doc.atualizado_em = nowIso;
+      doc.atualizado_por = 'cron-oportunidades';
+      acts[doc.id] = doc;
+      criadas++;
+    } catch (e) {
+      erros++;
+      if (errosDetalhe.length < 5) errosDetalhe.push((e.message || String(e)).slice(0, 150));
+    }
+  }
+
+  // Uma unica escrita no GitHub (com retry em caso de 409, comum quando outra
+  // request tocou o mesmo arquivo entre nosso read e write).
+  if (criadas > 0) {
+    let tentativas = 0, salvo = false, ultErr = null;
+    while (tentativas < 3 && !salvo) {
+      tentativas++;
+      try {
+        await crmStore.saveCollection('activities', acts,
+          'Cron oportunidades: +' + criadas + ' tarefas');
+        salvo = true;
+      } catch (e) {
+        ultErr = e;
+        // Se der 409, recarrega e faz merge (nossas tarefas novas + o que
+        // apareceu entre o read anterior e agora).
+        if (String(e.message || '').includes('409')) {
+          try {
+            crmStore.invalidate('activities');
+            const fresh = await crmStore.getCollection('activities');
+            for (const id of Object.keys(acts)) {
+              if (!fresh[id]) fresh[id] = acts[id]; // so adiciona o que nao existe
+            }
+            acts = fresh;
+          } catch (e2) { /* segue pra proxima tentativa */ }
+        } else {
+          break; // outros erros nao valem retry
+        }
+      }
+    }
+    if (!salvo) {
+      errosDetalhe.push('Save falhou apos ' + tentativas + ' tentativas: ' + (ultErr && ultErr.message));
+      erros = criadas; // se nao salvou, contar tudo como erro
+      criadas = 0;
+    }
+  }
+
+  const porVendedorContagem = {};
+  for (const owner of Object.keys(porOwner)) {
+    porVendedorContagem[owner] = Math.min(porOwner[owner].length, TAREFAS_POR_VENDEDOR);
+  }
+
+  return {
+    ok: true,
+    duracao_ms: Date.now() - inicio,
+    contas_analisadas: accounts.length,
+    candidatos_gerados: candidatos.length,
+    apos_dedup: dedupados.length,
+    tarefas_criadas: criadas,
+    erros,
+    erros_detalhe: errosDetalhe,
+    vendedores_atingidos: Object.keys(porOwner).length,
+    por_vendedor: porVendedorContagem,
+    por_fonte: _contaPorFonte(finais),
+  };
 }
 
-// ── Helpers ─────────────────────────────────────────────────
+// Alias pra compatibilidade com a cron /api/crm/cron/reativacao existente,
+// que ja esta agendada no vercel.json. Ela agora dispara o motor completo.
+const disparaReativacao = gerarTarefasDiarias;
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS DE SCORE
+// ═══════════════════════════════════════════════════════════════
+
+// Reativacao: valor historico ancora, dias sumido em curva (pico ~90-120d),
+// confianca da sugestao pesa.
+function _scoreReativacao(acc, diasSumido, conf) {
+  const valorPeso = Math.min(30, (Number(acc.valor_total_compras) || 0) / 1000);
+  const diasIdeal = 100;
+  const distIdeal = Math.abs(diasSumido - diasIdeal);
+  const diasPeso = Math.max(0, 20 - distIdeal * 0.15);
+  const confPeso = (conf || 0) * 25;
+  const freqPeso = Math.min(10, (Number(acc.pedidos_count) || 0) * 2);
+  return valorPeso + diasPeso + confPeso + freqPeso;
+}
+
+// Cross-sell: confianca da cooc pesa mais, valor historico secundario.
+function _scoreCrossSell(acc, conf) {
+  const confPeso = (conf || 0) * 40;
+  const valorPeso = Math.min(20, (Number(acc.valor_total_compras) || 0) / 2000);
+  const freqPeso = Math.min(10, (Number(acc.pedidos_count) || 0) * 2);
+  return confPeso + valorPeso + freqPeso;
+}
+
+// Aniversario: valor historico + bonus fixo (volume baixo, boa desculpa).
+function _scoreAniversario(acc) {
+  const valorPeso = Math.min(35, (Number(acc.valor_total_compras) || 0) / 500);
+  return valorPeso + 15;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS DIVERSOS
+// ═══════════════════════════════════════════════════════════════
+
+// Escolhe a MELHOR sugestao de coocorrencia pro pedido de referencia.
+// Ignora SKUs que o cliente ja comprou. Retorna null se nao houver.
+async function _melhorSugestaoCooc(pedRef, skusJa, minConf) {
+  if (!pedRef || !pedRef.itens || !pedRef.itens.length) return null;
+  let melhor = null;
+  for (const it of pedRef.itens) {
+    const sku = String(it.sku || '');
+    if (!sku) continue;
+    let cooc;
+    try { cooc = await coocorrencia.getPara(sku); } catch (e) { continue; }
+    if (!cooc) continue;
+    const todos = [...(cooc.compraram_junto || []), ...(cooc.compraram_depois || [])];
+    for (const s of todos) {
+      if (skusJa.has(String(s.sku))) continue;
+      if ((s.confianca || 0) < minConf) continue;
+      if (!melhor || (s.confianca || 0) > (melhor.confianca || 0)) melhor = s;
+    }
+  }
+  return melhor;
+}
+
+function _skusUnicos(peds) {
+  const s = new Set();
+  for (const p of peds) for (const it of (p.itens || [])) if (it.sku) s.add(String(it.sku));
+  return s;
+}
+
+// Dono da tarefa — delega pra _resolverDonoFinal que:
+// 1. Vendedor da última venda (se for real/mapeado) OU
+// 2. Account.owner_id (se for real/mapeado) OU
+// 3. Rodizio
+//
+// Diferença chave: NÃO aleatoriza vendedores desligados que estão no
+// MAPEAMENTO_VENDEDORES_DESLIGADOS — esses vão pro sucessor definido.
+function _resolverVendedor(account, meusPeds) {
+  const accountId = account && account.id;
+  // Tenta vendedor da última venda primeiro
+  if (meusPeds && meusPeds.length && meusPeds[0].vendedor_id) {
+    const v = _normLogin(meusPeds[0].vendedor_id);
+    const r = _resolverDonoFinal(v, accountId);
+    // Se não foi pro rodizio (ou se o rodizio deu num mapeamento manual),
+    // retorna. Senão continua tentando outras fontes.
+    if (PSEUDOVENDEDORES.indexOf(v) === -1 && v) return r;
+  }
+  // Depois: owner do account
+  if (account && account.owner_id) {
+    return _resolverDonoFinal(account.owner_id, accountId);
+  }
+  // Nada → rodizio puro
+  return _rodizio(accountId);
+}
+
+// MAPEAMENTO MANUAL de vendedores DESLIGADOS pra vendedores atuais.
+// Quando um vendedor sai da empresa, a carteira dele passa pra um sucessor
+// definido pelo gestor. Esses clientes NÃO vão pro rodizio aleatório — vão
+// direto pro sucessor mapeado aqui. Adicione linhas quando outro vendedor sair.
+// Formato: 'nome_antigo_lowercase': 'login_do_sucessor'
+const MAPEAMENTO_VENDEDORES_DESLIGADOS = {
+  'jonatas': 'mathias', // Clientes do Jonatas (desligado) agora são do Wesley (mathias)
+};
+
+// Pseudo-vendedores que o Bling usa quando o pedido não tem vendedor humano
+// atribuído. Esses SIM vão pro rodizio aleatório.
+const PSEUDOVENDEDORES = ['gerencia', 'admin', 'auxiliar', 'diretor', 'tray'];
+
+// So considera vendedor "real" (dono legítimo) quem está na lista ativa OU
+// no mapeamento de desligados (que redireciona). Pseudo-vendedores (tray,
+// gerencia, etc) e nomes desconhecidos caem no rodizio.
+function _isVendedorReal(login) {
+  if (!login) return false;
+  if (PSEUDOVENDEDORES.indexOf(login) !== -1) return false;
+  if (MAPEAMENTO_VENDEDORES_DESLIGADOS[login]) return true; // mapeado = tem dono legítimo
+  return VENDEDORES_ATIVOS.indexOf(login) !== -1;
+}
+
+// Resolve o DONO FINAL de uma tarefa/conta/pedido. Aplica mapeamento de
+// desligados quando necessário.
+//   - Em branco → rodizio
+//   - Pseudo-vendedor (tray/gerencia/etc) → rodizio
+//   - Mapeado (ex: jonatas) → sucessor (ex: mathias)
+//   - Vendedor ativo → ele mesmo
+//   - Vendedor desconhecido (não ativo, não mapeado) → rodizio como fallback
+function _resolverDonoFinal(loginBruto, accountId) {
+  const v = _normLogin(loginBruto);
+  if (!v) return _rodizio(accountId);
+  if (PSEUDOVENDEDORES.indexOf(v) !== -1) return _rodizio(accountId);
+  if (MAPEAMENTO_VENDEDORES_DESLIGADOS[v]) return MAPEAMENTO_VENDEDORES_DESLIGADOS[v];
+  if (VENDEDORES_ATIVOS.indexOf(v) !== -1) return v;
+  // Desconhecido — não tem como adivinhar, joga no rodizio
+  return _rodizio(accountId);
+}
+
+// Transfere o account pro vendedor que vai receber a tarefa, mas SOMENTE se
+// o owner atual é "orfão" (gerencia / tray / vazio / vendedor fora da lista).
+// Isso resolve o bug "cliente não lhe pertence" — quando o rodizio da uma
+// tarefa pra Pedro de um cliente cujo owner é 'gerencia', Pedro nao conseguia
+// abrir a ficha porque canReadDoc valida owner_id. Agora transferimos a conta
+// pra ele no mesmo movimento. Nunca rouba conta de outro vendedor ativo.
+async function _realocarAccountSeOrfao(accountId, novoDono, actor) {
+  if (!accountId || !novoDono) return;
+  try {
+    const account = await crmStore.getDoc('accounts', accountId);
+    if (!account) return;
+    const atual = _normLogin(account.owner_id);
+    // Se já é vendedor ativo (e NÃO é o novoDono tentando se auto-transferir),
+    // não mexe — respeita a atribuição manual existente.
+    if (atual && _isVendedorReal(atual) && atual !== novoDono) return;
+    if (atual === novoDono) return; // já é dele, não precisa salvar
+    // Atualiza owner_id com actor rastreável — fica no histórico do doc
+    await crmStore.updateDoc('accounts', accountId, {
+      ...account,
+      owner_id: novoDono,
+      // Carimba a transferência pra auditoria
+      _realocado_por_automacao: {
+        de: atual || null,
+        para: novoDono,
+        em: new Date().toISOString(),
+        motivo: 'rodizio automatico (vendedor anterior era orfao: ' + (atual || 'vazio') + ')',
+      },
+    }, actor || 'automacao-rodizio');
+  } catch (e) {
+    // Falha silenciosa — não bloquear a criação da tarefa
+    console.warn('[automacaoUpsell] Falha ao realocar account ' + accountId + ' pra ' + novoDono + ': ' + e.message);
+  }
+}
+
+// Mesma lógica pra orders — quando o pedido veio sem vendedor ou com 'tray',
+// atualiza vendedor_id pro vendedor do rodizio. Nunca sobrescreve vendedor real.
+async function _realocarOrderSeOrfao(orderId, novoDono, actor) {
+  if (!orderId || !novoDono) return;
+  try {
+    const order = await crmStore.getDoc('orders', orderId);
+    if (!order) return;
+    const atual = _normLogin(order.vendedor_id);
+    if (atual && _isVendedorReal(atual) && atual !== novoDono) return;
+    if (atual === novoDono) return;
+    await crmStore.updateDoc('orders', orderId, {
+      ...order,
+      vendedor_id: novoDono,
+    }, actor || 'automacao-rodizio');
+  } catch (e) {
+    console.warn('[automacaoUpsell] Falha ao realocar order ' + orderId + ' pra ' + novoDono + ': ' + e.message);
+  }
+}
+
+// Rodizio deterministico entre vendedores ativos. Baseado em soma dos char
+// codes do accountId — mesmo cliente sempre cai no mesmo vendedor, ate a
+// lista mudar.
+function _rodizio(accountId) {
+  if (!VENDEDORES_ATIVOS.length) return 'gerencia';
+  const id = String(accountId || 'x');
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash + id.charCodeAt(i)) | 0;
+  return VENDEDORES_ATIVOS[Math.abs(hash) % VENDEDORES_ATIVOS.length];
+}
+
+function _normLogin(v) {
+  return String(v || '').trim().toLowerCase();
+}
+
+function _titulo(c) {
+  const nome = (c.account && c.account.nome) || c.accountId;
+  if (c.fonte === 'reativacao_match') return '🔥 Reativar — ' + nome;
+  if (c.fonte === 'cross_sell')       return '➕ Cross-sell — ' + nome;
+  if (c.fonte === 'aniversario')      return '🎉 1 ano de cliente — ' + nome;
+  return 'Oportunidade — ' + nome;
+}
+
+function _descricao(c) {
+  const acc = c.account || {};
+  const linhas = [];
+  linhas.push(c.motivoCurto);
+  linhas.push('');
+  linhas.push('Cliente: ' + (acc.nome || c.accountId));
+  if (acc.telefone) linhas.push('Telefone: ' + acc.telefone);
+  if (acc.ultima_compra_em) linhas.push('Ultima compra: ' + acc.ultima_compra_em);
+  if (acc.pedidos_count) linhas.push('Pedidos: ' + acc.pedidos_count);
+  if (acc.valor_total_compras) linhas.push('Valor historico: R$ ' + Number(acc.valor_total_compras).toFixed(2));
+  if (c.sku_desc) {
+    linhas.push('');
+    linhas.push('Produto sugerido: ' + c.sku_desc + (c.sku_sugerido ? ' (SKU ' + c.sku_sugerido + ')' : ''));
+    if (c.sug_confianca) linhas.push('Confianca: ' + Math.round(c.sug_confianca * 100) + '%');
+  }
+  linhas.push('');
+  linhas.push('💡 Clique em "Gerar pitch com IA" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.');
+  return linhas.join('\n');
+}
+
+function _descricaoPosVenda(account, order, sugestoes) {
+  const nome = (account && account.nome) || order.account_id;
+  const itensCompra = (order.itens || []).map(i => i.descricao || i.sku).slice(0, 3).join(', ');
+  const linhas = sugestoes.map((s, i) => (i + 1) + '. ' + (s.nome || s.sku_bling) + ' — ' + s.motivo);
+  let saida = 'Cliente ' + nome + ' comprou em ' + order.data_pedido + ': ' + itensCompra + '.\n\n';
+  saida += 'Sugestoes (abordar em ate ' + POSVENDA_PRAZO_DIAS + ' dias, cliente ainda quente):\n' + linhas.join('\n');
+  if (sugestoes[0] && sugestoes[0].pitch) {
+    saida += '\n\n📱 Pitch pronto pra WhatsApp:\n' + sugestoes[0].pitch;
+  }
+  return saida;
+}
+
+// Constroi activity via build() do collections (valida enum, campos obrigatorios)
+// e depois anexa os campos extras que o schema nao inclui mas o dashboard usa.
+function _buildAct(dados) {
+  const extras = {
+    fonte: dados.fonte,
+    account_id: dados.account_id,
+    order_id: dados.order_id,
+    sku_sugerido: dados.sku_sugerido,
+    sku_sugerido_descricao: dados.sku_sugerido_descricao,
+    motivo_curto: dados.motivo_curto,
+    sug_confianca: dados.sug_confianca,
+    pitch_pronto: dados.pitch_pronto,
+    sugestoes_json: dados.sugestoes_json,
+    dono: dados.dono,
+  };
+  // build() so aceita os campos do schema; passamos so o que ele quer
+  const base = crmColl.REGISTRY.activities.build({
+    id: uuid(),
+    tipo: dados.tipo,
+    status: 'pendente',
+    owner_id: dados.owner_id,
+    entidade_tipo: 'account',
+    entidade_id: dados.entidade_id,
+    titulo: dados.titulo,
+    descricao: dados.descricao,
+    prazo: dados.prazo,
+    pontos_base: dados.pontos_base || 0,
+    trigger_id: dados.trigger_id,
+    gerada_automaticamente: true,
+  });
+  // Anexa extras (nao validados, mas persistidos)
+  for (const k of Object.keys(extras)) if (extras[k] !== undefined && extras[k] !== null) base[k] = extras[k];
+  return base;
+}
+
+function _contaPorFonte(tarefas) {
+  const c = {};
+  for (const t of tarefas) c[t.fonte] = (c[t.fonte] || 0) + 1;
+  return c;
+}
+
+function _corta(s, n) {
+  s = String(s || '');
+  return s.length <= n ? s : s.slice(0, n - 1) + '…';
+}
+
+function _hojeISO() { return new Date().toISOString().slice(0, 10); }
+
 function _hojeMais(d) {
   const dt = new Date();
   dt.setDate(dt.getDate() + d);
   return dt.toISOString().slice(0, 10);
 }
-function _hojeMenos(d) {
-  const dt = new Date();
-  dt.setDate(dt.getDate() - d);
-  return dt.toISOString().slice(0, 10);
-}
-function _diffDias(a, b) {
-  const da = new Date(a + 'T00:00:00Z');
-  const db = new Date(b + 'T00:00:00Z');
-  return Math.round((db - da) / (1000 * 60 * 60 * 24));
-}
-function _montarDescricaoUpsell(account, order, sugestoes) {
-  const nome = account ? account.nome : order.account_id;
-  const itensCompra = (order.itens || []).map(i => i.descricao || i.sku).slice(0, 3).join(', ');
-  const linhas = sugestoes.map((s, i) => (i + 1) + '. ' + (s.nome || s.sku_bling) + ' — ' + s.motivo);
-  return 'Cliente ' + nome + ' comprou em ' + order.data_pedido + ': ' + itensCompra + '.\n\nSugestões (contatar em até ' + PRAZO_DIAS_UPSELL + ' dias):\n' + linhas.join('\n') +
-    (sugestoes[0] && sugestoes[0].pitch ? '\n\n📱 Pitch pronto pra WhatsApp:\n' + sugestoes[0].pitch : '');
+
+function _diasEntre(dataInicio, dataFim) {
+  const a = new Date(dataInicio + 'T00:00:00Z');
+  const b = new Date(dataFim + 'T00:00:00Z');
+  return Math.round((b - a) / (1000 * 60 * 60 * 24));
 }
 
-module.exports = { processarOrderNovo, disparaReativacao };
+// Tag de semana ISO (ex: 2026-09-w39) pra dedupe semanal
+function _semanaTag(iso) {
+  const d = new Date(iso + 'T00:00:00Z');
+  const dayNum = (d.getUTCDay() + 6) % 7; // segunda=0
+  d.setUTCDate(d.getUTCDate() - dayNum + 3);
+  const firstThursday = new Date(Date.UTC(d.getUTCFullYear(), 0, 4));
+  const diff = (d - firstThursday) / (7 * 24 * 60 * 60 * 1000);
+  const semana = 1 + Math.round(diff);
+  return d.getUTCFullYear() + '-w' + String(semana).padStart(2, '0');
+}
+
+// Varredura RETROATIVA pra consertar bagunça:
+// 1. Pra cada account/order com owner MAPEADO (ex: jonatas) → transfere pro
+//    sucessor (ex: mathias).
+// 2. Pra cada activity PENDENTE cujo owner é vendedor ativo mas account é
+//    órfão (pseudo-vendedor) → transfere o account pro mesmo vendedor da activity.
+// Chamar via endpoint quando mudar o MAPEAMENTO_VENDEDORES_DESLIGADOS ou pra
+// corrigir bugs antigos.
+async function repararAccountsOrfaosDeTarefas() {
+  const activities = await crmStore.listDocs('activities');
+  const pendentesComDonoReal = activities.filter(a =>
+    a.status === 'pendente' && _isVendedorReal(_normLogin(a.owner_id || a.dono))
+  );
+  const resultado = {
+    total_activities_pendentes: pendentesComDonoReal.length,
+    accounts_transferidos: 0,
+    orders_transferidos: 0,
+    mapeamento_aplicado: 0, // ex: jonatas→mathias
+    transferencias: [],
+    erros: [],
+  };
+
+  // ── PASSO 1: aplica o MAPEAMENTO_VENDEDORES_DESLIGADOS em TODOS os
+  // accounts e orders, independente de ter tarefa aberta. Isso move toda a
+  // carteira do Jonatas pra Wesley de uma vez só.
+  try {
+    const todosAccounts = await crmStore.listDocs('accounts');
+    for (const acc of todosAccounts) {
+      const owner = _normLogin(acc.owner_id);
+      const sucessor = MAPEAMENTO_VENDEDORES_DESLIGADOS[owner];
+      if (sucessor) {
+        try {
+          await crmStore.updateDoc('accounts', acc.id, {
+            ...acc, owner_id: sucessor,
+            _realocado_por_automacao: {
+              de: owner, para: sucessor,
+              em: new Date().toISOString(),
+              motivo: 'mapeamento manual vendedor desligado',
+            },
+          }, 'reparo-mapeamento');
+          resultado.mapeamento_aplicado++;
+          resultado.transferencias.push({ account_id: acc.id, de: owner, para: sucessor, motivo: 'mapeamento' });
+        } catch (e) {
+          resultado.erros.push({ account_id: acc.id, erro: e.message });
+        }
+      }
+    }
+    const todosOrders = await crmStore.listDocs('orders');
+    for (const o of todosOrders) {
+      const vend = _normLogin(o.vendedor_id);
+      const sucessor = MAPEAMENTO_VENDEDORES_DESLIGADOS[vend];
+      if (sucessor) {
+        try {
+          await crmStore.updateDoc('orders', o.id, { ...o, vendedor_id: sucessor }, 'reparo-mapeamento');
+          resultado.orders_transferidos++;
+        } catch (e) {
+          resultado.erros.push({ order_id: o.id, erro: e.message });
+        }
+      }
+    }
+  } catch (e) {
+    resultado.erros.push({ passo: 'mapeamento_global', erro: e.message });
+  }
+  // ── PASSO 2: transfere accounts órfãos (pseudo-vendedor) pros vendedores
+  // que já receberam tarefas via rodizio. Dedupe por account.
+  const paresFeitos = new Set();
+  for (const a of pendentesComDonoReal) {
+    const accId = a.entidade_id || a.account_id;
+    const dono = _normLogin(a.owner_id || a.dono);
+    if (!accId) continue;
+    const chave = accId + '→' + dono;
+    if (paresFeitos.has(chave)) continue;
+    paresFeitos.add(chave);
+    try {
+      const acc = await crmStore.getDoc('accounts', accId);
+      if (!acc) continue;
+      const ownerAtual = _normLogin(acc.owner_id);
+      // Só transfere se órfão (nunca rouba de outro vendedor ativo)
+      if (_isVendedorReal(ownerAtual) && ownerAtual !== dono) continue;
+      if (ownerAtual === dono) continue;
+      await _realocarAccountSeOrfao(accId, dono, 'reparo-retroativo');
+      resultado.accounts_transferidos++;
+      resultado.transferencias.push({ account_id: accId, de: ownerAtual || '(vazio)', para: dono });
+      // Também realoca orders dessa conta que estavam órfãos
+      const orders = await crmStore.listDocs('orders', o => o.account_id === accId);
+      for (const o of orders) {
+        if (!_isVendedorReal(_normLogin(o.vendedor_id))) {
+          await _realocarOrderSeOrfao(o.id, dono, 'reparo-retroativo');
+          resultado.orders_transferidos++;
+        }
+      }
+    } catch (e) {
+      resultado.erros.push({ account_id: accId, erro: e.message });
+    }
+  }
+  return resultado;
+}
+
+module.exports = {
+  processarOrderNovo,
+  gerarTarefasDiarias,
+  disparaReativacao, // alias — mantido pra cron atual
+  repararAccountsOrfaosDeTarefas,
+};
