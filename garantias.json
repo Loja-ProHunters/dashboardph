@@ -1492,5 +1492,96 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "d19474e2-efec-4636-b6bb-4e1cf8eca7b5": {
+    "id": "d19474e2-efec-4636-b6bb-4e1cf8eca7b5",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Sulivan Hevellin Pimentel de Araujo",
+      "cpf_cnpj": "91481082272",
+      "whatsapp": "+5591988323299",
+      "email": "sulivanpmpa08@gmail.com",
+      "cidade": "Belém",
+      "uf": "PA",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": null,
+      "data_compra": null,
+      "data_recebimento": null,
+      "nome_produto": null,
+      "marca": null,
+      "modelo": null,
+      "numero_serie": null,
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Sem descrição",
+      "data_percebido_problema": null,
+      "chegou_defeito_ou_depois": null,
+      "motivo_troca_devolucao": null,
+      "uploads": []
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": null,
+      "data_percebido_problema": null,
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao_sei",
+      "teve_modificacao": "nao",
+      "tem_evidencia": false,
+      "_flags_brutas": {
+        "queda_impacto": null,
+        "agua_umidade": null,
+        "aberto_por_terceiros": null,
+        "usado_conforme_manual": null,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal e sem indício claro de mau uso, mas o cliente não anexou foto/vídeo do defeito. Solicitar evidência antes de decidir ou avaliar troca mediante inspeção presencial.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-05T11:28:13.360Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-05T11:28:13.360Z",
+    "atualizado_em": "2026-10-05T11:28:13.360Z",
+    "tally_meta": {
+      "eventId": "sync_RWbvXvl",
+      "responseId": "RWbvXvl",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-08-10T11:25:37.000Z",
+      "raw_onde_comprou": "Outro local",
+      "raw_desejo": "Garantia (produto com defeito)",
+      "raw_momento": null
+    },
+    "historico": [
+      {
+        "ts": "2026-10-05T11:28:13.360Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
