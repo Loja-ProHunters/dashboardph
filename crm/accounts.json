@@ -28077,7 +28077,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "boschetto",
     "onboarding_id": null,
     "primeira_compra_em": "2026-03-23",
     "ultima_compra_em": "2026-03-31",
@@ -28089,8 +28089,14 @@
     "notas": null,
     "criado_em": "2026-09-22T12:09:00.207Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T12:12:07.990Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-05T19:44:00.544Z",
+    "atualizado_por": "reparo-retroativo",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "boschetto",
+      "em": "2026-10-05T19:44:00.544Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_d5ff8652d0402e29": {
     "id": "acc_d5ff8652d0402e29",
