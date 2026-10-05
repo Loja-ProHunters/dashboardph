@@ -835,5 +835,104 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "8f5c3810-8ead-4925-a46f-6fa6e2f278c0": {
+    "id": "8f5c3810-8ead-4925-a46f-6fa6e2f278c0",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Cassius Panice",
+      "cpf_cnpj": "14578119874",
+      "whatsapp": "+5514997757881",
+      "email": "cassiuspanice@gmail.com",
+      "cidade": "Bauru",
+      "uf": "SP",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "000.193.319",
+      "data_compra": "2026-08-17",
+      "data_recebimento": "2026-09-30",
+      "nome_produto": "Trilho de Aço Picatinny Long 20MOA - Vector Optics (Ref. VEC-SCRA-63) - Marca : Vector Optics - Modelo : SCRA-63",
+      "marca": "vector optics",
+      "modelo": "- Modelo : SCRA-63",
+      "numero_serie": "n.a",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Eu medi corretamente o tamanho externo e as distâncias do furos com o anúncio antes de comprar estava tudo ok . Mas a posição dos furos da peça que recebi é diferente",
+      "data_percebido_problema": "2026-09-01",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Eu medi corretamente o tamanho externo e as distâncias do furos com o anúncio antes de comprar estava tudo ok . Mas a posição dos furos é diferente",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "prohunters trilho 3.jpg",
+          "url": "https://storage.tally.so/private/prohunters-trilho-3.jpg?id=gX1aYP&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImdYMWFZUCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTE5OTY3OH0.vsV8rFX9DkfzRkAQ6UJHWF82obaRpHxtzKtUTr7Kr8U&signature=b9b6f31cfc2e84454f453f751364b97cabefdf277b4835d13417a5664e5598fa",
+          "mimeType": "image/jpeg",
+          "size": 742704
+        }
+      ]
+    },
+    "preferencia_cliente": "troca",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-09-30",
+      "data_percebido_problema": "2026-09-01",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "troca",
+      "sugestao_sistema": "procedente_troca",
+      "justificativa_sistema": "Dentro do prazo legal (CDC Art. 26), sem indício de mau uso, com evidência anexada. Cliente preferiu troca por produto igual novo (CDC Art. 18 §1º I).",
+      "score_confianca": "media",
+      "calculado_em": "2026-10-05T11:28:06.950Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-05T11:28:06.950Z",
+    "atualizado_em": "2026-10-05T11:28:06.950Z",
+    "tally_meta": {
+      "eventId": "sync_J1BV7qK",
+      "responseId": "J1BV7qK",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-09-03T17:52:03.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Troca (produto errado ou insatisfação)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-05T11:28:06.950Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
