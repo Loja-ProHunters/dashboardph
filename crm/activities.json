@@ -691,7 +691,7 @@
   "b49b04f2-2c0c-47e6-a90b-4f1436f3cc85": {
     "id": "b49b04f2-2c0c-47e6-a90b-4f1436f3cc85",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_ef270a72e07c701f",
@@ -714,10 +714,13 @@
     "dono": "boschetto",
     "criado_em": "2026-09-25T15:07:04.692Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-09-25T15:07:04.692Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-05T20:31:06.917Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "Guilherme Stefanello da silveira",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-05T20:31:06.917Z",
+    "concluida_por": "boschetto"
   },
   "d047e370-87c7-4b25-9baa-25cd2f208661": {
     "id": "d047e370-87c7-4b25-9baa-25cd2f208661",
