@@ -328,5 +328,111 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "09712c5f-20a4-4372-9f7a-1eaa87c982da": {
+    "id": "09712c5f-20a4-4372-9f7a-1eaa87c982da",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Rafael Baptista Rodrigues",
+      "cpf_cnpj": "345.153.018-02",
+      "whatsapp": "+5511947570329",
+      "email": "rrtarts@gmail.com",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031294",
+      "data_compra": "2026-09-09",
+      "data_recebimento": "2026-09-13",
+      "nome_produto": "Lanterna para arma olight PL mini 2",
+      "marca": "Olight",
+      "modelo": "Pl mini 2 valkyrie desert",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "A bateria não está segurando carga. Carreguei 100% conforme indica o fabricante, depois de aproximadamente 1 semana a carga está praticamente zerada.",
+      "data_percebido_problema": "2026-09-24",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Bateria não segura carga, gostaria da troca da lanterna.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "427897.heic",
+          "url": "https://storage.tally.so/private/427897.heic?id=6Yl8Ve&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZZbDhWZSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTE5OTY3OH0.tSlwb2VMEl-jxYRZcHXwXc0bHtw8ywuI4bjRAQPFSyo&signature=4326cb555f44942f0b2bc5316a0a3e32cdc07ffc8466c223e739dd5555363c28",
+          "mimeType": "image/heic",
+          "size": 191982
+        },
+        {
+          "tipo": "foto",
+          "nome": "427896.heic",
+          "url": "https://storage.tally.so/private/427896.heic?id=LjrZoG&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkxqclpvRyIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTE5OTY3OH0.2egBkX3bh9MhbsjEZc0PnEPE6vfQipEZl81jjUdtTZY&signature=75d655b46829063ece4317f23b3bd6d9b4b7da1b288c9aba70f61d1f8cff9024",
+          "mimeType": "image/heic",
+          "size": 1040099
+        }
+      ]
+    },
+    "preferencia_cliente": "troca",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-09-13",
+      "data_percebido_problema": "2026-09-24",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "troca",
+      "sugestao_sistema": "procedente_troca",
+      "justificativa_sistema": "Dentro do prazo legal (CDC Art. 26), sem indício de mau uso, com evidência anexada. Cliente preferiu troca por produto igual novo (CDC Art. 18 §1º I).",
+      "score_confianca": "media",
+      "calculado_em": "2026-10-05T11:28:02.120Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-05T11:28:02.120Z",
+    "atualizado_em": "2026-10-05T11:28:02.120Z",
+    "tally_meta": {
+      "eventId": "sync_o9QNLDb",
+      "responseId": "o9QNLDb",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-09-24T13:06:36.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Troca (produto errado ou insatisfação)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-05T11:28:02.120Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
