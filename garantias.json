@@ -603,7 +603,14 @@
       "score_confianca": "baixa",
       "calculado_em": "2026-10-05T11:28:04.003Z"
     },
-    "decisao_operador": null,
+    "decisao_operador": {
+      "valor": "analise_manual",
+      "justificativa": null,
+      "por": "auxiliar",
+      "em": "2026-10-05T16:15:11.530Z",
+      "divergiu_do_sistema": false,
+      "sugestao_original": "analise_manual"
+    },
     "status": "aberto",
     "resultado": null,
     "produto_fisico": {
@@ -620,7 +627,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:04.003Z",
-    "atualizado_em": "2026-10-05T11:28:04.003Z",
+    "atualizado_em": "2026-10-05T16:15:11.530Z",
     "tally_meta": {
       "eventId": "sync_2j5vRjV",
       "responseId": "2j5vRjV",
@@ -635,6 +642,13 @@
         "ts": "2026-10-05T11:28:04.003Z",
         "acao": "criada",
         "por": "tally-webhook"
+      },
+      {
+        "ts": "2026-10-05T16:15:11.530Z",
+        "acao": "decisao_registrada",
+        "por": "auxiliar",
+        "valor": "analise_manual",
+        "divergiu": false
       }
     ]
   },
