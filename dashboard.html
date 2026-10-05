@@ -9943,5 +9943,222 @@ window.PROD = (function(){
 })();
 </script>
 
+<!-- ═══════════════════════════════════════════════════════════════
+  WIDGET FLUTUANTE DE CHAT (canto inferior direito)
+  Aparece quando o usuario tem msgs nao lidas em alguma solicitacao.
+  Clica → abre painel com a lista dos chats pendentes.
+  Clica num chat → navega pra aba Solicitacoes com o chat aberto.
+═══════════════════════════════════════════════════════════════ -->
+<div id="chat-widget" style="display:none">
+  <div id="chat-widget-fab" onclick="CHAT_WIDGET.togglePanel()" title="Mensagens não lidas">
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+    <span id="chat-widget-badge">0</span>
+  </div>
+  <div id="chat-widget-panel">
+    <div id="chat-widget-head">
+      <span>Mensagens não lidas</span>
+      <button onclick="CHAT_WIDGET.togglePanel()" aria-label="Fechar">×</button>
+    </div>
+    <div id="chat-widget-list">
+      <div style="padding:20px;text-align:center;color:#7b8285;font-size:12.5px">Carregando…</div>
+    </div>
+  </div>
+</div>
+
+<style>
+#chat-widget {
+  position: fixed; bottom: 20px; right: 20px; z-index: 999;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+#chat-widget-fab {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, #1a8bff, #0e6bd4); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(26,139,255,.4);
+  cursor: pointer; position: relative;
+  transition: transform .2s ease, box-shadow .2s ease;
+  animation: chatPulse 2s ease-in-out infinite;
+}
+#chat-widget-fab:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(26,139,255,.55); }
+@keyframes chatPulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(26,139,255,.4); }
+  50% { box-shadow: 0 4px 24px rgba(26,139,255,.75), 0 0 0 8px rgba(26,139,255,.15); }
+}
+#chat-widget-badge {
+  position: absolute; top: -4px; right: -4px;
+  background: #e03030; color: #fff; min-width: 22px; height: 22px;
+  border-radius: 11px; font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 6px; border: 2px solid #fff;
+}
+#chat-widget-panel {
+  position: absolute; bottom: 72px; right: 0;
+  width: 340px; max-height: 440px; background: #fff;
+  border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.18);
+  display: none; flex-direction: column; overflow: hidden;
+  border: 1px solid #e0e4e7;
+}
+#chat-widget-panel.aberto { display: flex; }
+#chat-widget-head {
+  background: linear-gradient(135deg, #1a8bff, #0e6bd4); color: #fff;
+  padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+  font-size: 14px; font-weight: 700;
+}
+#chat-widget-head button {
+  background: transparent; border: none; color: #fff; font-size: 22px;
+  cursor: pointer; width: 28px; height: 28px; border-radius: 4px; line-height: 1;
+}
+#chat-widget-head button:hover { background: rgba(255,255,255,.15); }
+#chat-widget-list { overflow-y: auto; max-height: 380px; }
+.cw-item {
+  padding: 12px 14px; border-bottom: 1px solid #eef0f1;
+  cursor: pointer; transition: background .12s;
+}
+.cw-item:last-child { border-bottom: 0; }
+.cw-item:hover { background: #f8f9fa; }
+.cw-item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.cw-item-nome { font-weight: 700; font-size: 13px; color: #1a1a1a; }
+.cw-item-badge {
+  background: #e03030; color: #fff; font-size: 10.5px; font-weight: 700;
+  padding: 2px 7px; border-radius: 10px; min-width: 18px; text-align: center;
+}
+.cw-item-tit { font-size: 12px; color: #4a5057; margin-bottom: 3px; }
+.cw-item-prev { font-size: 11.5px; color: #7b8285; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cw-empty { padding: 30px 20px; text-align: center; color: #7b8285; font-size: 12.5px; }
+</style>
+
+<script>
+window.CHAT_WIDGET = (function(){
+  var state = { aberto: false, chats: [], ultimoTotal: 0 };
+
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function fmtQuando(iso){
+    if (!iso) return '';
+    var d = new Date(iso); var hoje = new Date();
+    if (d.toDateString() === hoje.toDateString()) {
+      return d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+    }
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  async function atualizar(){
+    try {
+      var r = await fetch('/api/solicitacoes/chats-nao-lidos');
+      if (!r.ok) return;
+      var d = await r.json();
+      state.chats = d.chats || [];
+      var total = d.total || 0;
+      var widget = document.getElementById('chat-widget');
+      var badge = document.getElementById('chat-widget-badge');
+      if (!widget || !badge) return;
+      if (total > 0) {
+        widget.style.display = '';
+        badge.textContent = total > 99 ? '99+' : total;
+      } else {
+        widget.style.display = 'none';
+        if (state.aberto) togglePanel();
+      }
+      if (state.aberto) renderLista();
+      // Som sutil quando chega msg nova (so se incrementou)
+      if (total > state.ultimoTotal && state.ultimoTotal >= 0) {
+        try { _bip(); } catch(_) {}
+      }
+      state.ultimoTotal = total;
+    } catch(_) {}
+  }
+
+  function renderLista(){
+    var el = document.getElementById('chat-widget-list');
+    if (!el) return;
+    if (!state.chats.length) {
+      el.innerHTML = '<div class="cw-empty">Nenhuma mensagem não lida. 🎉</div>';
+      return;
+    }
+    el.innerHTML = state.chats.map(function(c){
+      var prev = c.ultima_mensagem ? (c.ultima_mensagem.de === (typeof USER_USUARIO!=='undefined'?USER_USUARIO:'') ? 'Você: ' : '') + c.ultima_mensagem.texto : '';
+      return '<div class="cw-item" onclick="CHAT_WIDGET.abrirChat(\'' + c.id + '\')">' +
+        '<div class="cw-item-top">' +
+          '<span class="cw-item-nome">' + esc(c.outro_nome) + '</span>' +
+          '<span class="cw-item-badge">' + c.qtd_naolidas + '</span>' +
+        '</div>' +
+        '<div class="cw-item-tit">' + esc(c.titulo) + '</div>' +
+        '<div class="cw-item-prev">' + esc(prev).slice(0, 80) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function togglePanel(){
+    var p = document.getElementById('chat-widget-panel');
+    if (!p) return;
+    state.aberto = !state.aberto;
+    p.classList.toggle('aberto', state.aberto);
+    if (state.aberto) renderLista();
+  }
+
+  async function abrirChat(solicitacaoId){
+    // Marca como lido no backend
+    try {
+      await fetch('/api/solicitacoes/' + solicitacaoId + '/marcar-lido', { method:'POST' });
+    } catch(_) {}
+    // Navega pra aba Solicitações
+    try {
+      var btn = document.querySelector('.ni[onclick*="solicitacoes"]');
+      if (btn) goTab('solicitacoes', btn);
+    } catch(_) {}
+    // Fecha o panel do widget
+    togglePanel();
+    // Dá um tempo pro HTML da lista de solicitações carregar, depois abre o chat
+    setTimeout(function(){
+      try {
+        if (typeof solicToggleChat === 'function') {
+          // Fecha se estava aberto, abre de novo pra garantir estado limpo
+          if (window.SOLIC_CHAT && window.SOLIC_CHAT.abertos[solicitacaoId]) {
+            // já aberto, scroll até ele
+          } else {
+            solicToggleChat(solicitacaoId);
+          }
+          var el = document.getElementById('chat-' + solicitacaoId);
+          if (el && el.scrollIntoView) el.scrollIntoView({ behavior:'smooth', block:'center' });
+        }
+      } catch(_) {}
+      // Atualiza widget pra remover esse chat (ja marcado como lido)
+      atualizar();
+    }, 500);
+  }
+
+  // Bip sutil usando Web Audio API — sem precisar de arquivo mp3
+  var _audioCtx = null;
+  function _bip(){
+    try {
+      if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var o = _audioCtx.createOscillator();
+      var g = _audioCtx.createGain();
+      o.connect(g); g.connect(_audioCtx.destination);
+      o.type = 'sine'; o.frequency.value = 880;
+      g.gain.setValueAtTime(0.001, _audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.08, _audioCtx.currentTime + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, _audioCtx.currentTime + 0.25);
+      o.start(); o.stop(_audioCtx.currentTime + 0.3);
+    } catch(_) {}
+  }
+
+  function init(){
+    atualizar();
+    setInterval(atualizar, 15000); // 15s conforme Luis escolheu
+  }
+
+  // Inicializa quando a pagina carrega
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  return { atualizar: atualizar, togglePanel: togglePanel, abrirChat: abrirChat };
+})();
+</script>
+
 </body>
 </html>
