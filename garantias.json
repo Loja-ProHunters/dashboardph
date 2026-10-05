@@ -812,11 +812,11 @@
     "status": "aberto",
     "resultado": null,
     "produto_fisico": {
-      "status": "aguardando_chegada",
+      "status": "recebido_loja",
       "rastreio_entrada": null,
       "aguardando_desde": "2026-10-05T15:42:16.452Z",
-      "recebido_em": null,
-      "recebido_por": null,
+      "recebido_em": "2026-10-05T15:42:30.713Z",
+      "recebido_por": "auxiliar",
       "localizacao_loja": null,
       "etiqueta_impressa_em": null,
       "etiqueta_impressa_por": null,
@@ -825,7 +825,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:05.972Z",
-    "atualizado_em": "2026-10-05T15:42:16.452Z",
+    "atualizado_em": "2026-10-05T15:42:30.713Z",
     "tally_meta": {
       "eventId": "sync_NqgO8jl",
       "responseId": "NqgO8jl",
@@ -853,6 +853,13 @@
         "acao": "produto_solicitado",
         "por": "auxiliar",
         "rastreio": null
+      },
+      {
+        "ts": "2026-10-05T15:42:30.713Z",
+        "acao": "produto_recebido",
+        "por": "auxiliar",
+        "localizacao": null,
+        "nota": null
       }
     ]
   },
