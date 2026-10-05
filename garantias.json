@@ -2479,5 +2479,104 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "ed141fc4-3715-4b4b-b8b7-3e0a3191d974": {
+    "id": "ed141fc4-3715-4b4b-b8b7-3e0a3191d974",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Breno Henrique Xavier de Moraes",
+      "cpf_cnpj": "09989955689",
+      "whatsapp": "+5531996224500",
+      "email": "brenohmoraes@gmail.com",
+      "cidade": "Belo Horizonte",
+      "uf": "MG",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "030408",
+      "data_compra": "2026-05-26",
+      "data_recebimento": "2026-06-05",
+      "nome_produto": "Lanterna de cabeça",
+      "marca": "Fênix",
+      "modelo": "HM23",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "A lanterna não liga. Testei com a pilha que veio acompanhando e também com outra pilha. Identifiquei dias após receber, mas como eu viajei logo em seguida não abri o chamado antes pois não conseguiria fazer o despacho pelos correios antes",
+      "data_percebido_problema": "2026-06-08",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "A lanterna não liga. Testei com a pilha que veio acompanhando e também com outra pilha. Identifiquei dias após receber, mas como eu viajei logo em seguida não abri o chamado antes pois não conseguiria fazer o despacho pelos correios antes",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "IMG_7123.jpeg",
+          "url": "https://storage.tally.so/private/IMG_7123.jpeg?id=p1GE4b&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InAxR0U0YiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTE5OTY3OX0.JlxX3zLPQPwxzf8cjmEte5p1borz66gczGFfO1UzhEo&signature=732ca29c70d451d0e2fa9e88e3ba90297bb068f9243f2157ca2e9305620e9db9",
+          "mimeType": "image/jpeg",
+          "size": 374058
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-06-05",
+      "data_percebido_problema": "2026-06-08",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "improcedente_prazo",
+      "justificativa_sistema": "Fora do prazo decadencial do CDC Art. 26 (90 dias para produto durável). Já se passaram 122 dias do recebimento (vício aparente).",
+      "score_confianca": "alta",
+      "calculado_em": "2026-10-05T11:28:24.929Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-05T11:28:24.929Z",
+    "atualizado_em": "2026-10-05T11:28:24.929Z",
+    "tally_meta": {
+      "eventId": "sync_gbQ7BxP",
+      "responseId": "gbQ7BxP",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-07-17T18:21:24.000Z",
+      "raw_onde_comprou": "Site da Fenix Store Brasil",
+      "raw_desejo": "Garantia (produto com defeito)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-05T11:28:24.929Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
