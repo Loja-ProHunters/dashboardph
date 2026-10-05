@@ -118,7 +118,7 @@
   "fdc546de-9482-4e3a-97ff-af13826824f6": {
     "id": "fdc546de-9482-4e3a-97ff-af13826824f6",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_48800551d601200c",
@@ -138,8 +138,11 @@
     "dono": "dickmann",
     "criado_em": "2026-09-25T15:07:04.692Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-09-25T15:07:04.692Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_em": "2026-10-05T14:05:47.993Z",
+    "atualizado_por": "dickmann",
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-05T14:05:47.993Z",
+    "concluida_por": "dickmann"
   },
   "2bc7a122-19a0-45ae-8370-f41f09195544": {
     "id": "2bc7a122-19a0-45ae-8370-f41f09195544",
