@@ -1928,6 +1928,29 @@ module.exports = async (req, res) => {
         if (aOver !== bOver) return aOver - bOver;
         return String(a.prazo || '').localeCompare(String(b.prazo || ''));
       });
+      // Enriquece cada tarefa com dados do cliente (nome + telefone) pra UI
+      // montar botão "💬 WhatsApp" com link direto wa.me já com pitch como texto.
+      // Lookup via mapa O(1) — evita N queries ao storage pra listas grandes.
+      if (tarefas.length) {
+        const accounts = await crmStore.listDocs('accounts');
+        const accMap = {};
+        for (const a of accounts) accMap[a.id] = a;
+        for (const t of tarefas) {
+          let acc = null;
+          if (t.entidade_tipo === 'account' && t.entidade_id) acc = accMap[t.entidade_id];
+          else if (t.entidade_tipo === 'order' && t.entidade_id) {
+            // Pra tarefa de pedido, tenta pegar o account via orders
+            try {
+              const o = await crmStore.getDoc('orders', t.entidade_id);
+              if (o && o.account_id) acc = accMap[o.account_id];
+            } catch (_) {}
+          }
+          if (acc) {
+            t.cliente_nome = acc.nome || acc.razao_social || null;
+            t.cliente_telefone = acc.telefone || null;
+          }
+        }
+      }
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ tarefas, total: tarefas.length }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
@@ -2510,6 +2533,37 @@ module.exports = async (req, res) => {
       activities.sort((a, b) => String(b.criado_em || '').localeCompare(String(a.criado_em || '')));
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ account, orders, activities }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── PATCH /api/crm/accounts/:id/telefone — atualiza whatsapp/telefone do cliente
+  // Usado pelo botão WhatsApp no card de tarefa quando o cliente ainda não tem
+  // telefone cadastrado. Admin/diretor/vendedor dono da conta.
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/accounts\/[a-zA-Z0-9_\-]+\/telefone$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canEditCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao de edicao.'}));
+      return;
+    }
+    try {
+      const accId = url.split('/')[4];
+      const account = await crmStore.getDoc('accounts', accId);
+      if (!account) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Cliente nao encontrado'})); return; }
+      if (!crmUtils.canReadDoc(sess, account)) {
+        res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Este cliente esta atribuido a outro vendedor.'}));
+        return;
+      }
+      const body = await readBody(req);
+      const { telefone } = JSON.parse(body || '{}');
+      // Mantém só dígitos
+      const limpo = String(telefone || '').replace(/[^0-9]/g, '');
+      if (limpo.length < 10) {
+        res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Telefone invalido (minimo 10 digitos).'}));
+        return;
+      }
+      const atualizado = await crmStore.updateDoc('accounts', accId, { telefone: limpo }, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, account: atualizado }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
   }
