@@ -9558,21 +9558,46 @@ window.GAR = (function(){
       var dec = g.decisao_operador.valor;
       var procedente = dec === 'procedente_troca' || dec === 'procedente_restituicao';
       var pf = (g.produto_fisico && g.produto_fisico.status) || 'nao_solicitado';
-      if (procedente && pf === 'nao_solicitado') {
+
+      // ── FLUXO 1: Logística do produto físico (defeituoso) ──────
+      // Rastreia independente do atendimento. Produto defeituoso vem,
+      // vai pro estoque, depois vira lote pro fabricante.
+      if (procedente && pf === 'nao_solicitado' && g.status !== 'resolvido') {
         acoes.push('<button class="gar-ok" onclick="GAR.pedirProduto(\'' + g.id + '\')">📬 Pedir produto do cliente</button>');
       }
       if (pf === 'aguardando_chegada') {
-        acoes.push('<button class="gar-ok" onclick="GAR.receberProduto(\'' + g.id + '\')">📦 Marcar como recebido</button>');
+        acoes.push('<button class="gar-ok" onclick="GAR.receberProduto(\'' + g.id + '\')">📦 Marcar produto como recebido</button>');
       }
+
+      // ── FLUXO 2: Atendimento ao cliente (resolução) ────────────
+      // Pode finalizar atendimento INDEPENDENTE do produto físico — se
+      // operador já enviou a troca/devolução pro cliente, o problema do
+      // CLIENTE está resolvido. Produto defeituoso continua tracked no
+      // Estoque até fechar com o fabricante.
+      if (procedente && g.status !== 'resolvido') {
+        var lblFinalizar = dec === 'procedente_troca'
+          ? '✅ Finalizar: troca enviada ao cliente'
+          : '✅ Finalizar: devolução feita';
+        var resultadoFinal = dec === 'procedente_troca' ? 'troca' : 'restituicao';
+        acoes.push('<button class="gar-ok" style="background:#16a34a" onclick="GAR.finalizarAtendimento(\'' + g.id + '\',\'' + resultadoFinal + '\')">' + lblFinalizar + '</button>');
+      }
+
       if (!procedente && g.status !== 'resolvido') {
         acoes.push('<button class="gar-ok" onclick="GAR.resolverNegada(\'' + g.id + '\')">Finalizar como negada</button>');
       }
-      // Botão de mudar status
+      // Botão de mudar status manual (atalhos)
       if (g.status === 'aberto') acoes.push('<button class="gar-btn-sec" onclick="GAR.mudarStatus(\'' + g.id + '\',\'em_analise\')">→ Em análise</button>');
       if (g.status === 'em_analise') acoes.push('<button class="gar-btn-sec" onclick="GAR.mudarStatus(\'' + g.id + '\',\'aguardando_cliente\')">→ Aguardando cliente</button>');
     }
     if (!acoes.length) return '';
-    return '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">' + acoes.join('') + '</div>';
+    // Dica visual pro operador entender as 2 trilhas paralelas
+    var dica = '';
+    if (g.decisao_operador && (g.decisao_operador.valor === 'procedente_troca' || g.decisao_operador.valor === 'procedente_restituicao') && g.status !== 'resolvido') {
+      dica = '<div style="margin-top:12px;padding:8px 12px;background:#eff6ff;border-left:3px solid #0e4b7a;border-radius:4px;font-size:11.5px;color:#4a5057;line-height:1.5">' +
+        '💡 <b>2 trilhas paralelas:</b> você pode <b>finalizar o atendimento</b> assim que mandar a troca/devolução pro cliente, mesmo com o produto defeituoso ainda em processo. O produto físico continua rastreado na aba <b>Estoque de Garantia</b> até resolver com o fabricante.' +
+      '</div>';
+    }
+    return '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">' + acoes.join('') + '</div>' + dica;
   }
 
   function renderProdutoFisico(g){
@@ -9668,6 +9693,25 @@ window.GAR = (function(){
       var r = await fetch('/api/garantias/' + id + '/resolver', {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ resultado: 'negada', nota: nota })
+      });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      fecharModal('gar-mdl-det');
+      recarregar();
+    } catch(e) { alert('Erro: ' + e.message); }
+  }
+
+  // Finaliza o atendimento ao cliente (troca enviada ou devolução feita).
+  // Marca a garantia como RESOLVIDA. O produto físico (defeituoso) continua
+  // sendo tracked na aba Estoque até fechar com o fabricante — fluxo paralelo.
+  async function finalizarAtendimento(id, resultado){
+    var lbl = resultado === 'troca' ? 'troca enviada' : 'devolução feita';
+    if (!confirm('Confirmar que a ' + lbl + ' ao cliente?\n\nIsso finaliza o atendimento (status: Resolvido).\n\nO produto defeituoso continua rastreado no Estoque de Garantia pra envio ao fabricante.')) return;
+    var nota = prompt('Nota de encerramento (ex: nº do pedido Bling da troca, PIX enviado, etc). Opcional:') || '';
+    try {
+      var r = await fetch('/api/garantias/' + id + '/resolver', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ resultado: resultado, nota: nota })
       });
       var d = await r.json();
       if (!r.ok) throw new Error(d.error);
@@ -9835,6 +9879,7 @@ window.GAR = (function(){
     decidirSugestao: decidirSugestao, decidirOverride: decidirOverride,
     pedirProduto: pedirProduto, receberProduto: receberProduto,
     mudarStatus: mudarStatus, resolverNegada: resolverNegada,
+    finalizarAtendimento: finalizarAtendimento,
     toggleSel: toggleSel, imprimirSelecionadas: imprimirSelecionadas,
     abrirModalEnvio: abrirModalEnvio, confirmarEnvio: confirmarEnvio,
     fecharModal: fecharModal,
