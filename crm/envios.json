@@ -2304,9 +2304,9 @@
     },
     "status": "aberto",
     "confirmado_bling": true,
-    "volumes_qtd": null,
-    "volumes_por": null,
-    "volumes_em": null,
+    "volumes_qtd": 1,
+    "volumes_por": "gerencia",
+    "volumes_em": "2026-10-05T20:31:59.421Z",
     "conferencia_ok": false,
     "conferencia_por": null,
     "conferencia_em": null,
@@ -2355,11 +2355,19 @@
         "por": "gerencia",
         "acao": "envio_criado",
         "detalhe": "empresa=calibre numero=1959"
+      },
+      {
+        "ts": "2026-10-05T20:31:59.421Z",
+        "por": "gerencia",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "volumes_qtd",
+        "novo": 1
       }
     ],
     "criado_em": "2026-10-05T20:31:51.657Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-10-05T20:31:51.657Z",
+    "atualizado_em": "2026-10-05T20:31:59.421Z",
     "atualizado_por": "gerencia"
   }
 }
