@@ -586,6 +586,43 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // GET /api/solicitacoes/chats-nao-lidos — lista de chats com msgs nao lidas
+  // + total. Alimenta o widget flutuante no canto inferior direito.
+  if (url === '/api/solicitacoes/chats-nao-lidos' && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      // Pega mapa login→nome pra UI (nao precisa de role)
+      const all = await getAllUsers();
+      const mapa = {};
+      for (const [k, v] of Object.entries(all)) mapa[String(k).toLowerCase()] = v.nome || k;
+      const chats = await solic.listarChatsComNaoLidas(sess.usuario, mapa);
+      const total = chats.reduce((n, c) => n + c.qtd_naolidas, 0);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ total, chats }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/solicitacoes/:id/marcar-lido — zera o contador de nao lidas
+  // daquela solicitacao pro usuario atual. Chamado quando ele abre o chat.
+  if (req.method === 'POST' && url.match(/^\/api\/solicitacoes\/[a-zA-Z0-9_\-]+\/marcar-lido$/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const id = url.split('/')[3];
+      const s = await solic.marcarLido(id, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, solicitacao: s }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // GET /api/solicitacoes/contador — quantas pendentes pra mim (pra sino/barra)
   if (url === '/api/solicitacoes/contador' && req.method === 'GET') {
     const sess = getSession(req);
