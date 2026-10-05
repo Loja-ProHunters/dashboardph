@@ -13840,7 +13840,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "boschetto",
     "onboarding_id": null,
     "primeira_compra_em": "2026-07-20",
     "ultima_compra_em": "2026-07-20",
@@ -13852,8 +13852,14 @@
     "notas": null,
     "criado_em": "2026-09-22T11:40:05.391Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:40:05.391Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-05T19:44:16.224Z",
+    "atualizado_por": "reparo-retroativo",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "boschetto",
+      "em": "2026-10-05T19:44:16.224Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_a95dc2eeee39a0ad": {
     "id": "acc_a95dc2eeee39a0ad",
