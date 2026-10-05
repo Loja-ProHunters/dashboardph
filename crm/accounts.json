@@ -25315,7 +25315,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "dickmann",
     "onboarding_id": null,
     "primeira_compra_em": "2026-04-22",
     "ultima_compra_em": "2026-04-22",
@@ -25327,8 +25327,14 @@
     "notas": null,
     "criado_em": "2026-09-22T12:03:47.911Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T12:03:47.911Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-05T19:43:57.536Z",
+    "atualizado_por": "reparo-retroativo",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "dickmann",
+      "em": "2026-10-05T19:43:57.536Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_4f9b4fe5f9b699e5": {
     "id": "acc_4f9b4fe5f9b699e5",
