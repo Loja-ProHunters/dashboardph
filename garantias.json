@@ -2216,7 +2216,14 @@
       "score_confianca": "media",
       "calculado_em": "2026-10-05T11:28:17.901Z"
     },
-    "decisao_operador": null,
+    "decisao_operador": {
+      "valor": "improcedente_mau_uso",
+      "justificativa": "Informado ao cliente a tratar diretamento com o fabricante",
+      "por": "auxiliar",
+      "em": "2026-10-06T13:07:51.812Z",
+      "divergiu_do_sistema": false,
+      "sugestao_original": "improcedente_mau_uso"
+    },
     "status": "aberto",
     "resultado": null,
     "produto_fisico": {
@@ -2233,7 +2240,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:17.901Z",
-    "atualizado_em": "2026-10-05T11:28:17.901Z",
+    "atualizado_em": "2026-10-06T13:07:51.812Z",
     "tally_meta": {
       "eventId": "sync_Eq8oBkr",
       "responseId": "Eq8oBkr",
@@ -2248,6 +2255,13 @@
         "ts": "2026-10-05T11:28:17.901Z",
         "acao": "criada",
         "por": "tally-webhook"
+      },
+      {
+        "ts": "2026-10-06T13:07:51.812Z",
+        "acao": "decisao_registrada",
+        "por": "auxiliar",
+        "valor": "improcedente_mau_uso",
+        "divergiu": false
       }
     ]
   },
