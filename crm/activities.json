@@ -171,7 +171,9 @@
     "criado_em": "2026-09-25T15:07:04.692Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-09-25T15:07:04.692Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Thiago Teixeira Bochnia",
+    "cliente_telefone": null
   },
   "70c70c63-c493-42da-9a1c-7f358c73dca1": {
     "id": "70c70c63-c493-42da-9a1c-7f358c73dca1",
@@ -200,7 +202,9 @@
     "criado_em": "2026-09-25T15:07:04.692Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-09-25T15:07:04.692Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "MARCOS FUCHS NOBRE",
+    "cliente_telefone": null
   },
   "b5dd11b3-c74e-4093-83ba-bc179d584bf4": {
     "id": "b5dd11b3-c74e-4093-83ba-bc179d584bf4",
@@ -666,7 +670,7 @@
   "8c072292-1659-4bd8-8f6e-f5f0e0acae6f": {
     "id": "8c072292-1659-4bd8-8f6e-f5f0e0acae6f",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_d6edd309c9dcd1c8",
@@ -686,10 +690,13 @@
     "dono": "boschetto",
     "criado_em": "2026-09-25T15:07:04.692Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-09-25T15:07:04.692Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-06T11:39:17.669Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "CAC IMPORTACAO E COMERCIO DE ARMAS MUNICOES E EQUIPAMENTOS L",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "convertida",
+    "concluida_em": "2026-10-06T11:39:17.669Z",
+    "concluida_por": "boschetto"
   },
   "b49b04f2-2c0c-47e6-a90b-4f1436f3cc85": {
     "id": "b49b04f2-2c0c-47e6-a90b-4f1436f3cc85",
