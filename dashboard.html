@@ -6404,12 +6404,20 @@ async function crmRenderTarefas(){
     window.CRM.tarefasOverdue = overdue;
     crmRenderSubTabs();
 
+    // Header com botão de nova tarefa manual — vendedor pode criar lembrete
+    // durante atendimento ("retornar amanhã 14h pra fechar Tanfoglio").
+    var topBar = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">' +
+      '<div style="font-size:12.5px;color:#7b8285">' + tarefas.length + ' tarefa(s) na sua fila</div>' +
+      '<button onclick="crmAbrirModalNovaTarefa()" style="background:linear-gradient(135deg,#1a8bff,#0e6bd4);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(26,139,255,.3)">+ Nova tarefa manual</button>' +
+    '</div>';
+
     if (!tarefas.length) {
       view.innerHTML =
+        topBar +
         '<div class="crm-empty">' +
         '<div style="font-size:36px;margin-bottom:8px">🎯</div>' +
         '<div style="font-weight:700;color:var(--tx);margin-bottom:4px">Sem tarefas pendentes.</div>' +
-        '<div style="font-size:12px">O CRM cria tarefas automáticas quando um cliente compra algo com boas chances de upsell, ou quando fica muito tempo parado. Volte aqui depois — ou dispare manualmente uma sugestão em "🔍 Buscar Cliente".</div>' +
+        '<div style="font-size:12px">O CRM cria tarefas automáticas quando um cliente compra algo com boas chances de upsell, ou quando fica muito tempo parado. Volte aqui depois — ou dispare manualmente uma sugestão em "🔍 Buscar Cliente", ou crie uma tarefa manual no botão acima.</div>' +
         '</div>';
       // Tooltip primeiro uso
       crmMostraTooltipUmaVez('tarefas_vazias',
@@ -6418,17 +6426,23 @@ async function crmRenderTarefas(){
       return;
     }
 
-    var html = '<div class="tar-list">';
+    var html = topBar + '<div class="tar-list">';
+    var agoraMin = new Date().toISOString().slice(0,16); // YYYY-MM-DDTHH:MM
     tarefas.forEach(function(t){
       var cls = 'tar-card';
       var prazoCls = '';
-      var prazoTxt = t.prazo ? crmFmtDate(t.prazo) : 'sem prazo';
-      if (t.prazo && t.prazo < hoje) { cls += ' overdue'; prazoCls = 'overdue'; prazoTxt = '⚠ Atrasada'; }
-      else if (t.prazo === hoje) { cls += ' upcoming'; prazoCls = 'hoje'; prazoTxt = 'Hoje'; }
+      var limiteISO = t.prazo ? (t.prazo + 'T' + (t.hora || '23:59')) : null;
+      var temHora = !!t.hora;
+      var prazoTxt = t.prazo ? crmFmtDate(t.prazo) + (temHora ? ' às ' + t.hora : '') : 'sem prazo';
+      if (limiteISO && limiteISO < agoraMin) {
+        cls += ' overdue'; prazoCls = 'overdue';
+        prazoTxt = '⚠ Vencida — ' + crmFmtDate(t.prazo) + (temHora ? ' ' + t.hora : '');
+      }
+      else if (t.prazo === hoje) { cls += ' upcoming'; prazoCls = 'hoje'; prazoTxt = temHora ? 'Hoje ' + t.hora : 'Hoje'; }
       else if (t.prazo) {
         var diasAte = Math.round((new Date(t.prazo)-new Date(hoje))/86400000);
         if (diasAte <= 3) cls += ' upcoming';
-        prazoTxt = 'D+' + diasAte + ' (' + crmFmtDate(t.prazo) + ')';
+        prazoTxt = 'D+' + diasAte + ' (' + crmFmtDate(t.prazo) + (temHora ? ' ' + t.hora : '') + ')';
       }
       var pitch = t.pitch_pronto || '';
       var pitchBlock = pitch ? '<div class="tar-pitch">' + crmEsc(pitch) + '</div>' : '';
@@ -6474,6 +6488,138 @@ async function crmRenderTarefas(){
       'Cada card é uma sugestão pronta. O botão "📋 Copiar pitch" copia a mensagem de WhatsApp pra você colar no cliente. Depois de falar com ele, marque como "Convertida" (virou venda) ou "Não convertida" (falou, mas não fechou). Isso ajuda o CRM a aprender.');
   } catch (e) {
     view.innerHTML = '<div class="crm-empty">Erro: '+crmEsc(e.message)+'</div>';
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// NOVA TAREFA MANUAL — vendedor cria lembrete durante atendimento.
+// Fluxo: busca cliente por nome/CPF/telefone/pedido → preenche descrição
+// e data+hora → salva. Vai aparecer na fila de "Minhas tarefas".
+// ─────────────────────────────────────────────────────────────
+function crmAbrirModalNovaTarefa(){
+  // Evita abrir 2x
+  if (document.getElementById('crm-mdl-novatar')) return;
+  var hojeStr = new Date().toISOString().slice(0,10);
+  var html = '<div id="crm-mdl-novatar" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10050;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)crmFecharModalNovaTarefa()">' +
+    '<div style="background:#fff;border-radius:12px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,.3)">' +
+      '<h3 style="margin:0 0 4px;color:#0e6bd4">+ Nova tarefa manual</h3>' +
+      '<p style="margin:0 0 18px;font-size:12.5px;color:#7b8285">Lembrete pra retornar um cliente — buscar por nome, CPF, telefone ou nº do pedido Bling.</p>' +
+      '<div style="margin-bottom:12px">' +
+        '<label style="font-size:12px;font-weight:700;color:#4a5057;display:block;margin-bottom:4px">Buscar cliente *</label>' +
+        '<input id="crm-nt-busca" placeholder="Nome, CPF, telefone ou nº do pedido…" oninput="crmBuscarClienteDebounced()" style="width:100%;padding:10px 12px;border:1px solid #ccd0d3;border-radius:6px;font-size:13px"/>' +
+        '<div id="crm-nt-resultados" style="margin-top:6px;max-height:180px;overflow-y:auto;border:1px solid #eef0f1;border-radius:6px;display:none"></div>' +
+        '<div id="crm-nt-selecionado" style="margin-top:6px;padding:8px 10px;background:#d1fae5;border-left:3px solid #16a34a;border-radius:4px;font-size:12.5px;display:none"></div>' +
+      '</div>' +
+      '<div style="margin-bottom:12px">' +
+        '<label style="font-size:12px;font-weight:700;color:#4a5057;display:block;margin-bottom:4px">O que precisa fazer? *</label>' +
+        '<textarea id="crm-nt-desc" rows="3" placeholder="Ex: Retornar cliente para fechar a compra da Tanfoglio GT28" maxlength="2000" style="width:100%;padding:10px 12px;border:1px solid #ccd0d3;border-radius:6px;font-size:13px;font-family:inherit;resize:vertical"></textarea>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">' +
+        '<div>' +
+          '<label style="font-size:12px;font-weight:700;color:#4a5057;display:block;margin-bottom:4px">Data *</label>' +
+          '<input id="crm-nt-data" type="date" min="' + hojeStr + '" value="' + hojeStr + '" style="width:100%;padding:9px 10px;border:1px solid #ccd0d3;border-radius:6px;font-size:13px"/>' +
+        '</div>' +
+        '<div>' +
+          '<label style="font-size:12px;font-weight:700;color:#4a5057;display:block;margin-bottom:4px">Hora <span style="font-weight:400;color:#7b8285">(opcional)</span></label>' +
+          '<input id="crm-nt-hora" type="time" style="width:100%;padding:9px 10px;border:1px solid #ccd0d3;border-radius:6px;font-size:13px"/>' +
+        '</div>' +
+      '</div>' +
+      '<div id="crm-nt-erro" style="color:#c62828;font-size:12.5px;margin-bottom:10px;display:none"></div>' +
+      '<div style="display:flex;gap:10px;justify-content:flex-end">' +
+        '<button onclick="crmFecharModalNovaTarefa()" style="background:#e5e7eb;color:#374151;border:none;border-radius:6px;padding:10px 18px;font-weight:600;cursor:pointer">Cancelar</button>' +
+        '<button id="crm-nt-salvar" onclick="crmSalvarTarefaManual()" style="background:#0e6bd4;color:#fff;border:none;border-radius:6px;padding:10px 18px;font-weight:700;cursor:pointer">Criar tarefa</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+  window.CRM_NT = { clienteSelecionado: null };
+  setTimeout(function(){ var i = document.getElementById('crm-nt-busca'); if (i) i.focus(); }, 50);
+}
+
+function crmFecharModalNovaTarefa(){
+  var m = document.getElementById('crm-mdl-novatar');
+  if (m) m.remove();
+  window.CRM_NT = null;
+}
+
+// Debounce da busca pra não bater no backend a cada tecla
+var _crmBuscaTimer = null;
+function crmBuscarClienteDebounced(){
+  clearTimeout(_crmBuscaTimer);
+  _crmBuscaTimer = setTimeout(crmBuscarClienteAgora, 300);
+}
+
+async function crmBuscarClienteAgora(){
+  var q = (document.getElementById('crm-nt-busca')||{}).value || '';
+  var box = document.getElementById('crm-nt-resultados');
+  if (!box) return;
+  if (q.length < 2) { box.style.display='none'; box.innerHTML=''; return; }
+  try {
+    var r = await fetch('/api/crm/ficha/buscar?q=' + encodeURIComponent(q));
+    var d = await r.json();
+    var lista = d.resultados || [];
+    if (!lista.length) {
+      box.innerHTML = '<div style="padding:10px;color:#7b8285;font-size:12.5px;text-align:center">Nenhum cliente encontrado.</div>';
+      box.style.display='block';
+      return;
+    }
+    box.innerHTML = lista.slice(0,10).map(function(a){
+      return '<div onclick="crmSelecionarCliente(\'' + crmEsc(a.id) + '\',\'' + crmEsc((a.nome||'').replace(/[\'"]/g,'')) + '\',\'' + crmEsc(a.telefone||'') + '\')" style="padding:8px 10px;border-bottom:1px solid #f0f2f3;cursor:pointer;font-size:12.5px" onmouseover="this.style.background=\'#f8f9fa\'" onmouseout="this.style.background=\'\'">' +
+        '<div style="font-weight:600">' + crmEsc(a.nome||'(sem nome)') + '</div>' +
+        '<div style="font-size:11px;color:#7b8285">' + crmEsc(a.cpf_cnpj||'') + (a.telefone ? ' · ' + crmEsc(a.telefone) : '') + '</div>' +
+      '</div>';
+    }).join('');
+    box.style.display='block';
+  } catch(e) {
+    box.innerHTML = '<div style="padding:10px;color:#c62828;font-size:12.5px">Erro: ' + crmEsc(e.message) + '</div>';
+    box.style.display='block';
+  }
+}
+
+function crmSelecionarCliente(id, nome, telefone){
+  if (!window.CRM_NT) return;
+  window.CRM_NT.clienteSelecionado = { id: id, nome: nome, telefone: telefone };
+  var sel = document.getElementById('crm-nt-selecionado');
+  if (sel) {
+    sel.innerHTML = '✓ <b>' + crmEsc(nome) + '</b>' + (telefone ? ' · ' + crmEsc(telefone) : '');
+    sel.style.display = 'block';
+  }
+  var box = document.getElementById('crm-nt-resultados');
+  if (box) { box.style.display='none'; box.innerHTML=''; }
+  var inp = document.getElementById('crm-nt-busca');
+  if (inp) inp.value = nome;
+}
+
+async function crmSalvarTarefaManual(){
+  var err = document.getElementById('crm-nt-erro');
+  err.style.display = 'none';
+  if (!window.CRM_NT || !window.CRM_NT.clienteSelecionado) {
+    err.textContent = 'Selecione um cliente antes de salvar.'; err.style.display='block'; return;
+  }
+  var desc = (document.getElementById('crm-nt-desc')||{}).value || '';
+  var data = (document.getElementById('crm-nt-data')||{}).value || '';
+  var hora = (document.getElementById('crm-nt-hora')||{}).value || '';
+  if (!desc.trim()) { err.textContent = 'Preencha o que precisa fazer.'; err.style.display='block'; return; }
+  if (!data) { err.textContent = 'Escolha a data.'; err.style.display='block'; return; }
+  var btn = document.getElementById('crm-nt-salvar');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  try {
+    var r = await fetch('/api/crm/tarefas/manual', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        account_id: window.CRM_NT.clienteSelecionado.id,
+        descricao: desc,
+        prazo: data,
+        hora: hora || null,
+      })
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro ao salvar');
+    crmFecharModalNovaTarefa();
+    crmRenderTarefas();
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'Criar tarefa';
+    err.textContent = e.message; err.style.display='block';
   }
 }
 
