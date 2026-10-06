@@ -7806,10 +7806,112 @@ function ctrlRenderDetalhe(){
     '</div>' +
     '<div style="font-size:12.5px;background:var(--bg);border-radius:6px;padding:8px 10px;margin-bottom:14px"><b>Produtos:</b> '+(produtosTxt||'—')+'</div>' +
     passosHtml + condHtml +
+    // Bloco de status finalizado — aparece quando o envio foi retirado ou cancelado
+    (e.status === 'retirado' ? (
+      '<div style="margin-top:14px;padding:14px;background:#dcfce7;border-left:4px solid #16a34a;border-radius:6px">' +
+        '<div style="font-size:12px;font-weight:700;color:#065f46;margin-bottom:6px">✓ RETIRADO EM LOJA</div>' +
+        '<div style="font-size:13px"><b>Retirado por:</b> '+crmEsc(e.retirado_cliente_nome||'—')+(e.retirado_cliente_doc ? ' (doc: '+crmEsc(e.retirado_cliente_doc)+')' : '')+'</div>' +
+        '<div style="font-size:12.5px;color:#065f46">Em '+crmFmtDateTime(e.retirado_em)+' · registrado por '+crmEsc(e.retirado_por||'—')+'</div>' +
+        (e.retirado_nota ? '<div style="font-size:12px;margin-top:6px"><b>Obs:</b> '+crmEsc(e.retirado_nota)+'</div>' : '') +
+      '</div>'
+    ) : '') +
+    (e.status === 'cancelado' ? (
+      '<div style="margin-top:14px;padding:14px;background:#fee2e2;border-left:4px solid #c62828;border-radius:6px">' +
+        '<div style="font-size:12px;font-weight:700;color:#991b1b;margin-bottom:6px">✗ ENVIO CANCELADO</div>' +
+        '<div style="font-size:13px"><b>Motivo:</b> '+crmEsc(e.cancelado_motivo||'—')+'</div>' +
+        '<div style="font-size:12.5px;color:#991b1b">Em '+crmFmtDateTime(e.cancelado_em)+' por '+crmEsc(e.cancelado_por||'—')+'</div>' +
+      '</div>'
+    ) : '') +
     '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">' +
-      '<button class="crm-btn" '+(podeLiberar?'':'disabled')+' onclick="ctrlMarcarLiberacao()">'+(e.liberacao_ok?'✓ Já liberado':'Marcar liberação final')+'</button>' +
-      '<button class="crm-btn ghost" onclick="ctrlAbrirDetalhe(\''+e.id+'\')">↻ Recarregar</button>' +
+      // Botoes de progresso — so quando o envio esta ativo (nao retirado/cancelado/enviado)
+      (e.status !== 'enviado' && e.status !== 'cancelado' && e.status !== 'retirado' ? (
+        '<button class="crm-btn" '+(podeLiberar?'':'disabled')+' onclick="ctrlMarcarLiberacao()">'+(e.liberacao_ok?'✓ Já liberado':'Marcar liberação final')+'</button>' +
+        // Marcar retirada em loja (cliente retira pessoalmente) — exige NF emitida
+        '<button class="crm-btn" '+((!e.nf_numero)?'disabled title="Emita a NF primeiro"':'')+' style="background:#16a34a;color:#fff;border-color:#16a34a" onclick="ctrlMarcarRetirado(\''+e.id+'\')">🏪 Marcar como RETIRADO em loja</button>' +
+        // Cancelar envio — remover da fila quando alguem subiu errado
+        '<button class="crm-btn ghost" style="color:#c62828;border-color:#c62828" onclick="ctrlCancelarEnvio(\''+e.id+'\')">✗ Cancelar envio (remover da fila)</button>'
+      ) : '') +
+      '<button class="crm-btn ghost" onclick="ctrlAbrirDetalhe(\''+e.id+'\')" style="margin-left:auto">↻ Recarregar</button>' +
     '</div>';
+}
+
+// Marca o envio como RETIRADO em loja. Abre modal pedindo nome de quem retirou
+// e doc, e envia pro backend que notifica financeiro+gerencia via solicitacoes.
+async function ctrlMarcarRetirado(envioId){
+  var e = window.CTRL.envioAberto;
+  if (!e || e.id !== envioId) { alert('Abra o envio primeiro'); return; }
+  if (!e.nf_numero) {
+    alert('Precisa emitir a Nota Fiscal antes de liberar a retirada.');
+    return;
+  }
+  var html =
+    '<div id="ctrl-mdl-ret" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10060;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)document.getElementById(\'ctrl-mdl-ret\').remove()">' +
+    '<div style="background:#fff;border-radius:12px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,.3)">' +
+      '<h3 style="margin:0 0 8px">🏪 Marcar como RETIRADO em loja</h3>' +
+      '<div style="font-size:12.5px;color:#7b8285;margin-bottom:14px">Pedido #'+crmEsc(e.numero)+' · '+crmEsc(e.cliente_nome||'—')+'<br>Após confirmar, o pedido sai da fila e <b>o financeiro + gerência recebem uma notificação</b>.</div>' +
+      '<div style="display:grid;gap:10px">' +
+        '<label style="font-size:12px;font-weight:600">Nome de quem retirou *' +
+          '<input id="ret-nome" type="text" placeholder="Nome completo (cliente ou representante)" style="width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px" value="'+crmEsc(e.cliente_nome||'')+'"/>' +
+        '</label>' +
+        '<label style="font-size:12px;font-weight:600">CPF/RG de quem retirou' +
+          '<input id="ret-doc" type="text" placeholder="apenas números" style="width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px"/>' +
+        '</label>' +
+        '<label style="font-size:12px;font-weight:600">Observação (opcional)' +
+          '<textarea id="ret-nota" rows="2" style="width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px;resize:vertical" placeholder="ex: Retirado pelo próprio cliente, levou os 2 volumes"></textarea>' +
+        '</label>' +
+      '</div>' +
+      '<div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">' +
+        '<button class="crm-btn ghost" onclick="document.getElementById(\'ctrl-mdl-ret\').remove()">Cancelar</button>' +
+        '<button class="crm-btn" style="background:#16a34a;color:#fff;border-color:#16a34a" onclick="ctrlConfirmarRetirada(\''+envioId+'\')">✓ Confirmar retirada</button>' +
+      '</div>' +
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+async function ctrlConfirmarRetirada(envioId){
+  var nome = (document.getElementById('ret-nome')||{}).value || '';
+  var doc = (document.getElementById('ret-doc')||{}).value || '';
+  var nota = (document.getElementById('ret-nota')||{}).value || '';
+  if (!nome.trim()) { alert('Preencha o nome de quem retirou.'); return; }
+  try {
+    var r = await fetch('/api/crm/envios/'+encodeURIComponent(envioId)+'/marcar-retirado', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ retirado_cliente_nome: nome, retirado_cliente_doc: doc, nota: nota })
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    var m = document.getElementById('ctrl-mdl-ret'); if (m) m.remove();
+    alert('✓ Pedido marcado como retirado em loja.\n\nO financeiro e a gerência foram notificados automaticamente.');
+    // Recarrega fila + fecha detalhe
+    window.CTRL.envioAberto = null;
+    window.CTRL.envioChecklist = null;
+    document.getElementById('ctrl-fila-detail').innerHTML = '';
+    if (typeof ctrlCarregarFila === 'function') ctrlCarregarFila();
+  } catch(e) {
+    alert('Erro: ' + e.message);
+  }
+}
+
+// Cancela o envio — soft delete, sai da fila mas fica no historico pra auditoria.
+async function ctrlCancelarEnvio(envioId){
+  var motivo = prompt('Por que está cancelando este envio?\n\n(ex: "subiu número errado", "cliente desistiu", "pedido duplicado")\n\nObrigatório — vai pro histórico:');
+  if (!motivo || !motivo.trim()) return;
+  if (!confirm('CANCELAR o envio '+envioId+'?\n\nMotivo: '+motivo+'\n\nIsso remove ele da fila. O histórico fica preservado pra auditoria.')) return;
+  try {
+    var r = await fetch('/api/crm/envios/'+encodeURIComponent(envioId)+'/cancelar', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ motivo: motivo })
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    alert('✓ Envio cancelado e removido da fila.');
+    window.CTRL.envioAberto = null;
+    window.CTRL.envioChecklist = null;
+    document.getElementById('ctrl-fila-detail').innerHTML = '';
+    if (typeof ctrlCarregarFila === 'function') ctrlCarregarFila();
+  } catch(e) {
+    alert('Erro: ' + e.message);
+  }
 }
 
 function ctrlMetaPasso(e, p) {
@@ -9498,11 +9600,17 @@ window.GAR = (function(){
       var dLbl = SUGESTAO_LBL[g.decisao_operador.valor];
       decHtml = '<span style="color:#065f46;font-weight:700;font-size:11px">✓ Decidido: ' + esc(dLbl ? dLbl[0] : g.decisao_operador.valor) + '</span>';
     }
+    // Badge extra: procedimento interno pendente (resolvida mas falta refaturamento/baixa estoque/estorno)
+    var procPend = '';
+    if (g.status === 'resolvido' && g.procedimento_interno && g.procedimento_interno.status === 'pendente') {
+      procPend = '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:6px">⏳ Pend. interno</span>';
+    }
     return '<div class="gar-card" onclick="GAR.abrirDetalhe(\'' + esc(g.id) + '\')" style="cursor:pointer">' +
       '<div class="gar-card-main">' +
         '<div class="gar-card-top">' +
           '<span class="gar-card-id">' + idCurto(g.id) + '</span>' +
           '<span class="gar-card-status ' + statusCls + '">' + esc(statusLbl) + '</span>' +
+          procPend +
         '</div>' +
         '<div class="gar-card-cli">' + esc(g.cliente.nome) + '</div>' +
         '<div class="gar-card-prod">' + esc(g.pedido.nome_produto || '—') + ' <span style="color:#888">· ' + esc(g.pedido.marca || '—') + '</span></div>' +
@@ -9681,6 +9789,7 @@ window.GAR = (function(){
         '</div>') : '') +
         decTxt +
         (g.status !== 'resolvido' ? renderAcoes(g) : '') +
+        renderProcedimentoInterno(g) +
         produtoFisicoBox +
         '<h4 style="margin:20px 0 6px;font-size:13px;color:#4a5057">Histórico</h4>' +
         '<div class="gar-timeline">' + timeline + '</div>' +
@@ -9813,6 +9922,161 @@ window.GAR = (function(){
       '<div style="font-size:12px;font-weight:700;color:#0e4b7a;margin-bottom:8px">📎 EVIDÊNCIAS ANEXADAS PELO CLIENTE (' + uploads.length + ')</div>' +
       '<div style="display:flex;gap:10px;flex-wrap:wrap">' + itens + '</div>' +
     '</div>';
+  }
+
+  // Procedimento interno pos-resolucao: refaturamento (troca) ou estorno (restituicao)
+  // + baixa de estoque. So aparece quando a garantia foi RESOLVIDA como troca/restituicao.
+  // Mostra pendente (amarelo) ou concluido (verde) com dados preenchidos.
+  function renderProcedimentoInterno(g){
+    if (g.status !== 'resolvido') return '';
+    if (!(g.resultado === 'troca' || g.resultado === 'restituicao')) return '';
+    var pi = g.procedimento_interno || {};
+    var isConcluido = pi.status === 'concluido';
+    var cor = isConcluido ? '#16a34a' : '#f59e0b';
+    var bg = isConcluido ? '#dcfce7' : '#fef3c7';
+    var titulo = isConcluido ? '✓ PROCEDIMENTO INTERNO CONCLUÍDO' : '⚠️ PROCEDIMENTO INTERNO PENDENTE';
+    var corpo = '';
+    if (g.resultado === 'troca') {
+      corpo =
+        '<div style="font-size:12.5px;margin-top:6px"><b>Pedido de reposição Bling:</b> ' + (pi.pedido_substituto ? esc(pi.pedido_substituto) : '<i style="color:#7b8285">— pendente</i>') + '</div>' +
+        '<div style="font-size:12.5px"><b>Baixa de estoque:</b> ' + (pi.baixa_estoque_feita ? '✓ Feita' + (pi.baixa_estoque_sku ? ' · SKU ' + esc(pi.baixa_estoque_sku) : '') + (pi.baixa_estoque_qtd ? ' · ' + esc(pi.baixa_estoque_qtd) + ' un' : '') : '<i style="color:#7b8285">— pendente</i>') + '</div>';
+    } else {
+      corpo =
+        '<div style="font-size:12.5px;margin-top:6px"><b>Estorno:</b> ' + (pi.estorno_valor ? 'R$ ' + Number(pi.estorno_valor).toFixed(2).replace('.',',') : '<i style="color:#7b8285">— pendente</i>') +
+        (pi.estorno_meio ? ' · ' + esc(pi.estorno_meio) : '') + '</div>';
+    }
+    if (pi.nota) corpo += '<div style="font-size:12.5px;margin-top:4px"><b>Obs:</b> ' + esc(pi.nota) + '</div>';
+    if (isConcluido && pi.concluido_em) {
+      corpo += '<div style="font-size:11.5px;color:#065f46;margin-top:6px">Concluído em ' + fmtDateTime(pi.concluido_em) + ' por ' + esc(pi.concluido_por||'') + '</div>';
+    }
+    var acoes = '';
+    if (!isConcluido) {
+      acoes =
+        '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">' +
+          '<button class="gar-ok" onclick="GAR.abrirProcedimento(\'' + g.id + '\')" style="background:#f59e0b">📝 Registrar/atualizar</button>' +
+          '<button class="gar-ok" onclick="GAR.concluirProcedimento(\'' + g.id + '\')" style="background:#16a34a">✓ Marcar concluído</button>' +
+        '</div>';
+    } else {
+      acoes =
+        '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">' +
+          '<button class="gar-btn-sec" onclick="GAR.abrirProcedimento(\'' + g.id + '\')">↔ Editar dados</button>' +
+          '<button class="gar-btn-sec" onclick="GAR.reabrirProcedimento(\'' + g.id + '\')">↶ Reabrir (voltar p/ pendente)</button>' +
+        '</div>';
+    }
+    return '<div style="margin-top:14px;padding:14px;background:' + bg + ';border-left:4px solid ' + cor + ';border-radius:6px">' +
+      '<div style="font-size:12px;font-weight:700;color:' + cor + ';margin-bottom:8px">' + titulo + '</div>' +
+      (g.resultado === 'troca'
+        ? '<div style="font-size:12px;color:#4a5057;margin-bottom:6px">Troca enviada ao cliente. Falta: <b>emitir pedido de reposição no Bling + dar baixa no estoque da unidade enviada</b>.</div>'
+        : '<div style="font-size:12px;color:#4a5057;margin-bottom:6px">Devolução feita. Falta: <b>registrar o estorno/PIX enviado ao cliente</b>.</div>') +
+      corpo + acoes +
+    '</div>';
+  }
+
+  // Modal pra operador registrar os dados do procedimento interno (refaturamento,
+  // baixa de estoque, estorno). Pre-preenchido com o que ja esta salvo — pode ser
+  // chamado varias vezes pra ir completando aos poucos.
+  function abrirProcedimento(id){
+    var g = (state.lista || []).find(function(x){ return x.id === id; });
+    if (!g) { alert('Garantia não encontrada'); return; }
+    var pi = g.procedimento_interno || {};
+    var isTroca = g.resultado === 'troca';
+    var html =
+      '<div class="gar-modal-bg" id="gar-mdl-proc" onclick="if(event.target===this)GAR.fecharModal(\'gar-mdl-proc\')">' +
+      '<div class="gar-modal" style="max-width:620px">' +
+        '<h3 style="margin:0 0 8px">📝 Procedimento interno — ' + (isTroca ? 'troca' : 'restituição') + '</h3>' +
+        '<div style="font-size:12px;color:#7b8285;margin-bottom:14px">' + esc(g.cliente.nome) + ' · ' + esc(g.pedido.nome_produto||'produto') + '</div>' +
+        (isTroca
+          ? '<div style="display:grid;gap:10px">' +
+              '<label style="font-size:12px;font-weight:600">Nº do pedido Bling (reposição enviada ao cliente)' +
+                '<input id="proc-pedido" type="text" value="' + esc(pi.pedido_substituto||'') + '" placeholder="ex: 4521" style="width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px"/>' +
+              '</label>' +
+              '<label style="font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px">' +
+                '<input id="proc-baixa" type="checkbox" ' + (pi.baixa_estoque_feita?'checked':'') + '/>' +
+                '<span>Baixa de estoque feita no Bling (unidade saiu do estoque)</span>' +
+              '</label>' +
+              '<label style="font-size:12px;font-weight:600">SKU da unidade (opcional)' +
+                '<input id="proc-sku" type="text" value="' + esc(pi.baixa_estoque_sku||'') + '" placeholder="ex: GL-9MM-BLK" style="width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px"/>' +
+              '</label>' +
+              '<label style="font-size:12px;font-weight:600">Quantidade' +
+                '<input id="proc-qtd" type="number" min="1" value="' + (pi.baixa_estoque_qtd||1) + '" style="width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px"/>' +
+              '</label>' +
+            '</div>'
+          : '<div style="display:grid;gap:10px">' +
+              '<label style="font-size:12px;font-weight:600">Valor estornado (R$)' +
+                '<input id="proc-estval" type="number" step="0.01" value="' + (pi.estorno_valor||'') + '" style="width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px"/>' +
+              '</label>' +
+              '<label style="font-size:12px;font-weight:600">Meio de devolução' +
+                '<select id="proc-estmeio" style="width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px">' +
+                  '<option value="">— selecione —</option>' +
+                  '<option value="pix" ' + (pi.estorno_meio==='pix'?'selected':'') + '>PIX</option>' +
+                  '<option value="estorno_cartao" ' + (pi.estorno_meio==='estorno_cartao'?'selected':'') + '>Estorno no cartão</option>' +
+                  '<option value="outro" ' + (pi.estorno_meio==='outro'?'selected':'') + '>Outro</option>' +
+                '</select>' +
+              '</label>' +
+            '</div>') +
+        '<label style="font-size:12px;font-weight:600;display:block;margin-top:10px">Observação (opcional)' +
+          '<textarea id="proc-nota" rows="3" style="width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px;resize:vertical">' + esc(pi.nota||'') + '</textarea>' +
+        '</label>' +
+        '<div class="gar-modal-acts" style="margin-top:14px">' +
+          '<button class="gar-cancel" onclick="GAR.fecharModal(\'gar-mdl-proc\')">Cancelar</button>' +
+          '<button class="gar-ok" onclick="GAR.salvarProcedimento(\'' + id + '\')">Salvar</button>' +
+        '</div>' +
+      '</div></div>';
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  async function salvarProcedimento(id){
+    var g = (state.lista || []).find(function(x){ return x.id === id; });
+    if (!g) return;
+    var patch = {};
+    if (g.resultado === 'troca') {
+      patch.pedido_substituto = (document.getElementById('proc-pedido')||{}).value || null;
+      patch.baixa_estoque_feita = !!(document.getElementById('proc-baixa')||{}).checked;
+      patch.baixa_estoque_sku = (document.getElementById('proc-sku')||{}).value || null;
+      var q = Number((document.getElementById('proc-qtd')||{}).value || 0);
+      patch.baixa_estoque_qtd = q > 0 ? q : null;
+    } else {
+      var v = Number((document.getElementById('proc-estval')||{}).value || 0);
+      patch.estorno_valor = v > 0 ? v : null;
+      patch.estorno_meio = (document.getElementById('proc-estmeio')||{}).value || null;
+    }
+    patch.nota = (document.getElementById('proc-nota')||{}).value || null;
+    try {
+      var r = await fetch('/api/garantias/' + id + '/procedimento', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(patch)
+      });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      fecharModal('gar-mdl-proc');
+      fecharModal('gar-mdl-det');
+      await recarregar();
+      abrirDetalhe(id);
+    } catch(e) { alert('Erro: ' + e.message); }
+  }
+
+  async function concluirProcedimento(id){
+    if (!confirm('Marcar o procedimento interno como CONCLUÍDO?\n\nIsso signfica que:\n- Pedido de reposição foi emitido no Bling (troca) OU estorno foi feito (restituição)\n- Baixa de estoque foi registrada\n- Tudo que precisava ser feito internamente está pronto')) return;
+    try {
+      var r = await fetch('/api/garantias/' + id + '/procedimento/concluir', { method:'POST' });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      fecharModal('gar-mdl-det');
+      await recarregar();
+      abrirDetalhe(id);
+    } catch(e) { alert('Erro: ' + e.message); }
+  }
+
+  async function reabrirProcedimento(id){
+    if (!confirm('Reabrir o procedimento interno como PENDENTE?\n\nUse se percebeu que faltou algo depois de ter marcado como concluído.')) return;
+    try {
+      var r = await fetch('/api/garantias/' + id + '/procedimento/reabrir', { method:'POST' });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      fecharModal('gar-mdl-det');
+      await recarregar();
+      abrirDetalhe(id);
+    } catch(e) { alert('Erro: ' + e.message); }
   }
 
   function renderProdutoFisico(g){
@@ -10095,6 +10359,8 @@ window.GAR = (function(){
     pedirProduto: pedirProduto, receberProduto: receberProduto,
     mudarStatus: mudarStatus, resolverNegada: resolverNegada,
     finalizarAtendimento: finalizarAtendimento,
+    abrirProcedimento: abrirProcedimento, salvarProcedimento: salvarProcedimento,
+    concluirProcedimento: concluirProcedimento, reabrirProcedimento: reabrirProcedimento,
     toggleSel: toggleSel, imprimirSelecionadas: imprimirSelecionadas,
     abrirModalEnvio: abrirModalEnvio, confirmarEnvio: confirmarEnvio,
     fecharModal: fecharModal,
