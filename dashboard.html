@@ -9672,6 +9672,7 @@ window.GAR = (function(){
             '<div><b>Recebimento:</b> ' + fmtDate(g.pedido.data_recebimento) + '</div>' +
           '</div>' +
           '<div style="margin-top:12px;padding:10px;background:#fff;border-radius:6px"><b>Problema:</b> ' + esc(g.problema.descricao_cliente) + '</div>' +
+          renderEvidencias(g) +
         '</div>' +
         (sug ? ('<div class="gar-sug-box ' + sugBoxCls + '">' +
           '<div style="font-size:12px;font-weight:700;margin-bottom:4px">💡 SUGESTÃO DO SISTEMA (confiança: ' + sug.score_confianca + ')</div>' +
@@ -9720,16 +9721,33 @@ window.GAR = (function(){
       // operador já enviou a troca/devolução pro cliente, o problema do
       // CLIENTE está resolvido. Produto defeituoso continua tracked no
       // Estoque até fechar com o fabricante.
-      if (procedente && g.status !== 'resolvido') {
-        var lblFinalizar = dec === 'procedente_troca'
-          ? '✅ Finalizar: troca enviada ao cliente'
-          : '✅ Finalizar: devolução feita';
-        var resultadoFinal = dec === 'procedente_troca' ? 'troca' : 'restituicao';
-        acoes.push('<button class="gar-ok" style="background:#16a34a" onclick="GAR.finalizarAtendimento(\'' + g.id + '\',\'' + resultadoFinal + '\')">' + lblFinalizar + '</button>');
+      //
+      // Lógica das opções de finalização:
+      //   - procedente_troca   → só "finalizar com troca enviada"
+      //   - procedente_restituicao → só "finalizar com devolução feita"
+      //   - analise_manual     → TODAS as 3 opções (operador decide no fechamento)
+      //   - improcedente_*     → só "finalizar como negada"
+      if (g.status !== 'resolvido') {
+        if (dec === 'procedente_troca') {
+          acoes.push('<button class="gar-ok" style="background:#16a34a" onclick="GAR.finalizarAtendimento(\'' + g.id + '\',\'troca\')">✅ Finalizar: troca enviada ao cliente</button>');
+        } else if (dec === 'procedente_restituicao') {
+          acoes.push('<button class="gar-ok" style="background:#16a34a" onclick="GAR.finalizarAtendimento(\'' + g.id + '\',\'restituicao\')">✅ Finalizar: devolução feita</button>');
+        } else if (dec === 'analise_manual') {
+          // Operador decide o resultado final no momento do fechamento
+          acoes.push('<button class="gar-ok" style="background:#16a34a" onclick="GAR.finalizarAtendimento(\'' + g.id + '\',\'troca\')">✅ Finalizar: troca enviada</button>');
+          acoes.push('<button class="gar-ok" style="background:#16a34a" onclick="GAR.finalizarAtendimento(\'' + g.id + '\',\'restituicao\')">✅ Finalizar: devolução feita</button>');
+          acoes.push('<button class="gar-ok" style="background:#c62828" onclick="GAR.resolverNegada(\'' + g.id + '\')">✗ Finalizar como negada</button>');
+        } else {
+          // improcedente_* (prazo, mau_uso, sem_direito) → só negada
+          acoes.push('<button class="gar-ok" onclick="GAR.resolverNegada(\'' + g.id + '\')">✗ Finalizar como negada</button>');
+        }
       }
 
-      if (!procedente && g.status !== 'resolvido') {
-        acoes.push('<button class="gar-ok" onclick="GAR.resolverNegada(\'' + g.id + '\')">Finalizar como negada</button>');
+      // Botão sempre disponível pra MUDAR DE DECISÃO quando operador percebe
+      // depois que a decisão inicial estava errada (ex: aprovou análise manual
+      // mas depois quer refazer como procedente_troca pra deixar o fluxo claro).
+      if (g.status !== 'resolvido') {
+        acoes.push('<button class="gar-btn-sec" onclick="GAR.decidirOverride(\'' + g.id + '\')" style="margin-left:auto">↔ Mudar decisão</button>');
       }
       // Botão de mudar status manual (atalhos)
       if (g.status === 'aberto') acoes.push('<button class="gar-btn-sec" onclick="GAR.mudarStatus(\'' + g.id + '\',\'em_analise\')">→ Em análise</button>');
@@ -9744,6 +9762,57 @@ window.GAR = (function(){
       '</div>';
     }
     return '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">' + acoes.join('') + '</div>' + dica;
+  }
+
+  // Renderiza as evidências que o cliente anexou no Tally (foto do defeito,
+  // vídeo, PDF da nota fiscal). Thumbnails de imagem clicáveis que abrem em
+  // tamanho real na aba nova. Vídeos com player inline. PDF/outros como link.
+  function renderEvidencias(g){
+    var uploads = (g.problema && g.problema.uploads) || [];
+    if (!uploads.length) return '';
+    var itens = uploads.map(function(u){
+      if (!u.url) return '';
+      var mime = String(u.mimeType || '').toLowerCase();
+      var ehImg = mime.startsWith('image/') || u.tipo === 'foto';
+      var ehVid = mime.startsWith('video/') || u.tipo === 'video';
+      var ehPdf = mime.indexOf('pdf') !== -1 || u.tipo === 'nota_fiscal';
+      var nome = u.nome || '(arquivo)';
+      var tamanho = u.size ? ' · ' + Math.round(u.size/1024) + 'KB' : '';
+      if (ehImg) {
+        return '<a href="' + esc(u.url) + '" target="_blank" rel="noopener" title="' + esc(nome) + '" style="display:block;position:relative;width:120px;height:120px;border-radius:6px;overflow:hidden;border:1px solid #e0e4e7;background:#f8f9fa">' +
+          '<img src="' + esc(u.url) + '" alt="' + esc(nome) + '" loading="lazy" style="width:100%;height:100%;object-fit:cover"/>' +
+          '<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font-size:9px;padding:12px 4px 3px;text-align:center;font-weight:600">🖼️ Foto</div>' +
+        '</a>';
+      }
+      if (ehVid) {
+        return '<div style="width:200px;border-radius:6px;overflow:hidden;border:1px solid #e0e4e7;background:#000">' +
+          '<video src="' + esc(u.url) + '" controls preload="metadata" style="width:100%;max-height:160px;display:block"></video>' +
+          '<div style="padding:4px 6px;background:#f8f9fa;font-size:10px;color:#4a5057">🎬 ' + esc(nome).slice(0,30) + tamanho + '</div>' +
+        '</div>';
+      }
+      if (ehPdf) {
+        return '<a href="' + esc(u.url) + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:#fee2e2;border:1px solid #fecaca;border-radius:6px;text-decoration:none;color:#991b1b;font-size:12px;font-weight:600;min-width:160px">' +
+          '<span style="font-size:20px">📄</span>' +
+          '<div>' +
+            '<div>' + esc(nome).slice(0,30) + '</div>' +
+            '<div style="font-size:10px;color:#7f1d1d;font-weight:400">PDF' + tamanho + ' · abrir</div>' +
+          '</div>' +
+        '</a>';
+      }
+      // Fallback — qualquer outro tipo
+      return '<a href="' + esc(u.url) + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f8f9fa;border:1px solid #e0e4e7;border-radius:6px;text-decoration:none;color:#4a5057;font-size:12px;font-weight:600">' +
+        '<span style="font-size:20px">📎</span>' +
+        '<div>' +
+          '<div>' + esc(nome).slice(0,40) + '</div>' +
+          '<div style="font-size:10px;font-weight:400">' + esc(mime || 'arquivo') + tamanho + '</div>' +
+        '</div>' +
+      '</a>';
+    }).filter(Boolean).join('');
+    if (!itens) return '';
+    return '<div style="margin-top:12px;padding:12px;background:#eff6ff;border-radius:6px">' +
+      '<div style="font-size:12px;font-weight:700;color:#0e4b7a;margin-bottom:8px">📎 EVIDÊNCIAS ANEXADAS PELO CLIENTE (' + uploads.length + ')</div>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap">' + itens + '</div>' +
+    '</div>';
   }
 
   function renderProdutoFisico(g){
