@@ -2581,9 +2581,9 @@
     "transporte_valor": 250,
     "transporte_por": "mathias",
     "transporte_em": "2026-10-06T12:19:06.980Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "031491",
+    "nf_por": "mathias",
+    "nf_em": "2026-10-06T12:19:30.704Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -2653,11 +2653,19 @@
         "acao": "campo_alterado",
         "campo": "transporte_valor",
         "novo": 250
+      },
+      {
+        "ts": "2026-10-06T12:19:30.704Z",
+        "por": "mathias",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "031491"
       }
     ],
     "criado_em": "2026-10-06T12:18:29.344Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-06T12:19:06.980Z",
+    "atualizado_em": "2026-10-06T12:19:30.704Z",
     "atualizado_por": "mathias"
   }
 }
