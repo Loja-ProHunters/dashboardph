@@ -2318,9 +2318,9 @@
     "nf_numero": "002896",
     "nf_por": "auxiliar",
     "nf_em": "2026-10-06T11:22:11.824Z",
-    "gt_numero": null,
-    "gt_por": null,
-    "gt_em": null,
+    "gt_numero": "202674839995 ",
+    "gt_por": "auxiliar",
+    "gt_em": "2026-10-06T11:23:05.612Z",
     "assinatura_ok": false,
     "assinatura_por": null,
     "assinatura_em": null,
@@ -2395,11 +2395,19 @@
         "acao": "campo_alterado",
         "campo": "nf_numero",
         "novo": "002896"
+      },
+      {
+        "ts": "2026-10-06T11:23:05.612Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "gt_numero",
+        "novo": "202674839995 "
       }
     ],
     "criado_em": "2026-10-05T20:31:51.657Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-10-06T11:22:11.824Z",
+    "atualizado_em": "2026-10-06T11:23:05.612Z",
     "atualizado_por": "auxiliar"
   }
 }
