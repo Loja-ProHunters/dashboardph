@@ -2318,7 +2318,7 @@
       "id": 15596492397,
       "nome": null
     },
-    "status": "aberto",
+    "status": "pronto_coleta",
     "confirmado_bling": true,
     "volumes_qtd": 1,
     "volumes_por": "gerencia",
@@ -2340,9 +2340,9 @@
     "assinatura_ok": true,
     "assinatura_por": "auxiliar",
     "assinatura_em": "2026-10-06T12:16:55.358Z",
-    "liberacao_ok": false,
-    "liberacao_por": null,
-    "liberacao_em": null,
+    "liberacao_ok": true,
+    "liberacao_por": "auxiliar",
+    "liberacao_em": "2026-10-06T12:25:09.601Z",
     "anexo_p_ok": false,
     "anexo_p_por": null,
     "anexo_p_em": null,
@@ -2427,11 +2427,19 @@
         "acao": "campo_alterado",
         "campo": "assinatura_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-06T12:25:09.601Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "liberacao_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-05T20:31:51.657Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-10-06T12:16:55.358Z",
+    "atualizado_em": "2026-10-06T12:25:09.601Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_27036": {
