@@ -2315,9 +2315,9 @@
     "transporte_valor": 490,
     "transporte_por": "gerencia",
     "transporte_em": "2026-10-05T20:32:24.126Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "002896",
+    "nf_por": "auxiliar",
+    "nf_em": "2026-10-06T11:22:11.824Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -2387,11 +2387,19 @@
         "acao": "campo_alterado",
         "campo": "transporte_valor",
         "novo": 490
+      },
+      {
+        "ts": "2026-10-06T11:22:11.824Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "002896"
       }
     ],
     "criado_em": "2026-10-05T20:31:51.657Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-10-05T20:32:24.126Z",
-    "atualizado_por": "gerencia"
+    "atualizado_em": "2026-10-06T11:22:11.824Z",
+    "atualizado_por": "auxiliar"
   }
 }
