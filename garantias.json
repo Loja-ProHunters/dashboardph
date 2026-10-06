@@ -1731,7 +1731,14 @@
       "score_confianca": "baixa",
       "calculado_em": "2026-10-05T11:28:13.360Z"
     },
-    "decisao_operador": null,
+    "decisao_operador": {
+      "valor": "procedente_troca",
+      "justificativa": "Esta dentro do praso legal e sem evidencia de mal uso, constatado defeito de fabricação",
+      "por": "auxiliar",
+      "em": "2026-10-06T12:59:01.164Z",
+      "divergiu_do_sistema": true,
+      "sugestao_original": "analise_manual"
+    },
     "status": "aberto",
     "resultado": null,
     "produto_fisico": {
@@ -1748,7 +1755,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:13.360Z",
-    "atualizado_em": "2026-10-05T11:28:13.360Z",
+    "atualizado_em": "2026-10-06T12:59:01.164Z",
     "tally_meta": {
       "eventId": "sync_RWbvXvl",
       "responseId": "RWbvXvl",
@@ -1763,6 +1770,13 @@
         "ts": "2026-10-05T11:28:13.360Z",
         "acao": "criada",
         "por": "tally-webhook"
+      },
+      {
+        "ts": "2026-10-06T12:59:01.164Z",
+        "acao": "decisao_registrada",
+        "por": "auxiliar",
+        "valor": "procedente_troca",
+        "divergiu": true
       }
     ]
   },
