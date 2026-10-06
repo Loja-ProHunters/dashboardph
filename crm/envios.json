@@ -2445,9 +2445,9 @@
     },
     "status": "aberto",
     "confirmado_bling": true,
-    "volumes_qtd": null,
-    "volumes_por": null,
-    "volumes_em": null,
+    "volumes_qtd": 1,
+    "volumes_por": "dickmann",
+    "volumes_em": "2026-10-06T11:39:47.514Z",
     "conferencia_ok": false,
     "conferencia_por": null,
     "conferencia_em": null,
@@ -2496,11 +2496,19 @@
         "por": "dickmann",
         "acao": "envio_criado",
         "detalhe": "empresa=prohunters numero=27036"
+      },
+      {
+        "ts": "2026-10-06T11:39:47.514Z",
+        "por": "dickmann",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "volumes_qtd",
+        "novo": 1
       }
     ],
     "criado_em": "2026-10-06T11:39:26.914Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-10-06T11:39:26.914Z",
+    "atualizado_em": "2026-10-06T11:39:47.515Z",
     "atualizado_por": "dickmann"
   }
 }
