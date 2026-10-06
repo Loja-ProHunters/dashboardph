@@ -189,7 +189,7 @@
       "divergiu_do_sistema": true,
       "sugestao_original": "analise_manual"
     },
-    "status": "aberto",
+    "status": "em_analise",
     "resultado": null,
     "produto_fisico": {
       "status": "nao_solicitado",
@@ -205,7 +205,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:00.208Z",
-    "atualizado_em": "2026-10-06T15:55:19.336Z",
+    "atualizado_em": "2026-10-06T15:55:24.613Z",
     "tally_meta": {
       "eventId": "sync_rD1q9Y2",
       "responseId": "rD1q9Y2",
@@ -227,6 +227,14 @@
         "por": "auxiliar",
         "valor": "procedente_troca",
         "divergiu": true
+      },
+      {
+        "ts": "2026-10-06T15:55:24.613Z",
+        "acao": "status_mudou",
+        "por": "auxiliar",
+        "de": "aberto",
+        "para": "em_analise",
+        "nota": null
       }
     ]
   },
