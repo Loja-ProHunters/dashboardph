@@ -1938,13 +1938,21 @@ module.exports = async (req, res) => {
         tarefas = await crmStore.listDocs('activities', a =>
           a.status === 'pendente' && (scopeAll || String(a.owner_id || a.dono || '').toLowerCase() === login));
       }
-      // Ordena: overdue primeiro, depois por prazo
-      const hoje = new Date().toISOString().slice(0, 10);
+      // Ordena: vencidas (prazo+hora < agora) primeiro, depois por prazo+hora
+      const agora = new Date();
+      const hoje = agora.toISOString().slice(0, 10);
+      function _tsLimite(t) {
+        if (!t.prazo) return '9999-12-31T23:59';
+        return t.prazo + 'T' + (t.hora || '23:59');
+      }
+      const agoraISO = agora.toISOString().slice(0, 16);
       tarefas.sort((a, b) => {
-        const aOver = (a.prazo && a.prazo < hoje) ? 0 : 1;
-        const bOver = (b.prazo && b.prazo < hoje) ? 0 : 1;
+        const aLim = _tsLimite(a);
+        const bLim = _tsLimite(b);
+        const aOver = aLim < agoraISO ? 0 : 1;
+        const bOver = bLim < agoraISO ? 0 : 1;
         if (aOver !== bOver) return aOver - bOver;
-        return String(a.prazo || '').localeCompare(String(b.prazo || ''));
+        return aLim.localeCompare(bLim);
       });
       // Enriquece cada tarefa com dados do cliente (nome + telefone) pra UI
       // montar botão "💬 WhatsApp" com link direto wa.me já com pitch como texto.
@@ -1972,6 +1980,66 @@ module.exports = async (req, res) => {
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ tarefas, total: tarefas.length }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── POST /api/crm/tarefas/manual  body: { account_id, titulo, descricao,
+  //        prazo (YYYY-MM-DD), hora (HH:MM, opcional), owner_id (opcional) }
+  // Cria uma tarefa "manual" lançada pelo vendedor durante atendimento.
+  if (req.method === 'POST' && url === '/api/crm/tarefas/manual') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!crmUtils.canEditCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'Seu perfil pode consultar mas nao criar tarefas.'}));
+      return;
+    }
+    try {
+      const body = await readBody(req);
+      let payload = {};
+      try { payload = JSON.parse(body || '{}'); } catch(e){}
+      const { account_id, titulo, descricao, prazo, hora, owner_id } = payload;
+      if (!account_id) throw new Error('account_id obrigatório');
+      if (!descricao || !String(descricao).trim()) throw new Error('Descrição obrigatória');
+      if (!prazo) throw new Error('Prazo (data) obrigatório');
+      // Vendedor cria pra si mesmo. Admin pode delegar pra outro via owner_id.
+      let dono = String(sess.usuario).toLowerCase();
+      if (owner_id && crmUtils.canSeeAll(sess)) dono = String(owner_id).toLowerCase();
+      // Busca o account pra validar e enriquecer o título
+      const acc = await crmStore.getDoc('accounts', account_id);
+      if (!acc) throw new Error('Cliente não encontrado');
+      const tituloFinal = String(titulo || '').trim() || ('📞 Tarefa manual — ' + (acc.nome || 'cliente'));
+      const prazoLimpo = String(prazo).slice(0, 10);
+      const horaLimpa = hora ? String(hora).slice(0, 5) : null;
+      const id = crmUtils.uuid();
+      const doc = {
+        id,
+        tipo: 'manual', // tag pra diferenciar das automáticas (upsell/reativacao/aniversario)
+        status: 'pendente',
+        owner_id: dono,
+        entidade_tipo: 'account',
+        entidade_id: account_id,
+        titulo: tituloFinal,
+        descricao: String(descricao).trim().slice(0, 2000),
+        prazo: prazoLimpo,
+        hora: horaLimpa, // novo campo opcional — alertas usam
+        concluido_em: null,
+        concluido_com_order_id: null,
+        pontos_base: 10,
+        pontos_bonus: 0,
+        pontos_ganhos: 0,
+        trigger_id: 'manual_' + id,
+        gerada_automaticamente: false,
+        dono, // retrocompat
+        account_id,
+        criada_por_vendedor: sess.usuario, // auditoria
+      };
+      await crmStore.createDoc('activities', doc, sess.usuario);
+      res.writeHead(201,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, tarefa: doc }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
     return;
   }
 
@@ -2011,7 +2079,8 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // ── GET /api/crm/ficha/buscar?q=X — busca cliente por nome ou CPF/CNPJ
+  // ── GET /api/crm/ficha/buscar?q=X — busca cliente por nome, CPF/CNPJ,
+  // telefone ou número do pedido (Bling). Usado pela nova tarefa manual.
   if (req.method === 'GET' && url.startsWith('/api/crm/ficha/buscar')) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
@@ -2020,11 +2089,28 @@ module.exports = async (req, res) => {
       const q = String(u.searchParams.get('q') || '').toLowerCase().trim();
       if (!q || q.length < 2) { res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ resultados: [] })); return; }
       const qDigits = q.replace(/\D/g, '');
+
+      // Se parece com número de pedido, busca em orders primeiro.
+      // Pedido Bling costuma ter 4-10 dígitos. Se achou, pega o account_id.
+      let accountIdsViaPedido = new Set();
+      if (qDigits && qDigits.length >= 3 && qDigits.length <= 12) {
+        try {
+          const orders = await crmStore.listDocs('orders', o => {
+            const num = String(o.numero || o.numero_pedido || o.id || '').replace(/\D/g, '');
+            return num && num === qDigits;
+          });
+          for (const o of orders) if (o.account_id) accountIdsViaPedido.add(o.account_id);
+        } catch(_) {}
+      }
+
       const accounts = await crmStore.listDocs('accounts', a => {
+        if (accountIdsViaPedido.has(a.id)) return true;
         const nome = String(a.nome || '').toLowerCase();
         const doc = String(a.cpf_cnpj || '').replace(/\D/g, '');
+        const tel = String(a.telefone || '').replace(/\D/g, '');
         if (nome.includes(q)) return true;
-        if (qDigits && doc.includes(qDigits)) return true;
+        if (qDigits && qDigits.length >= 4 && doc.includes(qDigits)) return true;
+        if (qDigits && qDigits.length >= 4 && tel.includes(qDigits)) return true;
         return false;
       });
       const resultados = accounts.slice(0, 20).map(a => ({
