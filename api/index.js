@@ -991,15 +991,15 @@ module.exports = async (req, res) => {
   }
 
   // GET /api/garantias?status=&operador=
-  // Exclui /:id/... (acoes), /contador, /estoque, /etiquetas, /enviar-fabricante.
-  if (url.startsWith('/api/garantias') && req.method === 'GET' && !url.match(/\/(contador|estoque|etiquetas|enviar-fabricante)(\?|$)/) && !url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/[a-z\-]+$/)) {
+  // Exclui /:id/... (acoes), /contador, /estoque, /etiquetas, /enviar-fabricante, /procedimentos-pendentes.
+  if (url.startsWith('/api/garantias') && req.method === 'GET' && !url.match(/\/(contador|estoque|etiquetas|enviar-fabricante|procedimentos-pendentes)(\?|$)/) && !url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/[a-z\-]+$/)) {
     const sess = getSession(req);
     if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
     try {
       const gar = require('../lib/garantias');
       // Rota /api/garantias/:id (obter uma)
       const m = url.match(/^\/api\/garantias\/([a-zA-Z0-9_\-]+)(\?|$)/);
-      if (m && m[1] && m[1] !== 'contador' && m[1] !== 'estoque' && m[1] !== 'etiquetas' && m[1] !== 'enviar-fabricante') {
+      if (m && m[1] && m[1] !== 'contador' && m[1] !== 'estoque' && m[1] !== 'etiquetas' && m[1] !== 'enviar-fabricante' && m[1] !== 'procedimentos-pendentes') {
         const g = await gar.obter(m[1]);
         res.writeHead(200,{'Content-Type':'application/json'});
         res.end(JSON.stringify({ garantia: g }));
@@ -1148,6 +1148,68 @@ module.exports = async (req, res) => {
       const body = await readBody(req);
       const { tipo, nota } = JSON.parse(body || '{}');
       const g = await gar.registrarResolucaoFabricante(id, { tipo, nota, actor: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ─── Procedimento interno (pos-resolucao: refaturamento / baixa estoque / estorno) ───
+  // GET /api/garantias/procedimentos-pendentes — lista garantias resolvidas com
+  // procedimento interno ainda PENDENTE. Usado pra sub-aba "A fazer" / badge.
+  if (req.method === 'GET' && url === '/api/garantias/procedimentos-pendentes') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const lista = await gar.listarProcedimentosPendentes();
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantias: lista }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // POST /api/garantias/:id/procedimento body: { pedido_substituto, baixa_estoque_feita,
+  //    baixa_estoque_sku, baixa_estoque_qtd, estorno_valor, estorno_meio, nota }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/procedimento$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const patch = JSON.parse(body || '{}');
+      const g = await gar.registrarProcedimentoInterno(id, patch, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/procedimento/concluir — fecha o procedimento interno
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/procedimento\/concluir$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const g = await gar.concluirProcedimentoInterno(id, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/procedimento/reabrir — operador decidiu que falta algo
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/procedimento\/reabrir$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const g = await gar.reabrirProcedimentoInterno(id, sess.usuario);
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
     } catch (e) {
       res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
@@ -2883,7 +2945,8 @@ module.exports = async (req, res) => {
       const empresaFilter = (u.searchParams.get('empresa') || '').toLowerCase();
       const list = await crmStore.listDocs('envios');
       // Filtro especial 'enviados' = status=enviado (sub-aba Enviados)
-      // Filtro especial 'pendentes' (default) = status != enviado E != cancelado (fica na Fila)
+      // Filtro especial 'retirados' = status=retirado (sub-aba Retirados em loja)
+      // Filtro especial 'pendentes' (default) = status não finalizado (fica na Fila)
       const modo = (u.searchParams.get('modo') || 'pendentes').toLowerCase();
       const q = (u.searchParams.get('q') || '').toLowerCase().trim();
       const enriched = list.map(e => {
@@ -2913,6 +2976,13 @@ module.exports = async (req, res) => {
           coletado_em: e.coletado_em,
           coletado_motorista: e.coletado_motorista,
           coletado_placa: e.coletado_placa,
+          retirado_em: e.retirado_em,
+          retirado_por: e.retirado_por,
+          retirado_cliente_nome: e.retirado_cliente_nome,
+          retirado_cliente_doc: e.retirado_cliente_doc,
+          cancelado_motivo: e.cancelado_motivo,
+          cancelado_por: e.cancelado_por,
+          cancelado_em: e.cancelado_em,
           criado_em: e.criado_em,
           atualizado_em: e.atualizado_em,
         };
@@ -2920,15 +2990,20 @@ module.exports = async (req, res) => {
       let filtrado = enriched;
       if (statusFilter) filtrado = filtrado.filter(x => x.status === statusFilter);
       else if (modo === 'enviados') filtrado = filtrado.filter(x => x.status === 'enviado');
-      else if (modo === 'pendentes') filtrado = filtrado.filter(x => x.status !== 'enviado' && x.status !== 'cancelado');
+      else if (modo === 'retirados') filtrado = filtrado.filter(x => x.status === 'retirado');
+      else if (modo === 'cancelados') filtrado = filtrado.filter(x => x.status === 'cancelado');
+      else if (modo === 'pendentes') filtrado = filtrado.filter(x => x.status !== 'enviado' && x.status !== 'cancelado' && x.status !== 'retirado');
       if (empresaFilter) filtrado = filtrado.filter(x => x.empresa === empresaFilter);
       if (q) filtrado = filtrado.filter(x => {
         const hay = ((x.cliente_nome||'') + ' ' + (x.numero||'') + ' ' + (x.cliente_cpf_cnpj||'') + ' ' + (x.cliente_cidade||'') + ' ' + (x.nf_numero||'')).toLowerCase();
         return hay.indexOf(q) >= 0;
       });
-      // Ordena: prontos por último, resto por atualização desc; enviados por data de coleta desc
+      // Ordena: prontos por último, resto por atualização desc; enviados por data de coleta desc;
+      // retirados por data de retirada desc; cancelados por data de cancelamento desc
       filtrado.sort((a, b) => {
         if (modo === 'enviados') return String(b.coletado_em || b.atualizado_em || '').localeCompare(String(a.coletado_em || a.atualizado_em || ''));
+        if (modo === 'retirados') return String(b.retirado_em || b.atualizado_em || '').localeCompare(String(a.retirado_em || a.atualizado_em || ''));
+        if (modo === 'cancelados') return String(b.cancelado_em || b.atualizado_em || '').localeCompare(String(a.cancelado_em || a.atualizado_em || ''));
         if (a.pronto_coleta !== b.pronto_coleta) return a.pronto_coleta ? 1 : -1;
         return String(b.atualizado_em || '').localeCompare(String(a.atualizado_em || ''));
       });
@@ -2946,7 +3021,7 @@ module.exports = async (req, res) => {
     if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const list = await crmStore.listDocs('envios');
-      const prontos = list.filter(e => (e.status === 'pronto_coleta' || envios.estadoChecklist(e).pronto_coleta) && !e.romaneio_id && e.status !== 'enviado' && e.status !== 'cancelado');
+      const prontos = list.filter(e => (e.status === 'pronto_coleta' || envios.estadoChecklist(e).pronto_coleta) && !e.romaneio_id && e.status !== 'enviado' && e.status !== 'cancelado' && e.status !== 'retirado');
       const grupos = {};
       for (const e of prontos) {
         const t = e.transportadora || 'sem_transportadora';
@@ -3049,6 +3124,98 @@ module.exports = async (req, res) => {
       res.end(JSON.stringify({ ok: true, envio: salvo, checklist: envios.estadoChecklist(salvo) }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/envios/:id/cancelar body: { motivo }
+  // Soft delete — marca status='cancelado' pra tirar da fila. Mantem o doc
+  // pra auditoria (quem cancelou, quando, por que). Nao pode cancelar se ja
+  // esta em romaneio ou foi enviado/retirado.
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/cancelar$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
+    }
+    try {
+      const id = url.split('/')[4];
+      const env = await crmStore.getDoc('envios', id);
+      if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio nao encontrado'})); return; }
+      const body = await readBody(req);
+      const { motivo } = JSON.parse(body || '{}');
+      if (!motivo || !String(motivo).trim()) throw new Error('Motivo obrigatorio.');
+      const ip = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || (req.connection && req.connection.remoteAddress) || '').split(',')[0].trim() || null;
+      const cancelado = envios.cancelarEnvio(env, { motivo, actor: sess.usuario, ip });
+      const salvo = await crmStore.updateDoc('envios', id, cancelado, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, envio: salvo }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/envios/:id/marcar-retirado body: { retirado_cliente_nome, retirado_cliente_doc, nota }
+  // Cliente retirou o pedido presencialmente (sem transportadora). Marca o envio
+  // como retirado e dispara notificacao PRO FINANCEIRO + GERENCIA via solicitacoes.
+  // Precisa ter NF emitida — ninguem retira sem nota fiscal.
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/marcar-retirado$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
+    }
+    try {
+      const id = url.split('/')[4];
+      const env = await crmStore.getDoc('envios', id);
+      if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio nao encontrado'})); return; }
+      const body = await readBody(req);
+      const { retirado_cliente_nome, retirado_cliente_doc, nota } = JSON.parse(body || '{}');
+      const ip = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || (req.connection && req.connection.remoteAddress) || '').split(',')[0].trim() || null;
+      const retirado = envios.marcarRetirado(env, {
+        retirado_cliente_nome, retirado_cliente_doc, nota,
+        actor: sess.usuario, ip,
+      });
+      const salvo = await crmStore.updateDoc('envios', id, retirado, sess.usuario);
+
+      // ─── Notificacao pro financeiro + gerencia ───
+      // Pega todos usuarios ativos com role financeiro/admin/diretor e cria uma
+      // solicitacao pra cada (categoria=Financeiro). Nao bloqueia a resposta se
+      // a notificacao falhar — o envio ja foi marcado, so loga o erro.
+      try {
+        const solic = require('../lib/solicitacoes');
+        const all = await getAllUsers();
+        const destinos = Object.entries(all)
+          .filter(([k, v]) => v.ativo !== false && (v.role === 'financeiro' || v.role === 'admin' || v.role === 'diretor'))
+          .map(([k]) => String(k).toLowerCase())
+          .filter(k => k !== String(sess.usuario).toLowerCase());  // nao notifica quem fez
+        const empLbl = salvo.empresa === 'calibre' ? 'Calibre' : 'Pro Hunters';
+        const titulo = 'Pedido #' + salvo.numero + ' (' + empLbl + ') foi RETIRADO em loja';
+        const desc = [
+          'Cliente: ' + (salvo.cliente_nome || '—'),
+          (salvo.cliente_cpf_cnpj_tipo === 'pj' ? 'CNPJ: ' : 'CPF: ') + (salvo.cliente_cpf_cnpj || '—'),
+          'NF: ' + (salvo.nf_numero || '—'),
+          'Total do pedido: R$ ' + Number(salvo.total_pedido || 0).toFixed(2).replace('.', ','),
+          '',
+          'Retirado por: ' + salvo.retirado_cliente_nome + (salvo.retirado_cliente_doc ? ' (doc: ' + salvo.retirado_cliente_doc + ')' : ''),
+          'Registrado por: ' + sess.usuario,
+          nota ? '\nObs: ' + nota : '',
+        ].join('\n');
+        for (const para of destinos) {
+          try {
+            await solic.criar({
+              de: sess.usuario, para, categoria: 'Financeiro',
+              titulo, descricao: desc,
+            });
+          } catch (e) { console.error('[retirada] falha ao notificar ' + para + ':', e.message); }
+        }
+      } catch (e) {
+        console.error('[retirada] falha geral ao notificar:', e.message);
+      }
+
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, envio: salvo }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
     return;
   }
