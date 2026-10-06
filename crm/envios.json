@@ -2452,10 +2452,10 @@
     "conferencia_por": null,
     "conferencia_em": null,
     "conferencia_notas": null,
-    "transportadora": null,
-    "transporte_valor": null,
-    "transporte_por": null,
-    "transporte_em": null,
+    "transportadora": "ezequiel",
+    "transporte_valor": 200,
+    "transporte_por": "dickmann",
+    "transporte_em": "2026-10-06T11:41:05.993Z",
     "nf_numero": null,
     "nf_por": null,
     "nf_em": null,
@@ -2504,11 +2504,27 @@
         "acao": "campo_alterado",
         "campo": "volumes_qtd",
         "novo": 1
+      },
+      {
+        "ts": "2026-10-06T11:41:05.993Z",
+        "por": "dickmann",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "transportadora",
+        "novo": "ezequiel"
+      },
+      {
+        "ts": "2026-10-06T11:41:05.993Z",
+        "por": "dickmann",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "transporte_valor",
+        "novo": 200
       }
     ],
     "criado_em": "2026-10-06T11:39:26.914Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-10-06T11:39:47.515Z",
+    "atualizado_em": "2026-10-06T11:41:05.993Z",
     "atualizado_por": "dickmann"
   }
 }
