@@ -2857,9 +2857,9 @@
     "vendedor_bling": null,
     "status": "aberto",
     "confirmado_bling": true,
-    "volumes_qtd": 1,
-    "volumes_por": "mathias",
-    "volumes_em": "2026-10-06T13:46:17.898Z",
+    "volumes_qtd": null,
+    "volumes_por": null,
+    "volumes_em": null,
     "conferencia_ok": false,
     "conferencia_por": null,
     "conferencia_em": null,
@@ -2916,11 +2916,19 @@
         "acao": "campo_alterado",
         "campo": "volumes_qtd",
         "novo": 1
+      },
+      {
+        "ts": "2026-10-06T13:51:13.961Z",
+        "por": "gerencia",
+        "ip": "170.231.25.101",
+        "acao": "passo_revertido",
+        "passo": "volumes",
+        "titulo": "Volumes embalados"
       }
     ],
     "criado_em": "2026-10-06T13:46:11.264Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-06T13:46:17.898Z",
-    "atualizado_por": "mathias"
+    "atualizado_em": "2026-10-06T13:51:13.961Z",
+    "atualizado_por": "gerencia"
   }
 }
