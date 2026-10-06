@@ -2587,9 +2587,9 @@
     "gt_numero": "202636750373",
     "gt_por": "mathias",
     "gt_em": "2026-10-06T12:19:45.758Z",
-    "assinatura_ok": false,
-    "assinatura_por": null,
-    "assinatura_em": null,
+    "assinatura_ok": true,
+    "assinatura_por": "mathias",
+    "assinatura_em": "2026-10-06T12:19:55.314Z",
     "liberacao_ok": false,
     "liberacao_por": null,
     "liberacao_em": null,
@@ -2669,11 +2669,19 @@
         "acao": "campo_alterado",
         "campo": "gt_numero",
         "novo": "202636750373"
+      },
+      {
+        "ts": "2026-10-06T12:19:55.314Z",
+        "por": "mathias",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "assinatura_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-06T12:18:29.344Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-06T12:19:45.758Z",
+    "atualizado_em": "2026-10-06T12:19:55.314Z",
     "atualizado_por": "mathias"
   }
 }
