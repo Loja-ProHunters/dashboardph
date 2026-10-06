@@ -3785,7 +3785,14 @@
       "score_confianca": "alta",
       "calculado_em": "2026-10-05T11:28:34.978Z"
     },
-    "decisao_operador": null,
+    "decisao_operador": {
+      "valor": "procedente_restituicao",
+      "justificativa": "Crédito para proxima compra",
+      "por": "auxiliar",
+      "em": "2026-10-06T14:16:02.040Z",
+      "divergiu_do_sistema": true,
+      "sugestao_original": "improcedente_prazo"
+    },
     "status": "aberto",
     "resultado": null,
     "produto_fisico": {
@@ -3802,7 +3809,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:34.978Z",
-    "atualizado_em": "2026-10-05T11:28:34.978Z",
+    "atualizado_em": "2026-10-06T14:16:02.040Z",
     "tally_meta": {
       "eventId": "sync_7XZzrxa",
       "responseId": "7XZzrxa",
@@ -3817,6 +3824,13 @@
         "ts": "2026-10-05T11:28:34.978Z",
         "acao": "criada",
         "por": "tally-webhook"
+      },
+      {
+        "ts": "2026-10-06T14:16:02.040Z",
+        "acao": "decisao_registrada",
+        "por": "auxiliar",
+        "valor": "procedente_restituicao",
+        "divergiu": true
       }
     ]
   },
