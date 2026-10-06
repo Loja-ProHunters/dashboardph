@@ -3389,7 +3389,14 @@
       "score_confianca": "alta",
       "calculado_em": "2026-10-05T11:28:30.693Z"
     },
-    "decisao_operador": null,
+    "decisao_operador": {
+      "valor": "procedente_troca",
+      "justificativa": "Produto sem defeito, cliente comprou modelo errado e decidiu trocar",
+      "por": "auxiliar",
+      "em": "2026-10-06T14:22:32.640Z",
+      "divergiu_do_sistema": true,
+      "sugestao_original": "improcedente_prazo"
+    },
     "status": "aberto",
     "resultado": null,
     "produto_fisico": {
@@ -3406,7 +3413,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:30.693Z",
-    "atualizado_em": "2026-10-05T11:28:30.693Z",
+    "atualizado_em": "2026-10-06T14:22:32.640Z",
     "tally_meta": {
       "eventId": "sync_RWY8yYp",
       "responseId": "RWY8yYp",
@@ -3421,6 +3428,13 @@
         "ts": "2026-10-05T11:28:30.693Z",
         "acao": "criada",
         "por": "tally-webhook"
+      },
+      {
+        "ts": "2026-10-06T14:22:32.640Z",
+        "acao": "decisao_registrada",
+        "por": "auxiliar",
+        "valor": "procedente_troca",
+        "divergiu": true
       }
     ]
   },
