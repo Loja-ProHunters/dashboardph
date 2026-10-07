@@ -3021,7 +3021,7 @@ module.exports = async (req, res) => {
     if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
       const list = await crmStore.listDocs('envios');
-      const prontos = list.filter(e => (e.status === 'pronto_coleta' || envios.estadoChecklist(e).pronto_coleta) && !e.romaneio_id && e.status !== 'enviado' && e.status !== 'cancelado' && e.status !== 'retirado');
+      const prontos = list.filter(e => (e.status === 'pronto_coleta' || envios.estadoChecklist(e).pronto_coleta) && !e.romaneio_id && e.status !== 'enviado' && e.status !== 'cancelado' && e.status !== 'retirado' && e.transportadora !== 'retirada');
       const grupos = {};
       for (const e of prontos) {
         const t = e.transportadora || 'sem_transportadora';
@@ -4866,4 +4866,4 @@ module.exports = async (req, res) => {
 
 // Permite que a geração de conteúdo (chamada à IA, que pode levar mais que
 // os 10s padrão) rode até 60s. Aditivo — não altera roteamento nem o resto do portal.
-module.exports.config = { maxDuration: 60 }; 
+module.exports.config = { maxDuration: 60 };

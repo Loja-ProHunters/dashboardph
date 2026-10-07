@@ -7537,7 +7537,7 @@ function ctrlRenderResultados(d){
     '</div>';
 }
 function ctrlLabelRota(k){
-  return { ezequiel:'Ezequiel', lt:'LT', rpa:'RPA', aereo:'Aéreo (Ezequiel+Gollog)' }[k] || k;
+  return { ezequiel:'Ezequiel', lt:'LT', rpa:'RPA', aereo:'Aéreo (Ezequiel+Gollog)', retirada:'🏪 Retirada em loja' }[k] || k;
 }
 async function ctrlDiagMatriz(cidade, uf){
   cidade = decodeURIComponent(cidade);
@@ -7688,8 +7688,19 @@ function ctrlRenderFilaLista(){
     if (e.cnpj) extra.push('<span class="ctrl-chip">CNPJ</span>');
     var cidadeUf = (e.cliente_cidade || '—') + '/' + (e.cliente_uf || '');
     var isOpen = window.CTRL.envioAberto && window.CTRL.envioAberto.id === e.id;
-    return '<div class="ctrl-env-card '+empCls+(isOpen?' on':'')+'" onclick="ctrlAbrirDetalhe(\''+e.id+'\')">' +
-      '<div class="ctrl-env-head"><div><span class="'+empCorCls+'">'+empLbl+'</span> · <b>#'+crmEsc(e.numero)+'</b></div>'+progress+'</div>' +
+    // Botao X vermelho pra cancelar/remover direto da lista — sem precisar abrir detalhe.
+    // Soh aparece em envios que ainda nao foram coletados/retirados/cancelados.
+    var btnRemover = '';
+    if (e.status !== 'enviado' && e.status !== 'cancelado' && e.status !== 'retirado') {
+      btnRemover = '<button title="Remover da fila (cancelar envio)" ' +
+        'onclick="event.stopPropagation();ctrlCancelarEnvio(\''+e.id+'\')" ' +
+        'style="background:#fee2e2;color:#c62828;border:1px solid #fecaca;border-radius:4px;' +
+        'padding:4px 8px;font-size:12px;cursor:pointer;font-weight:700;line-height:1">✗</button>';
+    }
+    return '<div class="ctrl-env-card '+empCls+(isOpen?' on':'')+'" onclick="ctrlAbrirDetalhe(\''+e.id+'\')" style="position:relative">' +
+      '<div class="ctrl-env-head"><div><span class="'+empCorCls+'">'+empLbl+'</span> · <b>#'+crmEsc(e.numero)+'</b></div>' +
+        '<div style="display:flex;gap:6px;align-items:center">'+progress+btnRemover+'</div>' +
+      '</div>' +
       '<div class="ctrl-env-cli">'+crmEsc(e.cliente_nome||'—')+'</div>' +
       '<div style="font-size:12px;color:var(--gy);margin-top:2px">'+statusChip+' '+extra.join(' ')+' · '+crmEsc(cidadeUf)+
       (e.transportadora?' · '+ctrlLabelRota(e.transportadora):'')+'</div>' +
@@ -7944,8 +7955,10 @@ function ctrlFieldsPasso(e, cl, p) {
       var rota = window.CTRL.cotacaoResult && window.CTRL.cotacaoResult.rota_sugerida ? window.CTRL.cotacaoResult.rota_sugerida.rota : '';
       return '<div class="ctrl-inline-fields">' +
         '<select id="fld-trans"><option value="">Selecionar transportadora…</option>' +
-        '<option value="ezequiel">Ezequiel</option><option value="lt">LT</option><option value="rpa">RPA</option><option value="aereo">Ezequiel + Gollog (aéreo)</option></select>' +
-        '<input type="text" placeholder="Valor R$" id="fld-trans-val"/>' +
+        '<option value="ezequiel">Ezequiel</option><option value="lt">LT</option><option value="rpa">RPA</option><option value="aereo">Ezequiel + Gollog (aéreo)</option>' +
+        '<option value="retirada">🏪 Retirada em loja (sem transportadora)</option>' +
+        '</select>' +
+        '<input type="text" placeholder="Valor R$ (0 p/ retirada)" id="fld-trans-val"/>' +
         '<button class="crm-btn small" onclick="ctrlPatch({transportadora: document.getElementById(\'fld-trans\').value, transporte_valor: Number(String(document.getElementById(\'fld-trans-val\').value||\'0\').replace(/\\./g,\'\').replace(\',\',\'.\'))||0})">Salvar</button></div>';
     case 'faturamento':
       return '<div class="ctrl-inline-fields"><input type="text" placeholder="Nº da NF" id="fld-nf"/>' +
@@ -10722,4 +10735,3 @@ window.CHAT_WIDGET = (function(){
 
 </body>
 </html>
- 
