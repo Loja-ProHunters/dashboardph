@@ -4866,4 +4866,4 @@ module.exports = async (req, res) => {
 
 // Permite que a geração de conteúdo (chamada à IA, que pode levar mais que
 // os 10s padrão) rode até 60s. Aditivo — não altera roteamento nem o resto do portal.
-module.exports.config = { maxDuration: 60 };
+module.exports.config = { maxDuration: 60 }; 
