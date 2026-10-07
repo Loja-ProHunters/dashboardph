@@ -3458,7 +3458,7 @@
     "anexo_p_link": null,
     "gru_link": null,
     "comprovante_pix_link": null,
-    "pix_baixado": false,
+    "pix_baixado": true,
     "peso_kg": null,
     "dimensoes_cm": null,
     "minuta_numero": null,
@@ -3507,11 +3507,22 @@
         "acao": "campo_alterado",
         "campo": "transporte_valor",
         "novo": 530
+      },
+      {
+        "ts": "2026-10-07T13:57:08.535Z",
+        "por": "boschetto",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "pix_baixado",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-06T17:58:08.080Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-07T12:56:07.655Z",
-    "atualizado_por": "boschetto"
+    "atualizado_em": "2026-10-07T13:57:08.535Z",
+    "atualizado_por": "boschetto",
+    "pix_por": "boschetto",
+    "pix_em": "2026-10-07T13:57:08.535Z",
+    "pix_ip": "170.231.25.101"
   }
 }
