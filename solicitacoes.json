@@ -517,5 +517,34 @@
         "por": "auxiliar"
       }
     ]
+  },
+  "b1552a4d-1179-45c3-94ab-bf124d587f29": {
+    "id": "b1552a4d-1179-45c3-94ab-bf124d587f29",
+    "de": "auxiliar",
+    "para": "marlon",
+    "categoria": "Financeiro",
+    "titulo": "Pedido #27162 (Pro Hunters) foi RETIRADO em loja",
+    "descricao": "Cliente: Vera Lucia H Pieritz\nCPF: 65837924949\nNF: 031502\nTotal do pedido: R$ 254,64\n\nRetirado por: Vera Lucia H Pieritz (doc: 65837924949)\nRegistrado por: auxiliar",
+    "prazo": null,
+    "status": "pendente",
+    "criado_em": "2026-10-07T13:17:40.746Z",
+    "executado_em": null,
+    "executado_por": null,
+    "aprovado_em": null,
+    "aprovado_por": null,
+    "rejeitado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_motivo": null,
+    "mensagens": [],
+    "ultimaLeitura": {
+      "auxiliar": "2026-10-07T13:17:40.746Z"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-07T13:17:40.746Z",
+        "acao": "criada",
+        "por": "auxiliar"
+      }
+    ]
   }
 }
