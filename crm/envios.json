@@ -2774,10 +2774,10 @@
     "conferencia_por": "mathias",
     "conferencia_em": "2026-10-06T13:45:20.920Z",
     "conferencia_notas": null,
-    "transportadora": "",
+    "transportadora": "retirada",
     "transporte_valor": 0,
-    "transporte_por": null,
-    "transporte_em": null,
+    "transporte_por": "auxiliar",
+    "transporte_em": "2026-10-07T13:16:27.027Z",
     "nf_numero": null,
     "nf_por": null,
     "nf_em": null,
@@ -2850,12 +2850,20 @@
         "acao": "campo_alterado",
         "campo": "transporte_valor",
         "novo": 0
+      },
+      {
+        "ts": "2026-10-07T13:16:27.027Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "transportadora",
+        "novo": "retirada"
       }
     ],
     "criado_em": "2026-10-06T13:45:07.429Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-06T13:45:30.920Z",
-    "atualizado_por": "mathias"
+    "atualizado_em": "2026-10-07T13:16:27.028Z",
+    "atualizado_por": "auxiliar"
   },
   "env_prohunters_1961": {
     "id": "env_prohunters_1961",
