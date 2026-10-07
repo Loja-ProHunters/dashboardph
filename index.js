@@ -3177,46 +3177,10 @@ module.exports = async (req, res) => {
       });
       const salvo = await crmStore.updateDoc('envios', id, retirado, sess.usuario);
 
-      // ─── Notificacao SOMENTE pro financeiro ───
-      // Pega usuarios ativos com role=financeiro e cria uma solicitacao pra cada
-      // (categoria=Financeiro). Admin/diretor NAO recebem — eles acompanham via
-      // dashboard administrativo, nao por solicitacao, pra nao poluir o inbox deles.
-      // Nao bloqueia a resposta se a notificacao falhar — o envio ja foi marcado,
-      // so loga o erro.
-      try {
-        const solic = require('../lib/solicitacoes');
-        const all = await getAllUsers();
-        const destinos = Object.entries(all)
-          .filter(([k, v]) => v.ativo !== false && v.role === 'financeiro')
-          .map(([k]) => String(k).toLowerCase())
-          .filter(k => k !== String(sess.usuario).toLowerCase());  // nao notifica quem fez
-        const empLbl = salvo.empresa === 'calibre' ? 'Calibre' : 'Pro Hunters';
-        const titulo = 'Pedido #' + salvo.numero + ' (' + empLbl + ') foi RETIRADO em loja';
-        const desc = [
-          'Cliente: ' + (salvo.cliente_nome || '—'),
-          (salvo.cliente_cpf_cnpj_tipo === 'pj' ? 'CNPJ: ' : 'CPF: ') + (salvo.cliente_cpf_cnpj || '—'),
-          'NF: ' + (salvo.nf_numero || '—'),
-          'Total do pedido: R$ ' + Number(salvo.total_pedido || 0).toFixed(2).replace('.', ','),
-          '',
-          'Retirado por: ' + salvo.retirado_cliente_nome + (salvo.retirado_cliente_doc ? ' (doc: ' + salvo.retirado_cliente_doc + ')' : ''),
-          'Registrado por: ' + sess.usuario,
-          nota ? '\nObs: ' + nota : '',
-        ].join('\n');
-        for (const para of destinos) {
-          try {
-            await solic.criar({
-              de: sess.usuario, para, categoria: 'Financeiro',
-              titulo, descricao: desc,
-              // Fecha direto ao ser executada — eh notificacao automatica,
-              // nao faz sentido pedir aprovacao do operador que apenas
-              // registrou a retirada.
-              auto_fechar: true,
-            });
-          } catch (e) { console.error('[retirada] falha ao notificar ' + para + ':', e.message); }
-        }
-      } catch (e) {
-        console.error('[retirada] falha geral ao notificar:', e.message);
-      }
+      // (Removido) Antes criava notificacao via solicitacao pro financeiro.
+      // Nao gerava valor pratico — financeiro vai consultar diretamente a aba
+      // Op. Controlado -> Retirados quando precisar. Mantemos apenas o registro
+      // no envio (status=retirado + retirado_cliente_nome/doc/em).
 
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ ok: true, envio: salvo }));
