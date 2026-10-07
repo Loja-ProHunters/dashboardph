@@ -3215,9 +3215,9 @@
     "volumes_qtd": 1,
     "volumes_por": "mathias",
     "volumes_em": "2026-10-06T14:26:57.866Z",
-    "conferencia_ok": false,
-    "conferencia_por": null,
-    "conferencia_em": null,
+    "conferencia_ok": true,
+    "conferencia_por": "mathias",
+    "conferencia_em": "2026-10-07T13:18:56.586Z",
     "conferencia_notas": null,
     "transportadora": null,
     "transporte_valor": null,
@@ -3271,11 +3271,19 @@
         "acao": "campo_alterado",
         "campo": "volumes_qtd",
         "novo": 1
+      },
+      {
+        "ts": "2026-10-07T13:18:56.586Z",
+        "por": "mathias",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "conferencia_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-06T14:26:40.215Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-06T14:26:57.866Z",
+    "atualizado_em": "2026-10-07T13:18:56.587Z",
     "atualizado_por": "mathias"
   },
   "env_calibre_1963": {
