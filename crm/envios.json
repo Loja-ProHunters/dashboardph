@@ -3003,9 +3003,9 @@
     "transporte_valor": 0,
     "transporte_por": "auxiliar",
     "transporte_em": "2026-10-07T13:14:06.198Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "002898",
+    "nf_por": "auxiliar",
+    "nf_em": "2026-10-07T13:14:33.749Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -3083,11 +3083,19 @@
         "acao": "campo_alterado",
         "campo": "transportadora",
         "novo": "retirada"
+      },
+      {
+        "ts": "2026-10-07T13:14:33.749Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "002898"
       }
     ],
     "criado_em": "2026-10-06T13:53:39.490Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-07T13:14:06.198Z",
+    "atualizado_em": "2026-10-07T13:14:33.749Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_27163": {
