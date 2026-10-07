@@ -2871,7 +2871,7 @@
     "total_pedido": 302.25,
     "observacoes": "Nº Pedido Loja: 1508751137\nJAMA9626828\n\n",
     "vendedor_bling": null,
-    "status": "aberto",
+    "status": "cancelado",
     "confirmado_bling": true,
     "volumes_qtd": null,
     "volumes_por": null,
@@ -2940,12 +2940,22 @@
         "acao": "passo_revertido",
         "passo": "volumes",
         "titulo": "Volumes embalados"
+      },
+      {
+        "ts": "2026-10-07T12:53:36.353Z",
+        "por": "gerencia",
+        "ip": "170.231.25.101",
+        "acao": "envio_cancelado",
+        "motivo": "Wesley lançou o pedido errado"
       }
     ],
     "criado_em": "2026-10-06T13:46:11.264Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-06T13:51:13.961Z",
-    "atualizado_por": "gerencia"
+    "atualizado_em": "2026-10-07T12:53:36.353Z",
+    "atualizado_por": "gerencia",
+    "cancelado_motivo": "Wesley lançou o pedido errado",
+    "cancelado_por": "gerencia",
+    "cancelado_em": "2026-10-07T12:53:36.353Z"
   },
   "env_calibre_1961": {
     "id": "env_calibre_1961",
