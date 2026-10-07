@@ -8064,7 +8064,7 @@ function ctrlCondAereo(e){
       (e.pix_ip ? ' <span class="ctrl-audit-ip">IP '+crmEsc(e.pix_ip)+'</span>' : '') + '</div>'
     : '';
   return '<div class="ctrl-cond-block">' +
-    '<div class="ctrl-cond-lbl">✈️ Rota aérea — Pix + peso/medidas + Minuta obrigatórios</div>' +
+    '<div class="ctrl-cond-lbl">✈️ Rota aérea — Pix + peso/medidas + Minuta Gollog obrigatórios</div>' +
     '<div class="ctrl-check-item '+(pixOk?'checked':'')+'" onclick="ctrlCheckToggle(\'pix_baixado\',\''+e.id+'\','+pixOk+')" style="margin-bottom:10px">' +
       '<div class="ctrl-check-box">'+(pixOk?'✓':'')+'</div>' +
       '<div class="ctrl-check-content">' +
@@ -8073,10 +8073,16 @@ function ctrlCondAereo(e){
         pixAudit +
       '</div>' +
     '</div>' +
+    // Explicacao curta pra evitar confusao com a GT do Exercito (passo 6 do checklist).
+    '<div style="font-size:11.5px;color:var(--gy);margin:4px 0 8px;line-height:1.5">' +
+      '💡 <b>Minuta Gollog</b> é o número de rastreio da companhia aérea (AWB) ' +
+      'quando o Ezequiel redespacha pelo aéreo via Gollog. É um documento diferente ' +
+      'da <b>Guia de Trânsito (GT)</b> do Exército — essa já foi preenchida no passo 6.' +
+    '</div>' +
     '<div class="ctrl-inline-fields">' +
       '<input type="text" placeholder="Peso (kg)" id="fld-peso" value="'+crmEsc(e.peso_kg||'')+'" style="max-width:110px"/>' +
       '<input type="text" placeholder="L × A × C (cm)" id="fld-dim" value="'+crmEsc(e.dimensoes_cm||'')+'" style="max-width:140px"/>' +
-      '<input type="text" placeholder="Nº Minuta" id="fld-minuta" value="'+crmEsc(e.minuta_numero||'')+'" style="max-width:140px"/>' +
+      '<input type="text" placeholder="Nº Minuta Gollog (AWB)" id="fld-minuta" value="'+crmEsc(e.minuta_numero||'')+'" style="max-width:180px" title="Numero da minuta aerea emitida pela Gollog quando o produto embarca no voo. Diferente da GT do Exercito."/>' +
       '<input type="text" placeholder="IATA aeroporto" id="fld-aero" value="'+crmEsc(e.aeroporto_iata||'')+'" style="max-width:130px;text-transform:uppercase"/>' +
       '<button class="crm-btn small" onclick="ctrlSalvarAereo()">Salvar dados</button>' +
     '</div>' +

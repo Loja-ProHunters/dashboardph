@@ -1,0 +1,4871 @@
+const https  = require('https');
+const crypto = require('crypto');
+const fs     = require('fs');
+const path   = require('path');
+const config = require('../config');
+const { gerarContrato } = require('../lib/contracts');
+const { gerarGT } = require('../lib/gt');
+const { extrairNF } = require('../lib/nfExtract');
+const { extrairPedido } = require('../lib/pedidoExtract');
+const { getComercialData, saveComercialData, resetMonth, registrarVenda, registrarVendaSite } = require('../lib/comercialStore');
+const { getContatos, saveContatos } = require('../lib/contatosStore');
+const { getEditorial, saveEditorial } = require('../lib/editorialStore');
+const { getTarifas, saveTarifas } = require('../lib/tarifasStore');
+const { getParceiros, saveParceiros } = require('../lib/parceirosStore');
+const contratos = require('../lib/crm/contratos');
+const { verifyPassword, setPassword, upsertUser, deleteUser, getAllUsers, generateTempPassword, getRoleSync } = require('../lib/usersStore');
+const accessLog = require('../lib/accessLog');
+const { calcularProgressoMeta, getFeriadosCustom, saveFeriadosCustom } = require('../lib/metaDiaria');
+
+// ═══════════════════════════════════════════════════════════════
+// CRM Pro Hunters — Fatia 1 (Fundação)
+// ═══════════════════════════════════════════════════════════════
+const crmStore    = require('../lib/crm/store');
+const crmUtils    = require('../lib/crm/utils');
+const crmColl     = require('../lib/crm/collections');
+const crmOcr      = require('../lib/crm/docsOcr');
+const crmSchemas  = require('../lib/crm/docsSchemas');
+const fenixCompat = require('../lib/crm/fenixCompat');
+const blingFenixMap     = require('../lib/crm/blingFenixMap');
+const blingFenixGerador = require('../lib/crm/blingFenixGerador');
+const coocorrencia      = require('../lib/crm/coocorrencia');
+const { sugerirParaCliente } = require('../lib/crm/sugerir');
+const automacaoUpsell   = require('../lib/crm/automacaoUpsell');
+const catalogoBling     = require('../lib/crm/catalogoBling');
+
+// Bling API v3
+const blingOauth      = require('../lib/bling/oauth');
+const blingTokenStore = require('../lib/bling/tokenStore');
+const blingApi        = require('../lib/bling/api');
+const blingBackfill   = require('../lib/bling/backfill');
+const blingVendedores = require('../lib/bling/vendedores');
+const blingSync       = require('../lib/bling/sync');
+const blingContasReceber = require('../lib/bling/contasReceber');
+const freteCotar    = require('../lib/frete/cotar');
+const freteMatriz   = require('../lib/frete/matriz');
+const freteGollog   = require('../lib/frete/gollog');
+const freteAprendizado = require('../lib/frete/aprendizado');
+const envios        = require('../lib/crm/envios');
+const romaneios     = require('../lib/crm/romaneios');
+const { getFile: _ghGet, saveFile: _ghSave } = require('../lib/githubStore');
+
+// Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
+// Fallback pro esquema antigo (baseado no nome do usuário) fica só como safety-net.
+//
+// Roles aceitos:
+//   admin      — gerencia da empresa (Luis). Ve e edita tudo.
+//   diretor    — diretor (Joao). Mesmas permissoes de admin.
+//   vendas     — vendedor comercial (Pedro/Enzo/Wesley). Fila do CRM + Op.Controlado.
+//   auxiliar   — auxiliar administrativo (Maria). Op.Controlado + Dashboard Comercial.
+//   financeiro — gerente financeiro (Nicolay). Ve tudo em leitura exceto Base de
+//                Conhecimento/Linha Editorial/Usuarios. Nao edita tarefas comerciais.
+//   marketing  — time de marketing (Marlon/Pierre). Mesmas permissoes do financeiro.
+//   comex      — comex (Kyra). Somente Inicio, Dashboard Comercial e IA Pro Hunters.
+function getRole(usuario, sess) {
+  if (sess && sess.role) return sess.role;
+  if (usuario === 'gerencia') return 'admin';
+  if (usuario === 'auxiliar') return 'auxiliar';
+  return 'vendas';
+}
+// Diretor = admin em capacidade. Mantemos os 2 roles separados pra auditoria
+// (quem fez o que), mas onde a checagem e "pode fazer X operacao restrita",
+// os dois valem igual.
+function isAdminOrDiretor(sess) {
+  if (!sess) return false;
+  const r = getRole(sess.usuario, sess);
+  return r === 'admin' || r === 'diretor';
+}
+function canEditComercial(sess) { return isAdminOrDiretor(sess); }
+// Dashboard Comercial agora e visivel pra TODOS os usuarios logados (inclusive
+// auxiliar e comex) — a ferramenta virou o KPI compartilhado da empresa.
+// Edicao continua so admin/diretor via canEditComercial.
+function canViewComercial(sess) { return !!(sess && sess.usuario); }
+function canUseDocumentos(sess) { return sess && sess.usuario; } // Qualquer usuário logado pode usar Documentos
+// IA Pro Hunters: admin, diretor, vendas, financeiro, marketing, comex. Auxiliar nao.
+function canUseIA(sess) {
+  if (!sess) return false;
+  const r = getRole(sess.usuario, sess);
+  return r !== 'auxiliar';
+}
+// Base de Conhecimento (edita e ve): so admin/diretor.
+function canManageKB(sess) { return isAdminOrDiretor(sess); }
+// Garantias: admin, diretor e auxiliar (Maria). Nenhum outro perfil ve a aba.
+function canGerenciarGarantias(sess) {
+  if (!sess) return false;
+  const r = getRole(sess.usuario, sess);
+  return r === 'admin' || r === 'diretor' || r === 'auxiliar';
+}
+
+const SESSION_MS = (config.sessionHours || 8) * 60 * 60 * 1000;
+const ROOT       = path.join(__dirname, '..');
+const KB_FILE    = path.join(ROOT, 'knowledge.txt');
+
+// ── Sessão (stateless — assinada no próprio cookie, sem depender de ──
+// ── memória do servidor, que não é compartilhada entre instâncias   ──
+// ── serverless da Vercel) ─────────────────────────────────────────
+function sign(payloadB64) {
+  return crypto.createHmac('sha256', config.sessionSecret).update(payloadB64).digest('hex');
+}
+
+function newToken(sessionData) {
+  const payloadB64 = Buffer.from(JSON.stringify(sessionData)).toString('base64url');
+  const sig = sign(payloadB64);
+  return payloadB64 + '.' + sig;
+}
+
+function getSession(req) {
+  const m = (req.headers.cookie || '').match(/ph_session=([^;]+)/);
+  if (!m) return null;
+  const token = decodeURIComponent(m[1]);
+  const parts = token.split('.');
+  if (parts.length !== 2) return null;
+  const [payloadB64, sig] = parts;
+  let expectedSig;
+  try { expectedSig = sign(payloadB64); } catch (e) { return null; }
+  if (expectedSig.length !== sig.length || !crypto.timingSafeEqual(Buffer.from(expectedSig), Buffer.from(sig))) return null;
+  let data;
+  try { data = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf-8')); } catch (e) { return null; }
+  if (!data || Date.now() > data.expiry) return null;
+  return data;
+}
+
+function parseForm(body) {
+  try {
+    return Object.fromEntries(
+      body.split('&').map(p => p.split('=').map(v => decodeURIComponent(v.replace(/\+/g,' '))))
+    );
+  } catch(e) { return {}; }
+}
+
+function readBody(req) {
+  return new Promise(resolve => {
+    let b = '';
+    req.on('data', c => b += c);
+    req.on('end',  () => resolve(b));
+  });
+}
+
+// ── Knowledge base (persistida no GitHub, pois o filesystem da ──
+// ── Vercel é somente-leitura em produção — fs.writeFileSync nunca ──
+// ── vai persistir de verdade rodando lá) ─────────────────────────
+function githubRequest(method, apiPath, body) {
+  return new Promise((resolve, reject) => {
+    if (!config.githubToken || !config.githubRepo) {
+      reject(new Error('GITHUB_TOKEN ou GITHUB_REPO não configurados nas variáveis de ambiente da Vercel.'));
+      return;
+    }
+    const payload = body ? JSON.stringify(body) : null;
+    const opts = {
+      hostname: 'api.github.com',
+      path: apiPath,
+      method,
+      headers: {
+        'User-Agent': 'prohunters-portal',
+        'Accept': 'application/vnd.github+json',
+        'Authorization': 'Bearer ' + config.githubToken,
+        ...(payload ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) } : {}),
+      },
+    };
+    const r = https.request(opts, res => {
+      let d = '';
+      res.on('data', c => d += c);
+      res.on('end', () => {
+        let parsed = null;
+        try { parsed = JSON.parse(d); } catch (e) {}
+        if (res.statusCode >= 200 && res.statusCode < 300) resolve(parsed);
+        else reject(new Error('GitHub API ' + res.statusCode + ': ' + (parsed && parsed.message ? parsed.message : d)));
+      });
+    });
+    r.on('error', reject);
+    if (payload) r.write(payload);
+    r.end();
+  });
+}
+
+// Cache em memória por invocação fria (evita ficar batendo no GitHub a cada request de chat)
+let kbCache = { text: null, ts: 0 };
+const KB_CACHE_MS = 60 * 1000; // 1 minuto
+
+async function getKnowledge() {
+  const now = Date.now();
+  if (kbCache.text !== null && (now - kbCache.ts) < KB_CACHE_MS) {
+    return kbCache.text;
+  }
+  try {
+    const filePath = 'knowledge.txt';
+    const apiPath = '/repos/' + config.githubRepo + '/contents/' + filePath + '?ref=' + config.githubBranch;
+    const data = await githubRequest('GET', apiPath);
+    const text = Buffer.from(data.content, 'base64').toString('utf-8');
+    kbCache = { text, ts: now };
+    return text;
+  } catch (e) {
+    // Fallback: arquivo local empacotado no deploy (só leitura, pode estar desatualizado)
+    try { return fs.readFileSync(KB_FILE, 'utf-8'); }
+    catch (e2) { return require('../system_prompt'); }
+  }
+}
+
+async function saveKnowledge(text) {
+  const filePath = 'knowledge.txt';
+  const apiPath = '/repos/' + config.githubRepo + '/contents/' + filePath;
+  // Precisa do sha do arquivo atual para o GitHub aceitar o update
+  let sha = null;
+  try {
+    const current = await githubRequest('GET', apiPath + '?ref=' + config.githubBranch);
+    sha = current.sha;
+  } catch (e) {
+    // arquivo pode não existir ainda — segue sem sha (cria novo)
+  }
+  await githubRequest('PUT', apiPath, {
+    message: 'Atualiza base de conhecimento via painel admin',
+    content: Buffer.from(text, 'utf-8').toString('base64'),
+    branch: config.githubBranch,
+    ...(sha ? { sha } : {}),
+  });
+  kbCache = { text, ts: Date.now() }; // invalida cache local imediatamente
+}
+
+// ── Anthropic proxy ──────────────────────────────────────────
+function callAnthropic(messages, system) {
+  return new Promise((resolve, reject) => {
+    const payload = JSON.stringify({
+      model:      config.model || 'claude-sonnet-4-6',
+      max_tokens: config.maxTokens || 1000,
+      system,
+      messages,
+    });
+    const opts = {
+      hostname: 'api.anthropic.com',
+      path:     '/v1/messages',
+      method:   'POST',
+      headers: {
+        'Content-Type':      'application/json',
+        'x-api-key': config.anthropicApiKey,
+        'anthropic-version': '2023-06-01',
+        'Content-Length':    Buffer.byteLength(payload),
+      },
+    };
+    const r = https.request(opts, res => {
+      let d = '';
+      res.on('data', c => d += c);
+      res.on('end', () => resolve({ status: res.statusCode, body: d }));
+    });
+    r.on('error', reject);
+    r.write(payload);
+    r.end();
+  });
+}
+
+// ── Login page ───────────────────────────────────────────────
+function loginPage(erro) {
+  return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pro Hunters</title><link rel="icon" href="/assets/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Barlow','Segoe UI',system-ui,sans-serif;
+  background:radial-gradient(circle at 50% 20%, #12241c 0%, #0a1410 45%, #060a08 100%);
+  display:flex;align-items:center;justify-content:center;min-height:100vh;
+  overflow:hidden;position:relative;
+}
+/* textura de ruido sutil */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.35;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+}
+/* trilhas de projeteis passando em alta velocidade */
+.tracer{
+  position:fixed;left:-20%;width:46%;height:2px;z-index:2;pointer-events:none;
+  background:linear-gradient(90deg, transparent, rgba(120,220,150,.85) 60%, #eaffef 100%);
+  box-shadow:0 0 10px 1px rgba(120,220,150,.65);
+  border-radius:2px;
+  animation-name:tracerFly;
+  animation-timing-function:cubic-bezier(.3,0,.15,1);
+  animation-iteration-count:infinite;
+}
+.tracer::after{
+  content:'';position:absolute;right:-3px;top:50%;transform:translateY(-50%);
+  width:6px;height:6px;border-radius:50%;background:#eaffef;box-shadow:0 0 8px 3px rgba(160,255,190,.9);
+}
+@keyframes tracerFly{ from{ transform:translateX(0); opacity:0 } 4%{opacity:1} 92%{opacity:1} to{ transform:translateX(260vw); opacity:0 } }
+.tracer.t1{ top:14%; animation-duration:1.9s; animation-delay:.2s }
+.tracer.t2{ top:34%; animation-duration:2.6s; animation-delay:1.4s; opacity:.7 }
+.tracer.t3{ top:58%; animation-duration:1.6s; animation-delay:2.5s }
+.tracer.t4{ top:76%; animation-duration:2.2s; animation-delay:.9s; opacity:.6 }
+.tracer.t5{ top:90%; animation-duration:2.9s; animation-delay:3.4s; opacity:.5 }
+
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;box-shadow:inset 0 0 220px 40px rgba(0,0,0,.75)}
+
+.wrap{position:relative;z-index:5;width:100%;max-width:400px;padding:20px}
+.card{
+  background:rgba(15,26,20,.72);
+  border:1px solid rgba(120,200,150,.22);
+  border-radius:16px;padding:38px 34px;width:100%;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 20px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.03) inset;
+}
+.logo-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:22px}
+.logo-wrap img{height:46px;width:auto}
+h2{font-size:16px;font-weight:700;text-align:center;margin-bottom:4px;color:#f2f5f2;letter-spacing:.3px}
+.sub{font-size:12px;color:#9db3a4;text-align:center;margin-bottom:26px}
+label{font-size:11px;font-weight:700;color:#bcd4c4;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px}
+input{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(120,200,150,.25);
+  border-radius:10px;padding:13px 15px;font-size:15px;outline:none;margin-bottom:18px;
+  font-family:inherit;color:#f2f5f2;transition:border-color .18s,background .18s,box-shadow .18s;
+}
+input::placeholder{color:#5c6e63}
+input:focus{border-color:#4caf7a;background:rgba(255,255,255,.07);box-shadow:0 0 0 3px rgba(90,170,102,.22)}
+button{
+  width:100%;background:linear-gradient(135deg,#2d6a4f,#1b4332);color:#fff;border:none;
+  border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;
+  letter-spacing:.4px;transition:filter .18s,transform .1s,box-shadow .18s;
+  box-shadow:0 6px 18px rgba(27,67,50,.45);
+}
+button:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(90,170,102,.45)}
+button:hover{filter:brightness(1.15)}
+button:active{transform:scale(.98)}
+.err{background:rgba(224,48,48,.15);border:1px solid rgba(224,48,48,.4);border-radius:8px;padding:10px 14px;font-size:12px;color:#ff9d9d;margin-bottom:16px;text-align:center}
+.foot{font-size:11px;color:#5c6e63;text-align:center;margin-top:22px;letter-spacing:.4px}
+</style></head>
+<body>
+<div class="vignette"></div>
+<div class="tracer t1"></div>
+<div class="tracer t2"></div>
+<div class="tracer t3"></div>
+<div class="tracer t4"></div>
+<div class="tracer t5"></div>
+<div class="wrap">
+  <div class="card">
+    <div class="logo-wrap"><img src="/assets/ph_logo_header.png" alt="Pro Hunters"></div>
+    <h2>Acesso ao Portal</h2>
+    <p class="sub">Digite suas credenciais para entrar</p>
+    ${erro ? '<div class="err">Usuário ou senha incorretos.</div>' : ''}
+    <form method="POST" action="/login">
+      <label>Usuário</label>
+      <input type="text" name="usuario" autocomplete="username" autofocus required>
+      <label>Senha</label>
+      <input type="password" name="senha" autocomplete="current-password" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <div class="foot">PORTAL INTERNO · COMERCIAL</div>
+  </div>
+</div>
+</body></html>`;
+}
+
+// ── Handler principal ────────────────────────────────────────
+module.exports = async (req, res) => {
+  const url = (req.url || '/').split('?')[0];
+
+  // GET /favicon.ico — navegadores pedem isso direto na raiz por padrao
+  if (req.method === 'GET' && url === '/favicon.ico') {
+    try {
+      const buf = fs.readFileSync(path.join(ROOT, 'assets', 'favicon.ico'));
+      res.writeHead(200, { 'Content-Type': 'image/x-icon', 'Cache-Control': 'public, max-age=86400' });
+      res.end(buf);
+    } catch (e) {
+      res.writeHead(404); res.end();
+    }
+    return;
+  }
+
+  // GET /assets/* — arquivos estaticos publicos (logos, imagens)
+  if (req.method === 'GET' && url.startsWith('/assets/')) {
+    const fileName = url.replace('/assets/', '');
+    if (fileName.includes('..') || fileName.includes('/')) {
+      res.writeHead(400); res.end('Nome de arquivo invalido.'); return;
+    }
+    const filePath = path.join(ROOT, 'assets', fileName);
+    try {
+      const buf = fs.readFileSync(filePath);
+      const ext = path.extname(fileName).toLowerCase();
+      const mime = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream';
+      res.writeHead(200, { 'Content-Type': mime, 'Cache-Control': 'public, max-age=86400' });
+      res.end(buf);
+    } catch (e) {
+      res.writeHead(404); res.end('Arquivo nao encontrado.');
+    }
+    return;
+  }
+
+  // POST /login
+  if (req.method === 'POST' && url === '/login') {
+    const body = await readBody(req);
+    const { usuario, senha } = parseForm(body);
+    let user = null;
+    try { user = await verifyPassword(usuario, senha); }
+    catch (e) { console.warn('[login] erro em verifyPassword:', e.message); }
+    if (!user) {
+      accessLog.log('login_falha', req, { usuario: String(usuario || '').slice(0, 60) });
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(loginPage(true));
+      return;
+    }
+    accessLog.log('login_ok', req, { usuario: user.usuario, role: user.role });
+    const token = newToken({
+      nome: user.nome, usuario: user.usuario, role: user.role,
+      mustChange: !!user.mustChange, expiry: Date.now() + SESSION_MS,
+    });
+    res.writeHead(302, {
+      'Set-Cookie': 'ph_session=' + token + '; HttpOnly; Path=/; Max-Age=' + Math.floor(SESSION_MS/1000),
+      'Location': '/',
+    });
+    res.end();
+    return;
+  }
+
+  // GET /logout
+  if (url === '/logout') {
+    const sess = getSession(req);
+    if (sess) accessLog.log('logout', req, { usuario: sess.usuario });
+    res.writeHead(302, { 'Set-Cookie': 'ph_session=; HttpOnly; Path=/; Max-Age=0', 'Location': '/' });
+    res.end();
+    return;
+  }
+
+  // POST /api/change-password — trocar a própria senha (qualquer usuário logado)
+  if (req.method === 'POST' && url === '/api/change-password') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401, {'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const { senhaAtual, novaSenha } = JSON.parse(await readBody(req));
+      // Confirma senha atual antes de trocar
+      const ok = await verifyPassword(sess.usuario, senhaAtual);
+      if (!ok) throw new Error('Senha atual incorreta.');
+      await setPassword(sess.usuario, novaSenha, { mustChange: false });
+      accessLog.log('senha_alterada', req, { usuario: sess.usuario });
+      // Renova o cookie removendo o mustChange
+      const token = newToken({
+        nome: sess.nome, usuario: sess.usuario, role: sess.role,
+        mustChange: false, expiry: Date.now() + SESSION_MS,
+      });
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Set-Cookie': 'ph_session=' + token + '; HttpOnly; Path=/; Max-Age=' + Math.floor(SESSION_MS/1000),
+      });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(400, {'Content-Type':'application/json'}); res.end(JSON.stringify({error: e.message}));
+    }
+    return;
+  }
+
+  // ═══ ADMIN DE USUÁRIOS (só gerência) ═══════════════════════════════════════
+  // GET /api/users — lista
+  if (req.method === 'GET' && url === '/api/users') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const users = await getAllUsers();
+      // Nunca devolver os hashes
+      const safe = {};
+      for (const [k,v] of Object.entries(users)) safe[k] = { nome: v.nome, role: v.role, email: v.email, ativo: v.ativo !== false, mustChange: !!v.mustChange, criadoEm: v.criadoEm, senhaAlteradaEm: v.senhaAlteradaEm };
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ users: safe }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // POST /api/users — criar/atualizar
+  if (req.method === 'POST' && url === '/api/users') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const { usuario, dados } = JSON.parse(await readBody(req));
+      if (!usuario || !/^[a-z0-9._-]{2,32}$/i.test(usuario)) throw new Error('Usuário deve ter 2-32 caracteres alfanuméricos.');
+      const created = await upsertUser(String(usuario).toLowerCase(), dados || {});
+      accessLog.log('usuario_upsert', req, { por: sess.usuario, alvo: usuario });
+      const safe = { nome: created.nome, role: created.role, email: created.email, mustChange: !!created.mustChange };
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, usuario, ...safe }));
+    } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // POST /api/users/reset — gera nova senha temporária pra outro usuário (só gerência)
+  if (req.method === 'POST' && url === '/api/users/reset') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const { usuario } = JSON.parse(await readBody(req));
+      if (!usuario) throw new Error('usuario ausente.');
+      if (usuario === sess.usuario) throw new Error('Use "trocar minha senha" pra sua própria conta.');
+      const temp = generateTempPassword();
+      await setPassword(usuario, temp, { mustChange: true });
+      accessLog.log('senha_resetada', req, { por: sess.usuario, alvo: usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, senhaTemporaria: temp }));
+    } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // POST /api/users/delete
+  if (req.method === 'POST' && url === '/api/users/delete') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const { usuario } = JSON.parse(await readBody(req));
+      if (!usuario) throw new Error('usuario ausente.');
+      if (usuario === sess.usuario) throw new Error('Não pode se deletar.');
+      await deleteUser(usuario);
+      accessLog.log('usuario_deletado', req, { por: sess.usuario, alvo: usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+    } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // SOLICITAÇÕES entre colaboradores (hub de tarefas do dashboard)
+  // Qualquer usuário logado pode criar, ver e responder. Fluxo:
+  //   pendente → executada (destinatário) → aprovada/rejeitada (criador)
+  // ═════════════════════════════════════════════════════════════
+  if (url === '/api/solicitacoes/categorias' && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    const solic = require('../lib/solicitacoes');
+    res.writeHead(200,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({ categorias: solic.CATEGORIAS }));
+    return;
+  }
+
+  // GET /api/solicitacoes/usuarios — lista de usuários pro select "para quem"
+  // (sem hash de senha). Retorna todos os ativos. Qualquer logado pode chamar.
+  if (url === '/api/solicitacoes/usuarios' && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const all = await getAllUsers();
+      const lista = Object.entries(all)
+        .filter(([k, v]) => v.ativo !== false)
+        .map(([k, v]) => ({ login: k, nome: v.nome || k, role: v.role || 'vendas' }))
+        .sort((a, b) => String(a.nome).localeCompare(String(b.nome)));
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ usuarios: lista }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/solicitacoes?tipo=recebidas|enviadas (default: recebidas)
+  // Exclui tambem /mensagens — senao o handler generico captura o GET das
+  // mensagens de uma solicitacao especifica (bug: estava retornando a lista
+  // inteira de solicitacoes em vez do array de mensagens, chat ficava vazio).
+  if (url.startsWith('/api/solicitacoes') && req.method === 'GET' && !url.match(/\/(contador|categorias|usuarios|mensagens)(\?|$)/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      let tipo = u.searchParams.get('tipo') || 'recebidas';
+      // SEGURANÇA: `tipo=todas` retorna solicitacoes de todo mundo com o chat
+      // completo — antes qualquer usuario logado conseguia ler chats privados
+      // de outros pares. Agora so admin/diretor pode usar 'todas'; qualquer
+      // outro role cai em 'recebidas' silenciosamente.
+      if (tipo === 'todas' && !isAdminOrDiretor(sess)) tipo = 'recebidas';
+      const solic = require('../lib/solicitacoes');
+      const list = await solic.listar({ login: sess.usuario, tipo });
+      // Camada extra: mesmo em 'todas' (admin), removemos o array mensagens[]
+      // do payload — chat so aparece via GET /api/solicitacoes/:id/mensagens
+      // (que ja checa se e criador/destinatario). Isso impede admin ler chats
+      // sem permissao acidentalmente, e reduz tamanho do payload.
+      const login = String(sess.usuario || '').toLowerCase();
+      const seguro = list.map(s => {
+        const semMsgs = { ...s };
+        // So mantem mensagens se e visualizacao propria (recebidas/enviadas)
+        // ou se o usuario e um dos envolvidos
+        if (tipo === 'todas' && s.de !== login && s.para !== login) {
+          delete semMsgs.mensagens;
+        }
+        return semMsgs;
+      });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ solicitacoes: seguro, total: seguro.length }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/solicitacoes/chats-nao-lidos — lista de chats com msgs nao lidas
+  // + total. Alimenta o widget flutuante no canto inferior direito.
+  if (url === '/api/solicitacoes/chats-nao-lidos' && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      // Pega mapa login→nome pra UI (nao precisa de role)
+      const all = await getAllUsers();
+      const mapa = {};
+      for (const [k, v] of Object.entries(all)) mapa[String(k).toLowerCase()] = v.nome || k;
+      const chats = await solic.listarChatsComNaoLidas(sess.usuario, mapa);
+      const total = chats.reduce((n, c) => n + c.qtd_naolidas, 0);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ total, chats }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/solicitacoes/:id/marcar-lido — zera o contador de nao lidas
+  // daquela solicitacao pro usuario atual. Chamado quando ele abre o chat.
+  if (req.method === 'POST' && url.match(/^\/api\/solicitacoes\/[a-zA-Z0-9_\-]+\/marcar-lido$/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const id = url.split('/')[3];
+      const s = await solic.marcarLido(id, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, solicitacao: s }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/solicitacoes/contador — quantas pendentes pra mim (pra sino/barra)
+  if (url === '/api/solicitacoes/contador' && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const n = await solic.contarPendentes(sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ pendentes: n }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/solicitacoes — cria nova
+  if (url === '/api/solicitacoes' && req.method === 'POST') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const body = await readBody(req);
+      const { para, categoria, titulo, descricao, prazo } = JSON.parse(body || '{}');
+      const nova = await solic.criar({
+        de: sess.usuario, para, categoria, titulo, descricao, prazo,
+      });
+      res.writeHead(201,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, solicitacao: nova }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/solicitacoes/:id/executar — destinatario marca como feita
+  if (req.method === 'POST' && url.match(/^\/api\/solicitacoes\/[a-zA-Z0-9_\-]+\/executar$/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const id = url.split('/')[3];
+      const s = await solic.executar(id, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, solicitacao: s }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/solicitacoes/:id/aprovar — criador aprova a execucao
+  if (req.method === 'POST' && url.match(/^\/api\/solicitacoes\/[a-zA-Z0-9_\-]+\/aprovar$/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const id = url.split('/')[3];
+      const s = await solic.aprovar(id, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, solicitacao: s }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/solicitacoes/:id/mensagem body: { texto } — envia msg no chat
+  if (req.method === 'POST' && url.match(/^\/api\/solicitacoes\/[a-zA-Z0-9_\-]+\/mensagem$/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { texto } = JSON.parse(body || '{}');
+      const s = await solic.enviarMensagem(id, sess.usuario, texto);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, mensagens: s.mensagens || [] }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/solicitacoes/:id/mensagens — pra polling leve do chat aberto
+  if (req.method === 'GET' && url.match(/^\/api\/solicitacoes\/[a-zA-Z0-9_\-]+\/mensagens$/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const id = url.split('/')[3];
+      const msgs = await solic.getMensagens(id, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ mensagens: msgs, total: msgs.length }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/solicitacoes/:id/rejeitar body: { motivo }
+  if (req.method === 'POST' && url.match(/^\/api\/solicitacoes\/[a-zA-Z0-9_\-]+\/rejeitar$/)) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const solic = require('../lib/solicitacoes');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { motivo } = JSON.parse(body || '{}');
+      const s = await solic.rejeitar(id, sess.usuario, motivo);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, solicitacao: s }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // GARANTIAS / TROCAS / DEVOLUÇÕES — admin + diretor + auxiliar
+  // Fluxo: criar → triar (sistema sugere) → decidir (operador aprova/override)
+  //        → status (aberto → em_analise → aguardando_cliente → resolvido)
+  //        → estoque físico (aguardando_chegada → recebido → enviado_fabricante
+  //           → resolvido_fabricante)
+  //        → imprime etiqueta A4 pra colar na caixa
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /api/crm/produtividade — métricas de produtividade dos vendedores.
+  // Admin/diretor only. Retorna { equipe, vendedores:[{login,nome,...,lista_atrasadas}] }
+  if (url === '/api/crm/produtividade' && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
+    try {
+      const prod = require('../lib/crm/produtividade');
+      const r = await prod.calcularProdutividade();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/limpar-tally — DESTRUTIVO: apaga TODAS as garantias com
+  // fonte='tally_webhook'. Preserva as manuais. Usado quando acumulou lixo e
+  // queremos re-importar do zero. Admin/diretor/auxiliar.
+  if (url === '/api/garantias/limpar-tally' && req.method === 'POST') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const r = await gar.limparTodasTally();
+      console.log('[LIMPAR TALLY] ' + JSON.stringify(r));
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/deduplicar — remove garantias duplicadas vindas do Tally.
+  // Admin/diretor/auxiliar. Chamar UMA VEZ pra limpar o acumulado.
+  if (url === '/api/garantias/deduplicar' && req.method === 'POST') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const r = await gar.removerDuplicatasTally();
+      console.log('[DEDUP GARANTIAS] ' + JSON.stringify(r));
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/garantias/sync-tally/debug — mostra shape bruto da API Tally
+  // pra entender quais campos chegam e ajustar parser. Admin/diretor/auxiliar.
+  if (url.startsWith('/api/garantias/sync-tally/debug')) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const sync = require('../lib/garantiasTallySync');
+      const info = await sync.debugPrimeiraSubmissao({});
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(info, null, 2));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error: e.message}));
+    }
+    return;
+  }
+
+  // GET/POST /api/garantias/sync-tally — polling da API Tally pro cron.
+  // Protegido pelo CRON_SECRET ja existente (header Authorization: Bearer XXX
+  // OU query ?secret=XXX). Pode ser chamado tambem manualmente por admin logado
+  // (um clique no dashboard = testa a sync na hora).
+  if (url.startsWith('/api/garantias/sync-tally')) {
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const auth = req.headers['authorization'] || '';
+      const bearer = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+      const tokenPassado = u.searchParams.get('secret') || bearer;
+      const sess = getSession(req);
+      const podeOperar = sess && canGerenciarGarantias(sess); // admin + diretor + auxiliar
+      const tokenValido = config.cronSecret && tokenPassado === config.cronSecret;
+      if (!podeOperar && !tokenValido) {
+        res.writeHead(401,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Nao autorizado. Precisa de admin/diretor/auxiliar logado OU secret correto.'}));
+        return;
+      }
+      const sync = require('../lib/garantiasTallySync');
+      const r = await sync.sincronizar({});
+      console.log('[SYNC TALLY] ' + JSON.stringify(r));
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, ...r }));
+    } catch (e) {
+      console.error('[SYNC TALLY] Erro: ' + e.message);
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'Sync falhou: ' + e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/webhook?token=XXX — recebe submissao do Tally
+  // SEM autenticacao de sessao (publico), MAS validado por token secreto na
+  // query string (env var GARANTIAS_WEBHOOK_SECRET). Sem token valido = 401.
+  // Fluxo: valida token → parseia payload → mapeia pro formato interno →
+  //        cria garantia (que ja roda triagem CDC automatica).
+  if (url.startsWith('/api/garantias/webhook') && req.method === 'POST') {
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const tokenPassado = u.searchParams.get('token') || '';
+      const tokenEsperado = process.env.GARANTIAS_WEBHOOK_SECRET || '';
+      if (!tokenEsperado || tokenEsperado.length < 16) {
+        console.error('[WEBHOOK GARANTIAS] GARANTIAS_WEBHOOK_SECRET nao configurado ou curto (<16 chars)');
+        res.writeHead(500,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Webhook nao configurado no servidor.'}));
+        return;
+      }
+      // Comparacao tempo-constante pra evitar timing attack
+      const a = Buffer.from(tokenPassado); const b = Buffer.from(tokenEsperado);
+      const matches = a.length === b.length && crypto.timingSafeEqual(a, b);
+      if (!matches) {
+        console.warn('[WEBHOOK GARANTIAS] Token invalido vindo de ' + (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '?'));
+        res.writeHead(401,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Token invalido.'}));
+        return;
+      }
+      const bodyRaw = await readBody(req);
+      let payload;
+      try { payload = JSON.parse(bodyRaw || '{}'); }
+      catch (e) {
+        res.writeHead(400,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Body JSON invalido.'}));
+        return;
+      }
+      // Tally envia eventType='FORM_RESPONSE'. Se vier teste manual sem isso,
+      // ainda processamos (ajuda a debugar na primeira configuracao).
+      if (payload.eventType && payload.eventType !== 'FORM_RESPONSE') {
+        console.log('[WEBHOOK GARANTIAS] Evento ignorado: ' + payload.eventType);
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ok: true, ignored: true, eventType: payload.eventType }));
+        return;
+      }
+      const parser = require('../lib/garantiasTallyWebhook');
+      const gar = require('../lib/garantias');
+      const mapeado = parser.mapearPayloadTally(payload);
+      const nova = await gar.criar(mapeado);
+      console.log('[WEBHOOK GARANTIAS] Nova garantia criada: ' + nova.id + ' (cliente: ' + nova.cliente.nome + ')');
+      res.writeHead(201,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, garantia_id: nova.id, sugestao: nova.avaliacao_cdc && nova.avaliacao_cdc.sugestao_sistema }));
+    } catch (e) {
+      console.error('[WEBHOOK GARANTIAS] Erro: ' + e.message);
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'Erro ao processar webhook: ' + e.message}));
+    }
+    return;
+  }
+
+  // GET /api/garantias/contador — pendentes (pra badge do menu)
+  if (url === '/api/garantias/contador' && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const n = await gar.contarPendentes();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ pendentes: n }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/garantias/estoque?status=&marca=&agrupar=
+  if (url.startsWith('/api/garantias/estoque') && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const u = new URL('http://x' + (req.url || ''));
+      const status_produto = u.searchParams.get('status') || null;
+      const marca = u.searchParams.get('marca') || null;
+      const agrupar = u.searchParams.get('agrupar') === '1' || u.searchParams.get('agrupar') === 'true';
+      const r = await gar.listarEstoque({
+        status_produto,
+        marca,
+        agrupar_por_marca: agrupar,
+      });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ resultado: r, agrupado: agrupar }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/etiquetas body: { ids: [...] }
+  // Retorna HTML pronto pra abrir numa aba nova e dar Ctrl+P.
+  if (url === '/api/garantias/etiquetas' && req.method === 'POST') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'text/plain'}); res.end('Sem permissao.'); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const body = await readBody(req);
+      const { ids } = JSON.parse(body || '{}');
+      if (!Array.isArray(ids) || ids.length === 0) {
+        res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Lista de IDs vazia.'}));
+        return;
+      }
+      // Busca as garantias
+      const garantias = [];
+      for (const id of ids) {
+        try { garantias.push(await gar.obter(id)); } catch (_) { /* pula */ }
+      }
+      if (garantias.length === 0) {
+        res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nenhuma garantia encontrada.'}));
+        return;
+      }
+      // Marca a impressao no historico (nao impede reimprimir)
+      try { await gar.registrarImpressaoEtiqueta(garantias.map(g => g.id), sess.usuario); } catch (_) {}
+      const html = gar.gerarFolhaEtiquetasA4(garantias);
+      res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});
+      res.end(html);
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/enviar-fabricante body: { ids, canal, contato, protocolo_rma, rastreio_saida, nota }
+  if (url === '/api/garantias/enviar-fabricante' && req.method === 'POST') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const body = await readBody(req);
+      const payload = JSON.parse(body || '{}');
+      const r = await gar.registrarEnvioFabricante({ ...payload, actor: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, ...r }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/garantias?status=&operador=
+  // Exclui /:id/... (acoes), /contador, /estoque, /etiquetas, /enviar-fabricante, /procedimentos-pendentes.
+  if (url.startsWith('/api/garantias') && req.method === 'GET' && !url.match(/\/(contador|estoque|etiquetas|enviar-fabricante|procedimentos-pendentes)(\?|$)/) && !url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/[a-z\-]+$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      // Rota /api/garantias/:id (obter uma)
+      const m = url.match(/^\/api\/garantias\/([a-zA-Z0-9_\-]+)(\?|$)/);
+      if (m && m[1] && m[1] !== 'contador' && m[1] !== 'estoque' && m[1] !== 'etiquetas' && m[1] !== 'enviar-fabricante' && m[1] !== 'procedimentos-pendentes') {
+        const g = await gar.obter(m[1]);
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ garantia: g }));
+        return;
+      }
+      // Lista
+      const u = new URL('http://x' + (req.url || ''));
+      const status = u.searchParams.get('status') || null;
+      const operador = u.searchParams.get('operador') || null;
+      const limite = u.searchParams.get('limite') || null;
+      const lista = await gar.listar({ status, operador, limite });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ garantias: lista, total: lista.length }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias — cria nova
+  if (url === '/api/garantias' && req.method === 'POST') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const body = await readBody(req);
+      const payload = JSON.parse(body || '{}');
+      const nova = await gar.criar({ ...payload, criado_por: sess.usuario });
+      res.writeHead(201,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, garantia: nova }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/decidir body: { valor, justificativa }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/decidir$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { valor, justificativa } = JSON.parse(body || '{}');
+      const g = await gar.registrarDecisao(id, { valor, justificativa, actor: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/reavaliar body: { tipo_produto, forma_compra, ... }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/reavaliar$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const payload = JSON.parse(body || '{}');
+      const g = await gar.reavaliar(id, payload, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/status body: { novoStatus, nota }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/status$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { novoStatus, nota } = JSON.parse(body || '{}');
+      const g = await gar.mudarStatus(id, novoStatus, sess.usuario, nota);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/resolver body: { resultado, nota }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/resolver$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { resultado, nota } = JSON.parse(body || '{}');
+      const g = await gar.resolver(id, { resultado, nota, actor: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/aguardando-chegada body: { rastreio_entrada }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/aguardando-chegada$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { rastreio_entrada } = JSON.parse(body || '{}');
+      const g = await gar.marcarAguardandoChegada(id, { rastreio_entrada, actor: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/receber body: { localizacao_loja, nota }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/receber$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { localizacao_loja, nota } = JSON.parse(body || '{}');
+      const g = await gar.marcarRecebimentoLoja(id, { localizacao_loja, nota, actor: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/resolver-fabricante body: { tipo, nota }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/resolver-fabricante$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { tipo, nota } = JSON.parse(body || '{}');
+      const g = await gar.registrarResolucaoFabricante(id, { tipo, nota, actor: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ─── Procedimento interno (pos-resolucao: refaturamento / baixa estoque / estorno) ───
+  // GET /api/garantias/procedimentos-pendentes — lista garantias resolvidas com
+  // procedimento interno ainda PENDENTE. Usado pra sub-aba "A fazer" / badge.
+  if (req.method === 'GET' && url === '/api/garantias/procedimentos-pendentes') {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const lista = await gar.listarProcedimentosPendentes();
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantias: lista }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // POST /api/garantias/:id/procedimento body: { pedido_substituto, baixa_estoque_feita,
+  //    baixa_estoque_sku, baixa_estoque_qtd, estorno_valor, estorno_meio, nota }
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/procedimento$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const patch = JSON.parse(body || '{}');
+      const g = await gar.registrarProcedimentoInterno(id, patch, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/procedimento/concluir — fecha o procedimento interno
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/procedimento\/concluir$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const g = await gar.concluirProcedimentoInterno(id, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/garantias/:id/procedimento/reabrir — operador decidiu que falta algo
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/procedimento\/reabrir$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const g = await gar.reabrirProcedimentoInterno(id, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/access-log — últimos eventos (só gerência)
+  if (req.method === 'GET' && url === '/api/access-log') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const entries = await accessLog.readRecent(200);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ entries }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // GET /api/meta-diaria — progresso da meta acumulada por vendedor (todos logados)
+  if (req.method === 'GET' && url === '/api/meta-diaria') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const d = await getComercialData();
+      const progresso = await calcularProgressoMeta(d.sellers || []);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(progresso));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // GET /api/feriados — lista de feriados customizados (todos logados podem ler)
+  if (req.method === 'GET' && url === '/api/feriados') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    try {
+      const feriados = await getFeriadosCustom();
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ feriados, canEdit: canEditComercial(sess) }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // POST /api/feriados — atualiza lista (só gerência)
+  if (req.method === 'POST' && url === '/api/feriados') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const { feriados } = JSON.parse(await readBody(req));
+      if (!Array.isArray(feriados)) throw new Error('Formato inválido.');
+      // Valida: strings AAAA-MM-DD
+      const validos = feriados.filter(f => typeof f === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(f)).sort();
+      await saveFeriadosCustom(validos);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, feriados: validos }));
+    } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // CRM Pro Hunters — rotas /api/crm/*
+  // Fatia 1: CRUD REST genérico por coleção + session-info + migração parceiros.
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /api/crm/session-info — quem sou eu + posso acessar o CRM?
+  if (req.method === 'GET' && url === '/api/crm/session-info') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    const r = crmUtils.role(sess);
+    res.writeHead(200,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({
+      usuario: sess.usuario,
+      nome: sess.nome || sess.usuario,
+      role: r,
+      canAccess: crmUtils.canAccessCRM(sess),
+      canAccessControlado: crmUtils.canAccessControlado(sess),
+      canSeeAll: crmUtils.canSeeAll(sess),
+      isAdmin: r === 'admin',
+    }));
+    return;
+  }
+
+  // Roteador genérico das coleções CRM
+  // Formato: /api/crm/<colecao>[/<id>]
+  const crmMatch = url.match(/^\/api\/crm\/([a-z_]+)(?:\/([A-Za-z0-9\-_.]+))?$/);
+  if (crmMatch && crmMatch[1] !== 'session-info' && crmMatch[1] !== 'migrate-parceiros' && crmMatch[1] !== 'docs' && crmMatch[1] !== 'cron' && crmMatch[1] !== 'fenix'
+      && crmMatch[1] !== 'coocorrencia' && crmMatch[1] !== 'sugerir' && crmMatch[1] !== 'tarefas' && crmMatch[1] !== 'ficha'
+      && crmMatch[1] !== 'catalogo' && crmMatch[1] !== 'prospeccao' && crmMatch[1] !== 'vendedores' && crmMatch[1] !== 'bling'
+      && crmMatch[1] !== 'frete' && crmMatch[1] !== 'envios' && crmMatch[1] !== 'controlado' && crmMatch[1] !== 'romaneios') {
+    const colName = crmMatch[1];
+    const docId = crmMatch[2] || null;
+    const reg = crmColl.REGISTRY[colName];
+    if (!reg) {
+      res.writeHead(404,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'Coleção CRM desconhecida: ' + colName}));
+      return;
+    }
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
+    if (!crmUtils.canAccessCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso ao CRM.'})); return;
+    }
+    // Financeiro/marketing sao SOMENTE LEITURA no CRM — bloqueia POST/PUT/DELETE.
+    // GET passa (podem navegar clientes, ver historico, ver oportunidades).
+    if (req.method !== 'GET' && !crmUtils.canEditCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'Seu perfil pode consultar o CRM mas nao editar. Fale com a gerencia.'}));
+      return;
+    }
+
+    try {
+      // LIST — GET /api/crm/<col>
+      if (req.method === 'GET' && !docId) {
+        const filter = crmUtils.scopeFilter(sess);
+        const docs = await crmStore.listDocs(colName, filter);
+        // ordena mais novos primeiro
+        docs.sort((a,b) => String(b.criado_em||'').localeCompare(String(a.criado_em||'')));
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ docs, count: docs.length }));
+        return;
+      }
+      // DETAIL — GET /api/crm/<col>/<id>
+      if (req.method === 'GET' && docId) {
+        const doc = await crmStore.getDoc(colName, docId);
+        if (!doc) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Não encontrado.'})); return; }
+        if (!crmUtils.canReadDoc(sess, doc)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ doc }));
+        return;
+      }
+      // CREATE — POST /api/crm/<col>
+      if (req.method === 'POST' && !docId) {
+        const body = await readBody(req);
+        let dados;
+        try { dados = JSON.parse(body || '{}'); } catch (e) { throw new crmColl.ValidationError('JSON inválido no body.'); }
+        // Força owner se vendedor; admin pode escolher
+        dados = crmUtils.enforceOwner(sess, dados);
+        const doc = reg.build(dados);
+        const saved = await crmStore.createDoc(colName, doc, sess.usuario);
+        res.writeHead(201,{'Content-Type':'application/json'}); res.end(JSON.stringify({ doc: saved }));
+        return;
+      }
+      // UPDATE — PUT /api/crm/<col>/<id>
+      if (req.method === 'PUT' && docId) {
+        const cur = await crmStore.getDoc(colName, docId);
+        if (!cur) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Não encontrado.'})); return; }
+        if (!crmUtils.canWriteDoc(sess, cur)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao pra editar este documento.'})); return; }
+        const body = await readBody(req);
+        let patch;
+        try { patch = JSON.parse(body || '{}'); } catch (e) { throw new crmColl.ValidationError('JSON inválido no body.'); }
+        // Vendedor não muda owner_id pra outro (impede transferir doc pra fora do próprio escopo)
+        if (!crmUtils.canSeeAll(sess) && patch.owner_id && patch.owner_id !== sess.usuario) {
+          throw new crmColl.ValidationError('Vendedor não pode transferir owner de documento.');
+        }
+        // Roda o build passando o merge — pega validações
+        const merged = { ...cur, ...patch, id: docId };
+        const rebuilt = reg.build(merged);
+        // updateDoc mantém criado_em/por e escreve
+        const saved = await crmStore.updateDoc(colName, docId, rebuilt, sess.usuario);
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ doc: saved }));
+        return;
+      }
+      // DELETE — DELETE /api/crm/<col>/<id> (só admin)
+      if (req.method === 'DELETE' && docId) {
+        if (!crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência pode deletar.'})); return; }
+        const ok = await crmStore.deleteDoc(colName, docId);
+        if (!ok) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Não encontrado.'})); return; }
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+        return;
+      }
+      res.writeHead(405,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Método não suportado.'}));
+    } catch (e) {
+      const status = e && e.http ? e.http : 500;
+      res.writeHead(status,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ error: e.message || String(e) }));
+    }
+    return;
+  }
+
+  // POST /api/crm/migrate-parceiros — importa parceiros.json → crm/referrals.json (só admin, idempotente)
+  if (req.method === 'POST' && url === '/api/crm/migrate-parceiros') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const parceiros = await getParceiros();
+      const lista = Array.isArray(parceiros) ? parceiros : (parceiros && parceiros.parceiros ? parceiros.parceiros : []);
+      const existentes = await crmStore.getCollection('referrals');
+      // Marca por indicante_nome + telefone pra idempotência
+      const chaveExistente = (r) => (String(r.indicante_nome||'').trim().toLowerCase() + '|' + String(r.indicante_telefone||'').replace(/\D/g,''));
+      const jaImportadas = new Set(Object.values(existentes).map(chaveExistente));
+      let criados = 0, ignorados = 0;
+      for (const p of lista) {
+        const dados = {
+          indicante_nome: p.nome || p.name || p.indicante || 'Sem nome',
+          indicante_telefone: p.telefone || p.whatsapp || p.phone || null,
+          indicante_email: p.email || null,
+          tipo: 'influenciador',
+          status: 'ativo',
+          owner_id: sess.usuario,
+          reward_status: 'nao_aplica',
+          notas: 'Migrado de parceiros.json em ' + new Date().toISOString().slice(0,10),
+        };
+        const chave = chaveExistente(dados);
+        if (jaImportadas.has(chave)) { ignorados++; continue; }
+        const doc = crmColl.REGISTRY.referrals.build(dados);
+        await crmStore.createDoc('referrals', doc, sess.usuario);
+        jaImportadas.add(chave);
+        criados++;
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, criados, ignorados, total_parceiros: lista.length }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // CRM Módulo Documentos — OCR + confirmação + cron de vencimentos
+  // ═════════════════════════════════════════════════════════════
+
+  // POST /api/crm/docs/ocr — recebe { file_base64, media_type, tipo_hint? }
+  // Retorna { hash, tipo, motivo_classificacao, dados, duplicado? }.
+  if (req.method === 'POST' && url === '/api/crm/docs/ocr') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso ao CRM.'})); return;
+    }
+    try {
+      const body = await readBody(req);
+      const { file_base64, media_type, tipo_hint } = JSON.parse(body || '{}');
+      if (!file_base64) throw new Error('file_base64 obrigatório.');
+      if (!media_type) throw new Error('media_type obrigatório (ex: image/jpeg, application/pdf).');
+      const resultado = await crmOcr.processarDocumento(file_base64, media_type, tipo_hint);
+      // Checa duplicata: já tem documento com esse hash?
+      const existentes = await crmStore.listDocs('documentos', d => d.hash_arquivo === resultado.hash);
+      if (existentes.length) {
+        resultado.duplicado = true;
+        resultado.documento_existente_id = existentes[0].id;
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(resultado));
+    } catch (e) {
+      const status = e && e.http ? e.http : 500;
+      res.writeHead(status,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ error: e.message || String(e) }));
+    }
+    return;
+  }
+
+  // POST /api/crm/docs/confirm — recebe dados revisados e persiste.
+  // Body: { tipo, hash, dados_revisados, forcar_duplicado? }
+  //   dados_revisados = objeto com todos os campos que o vendedor confirmou/editou.
+  // Efeitos:
+  //   1) encontra ou cria Account pelo CPF
+  //   2) cria o Documento
+  //   3) se tipo=craf, encontra ou cria Arma pelo numero_serie
+  //   4) retorna { account_id, documento_id, arma_id?, criou_account, criou_arma }
+  if (req.method === 'POST' && url === '/api/crm/docs/confirm') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso ao CRM.'})); return;
+    }
+    try {
+      const body = await readBody(req);
+      const { tipo, hash, dados_revisados, forcar_duplicado } = JSON.parse(body || '{}');
+      if (!tipo || !crmSchemas.TIPOS[tipo]) throw new Error('tipo inválido: ' + tipo);
+      if (!hash) throw new Error('hash obrigatório.');
+      if (!dados_revisados) throw new Error('dados_revisados obrigatório.');
+
+      // Duplicata
+      if (!forcar_duplicado) {
+        const existentes = await crmStore.listDocs('documentos', d => d.hash_arquivo === hash);
+        if (existentes.length) {
+          throw Object.assign(new Error('Documento já cadastrado (mesmo hash). Use forcar_duplicado=true pra ignorar.'), { http: 409 });
+        }
+      }
+
+      const cpf = crmUtils.normalizaCpfCnpj(dados_revisados.cpf);
+      if (!crmUtils.validaCpfCnpj(cpf)) throw new Error('CPF inválido no doc revisado.');
+
+      // 1) Encontra ou cria Account
+      const accountsIndex = await crmStore.listDocs('accounts', a => crmUtils.normalizaCpfCnpj(a.cpf_cnpj) === cpf);
+      let account, criou_account = false;
+      if (accountsIndex.length) {
+        account = accountsIndex[0];
+      } else {
+        // Cria automaticamente com dados básicos extraídos
+        const dadosAcc = crmUtils.enforceOwner(sess, {
+          tipo: 'pf',
+          nome: dados_revisados.titular_nome || 'Sem nome',
+          cpf_cnpj: cpf,
+          status: 'ativo',
+        });
+        const buildAcc = crmColl.REGISTRY.accounts.build(dadosAcc);
+        account = await crmStore.createDoc('accounts', buildAcc, sess.usuario);
+        criou_account = true;
+      }
+
+      // 2) Se for CRAF, cuida da Arma antes do Documento (pra ter arma_id)
+      let arma = null, criou_arma = false;
+      if (tipo === 'craf') {
+        const serie = String(dados_revisados.arma_numero_serie || '').trim();
+        if (!serie) throw new Error('CRAF sem número de série extraído. Não dá pra criar a arma.');
+        const armasCliente = await crmStore.listDocs('armas', a => a.account_id === account.id && String(a.numero_serie).trim() === serie);
+        if (armasCliente.length) {
+          arma = armasCliente[0]; // mantém a arma, só vai atualizar CRAF vigente
+        } else {
+          const dadosArma = crmUtils.enforceOwner(sess, {
+            account_id: account.id,
+            numero_serie: serie,
+            numero_sigma: dados_revisados.arma_numero_sigma || null,
+            tipo: dados_revisados.arma_tipo || null,
+            marca: dados_revisados.arma_marca || null,
+            modelo: dados_revisados.arma_modelo || null,
+            calibre: dados_revisados.arma_calibre || null,
+            acionamento: 'pendente',
+            classificacao: 'pendente',
+            acervo: 'pendente',
+          });
+          const buildArm = crmColl.REGISTRY.armas.build(dadosArma);
+          arma = await crmStore.createDoc('armas', buildArm, sess.usuario);
+          criou_arma = true;
+        }
+      }
+
+      // 3) Cria o Documento
+      const validade = dados_revisados.validade || null;
+      const numero = dados_revisados.numero_registro || dados_revisados.numero_cr || dados_revisados.numero || null;
+      const dadosDoc = crmUtils.enforceOwner(sess, {
+        tipo,
+        account_id: account.id,
+        cpf,
+        titular_nome: dados_revisados.titular_nome || null,
+        numero,
+        validade,
+        orgao_emissor: dados_revisados.orgao_emissor || null,
+        data_emissao: dados_revisados.data_emissao || dados_revisados.data_expedicao || null,
+        dados_extraidos: dados_revisados,
+        hash_arquivo: hash,
+        arma_id: arma ? arma.id : null,
+        revisado_por: sess.usuario,
+        revisado_em: new Date().toISOString(),
+        avisos_ocr: Array.isArray(dados_revisados.avisos) ? dados_revisados.avisos : [],
+      });
+      const buildDoc = crmColl.REGISTRY.documentos.build(dadosDoc);
+      const documento = await crmStore.createDoc('documentos', buildDoc, sess.usuario);
+
+      // 4) Se criou arma via CRAF, atualiza craf_atual_id
+      if (arma && tipo === 'craf') {
+        const patchArma = { craf_atual_id: documento.id };
+        if (arma.craf_atual_id && arma.craf_atual_id !== documento.id) {
+          patchArma.crafs_historico = [...(arma.crafs_historico || []), arma.craf_atual_id];
+        }
+        await crmStore.updateDoc('armas', arma.id, { ...arma, ...patchArma }, sess.usuario);
+      }
+
+      // 5) Se doc vencido ou perto de vencer, cria Activity de renovação
+      const st = crmSchemas.calcularStatusValidade(validade);
+      if (st.status === 'vencido' || st.status === 'critico' || st.status === 'vence_em_60' || st.status === 'vence_em_90') {
+        try {
+          const dadosAct = crmUtils.enforceOwner(sess, {
+            tipo: 'manual',
+            status: 'pendente',
+            entidade_tipo: 'account',
+            entidade_id: account.id,
+            titulo: (st.status === 'vencido' ? '🔴 ' : '⚠ ') + crmSchemas.TIPOS[tipo].label + ' de ' + (dadosDoc.titular_nome || '?') + (st.status === 'vencido' ? ' VENCIDO' : ' vence em ' + st.dias_pra_vencer + ' dias'),
+            descricao: 'Documento ' + numero + '. Validade: ' + validade + '.',
+            prazo: (validade || new Date().toISOString().slice(0,10)),
+            pontos_base: st.status === 'vencido' ? 30 : 15,
+            gerada_automaticamente: true,
+            trigger_id: 'renovacao_doc_' + documento.id + '_' + st.status,
+          });
+          const buildAct = crmColl.REGISTRY.activities.build(dadosAct);
+          await crmStore.createDoc('activities', buildAct, sess.usuario);
+        } catch (e) { /* activity é bonus — não bloqueia o salvamento se falhar */ }
+      }
+
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({
+        ok: true,
+        account_id: account.id,
+        criou_account,
+        documento_id: documento.id,
+        arma_id: arma ? arma.id : null,
+        criou_arma,
+        status_validade: st.status,
+      }));
+    } catch (e) {
+      const status = e && e.http ? e.http : 500;
+      res.writeHead(status,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ error: e.message || String(e) }));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // Fenix — Camada 1 do "cérebro" do CRM: consulta pura à tabela oficial
+  // de compatibilidade (crm/compatibility-fenix.json).
+  // Ver: claude/crm-inteligencia-compatibilidade.md
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /api/crm/fenix/lista — modelos, acessórios, séries, grupos, notas,
+  // estatísticas. Popular UI (autocomplete, filtros).
+  if (req.method === 'GET' && url === '/api/crm/fenix/lista') {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sem_sessao'})); return; }
+    try {
+      const dados = await fenixCompat.listar();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(dados));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'fenix_lista_falhou', detalhe:(e.message||String(e)).slice(0,200)}));
+    }
+    return;
+  }
+
+  // GET /api/crm/fenix/consultar?modelo=PD36R+PRO — detalhe do modelo
+  // com acessórios e baterias, notas de rodapé já expandidas em PT.
+  if (req.method === 'GET' && url.startsWith('/api/crm/fenix/consultar')) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sem_sessao'})); return; }
+    try {
+      // req.url preserva a query string (a variável `url` já foi split-ada em '?')
+      const u = new URL('http://x' + (req.url || ''));
+      const modelo = u.searchParams.get('modelo');
+      if (!modelo) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'modelo_obrigatorio'})); return; }
+      const r = await fenixCompat.consultarModelo(modelo);
+      if (!r) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'modelo_nao_encontrado', modelo})); return; }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'fenix_consulta_falhou', detalhe:(e.message||String(e)).slice(0,200)}));
+    }
+    return;
+  }
+
+  // GET /api/crm/fenix/acessorio?sku=ALG-15 — índice reverso: em quais
+  // modelos esse acessório serve.
+  if (req.method === 'GET' && url.startsWith('/api/crm/fenix/acessorio')) {
+    const sess = getSession(req);
+    if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sem_sessao'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const sku = u.searchParams.get('sku');
+      if (!sku) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sku_obrigatorio'})); return; }
+      const r = await fenixCompat.consultarAcessorio(sku);
+      if (!r) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'acessorio_nao_encontrado', sku})); return; }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'fenix_acessorio_falhou', detalhe:(e.message||String(e)).slice(0,200)}));
+    }
+    return;
+  }
+
+  // POST /api/crm/fenix/invalidar-cache — força releitura do JSON do
+  // GitHub sem esperar o TTL de 5 min. Só gerência.
+  if (req.method === 'POST' && url === '/api/crm/fenix/invalidar-cache') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    fenixCompat.invalidarCache();
+    res.writeHead(200,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({ ok: true }));
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // Mapa Bling ⇄ Fenix — dicionário que traduz produtos do Bling
+  // nos códigos oficiais da tabela Fenix. Alimenta a Camada 4
+  // (automação de upsell). Ver claude/crm-inteligencia-compatibilidade.md
+  // ═════════════════════════════════════════════════════════════
+
+  // POST /api/crm/fenix/mapa/gerar-iniciar — extrai SKUs Fenix únicos dos
+  // pedidos e cria o checkpoint. Não chama Claude ainda — só prepara.
+  if (req.method === 'POST' && url === '/api/crm/fenix/mapa/gerar-iniciar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const body = await readBody(req);
+      const { forcarRegerarRevisados = false } = JSON.parse(body || '{}');
+      const r = await blingFenixGerador.iniciar({ iniciado_por: sess.usuario, forcarRegerarRevisados });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
+    return;
+  }
+
+  // POST /api/crm/fenix/mapa/gerar-tick — roda 1 lote (~10 SKUs pra Claude).
+  // A UI chama em loop até checkpoint.pendentes == 0.
+  if (req.method === 'POST' && url === '/api/crm/fenix/mapa/gerar-tick') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const r = await blingFenixGerador.tick();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
+    return;
+  }
+
+  // GET /api/crm/fenix/mapa/gerar-status — situação do checkpoint + stats do mapa
+  if (req.method === 'GET' && url === '/api/crm/fenix/mapa/gerar-status') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const cp = await blingFenixGerador.lerCheckpoint();
+      const stats = await blingFenixMap.estatisticas();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ checkpoint: cp, estatisticas: stats }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
+    return;
+  }
+
+  // GET /api/crm/fenix/mapa/lista?filtro=pendentes|revisados|fenix|nao_fenix|baixa_confianca|todos&limite=200
+  if (req.method === 'GET' && url.startsWith('/api/crm/fenix/mapa/lista')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const filtro = u.searchParams.get('filtro') || 'pendentes';
+      const limite = Math.min(500, Number(u.searchParams.get('limite') || 200));
+      const items = await blingFenixMap.listar({ filtro, limite });
+      const stats = await blingFenixMap.estatisticas();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ items, estatisticas: stats, filtro, limite }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
+    return;
+  }
+
+  // POST /api/crm/fenix/mapa/aprovar — body: {sku_bling, fenix_codes?, categoria?, marca?, eh_kit?}
+  if (req.method === 'POST' && url === '/api/crm/fenix/mapa/aprovar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const body = await readBody(req);
+      const { sku_bling, ...patch } = JSON.parse(body || '{}');
+      if (!sku_bling) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sku_bling obrigatório'})); return; }
+      const m = await blingFenixMap.aprovar(sku_bling, { por: sess.usuario, patch });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, mapeamento: m }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
+    return;
+  }
+
+  // POST /api/crm/fenix/mapa/rejeitar — body: {sku_bling, motivo?}
+  if (req.method === 'POST' && url === '/api/crm/fenix/mapa/rejeitar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const body = await readBody(req);
+      const { sku_bling, motivo } = JSON.parse(body || '{}');
+      if (!sku_bling) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'sku_bling obrigatório'})); return; }
+      const m = await blingFenixMap.rejeitar(sku_bling, { por: sess.usuario, motivo });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, mapeamento: m }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
+    return;
+  }
+
+  // GET /api/crm/cron/vencimentos — varre docs e cria Activities pendentes.
+  // Idempotente: usa `trigger_id: 'renovacao_doc_<id>_<marco>'` como chave anti-duplicata.
+  // Protegido por token: header `x-cron-secret: <config.cronSecret>` ou sessão admin.
+  if (req.method === 'GET' && url === '/api/crm/cron/vencimentos') {
+    const sess = getSession(req);
+    const cronToken = req.headers['x-cron-secret'];
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return;
+    }
+    try {
+      const docs = await crmStore.listDocs('documentos');
+      const activitiesExistentes = await crmStore.listDocs('activities', a => a.gerada_automaticamente && a.trigger_id && a.trigger_id.startsWith('renovacao_doc_'));
+      const triggersUsados = new Set(activitiesExistentes.map(a => a.trigger_id));
+      let criadas = 0, atualizadas_status = 0;
+      for (const d of docs) {
+        const st = crmSchemas.calcularStatusValidade(d.validade);
+        // Atualiza status_validade no doc se mudou (evita ficar defasado)
+        if (d.status_validade !== st.status) {
+          try { await crmStore.updateDoc('documentos', d.id, { ...d, status_validade: st.status }, 'cron'); atualizadas_status++; } catch(e){}
+        }
+        // Marco atual
+        const marco = st.status;
+        if (marco === 'em_dia' || marco === 'sem_validade') continue;
+        const trigger = 'renovacao_doc_' + d.id + '_' + marco;
+        if (triggersUsados.has(trigger)) continue;
+        try {
+          const label = crmSchemas.TIPOS[d.tipo] ? crmSchemas.TIPOS[d.tipo].label : d.tipo;
+          const dadosAct = {
+            tipo: 'manual',
+            status: 'pendente',
+            owner_id: d.owner_id || 'gerencia',
+            entidade_tipo: 'account',
+            entidade_id: d.account_id,
+            titulo: (marco === 'vencido' ? '🔴 ' : '⚠ ') + label + ' de ' + (d.titular_nome || '?') + (marco === 'vencido' ? ' VENCIDO' : ' vence em ' + st.dias_pra_vencer + ' dias'),
+            descricao: 'Documento ' + (d.numero||'') + '. Validade: ' + (d.validade||'?') + '.',
+            prazo: d.validade || new Date().toISOString().slice(0,10),
+            pontos_base: marco === 'vencido' ? 30 : 15,
+            gerada_automaticamente: true,
+            trigger_id: trigger,
+          };
+          const buildAct = crmColl.REGISTRY.activities.build(dadosAct);
+          await crmStore.createDoc('activities', buildAct, 'cron');
+          triggersUsados.add(trigger);
+          criadas++;
+        } catch(e) { /* silencia — segue pra próxima */ }
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, docs_varridos: docs.length, activities_criadas: criadas, docs_atualizados: atualizadas_status }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error: e.message}));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // CRM Camada 2/3.2/4 — Coocorrência, Sugestões, Automação, Vendedor
+  // ═════════════════════════════════════════════════════════════
+
+  // ── GET /api/crm/coocorrencia/rebuild — analisa orders.json e gera JSON.
+  //    Aceita via x-vercel-cron (cron semanal) OU sessão gerência.
+  if (req.method === 'GET' && url === '/api/crm/coocorrencia/rebuild') {
+    const sess = getSession(req);
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const cronToken = req.headers['x-cron-secret'];
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+    try {
+      const r = await coocorrencia.analisar();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:e.message||String(e)}));
+    }
+    return;
+  }
+
+  // ── GET /api/crm/coocorrencia/stats
+  if (req.method === 'GET' && url === '/api/crm/coocorrencia/stats') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const s = await coocorrencia.estatisticas();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(s));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/sugerir?account_id=X&order_id=Y (Y opcional)
+  if (req.method === 'GET' && url.startsWith('/api/crm/sugerir')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const accountId = u.searchParams.get('account_id');
+      const orderId = u.searchParams.get('order_id') || null;
+      if (!accountId) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'account_id obrigatório'})); return; }
+      const r = await sugerirParaCliente({ accountId, orderId });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/cron/reativacao — cron semanal (protegida por Vercel Cron)
+  if (req.method === 'GET' && url === '/api/crm/cron/reativacao') {
+    const sess = getSession(req);
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const cronToken = req.headers['x-cron-secret'];
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+    try {
+      const r = await automacaoUpsell.disparaReativacao();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── POST /api/crm/tarefas/rebalancear-orfas — reatribui tarefas pendentes
+  // com owner_id='gerencia', 'admin', 'auxiliar' ou fora dos vendedores ativos
+  // pro rodizio deterministico (mesmo hash que a cron diaria usa). NAO deleta —
+  // so troca o dono. Idempotente: rodar de novo nao muda nada se ja rebalanceou.
+  // So admin dispara.
+  if (req.method === 'POST' && url === '/api/crm/tarefas/rebalancear-orfas') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin.'})); return;
+    }
+    try {
+      const VENDEDORES_ATIVOS = ['dickmann', 'boschetto', 'mathias'];
+      function rodizio(accountId) {
+        const id = String(accountId || 'x');
+        let h = 0; for (let i = 0; i < id.length; i++) h = (h + id.charCodeAt(i)) | 0;
+        return VENDEDORES_ATIVOS[Math.abs(h) % VENDEDORES_ATIVOS.length];
+      }
+      const ehOrfa = (o) => {
+        const s = String(o || '').toLowerCase();
+        if (!s) return true;
+        if (s === 'gerencia' || s === 'admin' || s === 'auxiliar') return true;
+        return VENDEDORES_ATIVOS.indexOf(s) === -1;
+      };
+      const acts = await crmStore.getCollection('activities');
+      let reatribuidas = 0;
+      for (const id of Object.keys(acts)) {
+        const a = acts[id];
+        if (a.status !== 'pendente') continue;
+        if (ehOrfa(a.owner_id) && ehOrfa(a.dono)) {
+          const accountId = a.account_id || a.entidade_id || id;
+          const novoDono = rodizio(accountId);
+          a.owner_id = novoDono;
+          a.dono = novoDono;
+          a.atualizado_em = new Date().toISOString();
+          a.atualizado_por = 'rebalance-orfas';
+          reatribuidas++;
+        }
+      }
+      if (reatribuidas > 0) {
+        await crmStore.saveCollection('activities', acts, 'Rebalanceia ' + reatribuidas + ' tarefas orfas pro rodizio');
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, reatribuidas }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ── POST /api/crm/reparar-donos — varre activities pendentes e transfere
+  // os accounts/orders órfãos (owner=gerencia/tray/vazio) pros vendedores que
+  // já receberam tarefas via rodízio. Resolve "cliente não lhe pertence"
+  // retroativamente. Só admin/diretor.
+  if (req.method === 'POST' && url === '/api/crm/reparar-donos') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
+    try {
+      const auto = require('../lib/crm/automacaoUpsell');
+      const r = await auto.repararAccountsOrfaosDeTarefas();
+      console.log('[REPARAR DONOS] ' + JSON.stringify({ac:r.accounts_transferidos, or:r.orders_transferidos}));
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ── GET /api/crm/tarefas/minhas — fila do PROPRIO usuario logado.
+  // Admin ve so as tarefas dele (login==gerencia). Se quiser ver TODAS as
+  // tarefas de todos os vendedores, passa ?todos=1 na URL — util pra dashboard
+  // de gestao. Isso impede o admin de aparecer com 30 tarefas no painel dele
+  // por default so porque canSeeAll retorna true.
+  if (req.method === 'GET' && url.startsWith('/api/crm/tarefas/minhas')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const verTodas = u.searchParams.get('todos') === '1';
+      const login = String(sess.usuario || '').toLowerCase();
+      const ehAdmin = crmUtils.canSeeAll(sess);
+      // Admin nao tem "fila propria" — as tarefas sao operacionais, pros
+      // vendedores executarem. Se admin abrir "Minhas Tarefas" sem ?todos=1,
+      // devolve vazio. Com ?todos=1, ve a fila consolidada de todos.
+      let tarefas = [];
+      if (ehAdmin && !verTodas) {
+        tarefas = [];
+      } else {
+        const scopeAll = verTodas && ehAdmin;
+        tarefas = await crmStore.listDocs('activities', a =>
+          a.status === 'pendente' && (scopeAll || String(a.owner_id || a.dono || '').toLowerCase() === login));
+      }
+      // Ordena: vencidas (prazo+hora < agora) primeiro, depois por prazo+hora
+      const agora = new Date();
+      const hoje = agora.toISOString().slice(0, 10);
+      function _tsLimite(t) {
+        if (!t.prazo) return '9999-12-31T23:59';
+        return t.prazo + 'T' + (t.hora || '23:59');
+      }
+      const agoraISO = agora.toISOString().slice(0, 16);
+      tarefas.sort((a, b) => {
+        const aLim = _tsLimite(a);
+        const bLim = _tsLimite(b);
+        const aOver = aLim < agoraISO ? 0 : 1;
+        const bOver = bLim < agoraISO ? 0 : 1;
+        if (aOver !== bOver) return aOver - bOver;
+        return aLim.localeCompare(bLim);
+      });
+      // Enriquece cada tarefa com dados do cliente (nome + telefone) pra UI
+      // montar botão "💬 WhatsApp" com link direto wa.me já com pitch como texto.
+      // Lookup via mapa O(1) — evita N queries ao storage pra listas grandes.
+      if (tarefas.length) {
+        const accounts = await crmStore.listDocs('accounts');
+        const accMap = {};
+        for (const a of accounts) accMap[a.id] = a;
+        for (const t of tarefas) {
+          let acc = null;
+          if (t.entidade_tipo === 'account' && t.entidade_id) acc = accMap[t.entidade_id];
+          else if (t.entidade_tipo === 'order' && t.entidade_id) {
+            // Pra tarefa de pedido, tenta pegar o account via orders
+            try {
+              const o = await crmStore.getDoc('orders', t.entidade_id);
+              if (o && o.account_id) acc = accMap[o.account_id];
+            } catch (_) {}
+          }
+          if (acc) {
+            t.cliente_nome = acc.nome || acc.razao_social || null;
+            t.cliente_telefone = acc.telefone || null;
+          }
+        }
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ tarefas, total: tarefas.length }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── POST /api/crm/tarefas/manual  body: { account_id, titulo, descricao,
+  //        prazo (YYYY-MM-DD), hora (HH:MM, opcional), owner_id (opcional) }
+  // Cria uma tarefa "manual" lançada pelo vendedor durante atendimento.
+  if (req.method === 'POST' && url === '/api/crm/tarefas/manual') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!crmUtils.canEditCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'Seu perfil pode consultar mas nao criar tarefas.'}));
+      return;
+    }
+    try {
+      const body = await readBody(req);
+      let payload = {};
+      try { payload = JSON.parse(body || '{}'); } catch(e){}
+      const { account_id, titulo, descricao, prazo, hora, owner_id } = payload;
+      if (!account_id) throw new Error('account_id obrigatório');
+      if (!descricao || !String(descricao).trim()) throw new Error('Descrição obrigatória');
+      if (!prazo) throw new Error('Prazo (data) obrigatório');
+      // Vendedor cria pra si mesmo. Admin pode delegar pra outro via owner_id.
+      let dono = String(sess.usuario).toLowerCase();
+      if (owner_id && crmUtils.canSeeAll(sess)) dono = String(owner_id).toLowerCase();
+      // Busca o account pra validar e enriquecer o título
+      const acc = await crmStore.getDoc('accounts', account_id);
+      if (!acc) throw new Error('Cliente não encontrado');
+      const tituloFinal = String(titulo || '').trim() || ('📞 Tarefa manual — ' + (acc.nome || 'cliente'));
+      const prazoLimpo = String(prazo).slice(0, 10);
+      const horaLimpa = hora ? String(hora).slice(0, 5) : null;
+      const id = crmUtils.uuid();
+      const doc = {
+        id,
+        tipo: 'manual', // tag pra diferenciar das automáticas (upsell/reativacao/aniversario)
+        status: 'pendente',
+        owner_id: dono,
+        entidade_tipo: 'account',
+        entidade_id: account_id,
+        titulo: tituloFinal,
+        descricao: String(descricao).trim().slice(0, 2000),
+        prazo: prazoLimpo,
+        hora: horaLimpa, // novo campo opcional — alertas usam
+        concluido_em: null,
+        concluido_com_order_id: null,
+        pontos_base: 10,
+        pontos_bonus: 0,
+        pontos_ganhos: 0,
+        trigger_id: 'manual_' + id,
+        gerada_automaticamente: false,
+        dono, // retrocompat
+        account_id,
+        criada_por_vendedor: sess.usuario, // auditoria
+      };
+      await crmStore.createDoc('activities', doc, sess.usuario);
+      res.writeHead(201,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, tarefa: doc }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ── POST /api/crm/tarefas/:id/concluir  body: { resultado: 'convertida'|'nao_convertida' }
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/tarefas\/[a-zA-Z0-9_\-]+\/concluir$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!crmUtils.canEditCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error:'Seu perfil pode consultar mas nao concluir tarefas comerciais.'}));
+      return;
+    }
+    try {
+      const id = url.split('/')[4];
+      const body = await readBody(req);
+      let payload = {};
+      try { payload = JSON.parse(body || '{}'); } catch(e){}
+      const resultado = payload.resultado;
+      const t = await crmStore.getDoc('activities', id);
+      if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
+      // SEGURANÇA IDOR: so o DONO da tarefa (ou admin/diretor) pode concluir.
+      // Antes qualquer vendedor podia concluir tarefa alheia via curl, sabotando
+      // o ranking do colega e a automacao de renovacao de docs regulatorios.
+      const meuLogin = String(sess.usuario || '').toLowerCase();
+      const donoTarefa = String(t.owner_id || t.dono || '').toLowerCase();
+      if (!crmUtils.canSeeAll(sess) && donoTarefa !== meuLogin) {
+        res.writeHead(403,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Esta tarefa nao esta atribuida a voce.'}));
+        return;
+      }
+      await crmStore.updateDoc('activities', id, {
+        ...t, status: 'concluida', resultado: resultado || 'concluida',
+        concluida_em: new Date().toISOString(), concluida_por: sess.usuario,
+      }, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/ficha/buscar?q=X — busca cliente por nome, CPF/CNPJ,
+  // telefone ou número do pedido (Bling). Usado pela nova tarefa manual.
+  if (req.method === 'GET' && url.startsWith('/api/crm/ficha/buscar')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const q = String(u.searchParams.get('q') || '').toLowerCase().trim();
+      if (!q || q.length < 2) { res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ resultados: [] })); return; }
+      const qDigits = q.replace(/\D/g, '');
+
+      // Se parece com número de pedido, busca em orders primeiro.
+      // Pedido Bling costuma ter 4-10 dígitos. Se achou, pega o account_id.
+      let accountIdsViaPedido = new Set();
+      if (qDigits && qDigits.length >= 3 && qDigits.length <= 12) {
+        try {
+          const orders = await crmStore.listDocs('orders', o => {
+            const num = String(o.numero || o.numero_pedido || o.id || '').replace(/\D/g, '');
+            return num && num === qDigits;
+          });
+          for (const o of orders) if (o.account_id) accountIdsViaPedido.add(o.account_id);
+        } catch(_) {}
+      }
+
+      const accounts = await crmStore.listDocs('accounts', a => {
+        if (accountIdsViaPedido.has(a.id)) return true;
+        const nome = String(a.nome || '').toLowerCase();
+        const doc = String(a.cpf_cnpj || '').replace(/\D/g, '');
+        const tel = String(a.telefone || '').replace(/\D/g, '');
+        if (nome.includes(q)) return true;
+        if (qDigits && qDigits.length >= 4 && doc.includes(qDigits)) return true;
+        if (qDigits && qDigits.length >= 4 && tel.includes(qDigits)) return true;
+        return false;
+      });
+      const resultados = accounts.slice(0, 20).map(a => ({
+        id: a.id, nome: a.nome, cpf_cnpj: a.cpf_cnpj, cidade: a.cidade,
+        pedidos_count: a.pedidos_count || 0, valor_total: a.valor_total_compras || 0,
+        ultima_compra: a.ultima_compra_em, owner: a.owner_id,
+      }));
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ resultados, total: resultados.length }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/catalogo/rebuild — puxa /produtos do Bling e salva no GitHub
+  //    Aceita via x-vercel-cron (cron diário) OU sessão gerência.
+  if (req.method === 'GET' && url === '/api/crm/catalogo/rebuild') {
+    const sess = getSession(req);
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const cronToken = req.headers['x-cron-secret'];
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+    try {
+      const r = await catalogoBling.sincronizar();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ error: e.message || String(e) }));
+    }
+    return;
+  }
+
+  // ── POST /api/crm/prospeccao — filtra clientes por categoria/marca comprada + período + valor
+  //    body: { categoria?, marca?, dias?, valor_minimo?, status?, owner?, limite? }
+  //    Retorna: { clientes: [...], total, filtros_aplicados }
+  if (req.method === 'POST' && url === '/api/crm/prospeccao') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      let f = {};
+      try { f = JSON.parse(body || '{}'); } catch(e) {}
+      const dias = Number(f.dias || 0);
+      const categoria = String(f.categoria || '').toLowerCase().trim();
+      const marca = String(f.marca || '').toLowerCase().trim();
+      const valorMinimo = Number(f.valor_minimo || 0);
+      const status = String(f.status || '').toLowerCase().trim(); // '' | 'ativo' | 'parado' | 'novo'
+      const ownerFiltro = String(f.owner || '').toLowerCase().trim();
+      const limite = Math.min(500, Number(f.limite || 200));
+
+      // Data de corte pelo período
+      const hoje = new Date();
+      const corteData = dias > 0 ? new Date(hoje.getTime() - dias * 86400000).toISOString().slice(0,10) : null;
+
+      // Carrega catálogo pra saber categoria/marca de cada SKU
+      const catalogo = await catalogoBling.carregar();
+      const prodMap = catalogo.produtos || {};
+
+      // Escopo de owner: vendedor só vê os dele; admin vê todos (a não ser que filtre)
+      const scopeAll = crmUtils.canSeeAll(sess);
+      const login = String(sess.usuario || '').toLowerCase();
+
+      // 1) Filtra Orders por período + itens que casam com categoria/marca
+      const orders = await crmStore.listDocs('orders', o => {
+        if (o.status === 'cancelado') return false;
+        if (corteData && o.data_pedido && o.data_pedido < corteData) return false;
+        return true;
+      });
+
+      // 2) Agrega por account_id: soma valor, conta pedidos, guarda match
+      const agregado = {}; // accId → { pedidos_periodo, valor_periodo, matches:[{sku,nome,data,marca,cat}] }
+      for (const o of orders) {
+        const accId = o.account_id;
+        if (!accId) continue;
+        const itensMatch = [];
+        for (const it of (o.itens || [])) {
+          const sku = String(it.sku || '');
+          if (!sku) continue;
+          const prod = prodMap[sku];
+          const catProd = (prod && prod.categoria) ? String(prod.categoria).toLowerCase() : '';
+          const marcaProd = (prod && prod.marca) ? String(prod.marca).toLowerCase() : '';
+          // Fallback: se produto não está no catálogo, tenta detectar pelo descricao do item
+          const descItem = String(it.descricao || '').toLowerCase();
+          const catCasa = !categoria || catProd.includes(categoria) || (
+            categoria === 'arma' && (catProd.startsWith('arma_') || descItem.match(/pistola|revolver|revólver|carabina|rifle|espingarda|pcp/))
+          ) || descItem.includes(categoria);
+          const marcaCasa = !marca || marcaProd.includes(marca) || descItem.includes(marca);
+          if (catCasa && marcaCasa) {
+            itensMatch.push({
+              sku, nome: it.descricao || (prod && prod.nome) || sku,
+              data: o.data_pedido, valor: it.valor_total_item || 0,
+              marca: marcaProd || null, categoria: catProd || null,
+            });
+          }
+        }
+        if (!itensMatch.length && (categoria || marca)) continue; // pediu filtro e nada bateu
+
+        if (!agregado[accId]) agregado[accId] = { pedidos_periodo: 0, valor_periodo: 0, matches: [] };
+        agregado[accId].pedidos_periodo++;
+        agregado[accId].valor_periodo += Number(o.valor_total || 0);
+        for (const m of itensMatch) agregado[accId].matches.push(m);
+      }
+
+      // 3) Junta com accounts, aplica filtros restantes (valor, owner, status)
+      const accIds = Object.keys(agregado);
+      const accounts = await crmStore.listDocs('accounts', a => accIds.includes(a.id));
+      const accMap = {}; accounts.forEach(a => accMap[a.id] = a);
+
+      let resultado = [];
+      for (const accId of accIds) {
+        const a = accMap[accId];
+        if (!a) continue;
+        if (!scopeAll && String(a.owner_id || '').toLowerCase() !== login) continue;
+        if (ownerFiltro && String(a.owner_id || '').toLowerCase() !== ownerFiltro) continue;
+        const ag = agregado[accId];
+        // Status derivado
+        let stCliente = 'ativo';
+        const ultima = a.ultima_compra_em;
+        if (ultima) {
+          const diasDesdeUltima = Math.round((hoje - new Date(ultima)) / 86400000);
+          if (diasDesdeUltima > 90) stCliente = 'parado';
+        }
+        if ((a.pedidos_count || 0) === 1) stCliente = 'novo';
+        if (status && stCliente !== status) continue;
+        if (valorMinimo > 0 && (a.valor_total_compras || 0) < valorMinimo) continue;
+
+        resultado.push({
+          account_id: a.id,
+          nome: a.nome,
+          cpf_cnpj: a.cpf_cnpj,
+          telefone: a.telefone || null,
+          email: a.email || null,
+          cidade: a.cidade || null,
+          owner: a.owner_id,
+          status_cliente: stCliente,
+          pedidos_total: a.pedidos_count || 0,
+          valor_total: a.valor_total_compras || 0,
+          ultima_compra: a.ultima_compra_em,
+          pedidos_periodo: ag.pedidos_periodo,
+          valor_periodo: ag.valor_periodo,
+          matches: ag.matches.slice(0, 5), // amostra dos primeiros 5 itens que bateram
+          matches_total: ag.matches.length,
+        });
+      }
+
+      // 4) Ordena por valor_total desc, corta pelo limite
+      resultado.sort((a, b) => (b.valor_total || 0) - (a.valor_total || 0));
+      const total = resultado.length;
+      resultado = resultado.slice(0, limite);
+
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({
+        clientes: resultado,
+        total,
+        limitado: total > limite,
+        filtros_aplicados: { categoria: categoria || null, marca: marca || null, dias: dias || null, valor_minimo: valorMinimo || null, status: status || null, owner: ownerFiltro || null },
+      }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error: e.message || String(e)}));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // Reatribuição de VENDEDORES nos pedidos existentes
+  // Usada 1 vez (ou sempre que a lógica de mapping mudar) pra corrigir
+  // orders/accounts cujo vendedor caiu em "gerencia" por bug.
+  // ═════════════════════════════════════════════════════════════
+
+  const REATRIB_PATH = 'crm/reatribuicao-vendedores.json';
+  async function _reatribLer() {
+    try { return JSON.parse(await _ghGet(REATRIB_PATH)); } catch(e) { return null; }
+  }
+  async function _reatribSalvar(cp) {
+    await _ghSave(REATRIB_PATH, JSON.stringify(cp, null, 2), 'Reatribuição vendedores: checkpoint');
+  }
+
+  // ── GET /api/crm/vendedores/diagnostico — mostra amostra do formato do Bling
+  //     Útil pra confirmar que o campo vendedor está vindo (com nome/email/só id).
+  if (req.method === 'GET' && url === '/api/crm/vendedores/diagnostico') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      // Puxa 5 pedidos amostra do Bling (últimos 30 dias)
+      const ate = new Date().toISOString().slice(0,10);
+      const desde = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
+      const { pedidos } = await blingSync.puxarTodaListaPedidos({ desde, ate, limitePaginas: 1 });
+      const amostra = pedidos.slice(0, 5);
+      const detalhes = [];
+      for (const p of amostra) {
+        try {
+          const det = await blingSync.puxarDetalhePedido(p.id);
+          detalhes.push({
+            bling_id: p.id,
+            numero: det.numero,
+            data: det.data,
+            vendedor: det.vendedor || null, // ← o que interessa
+          });
+        } catch (e) {
+          detalhes.push({ bling_id: p.id, erro: e.message });
+        }
+      }
+      // Puxa mapa de vendedores do Bling
+      let mapaVendedores = null;
+      try { mapaVendedores = await blingVendedores.puxarMapa(); } catch(e) { mapaVendedores = { erro: e.message }; }
+      // Carrega users.json
+      const usersJson = await _loadUsersMap();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({
+        ok: true,
+        pedidos_amostra: detalhes,
+        vendedores_bling: mapaVendedores,
+        users_crm: Object.keys(usersJson || {}),
+      }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ── GET /api/crm/vendedores/investigar — puxa amostra maior e mostra vendedor cru + mapeamento
+  //     Ideal pra descobrir se o problema é no Bling (dado errado) ou no CRM (mapeamento).
+  //     Query: ?dias=30&limite=30  (padrão)
+  if (req.method === 'GET' && url.startsWith('/api/crm/vendedores/investigar')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const dias = Math.min(365, Number(u.searchParams.get('dias') || 30));
+      const limite = Math.min(50, Number(u.searchParams.get('limite') || 30));
+      const idFiltro = u.searchParams.get('id') || null; // ex: 15596916104 (Wesley)
+
+      const ate = new Date().toISOString().slice(0,10);
+      const desde = new Date(Date.now() - dias * 86400000).toISOString().slice(0,10);
+      const { pedidos } = await blingSync.puxarTodaListaPedidos({ desde, ate, limitePaginas: 5 });
+
+      const mapaBling = await blingVendedores.puxarMapa();
+      const usersJson = await _loadUsersMap();
+
+      const amostra = pedidos.slice(0, limite);
+      const linhas = [];
+      const porVendedorBling = {};
+      const porLoginMapeado  = {};
+
+      for (const p of amostra) {
+        try {
+          const det = await blingSync.puxarDetalhePedido(p.id);
+          const vend = det.vendedor || null;
+          const vendId = vend && (vend.id || (vend.contato && vend.contato.id)) || null;
+          const vendNomeCache = vendId ? (mapaBling[String(vendId)] && mapaBling[String(vendId)].nome) || null : null;
+          const login = await blingSync.mapearVendedor(det, usersJson, { vendedorMapaBling: mapaBling });
+          if (idFiltro && String(vendId) !== String(idFiltro)) continue;
+
+          const linha = {
+            bling_id: p.id,
+            numero: det.numero,
+            data: det.data,
+            situacao: det.situacao ? (det.situacao.valor || det.situacao.nome || det.situacao.descricao || det.situacao) : null,
+            vendedor_id_bling: vendId,
+            vendedor_nome_cache: vendNomeCache,
+            vendedor_raw_no_pedido: vend,
+            mapeado_para: login || 'gerencia',
+          };
+          linhas.push(linha);
+          const kBling = vendNomeCache || String(vendId) || 'sem_vendedor';
+          porVendedorBling[kBling] = (porVendedorBling[kBling] || 0) + 1;
+          porLoginMapeado[login || 'gerencia'] = (porLoginMapeado[login || 'gerencia'] || 0) + 1;
+        } catch (e) {
+          linhas.push({ bling_id: p.id, erro: e.message });
+        }
+      }
+
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({
+        ok: true,
+        parametros: { dias, limite, idFiltro },
+        total_pedidos_periodo: pedidos.length,
+        analisados: linhas.length,
+        resumo_por_vendedor_bling: porVendedorBling,
+        resumo_por_login_mapeado:  porLoginMapeado,
+        detalhe: linhas,
+      }, null, 2));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error: e.message || String(e)}));
+    }
+    return;
+  }
+
+  // ── POST /api/crm/vendedores/reatribuir-iniciar — lista IDs pra processar
+  //     Body opcional: { forcar: true } → ignora checkpoint anterior e recomeça
+  if (req.method === 'POST' && url === '/api/crm/vendedores/reatribuir-iniciar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const orders = await crmStore.listDocs('orders', o => o.status !== 'cancelado');
+      const ids = orders.map(o => o.bling_pedido_id).filter(Boolean);
+      let vendedorMapaBling = {};
+      try { vendedorMapaBling = await blingVendedores.puxarMapa({ forcar: true }); } catch(e) {}
+      const cp = {
+        status: 'em_andamento',
+        iniciado_em: new Date().toISOString(),
+        iniciado_por: sess.usuario,
+        total: ids.length,
+        processados: 0,
+        atualizados: 0,
+        ids_pendentes: ids,
+        vendedores_bling: vendedorMapaBling,
+        mudancas_por_login: {},
+        contadores: {
+          atualizados: 0, sem_vendedor_no_bling: 0, vendedor_nao_mapeado: 0,
+          ja_mapeado_correto: 0, order_nao_achado: 0, erro_rate_limit: 0, erro_outro: 0,
+        },
+      };
+      await _reatribSalvar(cp);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, checkpoint: cp }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ── POST /api/crm/vendedores/reatribuir-tick — processa lote com delay+retry
+  //     v2: 400ms entre requests, retry em 429/503, contadores detalhados por motivo.
+  if (req.method === 'POST' && url === '/api/crm/vendedores/reatribuir-tick') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const cp = await _reatribLer();
+      if (!cp || cp.status !== 'em_andamento') { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nenhuma reatribuição em andamento.'})); return; }
+      if (!cp.ids_pendentes || !cp.ids_pendentes.length) {
+        await _finalizarReatribuicao(cp);
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ok: true, terminou: true, checkpoint: cp }));
+        return;
+      }
+      const LOTE = 15;              // menor lote pra caber no timeout com delay
+      const DELAY_MS = 400;         // 2.5 req/s → respeita rate limit do Bling
+      const sleep = ms => new Promise(r => setTimeout(r, ms));
+      const lote = cp.ids_pendentes.slice(0, LOTE);
+      const resto = cp.ids_pendentes.slice(LOTE);
+
+      const usersJson = await _loadUsersMap();
+      const ordersAtual = await crmStore.getCollection('orders');
+      const idxBling = {};
+      for (const [oid, o] of Object.entries(ordersAtual)) {
+        if (o && o.bling_pedido_id) idxBling[String(o.bling_pedido_id)] = oid;
+      }
+
+      // Contadores detalhados (persistidos no checkpoint)
+      const contadores = cp.contadores || {
+        atualizados: 0,
+        sem_vendedor_no_bling: 0,   // vendedor.id = 0 ou null → gerencia
+        vendedor_nao_mapeado: 0,    // vendedor cadastrado no Bling mas não é do CRM (Luis, Redin, Tray)
+        ja_mapeado_correto: 0,      // order já estava com vendedor certo
+        order_nao_achado: 0,        // bling_id não bateu com nenhum order local
+        erro_rate_limit: 0,         // 429/503 mesmo após retry
+        erro_outro: 0,              // outra exceção
+      };
+      const mudancas = cp.mudancas_por_login || {};
+
+      // Processa 1 pedido com retry em 429/503
+      async function processar(blingId) {
+        let detalhe = null;
+        let tentativas = 0;
+        while (tentativas < 3) {
+          tentativas++;
+          try {
+            detalhe = await blingSync.puxarDetalhePedido(blingId);
+            break;
+          } catch (e) {
+            const status = e.status || 0;
+            if (status === 429 || status === 503) {
+              // Backoff progressivo: 1s, 2s, 4s
+              await sleep(1000 * Math.pow(2, tentativas - 1));
+              if (tentativas >= 3) { contadores.erro_rate_limit++; return; }
+              continue;
+            }
+            contadores.erro_outro++;
+            return;
+          }
+        }
+        if (!detalhe) { contadores.erro_outro++; return; }
+
+        // Extrai vendedor cru pra saber se foi realmente null ou só não mapeou
+        const v = detalhe.vendedor || null;
+        const vendIdBling = v && (v.id || (v.contato && v.contato.id)) || null;
+        const semVendBling = !vendIdBling || String(vendIdBling) === '0';
+
+        const vendLogin = await blingSync.mapearVendedor(detalhe, usersJson, {
+          vendedorMapaBling: cp.vendedores_bling || {},
+        });
+
+        if (!vendLogin) {
+          if (semVendBling) contadores.sem_vendedor_no_bling++;
+          else contadores.vendedor_nao_mapeado++;
+          return;
+        }
+        const orderId = idxBling[String(blingId)];
+        if (!orderId) { contadores.order_nao_achado++; return; }
+        const order = ordersAtual[orderId];
+        if (!order) { contadores.order_nao_achado++; return; }
+        if (order.vendedor_id === vendLogin) { contadores.ja_mapeado_correto++; return; }
+        order.vendedor_id = vendLogin;
+        order.atualizado_em = new Date().toISOString();
+        order.atualizado_por = 'reatribuicao';
+        contadores.atualizados++;
+        mudancas[vendLogin] = (mudancas[vendLogin] || 0) + 1;
+      }
+
+      // Loop com delay entre chamadas
+      for (let i = 0; i < lote.length; i++) {
+        await processar(lote[i]);
+        if (i < lote.length - 1) await sleep(DELAY_MS);
+      }
+
+      // Salva orders (1 write) se algo mudou
+      if (contadores.atualizados > 0) {
+        await crmStore.saveCollection('orders', ordersAtual, 'Reatribuição v2: +' + contadores.atualizados + ' orders acumulado');
+      }
+
+      cp.ids_pendentes = resto;
+      cp.processados = (cp.processados || 0) + lote.length;
+      cp.contadores = contadores;
+      cp.atualizados = contadores.atualizados; // mantém compat com UI anterior
+      cp.mudancas_por_login = mudancas;
+      cp.ultimo_tick_em = new Date().toISOString();
+
+      if (cp.ids_pendentes.length === 0) {
+        await _finalizarReatribuicao(cp);
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ok: true, terminou: true, atualizados_neste_lote: 'ver contadores', contadores, checkpoint: cp }));
+        return;
+      }
+      await _reatribSalvar(cp);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, terminou: false, contadores, checkpoint: cp }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error: e.message || String(e)}));
+    }
+    return;
+  }
+
+  // ── GET /api/crm/vendedores/reatribuir-status — mostra checkpoint atual
+  if (req.method === 'GET' && url === '/api/crm/vendedores/reatribuir-status') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const cp = await _reatribLer();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ checkpoint: cp }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // Helper interno: depois de terminar, recalcula owner_id de cada account = vendedor mais frequente
+  async function _finalizarReatribuicao(cp) {
+    const ordersAtual = await crmStore.getCollection('orders');
+    const accountsAtual = await crmStore.getCollection('accounts');
+    // Agrega: accountId → { login → count }
+    const contPorAcc = {};
+    for (const o of Object.values(ordersAtual)) {
+      if (!o || !o.account_id) continue;
+      if (!o.vendedor_id || o.vendedor_id === 'gerencia') continue;
+      const aid = o.account_id;
+      if (!contPorAcc[aid]) contPorAcc[aid] = {};
+      contPorAcc[aid][o.vendedor_id] = (contPorAcc[aid][o.vendedor_id] || 0) + 1;
+    }
+    let accsAtualizadas = 0;
+    for (const [aid, counts] of Object.entries(contPorAcc)) {
+      const acc = accountsAtual[aid];
+      if (!acc) continue;
+      // Vendedor mais frequente
+      const [top] = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+      if (!top) continue;
+      const [novoOwner] = top;
+      if (acc.owner_id === novoOwner) continue;
+      acc.owner_id = novoOwner;
+      acc.atualizado_em = new Date().toISOString();
+      acc.atualizado_por = 'reatribuicao';
+      accsAtualizadas++;
+    }
+    if (accsAtualizadas > 0) {
+      await crmStore.saveCollection('accounts', accountsAtual, 'Reatribuição: owner_id de ' + accsAtualizadas + ' accounts');
+    }
+    cp.status = 'concluido';
+    cp.concluido_em = new Date().toISOString();
+    cp.accounts_atualizadas = accsAtualizadas;
+    // Limpa mapa Bling pra não pesar no checkpoint
+    delete cp.vendedores_bling;
+    await _reatribSalvar(cp);
+  }
+
+  // ── GET /api/crm/catalogo/stats — estatísticas do catálogo (marcas, categorias, etc.)
+  if (req.method === 'GET' && url === '/api/crm/catalogo/stats') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const s = await catalogoBling.estatisticas();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify(s));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/ficha/:accountId — ficha completa com histórico
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/ficha\/[a-zA-Z0-9_\-]+$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const accId = url.split('/')[4];
+      const account = await crmStore.getDoc('accounts', accId);
+      if (!account) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Cliente não encontrado'})); return; }
+      // SEGURANÇA IDOR: vendedor so ve ficha das SUAS contas. Admin/diretor
+      // e financeiro/marketing (que tem CRM em leitura mas ampla) veem tudo.
+      if (!crmUtils.canReadDoc(sess, account)) {
+        res.writeHead(403,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Este cliente esta atribuido a outro vendedor.'}));
+        return;
+      }
+      const orders = await crmStore.listDocs('orders', o => o.account_id === accId);
+      orders.sort((a, b) => String(b.data_pedido || '').localeCompare(String(a.data_pedido || '')));
+      const activities = await crmStore.listDocs('activities', a => a.account_id === accId || (a.entidade_tipo === 'account' && a.entidade_id === accId));
+      activities.sort((a, b) => String(b.criado_em || '').localeCompare(String(a.criado_em || '')));
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ account, orders, activities }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── PATCH /api/crm/accounts/:id/telefone — atualiza whatsapp/telefone do cliente
+  // Usado pelo botão WhatsApp no card de tarefa quando o cliente ainda não tem
+  // telefone cadastrado. Admin/diretor/vendedor dono da conta.
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/accounts\/[a-zA-Z0-9_\-]+\/telefone$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canEditCRM(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao de edicao.'}));
+      return;
+    }
+    try {
+      const accId = url.split('/')[4];
+      const account = await crmStore.getDoc('accounts', accId);
+      if (!account) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Cliente nao encontrado'})); return; }
+      if (!crmUtils.canReadDoc(sess, account)) {
+        res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Este cliente esta atribuido a outro vendedor.'}));
+        return;
+      }
+      const body = await readBody(req);
+      const { telefone } = JSON.parse(body || '{}');
+      // Mantém só dígitos
+      const limpo = String(telefone || '').replace(/[^0-9]/g, '');
+      if (limpo.length < 10) {
+        res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Telefone invalido (minimo 10 digitos).'}));
+        return;
+      }
+      const atualizado = await crmStore.updateDoc('accounts', accId, { telefone: limpo }, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, account: atualizado }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/ficha/:accountId/contas-abertas — contas a receber em aberto
+  // Busca AO VIVO no Bling (Pro Hunters + Calibre) porque contas mudam constantemente
+  // (pagamentos entrando). Não guarda cache no CRM. Retorna consolidado.
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/ficha\/[a-zA-Z0-9_\-]+\/contas-abertas$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const accId = url.split('/')[4];
+      const account = await crmStore.getDoc('accounts', accId);
+      if (!account) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Cliente não encontrado'})); return; }
+      // SEGURANÇA IDOR: mesma protecao da /ficha. Contas em aberto trazem dados
+      // financeiros sensiveis (dividas do cliente) — nao pode expor pra vendedor
+      // que nao e dono da conta.
+      if (!crmUtils.canReadDoc(sess, account)) {
+        res.writeHead(403,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Este cliente esta atribuido a outro vendedor.'}));
+        return;
+      }
+      const cpf = account.cpf_cnpj || null;
+      const idsPorConta = account.bling_contato_id_por_conta || {};
+      // Fallback: se o account só tem bling_contato_id (legado), aponta ele pra 'prohunters'
+      if (!Object.keys(idsPorConta).length && account.bling_contato_id) {
+        idsPorConta.prohunters = String(account.bling_contato_id);
+      }
+      const r = await blingContasReceber.buscarEmAbertoDoCliente({ cpf, idsPorConta });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, account_id: accId, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // OPERAÇÃO CONTROLADO — Cotação de frete + fila de envio
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /api/crm/frete/diag?cidade=X&uf=Y — diagnóstico da matriz
+  // Debug: mostra se cidade+UF bate em cada base (Ezequiel/LT/RPA)
+  if (req.method === 'GET' && url.startsWith('/api/crm/frete/diag')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const cidade = u.searchParams.get('cidade') || '';
+      const uf = (u.searchParams.get('uf') || '').toUpperCase();
+      if (!cidade || !uf) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'cidade+uf obrigatórios'})); return; }
+      const r = await freteMatriz.diagnosticar(cidade, uf);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/frete/matriz?cidade=X&uf=Y — rota padrão sugerida
+  if (req.method === 'GET' && url.startsWith('/api/crm/frete/matriz')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const cidade = u.searchParams.get('cidade') || '';
+      const uf = (u.searchParams.get('uf') || '').toUpperCase();
+      const listar = u.searchParams.get('listar') === '1';
+      if (listar) {
+        const l = await freteMatriz.listar();
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, matriz: l }));
+        return;
+      }
+      if (!cidade || !uf) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'cidade+uf obrigatórios'})); return; }
+      const r = await freteMatriz.rotaPadrao(cidade, uf);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/frete/cotar — orquestra as 4 transportadoras
+  //   Body: { cep, cidade?, uf?, itens: [{tipo, quantidade|valor}] }
+  if (req.method === 'POST' && url === '/api/crm/frete/cotar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      const payload = JSON.parse(body || '{}');
+      const r = await freteCotar.cotarTudo({
+        cep: payload.cep,
+        cidade: payload.cidade,
+        uf: payload.uf,
+        itens: payload.itens || [],
+        actor: sess.usuario,
+      });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/frete/matriz/fechar — grava escolha na matriz
+  //   Body: { cidade, uf, rota }
+  if (req.method === 'POST' && url === '/api/crm/frete/matriz/fechar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      const p = JSON.parse(body || '{}');
+      await freteMatriz.registrarEscolha({ cidade: p.cidade, uf: p.uf, rota: p.rota, atualizado_por: sess.usuario });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/frete/aeroportos?uf=X — lista aeroportos comerciais da UF (Gollog)
+  if (req.method === 'GET' && url.startsWith('/api/crm/frete/aeroportos')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const uf = (u.searchParams.get('uf') || '').toUpperCase();
+      const lista = uf ? freteGollog.porUf(uf) : freteGollog.AEROPORTOS;
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, aeroportos: lista }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/envios/abrir — cria envio a partir de empresa+número (puxa Bling)
+  //   Body: { empresa: 'prohunters'|'calibre', numero }
+  if (req.method === 'POST' && url === '/api/crm/envios/abrir') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      const { empresa, numero } = JSON.parse(body || '{}');
+      if (!empresa || !numero) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'empresa+numero obrigatórios'})); return; }
+      const emp = String(empresa).toLowerCase().trim();
+      const num = String(numero).trim();
+      const envId = 'env_' + emp + '_' + num;
+      // Já existe?
+      const ja = await crmStore.getDoc('envios', envId);
+      if (ja) { res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, existente: true, envio: ja, checklist: envios.estadoChecklist(ja) })); return; }
+      // Puxa pedido do Bling pela conta
+      let pedido;
+      try {
+        const listaResp = await blingApi.get('/pedidos/vendas', { numero: num, limite: 5 }, emp);
+        const lista = (listaResp && listaResp.data) || [];
+        const bp = lista.find(p => String(p.numero) === num) || lista[0];
+        if (!bp) throw new Error('Nenhum pedido ' + num + ' no Bling da ' + emp);
+        const det = await blingApi.get('/pedidos/vendas/' + bp.id, null, emp);
+        pedido = det.data || det;
+      } catch (e) {
+        res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error: 'Pedido não encontrado no Bling: ' + e.message}));
+        return;
+      }
+      const contato = pedido.contato || pedido.cliente || {};
+      const cpfBruto = contato.numeroDocumento || contato.cpfCnpj || contato.cnpj || contato.cpf || '';
+      const cpf = String(cpfBruto).replace(/\D/g,'');
+      const tipo = cpf.length === 14 ? 'pj' : 'pf';
+      const end = contato.endereco || {};
+      const itens = (Array.isArray(pedido.itens) ? pedido.itens : []).map(it => ({
+        sku: String((it.produto || {}).codigo || it.codigo || ''),
+        descricao: String((it.produto || {}).descricao || it.descricao || ''),
+        quantidade: Number(it.quantidade) || 1,
+      }));
+      // Vendedor responsavel do pedido (Bling v3 traz em pedido.vendedor: {id, nome})
+      // Se vier so id sem nome, guarda o id mesmo — o nome pode ser resolvido depois.
+      const vendBling = pedido.vendedor || pedido.loja || null;
+      const vendedor_bling = vendBling && (vendBling.nome || vendBling.id) ? {
+        id: vendBling.id || null,
+        nome: vendBling.nome || null,
+      } : null;
+      const doc = envios.buildEnvio({
+        empresa: emp,
+        numero: num,
+        bling_pedido_id: String(pedido.id),
+        cliente_nome: contato.nome || contato.razao || 'Sem nome',
+        cliente_cpf_cnpj: cpf,
+        cliente_cpf_cnpj_tipo: tipo,
+        cliente_endereco: [end.endereco, end.numero, end.bairro].filter(Boolean).join(', ') || null,
+        cliente_cidade: end.municipio || null,
+        cliente_uf: end.uf || null,
+        cliente_cep: end.cep ? String(end.cep).replace(/\D/g,'') : null,
+        produtos: itens,
+        total_pedido: Number(pedido.total || pedido.totalvenda || 0),
+        observacoes: pedido.observacoes || null,
+        vendedor_bling,
+        criado_por: sess.usuario,
+      });
+      const salvo = await crmStore.createDoc('envios', doc, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envio: salvo, checklist: envios.estadoChecklist(salvo) }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/envios — fila. Query: status, empresa, dono_proximo, atrasados
+  if (req.method === 'GET' && url.startsWith('/api/crm/envios') && !url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const statusFilter = u.searchParams.get('status') || '';
+      const empresaFilter = (u.searchParams.get('empresa') || '').toLowerCase();
+      const list = await crmStore.listDocs('envios');
+      // Filtro especial 'enviados' = status=enviado (sub-aba Enviados)
+      // Filtro especial 'retirados' = status=retirado (sub-aba Retirados em loja)
+      // Filtro especial 'pendentes' (default) = status não finalizado (fica na Fila)
+      const modo = (u.searchParams.get('modo') || 'pendentes').toLowerCase();
+      const q = (u.searchParams.get('q') || '').toLowerCase().trim();
+      const enriched = list.map(e => {
+        const est = envios.estadoChecklist(e);
+        return {
+          id: e.id,
+          empresa: e.empresa,
+          numero: e.numero,
+          cliente_nome: e.cliente_nome,
+          cliente_cpf_cnpj: e.cliente_cpf_cnpj,
+          cliente_cpf_cnpj_tipo: e.cliente_cpf_cnpj_tipo,
+          cliente_uf: e.cliente_uf,
+          cliente_cidade: e.cliente_cidade,
+          transportadora: e.transportadora,
+          status: e.status,
+          feitos: est.feitos,
+          total: est.total,
+          pronto_coleta: est.pronto_coleta,
+          proximo_passo: est.proximo_passo,
+          aereo: est.aereo,
+          cnpj: est.cnpj,
+          nf_numero: e.nf_numero,
+          gt_numero: e.gt_numero,
+          volumes_qtd: e.volumes_qtd,
+          romaneio_id: e.romaneio_id,
+          romaneio_numero: e.romaneio_numero,
+          coletado_em: e.coletado_em,
+          coletado_motorista: e.coletado_motorista,
+          coletado_placa: e.coletado_placa,
+          retirado_em: e.retirado_em,
+          retirado_por: e.retirado_por,
+          retirado_cliente_nome: e.retirado_cliente_nome,
+          retirado_cliente_doc: e.retirado_cliente_doc,
+          cancelado_motivo: e.cancelado_motivo,
+          cancelado_por: e.cancelado_por,
+          cancelado_em: e.cancelado_em,
+          criado_em: e.criado_em,
+          atualizado_em: e.atualizado_em,
+        };
+      });
+      let filtrado = enriched;
+      if (statusFilter) filtrado = filtrado.filter(x => x.status === statusFilter);
+      else if (modo === 'enviados') filtrado = filtrado.filter(x => x.status === 'enviado');
+      else if (modo === 'retirados') filtrado = filtrado.filter(x => x.status === 'retirado');
+      else if (modo === 'cancelados') filtrado = filtrado.filter(x => x.status === 'cancelado');
+      else if (modo === 'pendentes') filtrado = filtrado.filter(x => x.status !== 'enviado' && x.status !== 'cancelado' && x.status !== 'retirado');
+      if (empresaFilter) filtrado = filtrado.filter(x => x.empresa === empresaFilter);
+      if (q) filtrado = filtrado.filter(x => {
+        const hay = ((x.cliente_nome||'') + ' ' + (x.numero||'') + ' ' + (x.cliente_cpf_cnpj||'') + ' ' + (x.cliente_cidade||'') + ' ' + (x.nf_numero||'')).toLowerCase();
+        return hay.indexOf(q) >= 0;
+      });
+      // Ordena: prontos por último, resto por atualização desc; enviados por data de coleta desc;
+      // retirados por data de retirada desc; cancelados por data de cancelamento desc
+      filtrado.sort((a, b) => {
+        if (modo === 'enviados') return String(b.coletado_em || b.atualizado_em || '').localeCompare(String(a.coletado_em || a.atualizado_em || ''));
+        if (modo === 'retirados') return String(b.retirado_em || b.atualizado_em || '').localeCompare(String(a.retirado_em || a.atualizado_em || ''));
+        if (modo === 'cancelados') return String(b.cancelado_em || b.atualizado_em || '').localeCompare(String(a.cancelado_em || a.atualizado_em || ''));
+        if (a.pronto_coleta !== b.pronto_coleta) return a.pronto_coleta ? 1 : -1;
+        return String(b.atualizado_em || '').localeCompare(String(a.atualizado_em || ''));
+      });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envios: filtrado }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/envios/prontos-por-transportadora — usado pelo botão "Gerar romaneio"
+  // PRECISA vir antes de /:id porque o regex de id bate com "prontos-por-transportadora".
+  if (req.method === 'GET' && url === '/api/crm/envios/prontos-por-transportadora') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const list = await crmStore.listDocs('envios');
+      const prontos = list.filter(e => (e.status === 'pronto_coleta' || envios.estadoChecklist(e).pronto_coleta) && !e.romaneio_id && e.status !== 'enviado' && e.status !== 'cancelado' && e.status !== 'retirado' && e.transportadora !== 'retirada');
+      const grupos = {};
+      for (const e of prontos) {
+        const t = e.transportadora || 'sem_transportadora';
+        if (!grupos[t]) grupos[t] = [];
+        grupos[t].push({
+          id: e.id, empresa: e.empresa, numero: e.numero,
+          cliente_nome: e.cliente_nome, cliente_cidade: e.cliente_cidade, cliente_uf: e.cliente_uf,
+          nf_numero: e.nf_numero, gt_numero: e.gt_numero,
+          volumes_qtd: e.volumes_qtd || 0,
+        });
+      }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, grupos }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/envios/:id — detalhe do envio + checklist
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const id = url.split('/').pop();
+      const env = await crmStore.getDoc('envios', id);
+      if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio não encontrado'})); return; }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envio: env, checklist: envios.estadoChecklist(env) }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // PATCH /api/crm/envios/:id — atualiza campos do envio (aciona passos)
+  if (req.method === 'PATCH' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const id = url.split('/').pop();
+      const env = await crmStore.getDoc('envios', id);
+      if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio não encontrado'})); return; }
+      const body = await readBody(req);
+      const patch = JSON.parse(body || '{}');
+      // Captura IP real do cliente (Vercel usa x-forwarded-for; fallback pra remote address)
+      const ip = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || (req.connection && req.connection.remoteAddress) || '').split(',')[0].trim() || null;
+      const proximo = envios.aplicarPatch(env, patch, sess.usuario, ip);
+      const salvo = await crmStore.updateDoc('envios', id, proximo, sess.usuario);
+      // ── APRENDIZADO DE VALORES ──────────────────────────────────
+      // Se este PATCH alterou transportadora OU transporte_valor, e ambos existem,
+      // registra a amostra pra próxima cotação do mesmo trecho já vir com valor sugerido.
+      const patchTocouTransp = Object.prototype.hasOwnProperty.call(patch, 'transportadora') || Object.prototype.hasOwnProperty.call(patch, 'transporte_valor');
+      if (patchTocouTransp && salvo.transportadora && salvo.transporte_valor > 0 && salvo.cliente_cidade && salvo.cliente_uf) {
+        try {
+          await freteAprendizado.registrarValor({
+            cidade: salvo.cliente_cidade,
+            uf: salvo.cliente_uf,
+            transportadora: salvo.transportadora,
+            valor: salvo.transporte_valor,
+            envio_id: salvo.id,
+            actor: sess.usuario,
+          });
+        } catch (e) { /* aprendizado é opcional — não bloqueia o save */ }
+      }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envio: salvo, checklist: envios.estadoChecklist(salvo) }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/envios/:id/reverter-passo — desfaz um passo especifico do
+  // checklist pra permitir correcao. Body: { passo_id: 'volumes'|'conferencia'|... }.
+  // Nao reverte 'abertura' (pra desfazer criacao, cancele o envio).
+  // Passos posteriores dependentes voltam pra 'travado' automaticamente, sem apagar
+  // seus valores — se o usuario refizer este passo com o mesmo dado, os posteriores
+  // destravam preservando o que ja tinha.
+  //
+  // Permissao: admin, diretor, vendas ou auxiliar (mesmo perfil que edita a fila).
+  // Log com IP na auditoria pra rastrear correcoes indevidas.
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/reverter-passo$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
+    }
+    try {
+      const id = url.split('/')[4];
+      const env = await crmStore.getDoc('envios', id);
+      if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio nao encontrado'})); return; }
+      if (env.status === 'enviado' || env.status === 'cancelado') {
+        res.writeHead(400,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Envio ja ' + env.status + ' — nao pode ser revertido. Fale com a gerencia.'})); return;
+      }
+      const body = await readBody(req);
+      const { passo_id } = JSON.parse(body || '{}');
+      if (!passo_id) throw new Error('passo_id obrigatorio');
+      const ip = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || (req.connection && req.connection.remoteAddress) || '').split(',')[0].trim() || null;
+      const revertido = envios.reverterPasso(env, passo_id, sess.usuario, ip);
+      const salvo = await crmStore.updateDoc('envios', id, revertido, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, envio: salvo, checklist: envios.estadoChecklist(salvo) }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/envios/:id/cancelar body: { motivo }
+  // Soft delete — marca status='cancelado' pra tirar da fila. Mantem o doc
+  // pra auditoria (quem cancelou, quando, por que). Nao pode cancelar se ja
+  // esta em romaneio ou foi enviado/retirado.
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/cancelar$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
+    }
+    try {
+      const id = url.split('/')[4];
+      const env = await crmStore.getDoc('envios', id);
+      if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio nao encontrado'})); return; }
+      const body = await readBody(req);
+      const { motivo } = JSON.parse(body || '{}');
+      if (!motivo || !String(motivo).trim()) throw new Error('Motivo obrigatorio.');
+      const ip = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || (req.connection && req.connection.remoteAddress) || '').split(',')[0].trim() || null;
+      const cancelado = envios.cancelarEnvio(env, { motivo, actor: sess.usuario, ip });
+      const salvo = await crmStore.updateDoc('envios', id, cancelado, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, envio: salvo }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/envios/:id/marcar-retirado body: { retirado_cliente_nome, retirado_cliente_doc, nota }
+  // Cliente retirou o pedido presencialmente (sem transportadora). Marca o envio
+  // como retirado e dispara notificacao PRO FINANCEIRO + GERENCIA via solicitacoes.
+  // Precisa ter NF emitida — ninguem retira sem nota fiscal.
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/marcar-retirado$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
+    }
+    try {
+      const id = url.split('/')[4];
+      const env = await crmStore.getDoc('envios', id);
+      if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio nao encontrado'})); return; }
+      const body = await readBody(req);
+      const { retirado_cliente_nome, retirado_cliente_doc, nota } = JSON.parse(body || '{}');
+      const ip = String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || (req.connection && req.connection.remoteAddress) || '').split(',')[0].trim() || null;
+      const retirado = envios.marcarRetirado(env, {
+        retirado_cliente_nome, retirado_cliente_doc, nota,
+        actor: sess.usuario, ip,
+      });
+      const salvo = await crmStore.updateDoc('envios', id, retirado, sess.usuario);
+
+      // ─── Notificacao SOMENTE pro financeiro ───
+      // Pega usuarios ativos com role=financeiro e cria uma solicitacao pra cada
+      // (categoria=Financeiro). Admin/diretor NAO recebem — eles acompanham via
+      // dashboard administrativo, nao por solicitacao, pra nao poluir o inbox deles.
+      // Nao bloqueia a resposta se a notificacao falhar — o envio ja foi marcado,
+      // so loga o erro.
+      try {
+        const solic = require('../lib/solicitacoes');
+        const all = await getAllUsers();
+        const destinos = Object.entries(all)
+          .filter(([k, v]) => v.ativo !== false && v.role === 'financeiro')
+          .map(([k]) => String(k).toLowerCase())
+          .filter(k => k !== String(sess.usuario).toLowerCase());  // nao notifica quem fez
+        const empLbl = salvo.empresa === 'calibre' ? 'Calibre' : 'Pro Hunters';
+        const titulo = 'Pedido #' + salvo.numero + ' (' + empLbl + ') foi RETIRADO em loja';
+        const desc = [
+          'Cliente: ' + (salvo.cliente_nome || '—'),
+          (salvo.cliente_cpf_cnpj_tipo === 'pj' ? 'CNPJ: ' : 'CPF: ') + (salvo.cliente_cpf_cnpj || '—'),
+          'NF: ' + (salvo.nf_numero || '—'),
+          'Total do pedido: R$ ' + Number(salvo.total_pedido || 0).toFixed(2).replace('.', ','),
+          '',
+          'Retirado por: ' + salvo.retirado_cliente_nome + (salvo.retirado_cliente_doc ? ' (doc: ' + salvo.retirado_cliente_doc + ')' : ''),
+          'Registrado por: ' + sess.usuario,
+          nota ? '\nObs: ' + nota : '',
+        ].join('\n');
+        for (const para of destinos) {
+          try {
+            await solic.criar({
+              de: sess.usuario, para, categoria: 'Financeiro',
+              titulo, descricao: desc,
+            });
+          } catch (e) { console.error('[retirada] falha ao notificar ' + para + ':', e.message); }
+        }
+      } catch (e) {
+        console.error('[retirada] falha geral ao notificar:', e.message);
+      }
+
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, envio: salvo }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // ROMANEIOS — geração e listagem
+  // ═════════════════════════════════════════════════════════════
+
+  // (rota "prontos-por-transportadora" foi movida pra cima, antes do handler :id,
+  //  senão o regex do id capturava a string "prontos-por-transportadora")
+
+  // POST /api/crm/romaneios — cria um romaneio a partir de uma lista de envios
+  //   Body: { transportadora, envio_ids: [...] }
+  if (req.method === 'POST' && url === '/api/crm/romaneios') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      const { transportadora, envio_ids } = JSON.parse(body || '{}');
+      if (!transportadora || !Array.isArray(envio_ids) || !envio_ids.length) {
+        res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'transportadora + envio_ids obrigatórios'})); return;
+      }
+      // Carrega os envios
+      const envDocs = [];
+      for (const eid of envio_ids) {
+        const e = await crmStore.getDoc('envios', eid);
+        if (!e) throw new Error('Envio não encontrado: ' + eid);
+        envDocs.push(e);
+      }
+      const rom = await romaneios.criar({ envios: envDocs, transportadora, gerado_por: sess.usuario });
+      const salvo = await crmStore.createDoc('romaneios', rom, sess.usuario);
+      // Atualiza os envios: romaneio_id + status='enviado' + coletado_em=now
+      const now = new Date().toISOString();
+      for (const e of envDocs) {
+        const patch = {
+          romaneio_id: rom.id,
+          romaneio_numero: rom.numero,
+          coletado_em: now,
+          status: 'enviado',
+        };
+        const proximo = envios.aplicarPatch(e, patch, sess.usuario, null);
+        proximo.status = 'enviado';
+        proximo.romaneio_id = rom.id;
+        proximo.romaneio_numero = rom.numero;
+        proximo.coletado_em = now;
+        await crmStore.updateDoc('envios', e.id, proximo, sess.usuario);
+      }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, romaneio: salvo }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/romaneios — lista romaneios
+  if (req.method === 'GET' && url === '/api/crm/romaneios') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const list = await crmStore.listDocs('romaneios');
+      list.sort((a, b) => String(b.criado_em || '').localeCompare(String(a.criado_em || '')));
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, romaneios: list }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/romaneios/:id — detalhe do romaneio + envios
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/romaneios\/[a-zA-Z0-9_\-]+$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const id = url.split('/').pop();
+      const rom = await crmStore.getDoc('romaneios', id);
+      if (!rom) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Romaneio não encontrado'})); return; }
+      const envDocs = [];
+      for (const eid of (rom.envio_ids || [])) {
+        const e = await crmStore.getDoc('envios', eid);
+        if (e) envDocs.push(e);
+      }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, romaneio: rom, envios: envDocs }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/romaneios/:id/pdf — HTML print-ready pra impressão
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/romaneios\/[a-zA-Z0-9_\-]+\/pdf$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'text/html'}); res.end('<h2>Sem acesso</h2>'); return; }
+    try {
+      const id = url.split('/')[4];
+      const rom = await crmStore.getDoc('romaneios', id);
+      if (!rom) { res.writeHead(404,{'Content-Type':'text/html'}); res.end('<h2>Romaneio não encontrado</h2>'); return; }
+      const envDocs = [];
+      for (const eid of (rom.envio_ids || [])) {
+        const e = await crmStore.getDoc('envios', eid);
+        if (e) envDocs.push(e);
+      }
+      const html = romaneios.renderHtml(rom, envDocs);
+      res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'}); res.end(html);
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'text/html'}); res.end('<h2>Erro: ' + String(e.message).replace(/</g,'&lt;') + '</h2>');
+    }
+    return;
+  }
+
+  // POST /api/crm/romaneios/:id/assinatura — registra dados do motorista
+  //   Body: { nome, cpf, placa }
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/romaneios\/[a-zA-Z0-9_\-]+\/assinatura$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const id = url.split('/')[4];
+      const rom = await crmStore.getDoc('romaneios', id);
+      if (!rom) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Romaneio não encontrado'})); return; }
+      const body = await readBody(req);
+      const dados = JSON.parse(body || '{}');
+      const proximo = romaneios.registrarAssinatura(rom, dados);
+      const salvo = await crmStore.updateDoc('romaneios', id, proximo, sess.usuario);
+      // Também propaga o nome do motorista pros envios do romaneio (útil pro vendedor consultar)
+      for (const eid of (rom.envio_ids || [])) {
+        const e = await crmStore.getDoc('envios', eid);
+        if (!e) continue;
+        const patch = {
+          coletado_motorista: salvo.motorista_nome,
+          coletado_motorista_cpf: salvo.motorista_cpf,
+          coletado_placa: salvo.motorista_placa,
+        };
+        const p = envios.aplicarPatch(e, patch, sess.usuario, null);
+        // Como aplicarPatch tem whitelist, sobrepõe direto:
+        p.coletado_motorista = salvo.motorista_nome;
+        p.coletado_motorista_cpf = salvo.motorista_cpf;
+        p.coletado_placa = salvo.motorista_placa;
+        await crmStore.updateDoc('envios', eid, p, sess.usuario);
+      }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, romaneio: salvo }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // Bling — OAuth 2.0 (integração com API v3)
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /api/bling/authorize?conta=<X> — só gerência. Gera state (com contaId
+  // embutida), guarda em cookie, redireciona pro Bling. O gerente autoriza no
+  // painel do Bling e o Bling redireciona de volta pra /api/bling/callback.
+  // Se conta não vem, usa a padrão (prohunters).
+  if (req.method === 'GET' && url.startsWith('/api/bling/authorize')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) {
+      res.writeHead(403,{'Content-Type':'text/html; charset=utf-8'});
+      res.end('<h2>Só gerência.</h2>');
+      return;
+    }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const conta = (u.searchParams.get('conta') || config.blingContaPadrao || 'prohunters').toLowerCase().trim();
+      const cfg = (config.blingContas || {})[conta];
+      if (!cfg || !cfg.ativa) {
+        res.writeHead(500,{'Content-Type':'text/html; charset=utf-8'});
+        res.end('<h2>Bling "' + conta + '" não configurado.</h2><p>Faltam env vars pra essa conta na Vercel.</p>');
+        return;
+      }
+      const state = blingOauth.buildStateComConta(conta);
+      const authUrl = blingOauth.buildAuthorizeUrl(conta, state);
+      // Cookie efêmero, apenas pra conferir no callback (10 min de vida).
+      // HttpOnly + SameSite=Lax pra sobreviver ao redirect do Bling.
+      const cookieVal = state + '|' + Buffer.from(sess.usuario).toString('base64url');
+      const cookie = 'bling_oauth_state=' + cookieVal + '; Max-Age=600; Path=/; HttpOnly; Secure; SameSite=Lax';
+      res.writeHead(302, { 'Location': authUrl, 'Set-Cookie': cookie });
+      res.end();
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'text/html; charset=utf-8'});
+      res.end('<h2>Erro ao iniciar OAuth Bling:</h2><pre>' + String(e.message).replace(/</g,'&lt;') + '</pre>');
+    }
+    return;
+  }
+
+  // GET /api/bling/callback?code=...&state=...
+  // Recebe o code, confere o state, troca por token, redireciona pra
+  // uma página de sucesso simples (que fecha se abriu em popup, senão
+  // volta pro dashboard).
+  if (req.method === 'GET' && url.startsWith('/api/bling/callback')) {
+    try {
+      // Vercel/Node podem expor query string em lugares diferentes.
+      // Tentamos múltiplas fontes pra ser robusto.
+      let code = null, stateRecebido = null, errParam = null, errDesc = null;
+      // (1) via req.url + URL parser
+      try {
+        const u = new URL('http://x' + url);
+        code = u.searchParams.get('code');
+        stateRecebido = u.searchParams.get('state');
+        errParam = u.searchParams.get('error');
+        errDesc = u.searchParams.get('error_description');
+      } catch (e) { /* segue */ }
+      // (2) fallback via req.query (Vercel serverless expõe assim quando parseia)
+      if (!code && req.query) {
+        code = code || req.query.code || null;
+        stateRecebido = stateRecebido || req.query.state || null;
+        errParam = errParam || req.query.error || null;
+        errDesc = errDesc || req.query.error_description || null;
+      }
+      // Log de debug (aparece nos Runtime Logs da Vercel)
+      console.log('[bling/callback] url=', url, 'code=', code ? '<presente>' : '<ausente>', 'state=', stateRecebido ? '<presente>' : '<ausente>', 'err=', errParam || '-');
+      if (errParam) throw new Error('Bling recusou: ' + errParam + ' — ' + (errDesc || ''));
+      if (!code) throw new Error('code ausente no callback. URL recebida: ' + url);
+      const cookieMatch = (req.headers.cookie || '').match(/bling_oauth_state=([^;]+)/);
+      if (!cookieMatch) throw new Error('Cookie de state ausente. Recomece a autorização.');
+      const [stateSalvo, actorB64] = decodeURIComponent(cookieMatch[1]).split('|');
+      if (!stateSalvo || stateSalvo !== stateRecebido) throw new Error('State não confere (possível CSRF).');
+      const actorLogin = actorB64 ? Buffer.from(actorB64, 'base64url').toString('utf8') : null;
+      // Extrai contaId embutida no state (formato "<random>.<contaId>")
+      const conta = blingOauth.extrairContaDoState(stateRecebido);
+      await blingOauth.exchangeCodeForToken(conta, code, actorLogin);
+      // Limpa cookie state
+      const clear = 'bling_oauth_state=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax';
+      const nomeConta = ((config.blingContas || {})[conta] || {}).nome || conta;
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Set-Cookie': clear });
+      res.end(
+        '<!doctype html><html><head><meta charset="utf-8"><title>Bling conectado</title>' +
+        '<style>body{font-family:system-ui;background:#f5f5f5;padding:40px;text-align:center;color:#222}' +
+        '.card{max-width:480px;margin:0 auto;background:#fff;padding:32px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.08)}' +
+        '.ok{color:#0a6e2e;font-size:48px;margin-bottom:12px}' +
+        'h1{font-size:20px;margin:0 0 8px}p{color:#666;font-size:14px}' +
+        '.badge{display:inline-block;background:#e6f4ea;color:#0a6e2e;padding:4px 10px;border-radius:6px;font-weight:600;font-size:13px;margin-top:8px}' +
+        '.btn{display:inline-block;background:#0a6e2e;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;margin-top:16px}' +
+        '</style></head><body><div class="card"><div class="ok">✓</div>' +
+        '<h1>Bling conectado com sucesso</h1>' +
+        '<div class="badge">' + String(nomeConta).replace(/</g,'&lt;') + '</div>' +
+        '<p style="margin-top:14px">Você já pode fechar esta aba ou voltar pro Painel.</p>' +
+        '<a class="btn" href="/">← Voltar ao Portal</a>' +
+        '</div></body></html>'
+      );
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(
+        '<!doctype html><html><head><meta charset="utf-8"><title>Erro Bling</title>' +
+        '<style>body{font-family:system-ui;background:#f5f5f5;padding:40px;text-align:center;color:#222}' +
+        '.card{max-width:520px;margin:0 auto;background:#fff;padding:32px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.08)}' +
+        '.err{color:#a01818;font-size:48px;margin-bottom:12px}' +
+        '</style></head><body><div class="card"><div class="err">✗</div>' +
+        '<h1>Não deu pra conectar o Bling</h1>' +
+        '<p style="color:#a01818;background:#fbe6e6;padding:10px;border-radius:6px;font-size:13px">' + String(e.message).replace(/</g,'&lt;') + '</p>' +
+        '<a href="/api/bling/authorize" style="color:#0a6e2e">← Tentar de novo</a>' +
+        '</div></body></html>'
+      );
+    }
+    return;
+  }
+
+  // Helper local: extrai contaId de ?conta= com fallback pra padrão
+  function _contaDaQuery(reqUrl) {
+    try {
+      const u = new URL('http://x' + (reqUrl || ''));
+      const c = (u.searchParams.get('conta') || '').toLowerCase().trim();
+      return c || (config.blingContaPadrao || 'prohunters');
+    } catch (e) { return config.blingContaPadrao || 'prohunters'; }
+  }
+
+  // GET /api/bling/status — JSON pra UI mostrar estado de TODAS as contas.
+  // Sem ?conta=: retorna { contas: [...] } com status de cada uma.
+  // Com ?conta=X: retorna apenas essa conta (compat com UI antiga).
+  if (req.method === 'GET' && url.startsWith('/api/bling/status')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return;
+    }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const contaQ = (u.searchParams.get('conta') || '').toLowerCase().trim();
+      if (contaQ) {
+        const info = await blingTokenStore.loadTokenInfo(contaQ);
+        const cfg = (config.blingContas || {})[contaQ] || {};
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ...info, configurado: !!cfg.ativa }));
+        return;
+      }
+      const contas = await blingTokenStore.listContasInfo();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ contas, padrao: config.blingContaPadrao || 'prohunters' }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/bling/refresh?conta=<X> — força refresh manual (debug/manutenção).
+  if (req.method === 'POST' && url.startsWith('/api/bling/refresh')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const conta = _contaDaQuery(req.url);
+      await blingOauth.refreshAccessToken(conta);
+      const info = await blingTokenStore.loadTokenInfo(conta);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, ...info }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/bling/disconnect?conta=<X> — revoga o token local dessa conta.
+  if (req.method === 'POST' && url.startsWith('/api/bling/disconnect')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const conta = _contaDaQuery(req.url);
+      await blingTokenStore.deleteToken(conta);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, contaId: conta }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/bling/test?conta=<X> — testa conexão da conta especificada.
+  if (req.method === 'GET' && url.startsWith('/api/bling/test')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const conta = _contaDaQuery(req.url);
+      const r = await blingApi.testConnection(conta);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, contaId: conta, resposta: r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message, status:e.status||500}));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // Bling sync — backfill (com checkpoint) + incremental (manual/cron)
+  // ═════════════════════════════════════════════════════════════
+
+  // Helper: carrega users.json pra mapear vendedor Bling → login CRM
+  async function _loadUsersMap() {
+    try { return await require('../lib/usersStore').getAllUsers(); }
+    catch (e) { return {}; }
+  }
+
+  // GET /api/bling/backfill/status?conta=<X> — situação atual do backfill DA CONTA
+  //   Sem ?conta=: retorna { contas: [{contaId, checkpoint}, ...] } com todas
+  if (req.method === 'GET' && url.startsWith('/api/bling/backfill/status')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const contaQ = (u.searchParams.get('conta') || '').toLowerCase().trim();
+      if (contaQ) {
+        const cp = await blingBackfill.lerCheckpoint(contaQ);
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ contaId: contaQ, checkpoint: cp }));
+        return;
+      }
+      const contas = config.blingContas || {};
+      const out = [];
+      for (const [cid, cfg] of Object.entries(contas)) {
+        const cp = await blingBackfill.lerCheckpoint(cid);
+        out.push({ contaId: cid, nome: cfg.nome, ativa: !!cfg.ativa, checkpoint: cp });
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ contas: out }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/bling/backfill/iniciar?conta=<X> — puxa lista de IDs do range
+  //     Body: { meses?: 12, forcar?: true, conta?: 'prohunters'|'calibre' }
+  //     ?conta= tem precedência sobre body.conta.
+  if (req.method === 'POST' && url.startsWith('/api/bling/backfill/iniciar')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const body = await readBody(req);
+      const payload = JSON.parse(body || '{}');
+      const u = new URL('http://x' + (req.url || ''));
+      const conta = ((u.searchParams.get('conta') || payload.conta || config.blingContaPadrao || 'prohunters') + '').toLowerCase().trim();
+      const meses = payload.meses || 12;
+      const forcar = !!payload.forcar;
+      const mesesNum = Math.max(1, Math.min(60, Number(meses) || 12));
+      const r = await blingBackfill.iniciar({ meses: mesesNum, iniciado_por: sess.usuario, forcar, contaId: conta });
+      res.writeHead(r.ok ? 200 : 409, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ contaId: conta, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/saude-bling?conta=<X>&meses=12 — verifica CRM ↔ Bling e retorna diff por mês
+  //   Sem ?conta=: retorna { resultados: [...] } com saúde de TODAS as contas ativas.
+  if (req.method === 'GET' && url.startsWith('/api/saude-bling')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const meses = Math.max(1, Math.min(24, Number(u.searchParams.get('meses') || 12)));
+      const contaQ = (u.searchParams.get('conta') || '').toLowerCase().trim();
+      if (contaQ) {
+        const r = await blingBackfill.verificarSaude({ meses, contaId: contaQ });
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify(r));
+      } else {
+        const r = await blingBackfill.verificarSaudeTodas({ meses });
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify(r));
+      }
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message || String(e)}));
+    }
+    return;
+  }
+
+  // GET /api/auto-recuperar-bling — cron diário: itera TODAS as contas ativas.
+  //   1) Pra cada conta, verifica saúde. 2) Se tem buraco e checkpoint não é recente,
+  //      dispara backfill 12 meses (forcar) pra recuperar. 3) Idempotente por conta.
+  if (req.method === 'GET' && url === '/api/auto-recuperar-bling') {
+    const sess = getSession(req);
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const cronToken  = req.headers['x-cron-secret'];
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+    try {
+      const contas = config.blingContas || {};
+      const resultados = [];
+      for (const [cid, cfg] of Object.entries(contas)) {
+        if (!cfg.ativa) { resultados.push({ contaId: cid, pulou: true, motivo: 'conta não configurada' }); continue; }
+        try {
+          const saude = await blingBackfill.verificarSaude({ meses: 12, contaId: cid });
+          if (!saude.meses_com_buraco || !saude.meses_com_buraco.length) {
+            resultados.push({ contaId: cid, motivo: 'sem_buracos', saude });
+            continue;
+          }
+          const cp = await blingBackfill.lerCheckpoint(cid);
+          if (cp && cp.status === 'em_andamento') {
+            const ultimo = cp.ultimo_lote_em ? new Date(cp.ultimo_lote_em) : new Date(cp.iniciado_em || 0);
+            const idadeH = (Date.now() - ultimo.getTime()) / 3600000;
+            if (idadeH < 6) {
+              resultados.push({ contaId: cid, motivo: 'backfill_recente_em_andamento', checkpoint: cp, saude });
+              continue;
+            }
+          }
+          const r = await blingBackfill.iniciar({ meses: 12, iniciado_por: 'auto-recuperar', forcar: true, contaId: cid });
+          await blingBackfill.apendarLog({ tipo: 'auto_recuperar_disparado', contaId: cid, saude, backfill: r });
+          resultados.push({ contaId: cid, motivo: 'buracos_detectados_backfill_iniciado', saude, backfill: r });
+        } catch (e) {
+          resultados.push({ contaId: cid, ok: false, erro: e.message });
+        }
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, resultados }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message || String(e)}));
+    }
+    return;
+  }
+
+  // POST /api/bling/backfill/continuar?conta=<X> — processa próximo lote DA CONTA
+  if (req.method === 'POST' && url.startsWith('/api/bling/backfill/continuar')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const body = await readBody(req);
+      let payload = {}; try { payload = JSON.parse(body || '{}'); } catch (e) {}
+      const u = new URL('http://x' + (req.url || ''));
+      const conta = ((u.searchParams.get('conta') || payload.conta || config.blingContaPadrao || 'prohunters') + '').toLowerCase().trim();
+      const usersJson = await _loadUsersMap();
+      const r = await blingBackfill.continuar({ usersJson, ownerFallback: 'gerencia', contaId: conta });
+      res.writeHead(r.ok ? 200 : 409, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ contaId: conta, ...r }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/bling/backfill/cancelar?conta=<X> — apaga checkpoint (sem apagar dados)
+  if (req.method === 'POST' && url.startsWith('/api/bling/backfill/cancelar')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const conta = _contaDaQuery(req.url);
+      await blingBackfill.apagarCheckpoint(conta);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ok:true, contaId: conta}));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/bling/sync-agora?conta=<X> — sync incremental manual (últimos N dias)
+  //   Sem ?conta= e sem body.conta: roda pra TODAS as contas ativas.
+  if (req.method === 'POST' && url.startsWith('/api/bling/sync-agora')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    try {
+      const body = await readBody(req);
+      let payload = {}; try { payload = JSON.parse(body || '{}'); } catch (e) {}
+      const dias = Math.max(1, Math.min(30, Number(payload.dias) || 1));
+      const u = new URL('http://x' + (req.url || ''));
+      const conta = ((u.searchParams.get('conta') || payload.conta || '') + '').toLowerCase().trim();
+      const usersJson = await _loadUsersMap();
+      if (conta) {
+        const r = await blingBackfill.syncIncremental({ dias, usersJson, contaId: conta });
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
+      } else {
+        const r = await blingBackfill.syncIncrementalTodas({ dias, usersJson });
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
+      }
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/bling/cron/sync — pra Vercel Cron ou disparo externo
+  // Roda sync incremental de 1 dia pra TODAS as contas ativas em sequência.
+  // Protegido por x-cron-secret OU sessão admin OU header do Vercel Cron.
+  if (req.method === 'GET' && url === '/api/bling/cron/sync') {
+    const sess = getSession(req);
+    const cronToken = req.headers['x-cron-secret'];
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+    try {
+      const usersJson = await _loadUsersMap();
+      const r = await blingBackfill.syncIncrementalTodas({ dias: 1, usersJson });
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/bling/cron/backfill-tick?conta=<X> — processa 1 lote da conta indicada.
+  //   Sem ?conta=: varre TODAS as contas ativas e roda 1 tick pra cada uma com
+  //   backfill em andamento (útil pro Vercel Cron sem parâmetros).
+  //   AUTO-CHAIN preserva ?conta= pra o próximo tick daquela conta especificamente.
+  //   Guarda anti-loop: ticks_hoje por conta, para em 500/dia.
+  if (req.method === 'GET' && url.startsWith('/api/bling/cron/backfill-tick')) {
+    const sess = getSession(req);
+    const cronToken = req.headers['x-cron-secret'];
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const chainToken = req.headers['x-bling-chain'] === config.sessionSecret; // self-invocation
+    const autorizado = vercelCron || chainToken || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+
+    // Helper local — path do checkpoint por conta (espelha backfill.js)
+    function _cpPath(cid) {
+      return (cid === 'prohunters') ? 'crm/bling-backfill.json' : ('crm/bling-backfill-' + cid + '.json');
+    }
+
+    async function _tickUmaConta(cid) {
+      const cpAntes = await blingBackfill.lerCheckpoint(cid);
+      if (!cpAntes || cpAntes.status !== 'em_andamento' || !cpAntes.ids_pendentes || cpAntes.ids_pendentes.length === 0) {
+        return { contaId: cid, ok: true, sem_backfill: true };
+      }
+      const ticksHoje = (cpAntes.ticks_hoje_data === new Date().toISOString().slice(0,10))
+        ? (cpAntes.ticks_hoje_count || 0) : 0;
+      if (ticksHoje >= 500) {
+        return { contaId: cid, ok: true, limite_ticks_diario: true, ticks_hoje: ticksHoje };
+      }
+      const usersJson = await _loadUsersMap();
+      const r = await blingBackfill.continuar({ usersJson, ownerFallback: 'gerencia', contaId: cid });
+      // Atualiza contador de ticks (best-effort)
+      try {
+        const cpDepois = await blingBackfill.lerCheckpoint(cid);
+        if (cpDepois && cpDepois.status === 'em_andamento') {
+          cpDepois.ticks_hoje_data = new Date().toISOString().slice(0,10);
+          cpDepois.ticks_hoje_count = ticksHoje + 1;
+          const { saveFile } = require('../lib/githubStore');
+          await saveFile(_cpPath(cid), JSON.stringify(cpDepois, null, 2), 'Bling backfill [' + cid + ']: tick ' + (ticksHoje+1));
+        }
+      } catch (e) { /* silencia */ }
+      // AUTO-CHAIN: se ainda tem trabalho e não bateu limite, dispara próximo tick (com ?conta=)
+      if (!r.terminou && (ticksHoje + 1) < 500) {
+        const host = req.headers['x-forwarded-host'] || req.headers.host || 'dashboardph.vercel.app';
+        const nextUrl = 'https://' + host + '/api/bling/cron/backfill-tick?conta=' + encodeURIComponent(cid);
+        try {
+          const https = require('https');
+          const u = new URL(nextUrl);
+          const chainReq = https.request({
+            hostname: u.hostname, path: u.pathname + u.search, method: 'GET',
+            headers: { 'x-bling-chain': config.sessionSecret, 'User-Agent': 'bling-chain' },
+            timeout: 3000,
+          }, () => {});
+          chainReq.on('error', () => {});
+          chainReq.on('timeout', () => chainReq.destroy());
+          chainReq.end();
+        } catch (e) { /* silencia */ }
+      }
+      return { contaId: cid, ok: true, ...r, chained: !r.terminou };
+    }
+
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const contaQ = (u.searchParams.get('conta') || '').toLowerCase().trim();
+      if (contaQ) {
+        const r = await _tickUmaConta(contaQ);
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify(r));
+      } else {
+        // Varre todas as contas ativas — útil pro Vercel Cron sem params.
+        const contas = config.blingContas || {};
+        const resultados = [];
+        for (const [cid, cfg] of Object.entries(contas)) {
+          if (!cfg.ativa) { resultados.push({ contaId: cid, pulou: true, motivo: 'conta não configurada' }); continue; }
+          try { resultados.push(await _tickUmaConta(cid)); }
+          catch (e) { resultados.push({ contaId: cid, ok: false, erro: e.message }); }
+        }
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ok: true, resultados }));
+      }
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // Adiciona autorização por header Vercel Cron ao /api/crm/cron/vencimentos também
+  // (esse endpoint já existe acima; o header x-vercel-cron passa pela verificação de sess se
+  //  estiver logada, então o Vercel Cron precisa ser aceito explicitamente. Isso está tratado
+  //  no próprio handler dele — mas por segurança podemos ampliar depois se necessário.)
+
+  // POST /api/chat
+  if (req.method === 'POST' && url === '/api/chat') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: { message: 'Nao autorizado.' } }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { messages } = JSON.parse(body);
+      const knowledge = await getKnowledge();
+      const result = await callAnthropic(messages, knowledge);
+      res.writeHead(result.status, { 'Content-Type': 'application/json' });
+      res.end(result.body);
+    } catch(e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: { message: 'Erro interno: ' + e.message } }));
+    }
+    return;
+  }
+
+  // GET /api/knowledge — retorna o conteúdo atual (só admin)
+  if (req.method === 'GET' && url === '/api/knowledge') {
+    const sess = getSession(req);
+    if (!sess || sess.usuario !== 'gerencia') {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Acesso negado.' }));
+      return;
+    }
+    try {
+      const knowledge = await getKnowledge();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ knowledge }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao carregar: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/knowledge — salva novo conteúdo (só admin)
+  if (req.method === 'POST' && url === '/api/knowledge') {
+    const sess = getSession(req);
+    if (!sess || sess.usuario !== 'gerencia') {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Acesso negado.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { knowledge } = JSON.parse(body);
+      await saveKnowledge(knowledge);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } catch(e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao salvar: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/contract — gera o PDF do contrato (qualquer usuário logado: gerencia, vendas, auxiliar)
+  if (req.method === 'POST' && url === '/api/contract') {
+    const sess = getSession(req);
+    if (!canUseDocumentos(sess)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      if (!data || !data.cliente || !data.cliente.nome || !data.cliente.doc || !data.cliente.endereco || !data.produto) {
+        throw new Error('Preencha nome, documento, endereço do cliente e o produto.');
+      }
+      const { bytes, filename } = await gerarContrato(data);
+      res.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename="' + filename.replace(/"/g, '') + '"',
+      });
+      res.end(Buffer.from(bytes));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao gerar contrato: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/pedido-extract — extrai dados do Pedido de Venda via IA (qualquer usuário logado: gerencia, vendas, auxiliar)
+  if (req.method === 'POST' && url === '/api/pedido-extract') {
+    const sess = getSession(req);
+    if (!canUseDocumentos(sess)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { pdfBase64 } = JSON.parse(body);
+      if (!pdfBase64) throw new Error('Nenhum arquivo recebido.');
+      const data = await extrairPedido(pdfBase64);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(data));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao extrair dados do pedido: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/nf-extract — extrai dados da NF via IA (qualquer usuário logado: gerencia, vendas, auxiliar)
+  if (req.method === 'POST' && url === '/api/nf-extract') {
+    const sess = getSession(req);
+    if (!canUseDocumentos(sess)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { pdfBase64 } = JSON.parse(body);
+      if (!pdfBase64) throw new Error('Nenhum arquivo recebido.');
+      const data = await extrairNF(pdfBase64);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(data));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao extrair dados da NF: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/gt — gera o PDF da Guia de Transito (qualquer usuário logado: gerencia, vendas, auxiliar)
+  if (req.method === 'POST' && url === '/api/gt') {
+    const sess = getSession(req);
+    if (!canUseDocumentos(sess)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      if (!data || !data.destinatarios || !data.destinatarios[0] || !data.destinatarios[0].nome) {
+        throw new Error('Preencha ao menos os dados do destinatário.');
+      }
+      if (!data.produtos || !data.produtos.length) {
+        throw new Error('Adicione ao menos um produto.');
+      }
+      const { bytes, filename } = await gerarGT(data);
+      res.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename="' + filename.replace(/"/g, '') + '"',
+      });
+      res.end(Buffer.from(bytes));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao gerar GT: ' + e.message }));
+    }
+    return;
+  }
+
+  // GET /api/gollog/aeroporto-por-cep?cep=XXXXXXXX — devolve os 3 aeroportos
+  // da rede Gol mais próximos do CEP + o melhor. Consulta BrasilAPI + Haversine.
+  if (req.method === 'GET' && url.startsWith('/api/gollog/aeroporto-por-cep')) {
+    const sess = getSession(req);
+    if (!canUseDocumentos(sess)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const cep = u.searchParams.get('cep');
+      if (!cep) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'cep obrigatório'})); return; }
+      const { sugerirPorCEP } = require('../lib/gollog/aeroportos');
+      const r = await sugerirPorCEP(cep);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message || String(e) }));
+    }
+    return;
+  }
+
+  // GET /api/comercial — le os dados (luis e vendas podem ver; auxiliar nao)
+  if (req.method === 'GET' && url === '/api/comercial') {
+    const sess = getSession(req);
+    if (!sess || !canViewComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para ver o Dashboard Comercial.' }));
+      return;
+    }
+    try {
+      const data = await getComercialData();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ...data, canEdit: canEditComercial(sess) }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao carregar dados: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/comercial — salva os dados (somente luis/admin)
+  //
+  // MERGE, nao overwrite. O frontend de vendedores manda so os campos que ele
+  // edita (sellers, dias, mes, history) e NAO manda siteFat/faturamento do
+  // site — esse bucket é lançado por outra rota. Se aqui fizesse overwrite
+  // cru, o siteFat sumia toda vez que alguem salvava outra coisa. Entao
+  // pegamos o estado atual, aplicamos so os campos que vieram, e salvamos.
+  if (req.method === 'POST' && url === '/api/comercial') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para editar o Dashboard Comercial.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const incoming = JSON.parse(body);
+      const atual = await getComercialData();
+      const merged = {
+        ...atual,
+        ...incoming,
+        // Campos que so a rota especifica de site pode mexer: preserva o valor
+        // atual quando o incoming nao trouxer (ou trouxer undefined/null).
+        siteFat: (incoming.siteFat === undefined || incoming.siteFat === null)
+          ? (Number(atual.siteFat) || 0)
+          : Number(incoming.siteFat) || 0,
+        // history so persiste se veio explicito; senao mantem o do disco pra
+        // nao apagar meses fechados quando o frontend nao carrega historico.
+        history: Array.isArray(incoming.history) ? incoming.history : (atual.history || []),
+      };
+      await saveComercialData(merged);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao salvar: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/comercial/reset-month — fecha o mes, arquiva no historico e zera (somente luis/admin)
+  if (req.method === 'POST' && url === '/api/comercial/reset-month') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para fechar o mes.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { vencedor } = JSON.parse(body || '{}');
+      const data = await resetMonth(vencedor);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(data));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao fechar o mes: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/comercial/registrar-venda — autolancamento do proprio vendedor
+  // (qualquer um que pode VER o comercial pode registrar, nao precisa ser admin)
+  if (req.method === 'POST' && url === '/api/comercial/registrar-venda') {
+    const sess = getSession(req);
+    if (!sess || !canViewComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { sellerId, valor } = JSON.parse(body || '{}');
+      const valorNum = Number(valor);
+      if (!sellerId || !valorNum || valorNum <= 0) {
+        throw new Error('Informe o vendedor e um valor de venda maior que zero.');
+      }
+      let targetId = Number(sellerId);
+      // Se quem lança é vendedor, força o sellerId pro próprio (impede lançar
+      // pro colega mesmo via devtools ou POST direto). Gerência/auxiliar podem
+      // escolher qualquer vendedor.
+      if (sess.role === 'vendas') {
+        const dataAtual = await getComercialData();
+        const login = String(sess.usuario || '').toLowerCase();
+        const meu = (dataAtual.sellers || []).find(s => String(s.name || '').toLowerCase().includes(login));
+        if (!meu) {
+          throw new Error('Seu login não está vinculado a nenhum vendedor cadastrado.');
+        }
+        if (targetId !== meu.id) {
+          // silenciosamente redireciona pro próprio; o front já trava, então só
+          // chegaria aqui via tentativa manual.
+          targetId = meu.id;
+        }
+      }
+      const data = await registrarVenda(targetId, valorNum);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, sellers: data.sellers }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao registrar venda: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/comercial/registrar-venda-site — lançamento do bucket SITE.
+  // Só quem pode editar o comercial (gerência/luis) — vendedor comum nem vê a
+  // opção na UI. Site não é vendedor: soma pro Total Geral do mês, mas fica
+  // fora do rank/score/comissão/consultor-do-mês.
+  if (req.method === 'POST' && url === '/api/comercial/registrar-venda-site') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para lançar venda do site.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { valor } = JSON.parse(body || '{}');
+      const valorNum = Number(valor);
+      // Aceita negativo (correção). Rejeita só zero, NaN ou vazio.
+      if (!Number.isFinite(valorNum) || valorNum === 0) {
+        throw new Error('Informe um valor diferente de zero (use negativo pra corrigir).');
+      }
+      const data = await registrarVendaSite(valorNum);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, siteFat: data.siteFat, ajuste: valorNum }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao registrar venda do site: ' + e.message }));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // FILA DE PEDIDOS DO BLING → COMERCIAL — REVERTIDO 29/09/2026
+  // A tentativa de puxar pedidos automaticos do Bling foi descartada:
+  // o Bling v3 nao retornava nomes de situacao de forma confiavel na
+  // conta atual, entao o filtro "faturado/atendido" nunca casava.
+  // Vendedores voltam a lancar venda 100% manual pelo endpoint
+  // /api/comercial/registrar-venda existente.
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /comercial — dashboard comercial (luis e vendas podem ver; auxiliar nao)
+  if (req.method === 'GET' && url === '/comercial') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(loginPage(false));
+      return;
+    }
+    if (!canViewComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end('<!DOCTYPE html><html><body style="font-family:sans-serif;padding:40px;text-align:center;color:#444"><h2>Acesso restrito</h2><p>Seu usuario nao tem permissao para ver o Dashboard Comercial.</p><a href="/">Voltar</a></body></html>');
+      return;
+    }
+    try {
+      let html = fs.readFileSync(path.join(ROOT, 'comercial-dashboard.html'), 'utf-8');
+      const canEditCom = canEditComercial(sess) ? 'true' : 'false';
+      const escJs = s => String(s || '').replace(/["\\]/g, '\\$&').replace(/[\r\n]/g,' ');
+      html = html.replace('/* %%INJECT_COMERCIAL%% */',
+        'window.CAN_EDIT_COMERCIAL=' + canEditCom
+        + '; window.USER_NOME="' + escJs(sess.nome) + '"'
+        + '; window.USER_USUARIO="' + escJs(sess.usuario) + '"'
+        + '; window.USER_ROLE="' + escJs(sess.role || '') + '";'
+      );
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(html);
+    } catch (e) {
+      res.writeHead(500);
+      res.end('Erro ao carregar dashboard comercial: ' + e.message);
+    }
+    return;
+  }
+
+  // GET /api/contatos — lista de contatos úteis (qualquer usuário logado pode ver)
+  if (req.method === 'GET' && url === '/api/contatos') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    try {
+      const contatos = await getContatos();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ contatos, canEdit: canEditComercial(sess) }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao carregar contatos: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/contatos — salva a lista completa (somente admin/gerencia)
+  if (req.method === 'POST' && url === '/api/contatos') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para editar contatos.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { contatos } = JSON.parse(body);
+      if (!Array.isArray(contatos)) throw new Error('Formato inválido.');
+      await saveContatos(contatos);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao salvar: ' + e.message }));
+    }
+    return;
+  }
+
+  // GET /api/editorial — marcações do calendário da Linha Editorial (somente gerencia)
+  if (req.method === 'GET' && url === '/api/editorial') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const state = await getEditorial();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ state }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao carregar: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/editorial — salva as marcações (compartilhado; somente gerencia)
+  if (req.method === 'POST' && url === '/api/editorial') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para editar.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { state } = JSON.parse(body);
+      if (!state || typeof state !== 'object' || Array.isArray(state)) throw new Error('Formato inválido.');
+      await saveEditorial(state);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao salvar: ' + e.message }));
+    }
+    return;
+  }
+
+  // GET /api/tarifas — taxas das operadoras (qualquer usuário logado usa a calculadora)
+  if (req.method === 'GET' && url === '/api/tarifas') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    try {
+      const tarifas = await getTarifas();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ tarifas, canEdit: canEditComercial(sess) }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao carregar tarifas: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/tarifas — salva as taxas (somente gerencia)
+  if (req.method === 'POST' && url === '/api/tarifas') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para editar tarifas.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { tarifas } = JSON.parse(body);
+      if (!tarifas || typeof tarifas !== 'object' || Array.isArray(tarifas)) throw new Error('Formato inválido.');
+      await saveTarifas(tarifas);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao salvar: ' + e.message }));
+    }
+    return;
+  }
+
+
+  // ═══ PARCEIROS / INFLUENCIADORES ═══════════════════════════════════════════
+  // Todas as rotas /api/parceiros/*. Persistência via parceirosStore (GitHub).
+
+  // helper local: id curto e único
+  const _prcId = () => 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const _round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+
+  function _resumoInfluenciador(inf, vendas, pagamentos) {
+    const dele = vendas.filter(v => v.influenciadorId === inf.id && !v.cancelada);
+    const totalVendido = _round2(dele.reduce((a, v) => a + (Number(v.valorLiquido) || 0), 0));
+    const totalComissao = _round2(dele.reduce((a, v) => a + (Number(v.comissao) || 0), 0));
+    const totalPago = _round2(pagamentos.filter(p => p.influenciadorId === inf.id).reduce((a, p) => a + (Number(p.valor) || 0), 0));
+    const saldoAberto = _round2(totalComissao - totalPago);
+    const qtdVendas = dele.length;
+    const ultimaVenda = dele.length ? dele.map(v => v.data).sort().slice(-1)[0] : null;
+    return { totalVendido, totalComissao, totalPago, saldoAberto, qtdVendas, ultimaVenda };
+  }
+
+  // GET /api/parceiros — dados completos (só gerência)
+  if (req.method === 'GET' && url === '/api/parceiros') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const d = await getParceiros();
+      const resumos = {};
+      d.influenciadores.forEach(inf => { resumos[inf.id] = _resumoInfluenciador(inf, d.vendas, d.pagamentos); });
+      const totalDevido = _round2(Object.values(resumos).reduce((a, r) => a + r.saldoAberto, 0));
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        influenciadores: d.influenciadores,
+        vendas: d.vendas,
+        pagamentos: d.pagamentos,
+        tray: { modoTeste: !!d.tray.modoTeste, ultimaSync: d.tray.ultimaSync, configurado: !!(d.tray.consumer_key && d.tray.code) },
+        resumos,
+        totalDevido,
+      }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao carregar parceiros: ' + e.message }));
+    }
+    return;
+  }
+
+  // GET /api/parceiros/ranking — só posições e volume relativo (visão vendas)
+  if (req.method === 'GET' && url === '/api/parceiros/ranking') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    try {
+      const d = await getParceiros();
+      const hoje = new Date();
+      const ini = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().slice(0, 10);
+      const rankTodos = d.influenciadores.filter(i => i.ativo !== false).map(inf => {
+        const dele = d.vendas.filter(v => v.influenciadorId === inf.id && !v.cancelada);
+        const doMes = dele.filter(v => (v.data || '') >= ini);
+        return {
+          nome: inf.nome, handle: inf.handle || '', cupom: inf.cupom,
+          qtdMes: doMes.length, qtdTotal: dele.length,
+          volumeMes: _round2(doMes.reduce((a, v) => a + (Number(v.valorLiquido) || 0), 0)),
+        };
+      }).sort((a, b) => b.volumeMes - a.volumeMes || b.qtdMes - a.qtdMes);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ mes: ini.slice(0, 7), ranking: rankTodos }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro: ' + e.message }));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // CONTRATOS — templates .docx com variáveis
+  // ═════════════════════════════════════════════════════════════
+
+  // GET /api/parceiros/contratos/templates — lista modelos disponíveis
+  if (req.method === 'GET' && url === '/api/parceiros/contratos/templates') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissão.'})); return; }
+    try {
+      const templates = contratos.listarTemplates();
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, templates }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/contratos/gerar — gera .docx e devolve pra download
+  //   Body: { template_id, influenciador_id, valores: {...} }
+  if (req.method === 'POST' && url === '/api/parceiros/contratos/gerar') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissão.'})); return; }
+    try {
+      const body = JSON.parse(await readBody(req) || '{}');
+      const { template_id, influenciador_id, valores } = body;
+      if (!template_id) throw new Error('template_id obrigatório');
+      const r = await contratos.gerar({ templateId: template_id, valores: valores || {} });
+      // Registra histórico e salva o arquivo no repo (best-effort)
+      let registro = null;
+      if (influenciador_id) {
+        try {
+          registro = await contratos.registrarNoParceiro({
+            influenciadorId: influenciador_id,
+            templateId: template_id,
+            filename: r.filename,
+            valores: r.valores_final,
+            actor: sess.usuario,
+            buffer: r.buffer,
+          });
+        } catch (e) { /* histórico é opcional */ }
+      }
+      // Envia o arquivo direto pra download
+      res.writeHead(200, {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'Content-Disposition': 'attachment; filename="' + r.filename + '"',
+        'Content-Length': r.buffer.length,
+        'X-Contrato-Id': registro ? registro.id : '',
+      });
+      res.end(r.buffer);
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/parceiros/contratos/historico?influenciador_id=X — histórico de um parceiro
+  if (req.method === 'GET' && url.startsWith('/api/parceiros/contratos/historico')) {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissão.'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const infId = u.searchParams.get('influenciador_id') || '';
+      if (!infId) throw new Error('influenciador_id obrigatório');
+      const d = await getParceiros();
+      const inf = (d.influenciadores || []).find(x => x.id === infId);
+      if (!inf) throw new Error('Influenciador não encontrado');
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, contratos: inf.contratos_gerados || [] }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/parceiros/contratos/download?inf=X&ct=Y — baixa 2ª via do contrato
+  if (req.method === 'GET' && url.startsWith('/api/parceiros/contratos/download')) {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissão.'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      const infId = u.searchParams.get('inf') || '';
+      const ctId  = u.searchParams.get('ct') || '';
+      if (!infId || !ctId) throw new Error('inf + ct obrigatórios');
+      const r = await contratos.buscarContratoGerado(infId, ctId);
+      if (!r) throw new Error('Contrato não encontrado ou arquivo removido');
+      res.writeHead(200, {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'Content-Disposition': 'attachment; filename="' + r.registro.filename + '"',
+        'Content-Length': r.buffer.length,
+      });
+      res.end(r.buffer);
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/influenciador — criar/atualizar/desativar (só gerência)
+  if (req.method === 'POST' && url === '/api/parceiros/influenciador') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const body = JSON.parse(await readBody(req));
+      const inf = body.influenciador || {};
+      if (!inf.nome || !inf.cupom) throw new Error('Nome e cupom sao obrigatorios.');
+      inf.cupom = String(inf.cupom).trim().toUpperCase();
+      inf.comissaoPct = Number(inf.comissaoPct);
+      if (!isFinite(inf.comissaoPct) || inf.comissaoPct < 0 || inf.comissaoPct > 100) inf.comissaoPct = 5;
+      inf.ativo = inf.ativo !== false;
+      const d = await getParceiros();
+      // cupom precisa ser único
+      const outroComMesmoCupom = d.influenciadores.find(x => x.cupom === inf.cupom && x.id !== inf.id);
+      if (outroComMesmoCupom) throw new Error('Cupom "' + inf.cupom + '" já está em uso por ' + outroComMesmoCupom.nome + '.');
+      if (inf.id) {
+        const idx = d.influenciadores.findIndex(x => x.id === inf.id);
+        if (idx < 0) throw new Error('Influenciador não encontrado.');
+        d.influenciadores[idx] = Object.assign({}, d.influenciadores[idx], inf);
+      } else {
+        inf.id = _prcId();
+        inf.cadastradoEm = new Date().toISOString().slice(0, 10);
+        d.influenciadores.push(inf);
+      }
+      await saveParceiros(d);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, id: inf.id }));
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/venda — lança 1..N vendas manualmente (só gerência)
+  if (req.method === 'POST' && url === '/api/parceiros/venda') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const body = JSON.parse(await readBody(req));
+      const lista = Array.isArray(body.vendas) ? body.vendas : [body.venda].filter(Boolean);
+      if (!lista.length) throw new Error('Nenhuma venda enviada.');
+      const d = await getParceiros();
+      const criadas = [];
+      for (const raw of lista) {
+        const cupom = String(raw.cupom || '').trim().toUpperCase();
+        const inf = d.influenciadores.find(x => x.cupom === cupom);
+        if (!inf) { criadas.push({ pedido: raw.pedidoTray, erro: 'Cupom ' + cupom + ' sem influenciador cadastrado.' }); continue; }
+        // deduplica por pedidoTray (não lança 2x o mesmo pedido)
+        if (raw.pedidoTray && d.vendas.some(v => v.pedidoTray === String(raw.pedidoTray))) {
+          criadas.push({ pedido: raw.pedidoTray, erro: 'Pedido já lançado.' }); continue;
+        }
+        const vBruto = Number(raw.valorBruto) || 0;
+        const vFrete = Number(raw.valorFrete) || 0;
+        const vLiquido = _round2(vBruto - vFrete);
+        const comissao = _round2(vLiquido * (Number(inf.comissaoPct) || 0) / 100);
+        const venda = {
+          id: _prcId(),
+          pedidoTray: raw.pedidoTray ? String(raw.pedidoTray) : '',
+          cupom,
+          influenciadorId: inf.id,
+          data: raw.data || new Date().toISOString().slice(0, 10),
+          cliente: raw.cliente || '',
+          valorBruto: _round2(vBruto),
+          valorFrete: _round2(vFrete),
+          valorLiquido: vLiquido,
+          comissaoPct: Number(inf.comissaoPct) || 0,
+          comissao,
+          origem: raw.origem || 'manual',
+          statusTray: raw.statusTray || 'Enviado',
+          cancelada: false,
+          criadaEm: new Date().toISOString(),
+        };
+        d.vendas.push(venda);
+        criadas.push({ pedido: venda.pedidoTray, id: venda.id, comissao });
+      }
+      await saveParceiros(d);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, criadas }));
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/venda-cancelar — cancela uma venda (não conta na comissão)
+  if (req.method === 'POST' && url === '/api/parceiros/venda-cancelar') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const { id } = JSON.parse(await readBody(req));
+      const d = await getParceiros();
+      const v = d.vendas.find(x => x.id === id);
+      if (!v) throw new Error('Venda não encontrada.');
+      v.cancelada = true;
+      v.canceladaEm = new Date().toISOString();
+      await saveParceiros(d);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/pagar — registra pagamento que zera o saldo em aberto
+  if (req.method === 'POST' && url === '/api/parceiros/pagar') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const body = JSON.parse(await readBody(req));
+      const influenciadorId = body.influenciadorId;
+      const obs = body.observacao || '';
+      const d = await getParceiros();
+      const inf = d.influenciadores.find(x => x.id === influenciadorId);
+      if (!inf) throw new Error('Influenciador não encontrado.');
+      const r = _resumoInfluenciador(inf, d.vendas, d.pagamentos);
+      if (r.saldoAberto <= 0) throw new Error('Não há saldo em aberto para este influenciador.');
+      const pag = {
+        id: _prcId(),
+        influenciadorId,
+        data: body.data || new Date().toISOString().slice(0, 10),
+        valor: r.saldoAberto,
+        observacao: obs,
+        vendasIds: d.vendas.filter(v => v.influenciadorId === influenciadorId && !v.cancelada).map(v => v.id),
+        criadoEm: new Date().toISOString(),
+        criadoPor: sess.usuario,
+      };
+      d.pagamentos.push(pag);
+      await saveParceiros(d);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, valor: pag.valor }));
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/sync-tray — puxa da Tray (ou simula em modo teste)
+  if (req.method === 'POST' && url === '/api/parceiros/sync-tray') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const d = await getParceiros();
+      const modoTeste = !d.tray.consumer_key || !d.tray.code;
+      let novas = 0, erros = 0, msg = '';
+      if (modoTeste) {
+        // gera 2..5 vendas fictícias entre os cupons cadastrados
+        const infs = d.influenciadores.filter(i => i.ativo !== false);
+        if (!infs.length) throw new Error('Cadastre ao menos um influenciador antes de sincronizar em modo teste.');
+        const nClientes = ['João Souza', 'Maria Silva', 'Pedro Oliveira', 'Ana Costa', 'Carlos Lima', 'Julia Alves', 'Rafael Nunes'];
+        const qtd = 2 + Math.floor(Math.random() * 4);
+        for (let i = 0; i < qtd; i++) {
+          const inf = infs[Math.floor(Math.random() * infs.length)];
+          const pedidoTray = 'TEST-' + Date.now().toString().slice(-6) + '-' + i;
+          if (d.vendas.some(v => v.pedidoTray === pedidoTray)) continue;
+          const vBruto = 200 + Math.random() * 1800;
+          const vFrete = 30 + Math.random() * 60;
+          const vLiquido = _round2(vBruto - vFrete);
+          const comissao = _round2(vLiquido * (Number(inf.comissaoPct) || 0) / 100);
+          d.vendas.push({
+            id: _prcId(),
+            pedidoTray,
+            cupom: inf.cupom,
+            influenciadorId: inf.id,
+            data: new Date(Date.now() - Math.floor(Math.random() * 20) * 86400000).toISOString().slice(0, 10),
+            cliente: nClientes[Math.floor(Math.random() * nClientes.length)],
+            valorBruto: _round2(vBruto), valorFrete: _round2(vFrete), valorLiquido: vLiquido,
+            comissaoPct: Number(inf.comissaoPct) || 0, comissao,
+            origem: 'tray-teste', statusTray: 'Enviado', cancelada: false,
+            criadaEm: new Date().toISOString(),
+          });
+          novas++;
+        }
+        msg = 'Modo teste: ' + novas + ' venda(s) simulada(s) criada(s).';
+      } else {
+        // TODO: integração real com API da Tray (consumer_key/consumer_secret/code).
+        // Endpoint a implementar: GET /orders com filtro por status=Enviado (após ultimaSync).
+        // Cada pedido com coupon → mapeia pra influenciador pelo campo cupom.
+        msg = 'Integração real com a Tray ainda não implementada. Configure e me avise.';
+      }
+      d.tray.ultimaSync = new Date().toISOString();
+      await saveParceiros(d);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, novas, erros, msg, modoTeste }));
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/tray-config — salva credenciais da Tray (só gerência)
+  if (req.method === 'POST' && url === '/api/parceiros/tray-config') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const body = JSON.parse(await readBody(req));
+      const d = await getParceiros();
+      d.tray = Object.assign({}, d.tray, {
+        consumer_key: body.consumer_key || null,
+        consumer_secret: body.consumer_secret || null,
+        code: body.code || null,
+        modoTeste: !(body.consumer_key && body.code),
+      });
+      await saveParceiros(d);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, modoTeste: d.tray.modoTeste }));
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+  // ═══ FIM PARCEIROS ═════════════════════════════════════════════════════════
+
+  // POST /api/generate — Gerador de Conteúdo (usa a MESMA chave Anthropic do portal)
+  if (req.method === 'POST' && url === '/api/generate') {
+    const sess = getSession(req);
+    if (!sess) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Nao autorizado.' }));
+      return;
+    }
+    const apiKey = config.anthropicApiKey;
+    if (!apiKey) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'API key não configurada' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { system, userMessage } = JSON.parse(body);
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({
+          model: 'claude-opus-4-5',
+          max_tokens: 8000,
+          system,
+          messages: [{ role: 'user', content: userMessage }],
+        }),
+      });
+      if (!r.ok) {
+        let err = {};
+        try { err = await r.json(); } catch (e) {}
+        res.writeHead(r.status, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: (err.error && err.error.message) || 'Erro na API' }));
+        return;
+      }
+      const data = await r.json();
+      const textBlock = (data.content || []).find(b => b.type === 'text');
+      if (!textBlock) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Sem resposta de texto' }));
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ text: textBlock.text }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // Proteger tudo
+  const sess = getSession(req);
+  if (!sess) {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(loginPage(false));
+    return;
+  }
+
+  // Servir dashboard com flags de permissao injetadas
+  try {
+    let html = fs.readFileSync(path.join(ROOT, 'dashboard.html'), 'utf-8');
+    const userRole = getRole(sess.usuario, sess);
+    const isAdmin = isAdminOrDiretor(sess) ? 'true' : 'false';
+    const canViewCom = canViewComercial(sess) ? 'true' : 'false';
+    const canEditCom = canEditComercial(sess) ? 'true' : 'false';
+    const canAccessControlado = crmUtils.canAccessControlado(sess) ? 'true' : 'false';
+    const canAccessCrm = crmUtils.canAccessCRM(sess) ? 'true' : 'false';
+    const canEditCrm = crmUtils.canEditCRM(sess) ? 'true' : 'false';
+    const canUseIaFlag = canUseIA(sess) ? 'true' : 'false';
+    const canManageKBFlag = canManageKB(sess) ? 'true' : 'false';
+    const canGerGar = canGerenciarGarantias(sess) ? 'true' : 'false';
+    const canVerProd = isAdminOrDiretor(sess) ? 'true' : 'false';
+    const usuarioEsc = String(sess.usuario || '').replace(/"/g, '\\"');
+    const nomeEsc = String(sess.nome || '').replace(/"/g, '\\"');
+    const roleEsc = String(userRole || '').replace(/"/g, '\\"');
+    const mustChange = sess.mustChange ? 'true' : 'false';
+    html = html.replace('/* %%INJECT%% */',
+      'var IS_ADMIN=' + isAdmin + '; var USER_NOME="' + nomeEsc + '"; var USER_USUARIO="' + usuarioEsc + '"; ' +
+      'var USER_ROLE="' + roleEsc + '"; ' +
+      'var CAN_VIEW_COMERCIAL=' + canViewCom + '; var CAN_EDIT_COMERCIAL=' + canEditCom + '; ' +
+      'var CAN_ACCESS_CONTROLADO=' + canAccessControlado + '; ' +
+      'var CAN_ACCESS_CRM=' + canAccessCrm + '; var CAN_EDIT_CRM=' + canEditCrm + '; ' +
+      'var CAN_USE_IA=' + canUseIaFlag + '; var CAN_MANAGE_KB=' + canManageKBFlag + '; ' +
+      'var CAN_GERENCIAR_GARANTIAS=' + canGerGar + '; ' +
+      'var CAN_VER_PRODUTIVIDADE=' + canVerProd + '; ' +
+      'var MUST_CHANGE_PASSWORD=' + mustChange + ';'
+    );
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(html);
+  } catch(e) {
+    res.writeHead(500);
+    res.end('Erro ao carregar portal: ' + e.message);
+  }
+};
+
+// Permite que a geração de conteúdo (chamada à IA, que pode levar mais que
+// os 10s padrão) rode até 60s. Aditivo — não altera roteamento nem o resto do portal.
+module.exports.config = { maxDuration: 60 };
