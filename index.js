@@ -3207,6 +3207,10 @@ module.exports = async (req, res) => {
             await solic.criar({
               de: sess.usuario, para, categoria: 'Financeiro',
               titulo, descricao: desc,
+              // Fecha direto ao ser executada — eh notificacao automatica,
+              // nao faz sentido pedir aprovacao do operador que apenas
+              // registrou a retirada.
+              auto_fechar: true,
             });
           } catch (e) { console.error('[retirada] falha ao notificar ' + para + ':', e.message); }
         }

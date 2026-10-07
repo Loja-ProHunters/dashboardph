@@ -353,6 +353,7 @@ tbody tr:hover td{background:var(--gl)}
     <button class="ni" onclick="goTab('contatos',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M15.6 21A13.6 13.6 0 0 1 3 8.4 2.4 2.4 0 0 1 5.4 6h2.1L9 9.4 7.5 11a11 11 0 0 0 5.5 5.5L14.6 15l3.4 1.5v2.1A2.4 2.4 0 0 1 15.6 21z"/></svg></span><span class="ni-tx">Contatos Úteis</span></button>
     <button class="ni" onclick="goTab('calculadora',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2.2"/><path d="M8 7.5h8"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/></svg></span><span class="ni-tx">Calculadora de Juros</span></button>
     <button class="ni" id="ni-garantias" onclick="goTab('garantias',this)" style="display:none"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5 3.5 9.3 8 10 4.5-.7 8-5 8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></span><span class="ni-tx">Garantias</span><span class="badge" id="gar-badge-menu" style="display:none;background:#e03030;color:#fff">0</span></button>
+    <button class="ni" id="ni-controlado" data-tab-id="controlado" onclick="goOpControlado(this)" style="display:none"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M3 7h13v10H3z"/><path d="M16 10h4l1 3v4h-5"/><circle cx="7" cy="18" r="1.8"/><circle cx="18" cy="18" r="1.8"/></svg></span><span class="ni-tx">Op. Controlado</span></button>
   </div>
   <div class="sb-grp" id="grp-comercial" style="display:none">
     <div class="sb-lbl">Comercial</div>
@@ -3781,9 +3782,13 @@ var tabMeta = {
 // Se uma aba nao aparece na lista, e escondida no menu.
 // 'admin' e 'diretor' veem tudo (nao entram no mapa; passam pela else).
 var TABS_POR_ROLE = {
-  vendas:     ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
+  // 'controlado' pros vendedores e financeiro é um atalho direto pra sub-aba
+  // controlado do CRM (goOpControlado), sem precisar passar pelo CRM e clicar.
+  // Auxiliar NAO precisa dessa aba porque o botao "CRM" dele ja foi renomeado
+  // pra "Op. Controlado" (ele so acessa isso mesmo).
+  vendas:     ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','controlado','parceiros','ia','gerador'],
   auxiliar:   ['inicio','solicitacoes','contratos','contatos','comercial','crm','garantias'],
-  financeiro: ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
+  financeiro: ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','controlado','parceiros','ia','gerador'],
   marketing:  ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
   comex:      ['inicio','solicitacoes','comercial','ia'],
 };
@@ -3821,6 +3826,15 @@ window.onload = function() {
     // Dispara contador uma vez pro badge
     try { if (typeof GAR && GAR.atualizarContador) GAR.atualizarContador(); } catch(_){}
   }
+  // Revela Op. Controlado (atalho pra sub-aba Controlado do CRM) pra quem tem
+  // acesso: vendas, admin, diretor, financeiro. Auxiliar NAO ve esse botao
+  // porque pra ele o botao "CRM" ja foi renomeado pra "Op. Controlado".
+  var _niCtrl = document.getElementById('ni-controlado');
+  if (_niCtrl && typeof CAN_ACCESS_CONTROLADO !== 'undefined' && CAN_ACCESS_CONTROLADO) {
+    if (typeof USER_ROLE === 'undefined' || USER_ROLE !== 'auxiliar') {
+      _niCtrl.style.display = '';
+    }
+  }
   // Revela Produtividade (admin + diretor) — mesma visibilidade do grp-comercial
   var _niProd = document.getElementById('ni-produtividade');
   if (_niProd && typeof CAN_VER_PRODUTIVIDADE !== 'undefined' && CAN_VER_PRODUTIVIDADE) {
@@ -3854,10 +3868,14 @@ window.onload = function() {
   if (abasOk) {
     var okSet = {}; abasOk.forEach(function(k){ okSet[k] = true; });
     document.querySelectorAll('.sb .ni').forEach(function(btn){
-      // Extrai o id da aba do onclick="goTab('X',this)"
-      var m = (btn.getAttribute('onclick') || '').match(/goTab\('([^']+)'/);
-      if (!m) return;
-      var tabId = m[1];
+      // Primeiro tenta data-tab-id (botoes com handlers custom como goOpControlado).
+      // Se nao tiver, cai no onclick="goTab('X',this)" padrao.
+      var tabId = btn.dataset.tabId;
+      if (!tabId) {
+        var m = (btn.getAttribute('onclick') || '').match(/goTab\('([^']+)'/);
+        if (!m) return;
+        tabId = m[1];
+      }
       if (!okSet[tabId]) btn.style.display = 'none';
     });
     // Esconde grupos que ficaram totalmente vazios
@@ -3909,6 +3927,26 @@ function goTab(id, el) {
   if (id === 'solicitacoes') solicInit();
   if (id === 'garantias' && typeof GAR !== 'undefined') GAR.init();
   if (id === 'produtividade' && typeof PROD !== 'undefined') PROD.init();
+}
+
+// Atalho dedicado pra Op. Controlado — abre a aba do CRM mas forca a sub-aba
+// 'controlado' direto. Permite que vendedores tenham acesso rapido ao
+// operacional sem precisar navegar CRM -> aba Controlado toda vez.
+// A barra de sub-abas do CRM continua visivel (pra permitir voltar pra tarefas,
+// ficha etc), mas o atalho ja destaca o botao "Op. Controlado" como ativo.
+function goOpControlado(el) {
+  var tabs = document.querySelectorAll('.tab');
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
+  var nis = document.querySelectorAll('.ni');
+  for (var i = 0; i < nis.length; i++) nis[i].classList.remove('on');
+  document.getElementById('tab-crm').classList.add('on');
+  el.classList.add('on');
+  document.getElementById('tb-t').textContent = '🚚 Op. Controlado';
+  document.getElementById('tb-s').textContent = 'Cotação de frete + fila de envio de controlados';
+  closeSB();
+  // Forca a sub-aba controlado ANTES do init rodar
+  if (window.CRM) window.CRM.currentSub = 'controlado';
+  crmInit();
 }
 
 function toggleSB() {
