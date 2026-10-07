@@ -314,5 +314,34 @@
         "por": "gerencia"
       }
     ]
+  },
+  "5a86e2e8-6988-4fa2-bafa-38ae640d9146": {
+    "id": "5a86e2e8-6988-4fa2-bafa-38ae640d9146",
+    "de": "auxiliar",
+    "para": "gerencia",
+    "categoria": "Financeiro",
+    "titulo": "Pedido #1961 (Calibre) foi RETIRADO em loja",
+    "descricao": "Cliente: Vera Lucia H Pieritz\nCPF: 65837924949\nNF: 002898\nTotal do pedido: R$ 220,80\n\nRetirado por: Vera Lucia H Pieritz (doc: 65837924949)\nRegistrado por: auxiliar\n\nObs: Levou os 2 volumes",
+    "prazo": null,
+    "status": "pendente",
+    "criado_em": "2026-10-07T13:16:08.338Z",
+    "executado_em": null,
+    "executado_por": null,
+    "aprovado_em": null,
+    "aprovado_por": null,
+    "rejeitado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_motivo": null,
+    "mensagens": [],
+    "ultimaLeitura": {
+      "auxiliar": "2026-10-07T13:16:08.338Z"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-07T13:16:08.338Z",
+        "acao": "criada",
+        "por": "auxiliar"
+      }
+    ]
   }
 }
