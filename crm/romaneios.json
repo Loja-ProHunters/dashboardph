@@ -108,5 +108,25 @@
     "criado_por": "auxiliar",
     "atualizado_em": "2026-10-08T16:50:18.492Z",
     "atualizado_por": "auxiliar"
+  },
+  "rom_20261008_0006": {
+    "id": "rom_20261008_0006",
+    "numero": "0006",
+    "data": "2026-10-08",
+    "transportadora": "rpa",
+    "empresa_agrupada": "calibre",
+    "envio_ids": [
+      "env_calibre_1959"
+    ],
+    "total_volumes": 1,
+    "motorista_nome": null,
+    "motorista_cpf": null,
+    "motorista_placa": null,
+    "motorista_assinado_em": null,
+    "gerado_por": "gerencia",
+    "criado_em": "2026-10-08T17:02:49.326Z",
+    "criado_por": "gerencia",
+    "atualizado_em": "2026-10-08T17:02:49.326Z",
+    "atualizado_por": "gerencia"
   }
 }
