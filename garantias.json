@@ -132,7 +132,22 @@
         "para": "em_analise",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "d7bd1a07-bb59-404b-9f35-68f4f340a014": {
     "id": "d7bd1a07-bb59-404b-9f35-68f4f340a014",
@@ -258,7 +273,22 @@
         "para": "em_analise",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "4fe8a8c1-d89d-4f2d-931d-9646c580ca83": {
     "id": "4fe8a8c1-d89d-4f2d-931d-9646c580ca83",
@@ -393,7 +423,22 @@
         "para": "em_analise",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "09712c5f-20a4-4372-9f7a-1eaa87c982da": {
     "id": "09712c5f-20a4-4372-9f7a-1eaa87c982da",
@@ -521,7 +566,22 @@
         "para": "em_analise",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "84a1b4bc-241c-436e-b983-b5cd953e6f15": {
     "id": "84a1b4bc-241c-436e-b983-b5cd953e6f15",
@@ -646,7 +706,22 @@
         "resultado": "restituicao",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "1d63cb24-5699-4fcb-a54e-0f83f7b580ae": {
     "id": "1d63cb24-5699-4fcb-a54e-0f83f7b580ae",
@@ -790,7 +865,22 @@
         "resultado": "restituicao",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "f77e1404-143f-4b75-817b-9d857764f02b": {
     "id": "f77e1404-143f-4b75-817b-9d857764f02b",
@@ -939,7 +1029,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "9cd829bf-92d9-4799-ae55-d3f9983f911f": {
     "id": "9cd829bf-92d9-4799-ae55-d3f9983f911f",
@@ -1088,7 +1193,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "8f5c3810-8ead-4925-a46f-6fa6e2f278c0": {
     "id": "8f5c3810-8ead-4925-a46f-6fa6e2f278c0",
@@ -1208,7 +1328,22 @@
         "resultado": "restituicao",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "533bb0d3-2b4f-46c4-b938-5be0620b522d": {
     "id": "533bb0d3-2b4f-46c4-b938-5be0620b522d",
@@ -1335,7 +1470,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "571054fc-de53-4ba3-a095-006fe2791f17": {
     "id": "571054fc-de53-4ba3-a095-006fe2791f17",
@@ -1484,7 +1634,22 @@
         "para": "em_analise",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "e4633cb8-b87e-4198-8f71-509e6c5d2d80": {
     "id": "e4633cb8-b87e-4198-8f71-509e6c5d2d80",
@@ -1604,7 +1769,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "3e9b6019-f83b-4e51-9331-69804f1d285f": {
     "id": "3e9b6019-f83b-4e51-9331-69804f1d285f",
@@ -1768,7 +1948,22 @@
         "resultado": "restituicao",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "8438f32f-3784-4c75-811f-5781dba19979": {
     "id": "8438f32f-3784-4c75-811f-5781dba19979",
@@ -1888,7 +2083,22 @@
         "resultado": "negada",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "d19474e2-efec-4636-b6bb-4e1cf8eca7b5": {
     "id": "d19474e2-efec-4636-b6bb-4e1cf8eca7b5",
@@ -2000,7 +2210,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "78954c88-4ce6-419b-9895-3c863c156146": {
     "id": "78954c88-4ce6-419b-9895-3c863c156146",
@@ -2120,7 +2345,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "d1127821-d27c-4ca4-b340-db05d9a52b84": {
     "id": "d1127821-d27c-4ca4-b340-db05d9a52b84",
@@ -2245,7 +2485,22 @@
         "resultado": "restituicao",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "25d36c19-79dc-43f8-939b-e1f7bb6547bf": {
     "id": "25d36c19-79dc-43f8-939b-e1f7bb6547bf",
@@ -2365,7 +2620,22 @@
         "resultado": "negada",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "0a74b196-2139-4048-bffe-3d46d158b667": {
     "id": "0a74b196-2139-4048-bffe-3d46d158b667",
@@ -2485,7 +2755,22 @@
         "resultado": "negada",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "b5bd7535-8b0a-40cb-ada2-519839a5821d": {
     "id": "b5bd7535-8b0a-40cb-ada2-519839a5821d",
@@ -2605,7 +2890,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "fb3ca4d8-2a11-427c-bc4e-b0cacce2e0a6": {
     "id": "fb3ca4d8-2a11-427c-bc4e-b0cacce2e0a6",
@@ -2725,7 +3025,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "4448de09-008d-4b51-a5f5-cadfe89d1331": {
     "id": "4448de09-008d-4b51-a5f5-cadfe89d1331",
@@ -2845,7 +3160,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "d6215ea9-9411-4929-8ac7-26b28f5eb9ee": {
     "id": "d6215ea9-9411-4929-8ac7-26b28f5eb9ee",
@@ -2965,7 +3295,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "c1afe2d1-cbe5-4a9c-97be-8255995d15c5": {
     "id": "c1afe2d1-cbe5-4a9c-97be-8255995d15c5",
@@ -3085,7 +3430,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "ed141fc4-3715-4b4b-b8b7-3e0a3191d974": {
     "id": "ed141fc4-3715-4b4b-b8b7-3e0a3191d974",
@@ -3205,7 +3565,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "f2c6903a-e57c-4930-b628-7fe23f484c78": {
     "id": "f2c6903a-e57c-4930-b628-7fe23f484c78",
@@ -3325,7 +3700,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "7aa48c33-4087-4e68-b374-6176f6be90e8": {
     "id": "7aa48c33-4087-4e68-b374-6176f6be90e8",
@@ -3445,7 +3835,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "9ddf58d8-43d3-4c7d-a15f-f175e5fb2c77": {
     "id": "9ddf58d8-43d3-4c7d-a15f-f175e5fb2c77",
@@ -3565,7 +3970,22 @@
         "resultado": "restituicao",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "35c944b3-c1cf-4dbc-a371-dc998b43e779": {
     "id": "35c944b3-c1cf-4dbc-a371-dc998b43e779",
@@ -3686,7 +4106,22 @@
         "para": "em_analise",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "8c617597-21a9-4bca-b406-a22c05204fbd": {
     "id": "8c617597-21a9-4bca-b406-a22c05204fbd",
@@ -3806,7 +4241,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "247512eb-84fb-46aa-a05a-c973604e4155": {
     "id": "247512eb-84fb-46aa-a05a-c973604e4155",
@@ -3926,7 +4376,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "b7ac64c9-76ab-4491-b129-05a29c08e8a5": {
     "id": "b7ac64c9-76ab-4491-b129-05a29c08e8a5",
@@ -4046,7 +4511,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "1e09d601-45f1-4e8e-8d36-f011efa05ebd": {
     "id": "1e09d601-45f1-4e8e-8d36-f011efa05ebd",
@@ -4166,7 +4646,22 @@
         "resultado": "troca",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "f6ef828d-c923-4a13-a36e-0367e159eb48": {
     "id": "f6ef828d-c923-4a13-a36e-0367e159eb48",
@@ -4286,7 +4781,22 @@
         "resultado": "restituicao",
         "nota": null
       }
-    ]
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
   },
   "d9bc2144-7e53-409f-96d0-7c05c1263f0a": {
     "id": "d9bc2144-7e53-409f-96d0-7c05c1263f0a",
@@ -4405,6 +4915,147 @@
         "por": "auxiliar",
         "resultado": "troca",
         "nota": null
+      }
+    ],
+    "procedimento_interno": {
+      "status": "pendente",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    }
+  },
+  "5a5307d5-ee2c-49b4-85d1-3e81717ba7c8": {
+    "id": "5a5307d5-ee2c-49b4-85d1-3e81717ba7c8",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Filipe Robert Souza",
+      "cpf_cnpj": "13203138760",
+      "whatsapp": "+5521997227555",
+      "email": "flp_robert@hotmail.com",
+      "cidade": "Recife",
+      "uf": "PE",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031493",
+      "data_compra": "2026-10-03",
+      "data_recebimento": "2026-10-07",
+      "nome_produto": "Red dot frenzy",
+      "marca": "Vector optics",
+      "modelo": "SCRD-19II",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Infelizmente não consegui realizar a adaptação para o meu equipamento. Tentei ainda com a ajuda do vendedor Wesley, mas realmente não tenho o adaptador.",
+      "data_percebido_problema": "2026-10-07",
+      "chegou_defeito_ou_depois": "Funcionamento Normal",
+      "motivo_troca_devolucao": "Vou solicitar a devolução para comprar outro modelo. Infelizmente o modelo que desejo e que cabe na minha pistola, vocês não tem mais disponível.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "F08355AC-3EE4-432D-A4C8-AFF87C4936E5_still.jpeg",
+          "url": "https://storage.tally.so/private/F08355AC-3EE4-432D-A4C8-AFF87C4936E5_still.jpeg?id=j424GQ&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Imo0MjRHUSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTQ0NjM2Nn0.yz5SLzS_ta0cgTDiVyNn6G0BD9ic4wxdGPgXhHp4ttQ&signature=1b24f714679b962bf3b81e84c0f1f4d55e6649ea706ce23c6fefd3ce4a151c96",
+          "mimeType": "image/jpeg",
+          "size": 177998
+        },
+        {
+          "tipo": "foto",
+          "nome": "F08355AC-3EE4-432D-A4C8-AFF87C4936E5_still.jpeg",
+          "url": "https://storage.tally.so/private/F08355AC-3EE4-432D-A4C8-AFF87C4936E5_still.jpeg?id=eOPO9x&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImVPUE85eCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTQ0NjM2Nn0.mhCpkwMV4flsU8r1ytnheSsUt6MJEEq1RiHFGyKTtRs&signature=9de29e5c5e5e06e46fba70f406f9a307020a5a5fe2373243acff751eaf253e7e",
+          "mimeType": "image/jpeg",
+          "size": 170341
+        }
+      ]
+    },
+    "preferencia_cliente": "restituicao",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-10-07",
+      "data_percebido_problema": "2026-10-07",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": true,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": true
+      },
+      "_override": {
+        "sugestao": "analise_manual",
+        "justificativa": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+        "score_confianca": "baixa"
+      },
+      "preferencia_cliente": "restituicao",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-08T07:59:26.722Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-08T07:59:26.722Z",
+    "atualizado_em": "2026-10-08T07:59:26.722Z",
+    "tally_meta": {
+      "eventId": "sync_gbx60EP",
+      "responseId": "gbx60EP",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-10-07T21:11:07.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Devolução (arrependimento de compra)",
+      "raw_momento": "Funcionamento Normal"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-08T07:59:26.722Z",
+        "acao": "criada",
+        "por": "tally-webhook"
       }
     ]
   }
