@@ -3239,9 +3239,9 @@
     "transporte_valor": 200,
     "transporte_por": "mathias",
     "transporte_em": "2026-10-07T13:19:29.273Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "031515",
+    "nf_por": "auxiliar",
+    "nf_em": "2026-10-08T11:57:08.029Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -3311,12 +3311,20 @@
         "acao": "campo_alterado",
         "campo": "transporte_valor",
         "novo": 200
+      },
+      {
+        "ts": "2026-10-08T11:57:08.029Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "031515"
       }
     ],
     "criado_em": "2026-10-06T14:26:40.215Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-07T13:19:29.273Z",
-    "atualizado_por": "mathias"
+    "atualizado_em": "2026-10-08T11:57:08.029Z",
+    "atualizado_por": "auxiliar"
   },
   "env_calibre_1963": {
     "id": "env_calibre_1963",
