@@ -3689,9 +3689,9 @@
     "gt_numero": "202632538403",
     "gt_por": "auxiliar",
     "gt_em": "2026-10-08T11:56:02.571Z",
-    "assinatura_ok": false,
-    "assinatura_por": null,
-    "assinatura_em": null,
+    "assinatura_ok": true,
+    "assinatura_por": "auxiliar",
+    "assinatura_em": "2026-10-08T16:41:39.097Z",
     "liberacao_ok": false,
     "liberacao_por": null,
     "liberacao_em": null,
@@ -3795,11 +3795,19 @@
         "acao": "campo_alterado",
         "campo": "gru_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-08T16:41:39.097Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "assinatura_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-07T13:58:23.601Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-08T16:29:38.589Z",
+    "atualizado_em": "2026-10-08T16:41:39.097Z",
     "atualizado_por": "auxiliar"
   }
 }
