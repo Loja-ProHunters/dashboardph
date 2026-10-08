@@ -3462,8 +3462,8 @@
     "romaneio_id": "rom_20261008_0005",
     "romaneio_numero": "0005",
     "coletado_em": "2026-10-08T16:50:19.457Z",
-    "coletado_motorista": null,
-    "coletado_motorista_cpf": null,
+    "coletado_motorista": "Rafael Nadal",
+    "coletado_motorista_cpf": "00712640002",
     "coletado_placa": null,
     "historico": [
       {
@@ -3567,12 +3567,28 @@
         "acao": "campo_alterado",
         "campo": "status",
         "novo": "enviado"
+      },
+      {
+        "ts": "2026-10-08T17:24:05.468Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_motorista",
+        "novo": "Rafael Nadal"
+      },
+      {
+        "ts": "2026-10-08T17:24:05.468Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_motorista_cpf",
+        "novo": "00712640002"
       }
     ],
     "criado_em": "2026-10-06T14:26:40.215Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-08T16:50:22.718Z",
-    "atualizado_por": "auxiliar"
+    "atualizado_em": "2026-10-08T17:24:05.468Z",
+    "atualizado_por": "gerencia"
   },
   "env_calibre_1963": {
     "id": "env_calibre_1963",
