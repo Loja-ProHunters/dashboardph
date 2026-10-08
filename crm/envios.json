@@ -3655,10 +3655,10 @@
     "liberacao_ok": false,
     "liberacao_por": null,
     "liberacao_em": null,
-    "anexo_p_ok": false,
-    "anexo_p_por": null,
-    "anexo_p_em": null,
-    "anexo_p_ip": null,
+    "anexo_p_ok": true,
+    "anexo_p_por": "auxiliar",
+    "anexo_p_em": "2026-10-08T16:29:35.933Z",
+    "anexo_p_ip": "170.231.25.101",
     "gru_ok": false,
     "gru_por": null,
     "gru_em": null,
@@ -3739,11 +3739,19 @@
         "acao": "campo_alterado",
         "campo": "gt_numero",
         "novo": "202632538403"
+      },
+      {
+        "ts": "2026-10-08T16:29:35.933Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "anexo_p_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-07T13:58:23.601Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-08T11:56:02.572Z",
+    "atualizado_em": "2026-10-08T16:29:35.934Z",
     "atualizado_por": "auxiliar"
   }
 }
