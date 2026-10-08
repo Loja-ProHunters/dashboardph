@@ -3646,7 +3646,7 @@
       "id": 15596518687,
       "nome": null
     },
-    "status": "pronto_coleta",
+    "status": "enviado",
     "confirmado_bling": true,
     "volumes_qtd": 1,
     "volumes_por": "boschetto",
@@ -3687,9 +3687,9 @@
     "dimensoes_cm": "46x8x35",
     "minuta_numero": "202665177894",
     "aeroporto_iata": "SBFZ",
-    "romaneio_id": null,
-    "romaneio_numero": null,
-    "coletado_em": null,
+    "romaneio_id": "rom_20261008_0007",
+    "romaneio_numero": "0007",
+    "coletado_em": "2026-10-08T17:04:03.176Z",
     "coletado_motorista": null,
     "coletado_motorista_cpf": null,
     "coletado_placa": null,
@@ -3811,11 +3811,43 @@
         "acao": "campo_alterado",
         "campo": "liberacao_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-08T17:04:03.176Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "romaneio_id",
+        "novo": "rom_20261008_0007"
+      },
+      {
+        "ts": "2026-10-08T17:04:03.176Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "romaneio_numero",
+        "novo": "0007"
+      },
+      {
+        "ts": "2026-10-08T17:04:03.176Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_em",
+        "novo": "2026-10-08T17:04:03.176Z"
+      },
+      {
+        "ts": "2026-10-08T17:04:03.176Z",
+        "por": "gerencia",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "status",
+        "novo": "enviado"
       }
     ],
     "criado_em": "2026-10-06T17:58:08.080Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-08T16:45:19.091Z",
+    "atualizado_em": "2026-10-08T17:04:03.176Z",
     "atualizado_por": "gerencia",
     "pix_por": "boschetto",
     "pix_em": "2026-10-07T13:57:08.535Z",
