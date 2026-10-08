@@ -3467,9 +3467,9 @@
     "transporte_valor": 530,
     "transporte_por": "boschetto",
     "transporte_em": "2026-10-07T12:56:06.052Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "002901",
+    "nf_por": "auxiliar",
+    "nf_em": "2026-10-08T11:57:50.573Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -3547,12 +3547,20 @@
         "acao": "campo_alterado",
         "campo": "pix_baixado",
         "novo": true
+      },
+      {
+        "ts": "2026-10-08T11:57:50.573Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "002901"
       }
     ],
     "criado_em": "2026-10-06T17:58:08.080Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-07T13:57:08.535Z",
-    "atualizado_por": "boschetto",
+    "atualizado_em": "2026-10-08T11:57:50.573Z",
+    "atualizado_por": "auxiliar",
     "pix_por": "boschetto",
     "pix_em": "2026-10-07T13:57:08.535Z",
     "pix_ip": "170.231.25.101"
