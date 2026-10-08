@@ -3559,10 +3559,10 @@
     "conferencia_por": "mathias",
     "conferencia_em": "2026-10-08T11:41:36.038Z",
     "conferencia_notas": null,
-    "transportadora": null,
-    "transporte_valor": null,
-    "transporte_por": null,
-    "transporte_em": null,
+    "transportadora": "ezequiel",
+    "transporte_valor": 300,
+    "transporte_por": "mathias",
+    "transporte_em": "2026-10-08T11:42:46.146Z",
     "nf_numero": null,
     "nf_por": null,
     "nf_em": null,
@@ -3627,11 +3627,27 @@
         "acao": "campo_alterado",
         "campo": "conferencia_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-08T11:42:46.146Z",
+        "por": "mathias",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "transportadora",
+        "novo": "ezequiel"
+      },
+      {
+        "ts": "2026-10-08T11:42:46.146Z",
+        "por": "mathias",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "transporte_valor",
+        "novo": 300
       }
     ],
     "criado_em": "2026-10-07T13:58:23.601Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-08T11:41:36.038Z",
+    "atualizado_em": "2026-10-08T11:42:46.146Z",
     "atualizado_por": "mathias"
   }
 }
