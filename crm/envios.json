@@ -3491,10 +3491,10 @@
     "gru_link": null,
     "comprovante_pix_link": null,
     "pix_baixado": true,
-    "peso_kg": null,
-    "dimensoes_cm": null,
-    "minuta_numero": null,
-    "aeroporto_iata": null,
+    "peso_kg": "2,3kg",
+    "dimensoes_cm": "46x8x35",
+    "minuta_numero": "",
+    "aeroporto_iata": "SBFZ",
     "romaneio_id": null,
     "romaneio_numero": null,
     "coletado_em": null,
@@ -3555,12 +3555,44 @@
         "acao": "campo_alterado",
         "campo": "nf_numero",
         "novo": "002901"
+      },
+      {
+        "ts": "2026-10-08T12:02:13.513Z",
+        "por": "boschetto",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "peso_kg",
+        "novo": "2,3kg"
+      },
+      {
+        "ts": "2026-10-08T12:02:13.513Z",
+        "por": "boschetto",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "dimensoes_cm",
+        "novo": "46x8x35"
+      },
+      {
+        "ts": "2026-10-08T12:02:13.513Z",
+        "por": "boschetto",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "minuta_numero",
+        "novo": ""
+      },
+      {
+        "ts": "2026-10-08T12:02:13.513Z",
+        "por": "boschetto",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "aeroporto_iata",
+        "novo": "SBFZ"
       }
     ],
     "criado_em": "2026-10-06T17:58:08.080Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-08T11:57:50.573Z",
-    "atualizado_por": "auxiliar",
+    "atualizado_em": "2026-10-08T12:02:13.513Z",
+    "atualizado_por": "boschetto",
     "pix_por": "boschetto",
     "pix_em": "2026-10-07T13:57:08.535Z",
     "pix_ip": "170.231.25.101"
