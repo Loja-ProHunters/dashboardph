@@ -1766,7 +1766,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "mathias",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-03",
     "ultima_compra_em": "2026-07-09",
@@ -1778,8 +1778,14 @@
     "notas": null,
     "criado_em": "2026-09-16T13:32:23.008Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:44:48.993Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-08T14:04:11.708Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "mathias",
+      "em": "2026-10-08T14:04:11.708Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_f557fdc91ca67d21": {
     "id": "acc_f557fdc91ca67d21",
