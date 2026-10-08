@@ -39127,7 +39127,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "mathias",
     "onboarding_id": null,
     "primeira_compra_em": "2025-09-23",
     "ultima_compra_em": "2025-09-23",
@@ -39139,8 +39139,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:28:27.868Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:28:27.868Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-08T14:13:13.636Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "mathias",
+      "em": "2026-10-08T14:13:13.636Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_ef1514698cb98450": {
     "id": "acc_ef1514698cb98450",
