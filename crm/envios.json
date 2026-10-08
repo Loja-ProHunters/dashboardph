@@ -2512,9 +2512,9 @@
     "transporte_valor": 200,
     "transporte_por": "dickmann",
     "transporte_em": "2026-10-06T11:41:05.993Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "031516",
+    "nf_por": "auxiliar",
+    "nf_em": "2026-10-08T11:56:23.844Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -2584,12 +2584,20 @@
         "acao": "campo_alterado",
         "campo": "conferencia_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-08T11:56:23.844Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "031516"
       }
     ],
     "criado_em": "2026-10-06T11:39:26.914Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-10-07T12:59:51.671Z",
-    "atualizado_por": "dickmann"
+    "atualizado_em": "2026-10-08T11:56:23.844Z",
+    "atualizado_por": "auxiliar"
   },
   "env_prohunters_27141": {
     "id": "env_prohunters_27141",
