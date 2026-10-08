@@ -3486,7 +3486,7 @@
       "id": 15596518687,
       "nome": null
     },
-    "status": "aberto",
+    "status": "pronto_coleta",
     "confirmado_bling": true,
     "volumes_qtd": 1,
     "volumes_por": "boschetto",
@@ -3508,9 +3508,9 @@
     "assinatura_ok": true,
     "assinatura_por": "auxiliar",
     "assinatura_em": "2026-10-08T16:41:30.073Z",
-    "liberacao_ok": false,
-    "liberacao_por": null,
-    "liberacao_em": null,
+    "liberacao_ok": true,
+    "liberacao_por": "gerencia",
+    "liberacao_em": "2026-10-08T16:45:19.091Z",
     "anexo_p_ok": false,
     "anexo_p_por": null,
     "anexo_p_em": null,
@@ -3643,11 +3643,19 @@
         "acao": "campo_alterado",
         "campo": "minuta_numero",
         "novo": "202665177894"
+      },
+      {
+        "ts": "2026-10-08T16:45:19.091Z",
+        "por": "gerencia",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "liberacao_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-06T17:58:08.080Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-08T16:45:11.873Z",
+    "atualizado_em": "2026-10-08T16:45:19.091Z",
     "atualizado_por": "gerencia",
     "pix_por": "boschetto",
     "pix_em": "2026-10-07T13:57:08.535Z",
