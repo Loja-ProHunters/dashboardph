@@ -926,7 +926,7 @@
   "416685cf-62f4-4721-ae5a-9b9c79aa47e9": {
     "id": "416685cf-62f4-4721-ae5a-9b9c79aa47e9",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_61eb1c86c9c37fbd",
@@ -949,8 +949,13 @@
     "dono": "dickmann",
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_em": "2026-10-08T16:36:31.124Z",
+    "atualizado_por": "dickmann",
+    "cliente_nome": "João Carlos Redin",
+    "cliente_telefone": null,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-08T16:36:31.124Z",
+    "concluida_por": "dickmann"
   },
   "86262c23-e0f4-4e15-ba3e-a298f37e0be7": {
     "id": "86262c23-e0f4-4e15-ba3e-a298f37e0be7",
@@ -976,7 +981,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Embraer S.A.",
+    "cliente_telefone": null
   },
   "3edd738d-bffe-421f-98e3-6af16a57ed93": {
     "id": "3edd738d-bffe-421f-98e3-6af16a57ed93",
@@ -1002,7 +1009,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Prime Distribuidora",
+    "cliente_telefone": null
   },
   "91b9dcf7-f63e-456a-ab77-9a5733fd39ed": {
     "id": "91b9dcf7-f63e-456a-ab77-9a5733fd39ed",
@@ -1028,7 +1037,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Arles Granhem Brandão",
+    "cliente_telefone": null
   },
   "fec588df-fe37-4237-b3e1-0e7a3f0ea258": {
     "id": "fec588df-fe37-4237-b3e1-0e7a3f0ea258",
@@ -1054,7 +1065,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Elias dos Santos Neto",
+    "cliente_telefone": null
   },
   "fccf83b4-e103-4974-b6f5-27de262dae40": {
     "id": "fccf83b4-e103-4974-b6f5-27de262dae40",
@@ -1080,7 +1093,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "VANDEMBERG VILELA VITORIANO",
+    "cliente_telefone": null
   },
   "ba5d01cf-1159-4f95-9a65-0d7d1471e53a": {
     "id": "ba5d01cf-1159-4f95-9a65-0d7d1471e53a",
@@ -1109,7 +1124,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "MARCOS FUCHS NOBRE",
+    "cliente_telefone": null
   },
   "77e81e3c-f410-4f26-94bd-4b0c0456f908": {
     "id": "77e81e3c-f410-4f26-94bd-4b0c0456f908",
@@ -1138,7 +1155,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Peterson Castilho Tiburzio",
+    "cliente_telefone": null
   },
   "990d95e0-c653-416b-96fa-818deb7b5910": {
     "id": "990d95e0-c653-416b-96fa-818deb7b5910",
@@ -1167,7 +1186,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Rafael Gomes de Oliveira",
+    "cliente_telefone": null
   },
   "264d772d-cffb-43e5-b715-a0dc8d7fb6ee": {
     "id": "264d772d-cffb-43e5-b715-a0dc8d7fb6ee",
@@ -1193,7 +1214,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Genaro Lazzaron",
+    "cliente_telefone": null
   },
   "a738d308-5233-4488-b69f-e6825d9e1603": {
     "id": "a738d308-5233-4488-b69f-e6825d9e1603",
