@@ -5058,5 +5058,119 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "7511984b-3fb1-4e8a-8254-3885dd6d9bb4": {
+    "id": "7511984b-3fb1-4e8a-8254-3885dd6d9bb4",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Lucas Cappellesso Cenci",
+      "cpf_cnpj": "04543003101",
+      "whatsapp": "+5561998144514",
+      "email": "lucascenci98@gmail.com",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031477",
+      "data_compra": "2026-10-01",
+      "data_recebimento": "2026-10-05",
+      "nome_produto": "Red Dot Victoptics SPX 1x22",
+      "marca": "Victoptics",
+      "modelo": "SPX 1x22",
+      "numero_serie": "NA",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "O red Dot apresenta mal contatos e não se mantem ligado e ao manusear ou efetuar disparos ele desliga sozinho (Foi comprado uma bateria nova para ele). Também não esta dando regulagem por nada. Esta muito alta a mira e ele não acerta. Meu instrutor de tiro e outros colegas experientes tentaram dar regulagem e não deu, mesmo deixando a mira no maximo para cima, ainda assim ele estava mirando muito fora do alvo.",
+      "data_percebido_problema": "2026-10-07",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "Produto com esses pontos em negativo, gostaria de saber se esse produto costuma apresentar esses tipos de problemas, e se sim o que podemos fazer. Não há fotos do problema, o produto está integro e em perfeito estado, apenas não da regulagem de mira e mal contato na eletrica.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "IMG_9361.JPG",
+          "url": "https://storage.tally.so/private/IMG_9361.JPG?id=aJPPvW&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFKUFB2VyIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MTQ2NDExNn0.PK2IJSNoZii_waXV3xiOLJATrp1-eBueWLItHGoZ348&signature=32b5616baeafe06b5ba99f59e5b906e50ce9de3ce36a12d848bbad0cce64d491",
+          "mimeType": "image/jpeg",
+          "size": 5366376
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-10-05",
+      "data_percebido_problema": "2026-10-07",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-08T12:55:17.298Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-08T12:55:17.298Z",
+    "atualizado_em": "2026-10-08T12:55:17.298Z",
+    "tally_meta": {
+      "eventId": "sync_DqELADq",
+      "responseId": "DqELADq",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-10-08T12:52:37.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Garantia (produto com defeito)",
+      "raw_momento": "Apareceu após o uso"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-08T12:55:17.298Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
