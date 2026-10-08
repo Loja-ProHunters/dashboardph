@@ -1016,7 +1016,7 @@
   "91b9dcf7-f63e-456a-ab77-9a5733fd39ed": {
     "id": "91b9dcf7-f63e-456a-ab77-9a5733fd39ed",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_a594bcd666be292a",
@@ -1036,10 +1036,13 @@
     "dono": "dickmann",
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-08T19:57:01.703Z",
+    "atualizado_por": "dickmann",
     "cliente_nome": "Arles Granhem Brandão",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-08T19:57:01.703Z",
+    "concluida_por": "dickmann"
   },
   "fec588df-fe37-4237-b3e1-0e7a3f0ea258": {
     "id": "fec588df-fe37-4237-b3e1-0e7a3f0ea258",
