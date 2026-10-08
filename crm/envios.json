@@ -3659,10 +3659,10 @@
     "anexo_p_por": "auxiliar",
     "anexo_p_em": "2026-10-08T16:29:35.933Z",
     "anexo_p_ip": "170.231.25.101",
-    "gru_ok": false,
-    "gru_por": null,
-    "gru_em": null,
-    "gru_ip": null,
+    "gru_ok": true,
+    "gru_por": "auxiliar",
+    "gru_em": "2026-10-08T16:29:38.589Z",
+    "gru_ip": "170.231.25.101",
     "anexo_p_link": null,
     "gru_link": null,
     "comprovante_pix_link": null,
@@ -3747,11 +3747,19 @@
         "acao": "campo_alterado",
         "campo": "anexo_p_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-08T16:29:38.589Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "gru_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-07T13:58:23.601Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-08T16:29:35.934Z",
+    "atualizado_em": "2026-10-08T16:29:38.589Z",
     "atualizado_por": "auxiliar"
   }
 }
