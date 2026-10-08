@@ -32761,7 +32761,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "dickmann",
     "onboarding_id": null,
     "primeira_compra_em": "2025-09-29",
     "ultima_compra_em": "2026-09-18",
@@ -32773,8 +32773,14 @@
     "notas": null,
     "criado_em": "2026-09-22T14:09:50.334Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:28:23.976Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-08T14:06:28.432Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "dickmann",
+      "em": "2026-10-08T14:06:28.432Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_5fd24a8c0e8076fb": {
     "id": "acc_5fd24a8c0e8076fb",
