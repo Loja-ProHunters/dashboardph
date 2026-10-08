@@ -1,17 +1,3 @@
-# Cron Jobs — rodando TODOS no GitHub Actions (fallback do limite Hobby da Vercel)
-# ─────────────────────────────────────────────────────────────────────────────
-# A Vercel Hobby so suporta 2 cron jobs por projeto. Como temos 8 crons
-# diferentes rodando, ficava impossivel saber quais 2 a Vercel escolhia e os
-# outros 6 ficavam silenciosamente desativados — por isso o cron de reativacao
-# nao gerava mais tarefas.
-#
-# SOLUCAO: todos os 8 crons rodam aqui no GitHub Actions. O vercel.json ja NAO
-# tem mais o array "crons" (foi removido no mesmo commit). Fica tudo num lugar
-# so, sem ambiguidade.
-#
-# AUTENTICACAO: header "x-cron-secret" com o valor do secret CRON_SECRET
-# (configurado em GitHub Secrets + Vercel env vars com o MESMO valor).
-
 name: Cron Jobs
 
 on:
@@ -52,7 +38,6 @@ jobs:
           MANUAL: ${{ github.event.inputs.which }}
         run: |
           set -euo pipefail
-
           if [ -n "$MANUAL" ]; then
             case "$MANUAL" in
               coocorrencia_rebuild) PATH_URL='/api/crm/coocorrencia/rebuild' ;;
@@ -78,22 +63,8 @@ jobs:
               *) echo "Schedule desconhecido: $SCHED" >&2; exit 1 ;;
             esac
           fi
-
           FULL_URL="${BASE_URL}${PATH_URL}"
           echo "::group::Chamando $FULL_URL"
-
-          HTTP_CODE=$(curl -sS -o /tmp/resp.txt -w "%{http_code}" \
-            --max-time 300 \
-            -H "x-cron-secret: ${CRON_SECRET}" \
-            "$FULL_URL")
-
-          echo "HTTP $HTTP_CODE"
-          echo "Resposta:"
-          cat /tmp/resp.txt
-          echo
-          echo "::endgroup::"
-
-          if [ "$HTTP_CODE" -ge 400 ]; then
-            echo "::error::Cron falhou com HTTP $HTTP_CODE"
-            exit 1
-          fi
+          HTTP_CODE=$(curl -sS -o /tmp/resp.txt -w "%{http_code}" --max-time 300 -H "x-cron-secret: ${CRON_SECRET}" "$FULL_URL")
+          echo "HTTP $HTTP_CODE"; echo "Resposta:"; cat /tmp/resp.txt; echo; echo "::endgroup::"
+          if [ "$HTTP_CODE" -ge 400 ]; then echo "::error::Cron falhou com HTTP $HTTP_CODE"; exit 1; fi

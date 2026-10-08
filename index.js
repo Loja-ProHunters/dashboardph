@@ -2170,6 +2170,103 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // ── POST /api/crm/tarefas/:id/follow-up  body: { prazo, hora, descricao }
+  // Conclui a tarefa atual (resultado='follow_up_agendado') E cria uma NOVA
+  // tarefa de follow-up pro mesmo cliente/vendedor na data informada, com a
+  // descricao que o vendedor escreveu (serve de lembrete do que a tarefa é).
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/tarefas\/[a-zA-Z0-9_\-]+\/follow-up$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!crmUtils.canEditCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Seu perfil pode consultar mas nao criar tarefas.'})); return; }
+    try {
+      const id = url.split('/')[4];
+      const body = await readBody(req);
+      let payload = {};
+      try { payload = JSON.parse(body || '{}'); } catch(e){}
+      const { prazo, hora, descricao } = payload;
+      if (!prazo) throw new Error('Data do follow-up obrigatória');
+      if (!descricao || !String(descricao).trim()) throw new Error('Escreva o motivo do follow-up (serve de lembrete)');
+      const t = await crmStore.getDoc('activities', id);
+      if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
+      const meuLogin = String(sess.usuario || '').toLowerCase();
+      const donoTarefa = String(t.owner_id || t.dono || '').toLowerCase();
+      if (!crmUtils.canSeeAll(sess) && donoTarefa !== meuLogin) {
+        res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa nao esta atribuida a voce.'})); return;
+      }
+      const now = new Date().toISOString();
+      const dono = donoTarefa || meuLogin;
+      const accId = t.account_id || t.entidade_id || null;
+      // Nome do cliente pro titulo (busca o account; se nao achar usa o titulo antigo)
+      let nomeCliente = null;
+      if (accId) { try { const acc = await crmStore.getDoc('accounts', accId); if (acc) nomeCliente = acc.nome || acc.razao_social; } catch(_){} }
+      // 1) Conclui a tarefa atual marcando que gerou follow-up
+      await crmStore.updateDoc('activities', id, {
+        ...t, status: 'concluida', resultado: 'follow_up_agendado',
+        concluida_em: now, concluida_por: sess.usuario,
+      }, sess.usuario);
+      // 2) Cria a tarefa de follow-up
+      const novoId = crmUtils.uuid();
+      const followDoc = {
+        id: novoId,
+        tipo: 'follow_up',
+        status: 'pendente',
+        owner_id: dono,
+        entidade_tipo: 'account',
+        entidade_id: accId,
+        titulo: '📅 Follow-up — ' + (nomeCliente || 'cliente'),
+        descricao: String(descricao).trim().slice(0, 2000),
+        prazo: String(prazo).slice(0, 10),
+        hora: hora ? String(hora).slice(0, 5) : null,
+        concluido_em: null,
+        concluido_com_order_id: null,
+        pontos_base: 10,
+        pontos_bonus: 0,
+        pontos_ganhos: 0,
+        trigger_id: 'followup_' + novoId,
+        gerada_automaticamente: false,
+        fonte: 'follow_up',
+        dono,
+        account_id: accId,
+        origem_tarefa_id: id,
+        criada_por_vendedor: sess.usuario,
+      };
+      await crmStore.createDoc('activities', followDoc, sess.usuario);
+      res.writeHead(201,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, follow_up: followDoc }));
+    } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── POST /api/crm/tarefas/:id/cancelar  body: { motivo }
+  // Marca a tarefa como status='cancelada' (NAO 'concluida'). Diferenca
+  // importante: tarefa cancelada nao conta no cooldown da geracao automatica,
+  // entao o cliente pode voltar ao pool numa proxima rodada. Pra tarefas
+  // julgadas invalidas pelo vendedor.
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/tarefas\/[a-zA-Z0-9_\-]+\/cancelar$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!crmUtils.canEditCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Seu perfil pode consultar mas nao alterar tarefas.'})); return; }
+    try {
+      const id = url.split('/')[4];
+      const body = await readBody(req);
+      let payload = {};
+      try { payload = JSON.parse(body || '{}'); } catch(e){}
+      const t = await crmStore.getDoc('activities', id);
+      if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
+      const meuLogin = String(sess.usuario || '').toLowerCase();
+      const donoTarefa = String(t.owner_id || t.dono || '').toLowerCase();
+      if (!crmUtils.canSeeAll(sess) && donoTarefa !== meuLogin) {
+        res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa nao esta atribuida a voce.'})); return;
+      }
+      await crmStore.updateDoc('activities', id, {
+        ...t, status: 'cancelada', resultado: 'cancelada',
+        cancelada_em: new Date().toISOString(), cancelada_por: sess.usuario,
+        cancelamento_motivo: payload.motivo ? String(payload.motivo).trim().slice(0, 500) : null,
+      }, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
   // ── GET /api/crm/ficha/buscar?q=X — busca cliente por nome, CPF/CNPJ,
   // telefone ou número do pedido (Bling). Usado pela nova tarefa manual.
   if (req.method === 'GET' && url.startsWith('/api/crm/ficha/buscar')) {

@@ -4950,6 +4950,17 @@ async function gerarContratoParceiro() {
 #tab-crm .tar-wa-btn{display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;transition:transform .12s,box-shadow .12s;box-shadow:0 2px 6px rgba(37,211,102,.3)}
 #tab-crm .tar-wa-btn:hover{background:#1fb558;transform:translateY(-1px);box-shadow:0 3px 10px rgba(37,211,102,.45);color:#fff;text-decoration:none}
 #tab-crm .tar-wa-btn svg{flex-shrink:0}
+/* Box de finalização da tarefa — 4 opções */
+#tab-crm .tar-finaliza{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed var(--bd)}
+#tab-crm .tar-finaliza button{border:1px solid var(--bd);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:700;background:#fff;transition:all .12s}
+#tab-crm .tar-fin-conv{color:#0a6e2e;border-color:#b4e0c4 !important}
+#tab-crm .tar-fin-conv:hover{background:#0a6e2e;color:#fff}
+#tab-crm .tar-fin-nao{color:#4a5057}
+#tab-crm .tar-fin-nao:hover{background:#4a5057;color:#fff}
+#tab-crm .tar-fin-follow{color:#0e6bd4;border-color:#b6d6f5 !important}
+#tab-crm .tar-fin-follow:hover{background:#0e6bd4;color:#fff}
+#tab-crm .tar-fin-cancel{color:#c62828;border-color:#f3c0c0 !important;margin-left:auto}
+#tab-crm .tar-fin-cancel:hover{background:#c62828;color:#fff}
 /* Ficha do cliente */
 #tab-crm .fic-search-wrap{background:var(--wh);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:14px}
 #tab-crm .fic-search-inp{width:100%;padding:11px 14px;border:1px solid var(--bd);border-radius:8px;font-size:14px;background:var(--wh);color:var(--tx);outline:none;box-sizing:border-box}
@@ -6437,6 +6448,7 @@ async function crmRenderTarefas(){
     if (!r.ok) throw new Error(d.error || 'Erro ao carregar tarefas.');
     var tarefas = d.tarefas || [];
     window.CRM.tarefasCount = tarefas.length;
+    window.CRM.tarefasCache = tarefas; // cache pro modal de follow-up achar o nome do cliente
     var hoje = new Date().toISOString().slice(0,10);
     var overdue = tarefas.filter(function(t){ return t.prazo && t.prazo < hoje; }).length;
     window.CRM.tarefasOverdue = overdue;
@@ -6512,8 +6524,13 @@ async function crmRenderTarefas(){
           waBtn +
           (pitch ? '<button class="primary" onclick="crmCopiarPitch(\''+crmEsc(t.id)+'\', this)">📋 Copiar pitch</button>' : '') +
           (accId ? '<button onclick="crmAbrirFicha(\''+crmEsc(accId)+'\')">👤 Ver ficha</button>' : '') +
-          '<button onclick="crmConcluirTarefa(\''+crmEsc(t.id)+'\', \'convertida\')">✓ Convertida</button>' +
-          '<button onclick="crmConcluirTarefa(\''+crmEsc(t.id)+'\', \'nao_convertida\')">✗ Não convertida</button>' +
+        '</div>' +
+        // Box de finalização — 4 opções: converteu / não converteu / agenda follow-up / cancela
+        '<div class="tar-finaliza">' +
+          '<button class="tar-fin-conv" onclick="crmConcluirTarefa(\''+crmEsc(t.id)+'\', \'convertida\')">✓ Convertido</button>' +
+          '<button class="tar-fin-nao" onclick="crmConcluirTarefa(\''+crmEsc(t.id)+'\', \'nao_convertida\')">✗ Não convertido</button>' +
+          '<button class="tar-fin-follow" onclick="crmAbrirFollowUp(\''+crmEsc(t.id)+'\')">📅 Agendar follow-up</button>' +
+          '<button class="tar-fin-cancel" onclick="crmCancelarTarefa(\''+crmEsc(t.id)+'\')">🗑 Cancelar tarefa</button>' +
         '</div>' +
       '</div>';
     });
@@ -6750,6 +6767,94 @@ async function crmConcluirTarefa(id, resultado){
   } catch (e) { alert('Erro: ' + e.message); }
 }
 
+// Cancela a tarefa (julgada inválida). Status vira 'cancelada' — não conta no
+// cooldown da geração automática, então o cliente pode voltar ao pool depois.
+async function crmCancelarTarefa(id){
+  var motivo = prompt('Cancelar esta tarefa?\n\nOpcional: por que está cancelando? (ex: "cliente duplicado", "já comprou", "número errado")');
+  if (motivo === null) return; // clicou cancelar no prompt
+  try {
+    var r = await fetch('/api/crm/tarefas/'+encodeURIComponent(id)+'/cancelar', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ motivo: motivo || '' })
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro ao cancelar.');
+    var el = document.getElementById('tar-'+id);
+    if (el) { el.style.transition='opacity .3s, transform .3s'; el.style.opacity='0'; el.style.transform='translateX(20px)'; setTimeout(function(){ crmRenderTarefas(); }, 300); }
+    else crmRenderTarefas();
+  } catch (e) { alert('Erro: ' + e.message); }
+}
+
+// Abre modal pra agendar follow-up: escolhe data+hora e escreve um lembrete.
+// Ao confirmar, conclui a tarefa atual e cria uma nova tarefa de follow-up.
+function crmAbrirFollowUp(id){
+  if (document.getElementById('crm-mdl-followup')) return;
+  var cache = window.CRM.tarefasCache || [];
+  var t = cache.find(function(x){ return x.id === id; }) || {};
+  var nome = t.cliente_nome || 'cliente';
+  var descAtual = t.descricao || t.titulo || '';
+  // Default: amanhã
+  var amanha = new Date(Date.now() + 86400000).toISOString().slice(0,10);
+  var hojeStr = new Date().toISOString().slice(0,10);
+  var html = '<div id="crm-mdl-followup" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10055;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)crmFecharFollowUp()">' +
+    '<div style="background:#fff;border-radius:12px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,.3)">' +
+      '<h3 style="margin:0 0 4px;color:#0e6bd4">📅 Agendar follow-up</h3>' +
+      '<p style="margin:0 0 16px;font-size:12.5px;color:#7b8285">Cliente: <b>' + crmEsc(nome) + '</b><br>Isso conclui a tarefa atual e cria uma nova pra data escolhida.</p>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">' +
+        '<div>' +
+          '<label style="font-size:12px;font-weight:700;color:#4a5057;display:block;margin-bottom:4px">Data do retorno *</label>' +
+          '<input id="crm-fu-data" type="date" min="' + hojeStr + '" value="' + amanha + '" style="width:100%;padding:9px 10px;border:1px solid #ccd0d3;border-radius:6px;font-size:13px"/>' +
+        '</div>' +
+        '<div>' +
+          '<label style="font-size:12px;font-weight:700;color:#4a5057;display:block;margin-bottom:4px">Hora <span style="font-weight:400;color:#7b8285">(opcional)</span></label>' +
+          '<input id="crm-fu-hora" type="time" style="width:100%;padding:9px 10px;border:1px solid #ccd0d3;border-radius:6px;font-size:13px"/>' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-bottom:14px">' +
+        '<label style="font-size:12px;font-weight:700;color:#4a5057;display:block;margin-bottom:4px">O que lembrar no follow-up? *</label>' +
+        '<textarea id="crm-fu-desc" rows="3" maxlength="2000" placeholder="Ex: Cliente pediu pra retornar semana que vem, estava avaliando a Glock G25" style="width:100%;padding:10px 12px;border:1px solid #ccd0d3;border-radius:6px;font-size:13px;font-family:inherit;resize:vertical">' + crmEsc(descAtual) + '</textarea>' +
+      '</div>' +
+      '<div id="crm-fu-erro" style="color:#c62828;font-size:12.5px;margin-bottom:10px;display:none"></div>' +
+      '<div style="display:flex;gap:10px;justify-content:flex-end">' +
+        '<button onclick="crmFecharFollowUp()" style="background:#e5e7eb;color:#374151;border:none;border-radius:6px;padding:10px 18px;font-weight:600;cursor:pointer">Cancelar</button>' +
+        '<button id="crm-fu-salvar" onclick="crmSalvarFollowUp(\''+crmEsc(id)+'\')" style="background:#0e6bd4;color:#fff;border:none;border-radius:6px;padding:10px 18px;font-weight:700;cursor:pointer">Agendar</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+  setTimeout(function(){ var i = document.getElementById('crm-fu-desc'); if (i) i.focus(); }, 50);
+}
+
+function crmFecharFollowUp(){
+  var m = document.getElementById('crm-mdl-followup');
+  if (m) m.remove();
+}
+
+async function crmSalvarFollowUp(id){
+  var err = document.getElementById('crm-fu-erro');
+  err.style.display = 'none';
+  var data = (document.getElementById('crm-fu-data')||{}).value || '';
+  var hora = (document.getElementById('crm-fu-hora')||{}).value || '';
+  var desc = (document.getElementById('crm-fu-desc')||{}).value || '';
+  if (!data) { err.textContent = 'Escolha a data do follow-up.'; err.style.display='block'; return; }
+  if (!desc.trim()) { err.textContent = 'Escreva o que lembrar no follow-up.'; err.style.display='block'; return; }
+  var btn = document.getElementById('crm-fu-salvar');
+  btn.disabled = true; btn.textContent = 'Agendando…';
+  try {
+    var r = await fetch('/api/crm/tarefas/'+encodeURIComponent(id)+'/follow-up', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ prazo: data, hora: hora || null, descricao: desc })
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro ao agendar follow-up.');
+    crmFecharFollowUp();
+    crmRenderTarefas();
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'Agendar';
+    err.textContent = e.message; err.style.display='block';
+  }
+}
+
 function crmCopiarPitch(tarefaId, btn){
   var card = document.getElementById('tar-'+tarefaId);
   if (!card) return;
@@ -6864,7 +6969,18 @@ async function crmAbreFicha(accId){
           '<div class="fic-kpi"><div class="fic-kpi-lbl">Última compra</div><div class="fic-kpi-val" style="font-size:13px">'+(a.ultima_compra_em?crmFmtDate(a.ultima_compra_em):'—')+'</div></div>' +
           '<div class="fic-kpi"><div class="fic-kpi-lbl">Owner</div><div class="fic-kpi-val" style="font-size:13px">'+crmEsc(a.owner_id||'—')+'</div></div>' +
         '</div>' +
-        '<div style="text-align:right;margin-top:10px">' +
+        '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap">' +
+          (function(){
+            // Botão WhatsApp na ficha — abre conversa direto com o cliente
+            var tel = crmNormalizaTelBR(a.telefone);
+            if (!tel) return '';
+            var txt = 'Olá! Aqui é da Pro Hunters';
+            var waUrl = 'https://wa.me/' + tel + '?text=' + encodeURIComponent(txt);
+            return '<a class="tar-wa-btn" href="' + waUrl + '" target="_blank" rel="noopener noreferrer" title="Abrir WhatsApp com ' + crmEsc(a.nome||'cliente') + '">' +
+              '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.511 5.26l-.999 3.648 3.977-1.044zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>' +
+              ' WhatsApp' +
+            '</a>';
+          })() +
           '<button class="crm-btn" onclick="crmSugerirManual(\''+crmEsc(accId)+'\')">🤖 Sugerir próxima venda</button>' +
         '</div>' +
         '<div id="fic-sugestoes"></div>' +

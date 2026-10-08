@@ -146,20 +146,36 @@ async function gerarTarefasDiarias() {
   const cutoffISO = _hojeMenos(COOLDOWN_DIAS);
   const activitiesRelevantes = await crmStore.listDocs('activities', a => {
     if (!a.gerada_automaticamente) return false;
+    // Cancelada NAO bloqueia nem conta: se o vendedor julgou a tarefa invalida,
+    // o cliente deve poder voltar ao pool numa proxima rodada.
+    if (a.status === 'cancelada') return false;
     if (a.status === 'pendente') return true;
     // Concluida/outra: so se foi recente
-    const quando = a.concluido_em || a.atualizado_em || a.criado_em || '';
+    const quando = a.concluido_em || a.concluida_em || a.atualizado_em || a.criado_em || '';
     return String(quando).slice(0, 10) >= cutoffISO;
   });
   // Mapa (accountId -> Set<fonte>) dos bloqueios
   const bloqueado = new Map(); // key = accountId, value = Set de fontes bloqueadas
+  // Contagem de tarefas PENDENTES automaticas por vendedor — usada pra cota.
+  // Objetivo: cada vendedor tem no MAXIMO TAREFAS_POR_VENDEDOR pendentes. O cron
+  // so cria o delta que falta pra completar a cota. Isso resolve 2 coisas:
+  //   1) Rodar o cron varias vezes no dia NAO infla a fila (completa ate 20 e para).
+  //   2) Se o vendedor nao concluiu nada, nao recebe tarefa nova (nao "vem as mesmas"
+  //      nem acumula infinito) — so recebe quando abrir espaco concluindo.
+  const pendentesPorVendedor = {};
   for (const a of activitiesRelevantes) {
     const accId = a.account_id || a.entidade_id;
-    if (!accId) continue;
-    const fonte = a.fonte || _fonteDoTipo(a.tipo); // retrocompat
-    if (!fonte) continue;
-    if (!bloqueado.has(accId)) bloqueado.set(accId, new Set());
-    bloqueado.get(accId).add(fonte);
+    if (accId) {
+      const fonte = a.fonte || _fonteDoTipo(a.tipo); // retrocompat
+      if (fonte) {
+        if (!bloqueado.has(accId)) bloqueado.set(accId, new Set());
+        bloqueado.get(accId).add(fonte);
+      }
+    }
+    if (a.status === 'pendente') {
+      const owner = _normLogin(a.owner_id || a.dono);
+      if (owner) pendentesPorVendedor[owner] = (pendentesPorVendedor[owner] || 0) + 1;
+    }
   }
   function _estaBloqueado(accountId, fonte) {
     const s = bloqueado.get(accountId);
@@ -297,11 +313,18 @@ async function gerarTarefasDiarias() {
     catch (e) { console.warn('[automacaoUpsell] batch orders falhou: ' + (e.message || e)); }
   }
 
-  // Pega top TAREFAS_POR_VENDEDOR por vendedor (menor score completa a cota)
+  // Pega top da cota por vendedor. A cota NAO e fixa em TAREFAS_POR_VENDEDOR —
+  // e o quanto FALTA pra cada vendedor chegar em TAREFAS_POR_VENDEDOR pendentes.
+  // Ex: vendedor ja tem 15 pendentes -> cota = 20-15 = 5 novas. Ja tem 20 -> 0.
+  // Assim a fila fica estavel em ~20 e rodar o cron varias vezes nao infla.
   const finais = [];
+  const cotaPorVendedor = {};
   for (const owner of Object.keys(porOwner)) {
     porOwner[owner].sort((a, b) => b.score - a.score);
-    finais.push(...porOwner[owner].slice(0, TAREFAS_POR_VENDEDOR));
+    const jaTem = pendentesPorVendedor[owner] || 0;
+    const cota = Math.max(0, TAREFAS_POR_VENDEDOR - jaTem);
+    cotaPorVendedor[owner] = cota;
+    if (cota > 0) finais.push(...porOwner[owner].slice(0, cota));
   }
 
   // Cria as activities em BULK — carrega a colecao uma vez, adiciona todas
@@ -394,9 +417,10 @@ async function gerarTarefasDiarias() {
     }
   }
 
+  // Contagem do que FOI criado por vendedor nesta rodada (respeitando a cota)
   const porVendedorContagem = {};
   for (const owner of Object.keys(porOwner)) {
-    porVendedorContagem[owner] = Math.min(porOwner[owner].length, TAREFAS_POR_VENDEDOR);
+    porVendedorContagem[owner] = Math.min(porOwner[owner].length, cotaPorVendedor[owner] || 0);
   }
 
   return {
@@ -409,6 +433,9 @@ async function gerarTarefasDiarias() {
     erros,
     erros_detalhe: errosDetalhe,
     vendedores_atingidos: Object.keys(porOwner).length,
+    // Quantas cada vendedor JA tinha pendentes antes desta rodada (pra entender a cota)
+    pendentes_antes: pendentesPorVendedor,
+    cota_por_vendedor: cotaPorVendedor,
     por_vendedor: porVendedorContagem,
     por_fonte: _contaPorFonte(finais),
   };
