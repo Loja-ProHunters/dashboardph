@@ -39031,7 +39031,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "boschetto",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-07",
     "ultima_compra_em": "2025-10-07",
@@ -39043,8 +39043,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:28:22.885Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:28:22.885Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-08T14:13:05.837Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "boschetto",
+      "em": "2026-10-08T14:13:05.837Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_9b3339105403502b": {
     "id": "acc_9b3339105403502b",
