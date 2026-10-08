@@ -3525,7 +3525,7 @@
     "pix_baixado": true,
     "peso_kg": "2,3kg",
     "dimensoes_cm": "46x8x35",
-    "minuta_numero": "",
+    "minuta_numero": "202665177894",
     "aeroporto_iata": "SBFZ",
     "romaneio_id": null,
     "romaneio_numero": null,
@@ -3635,12 +3635,20 @@
         "acao": "campo_alterado",
         "campo": "assinatura_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-08T16:45:11.873Z",
+        "por": "gerencia",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "minuta_numero",
+        "novo": "202665177894"
       }
     ],
     "criado_em": "2026-10-06T17:58:08.080Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-08T16:42:20.106Z",
-    "atualizado_por": "auxiliar",
+    "atualizado_em": "2026-10-08T16:45:11.873Z",
+    "atualizado_por": "gerencia",
     "pix_por": "boschetto",
     "pix_em": "2026-10-07T13:57:08.535Z",
     "pix_ip": "170.231.25.101"
