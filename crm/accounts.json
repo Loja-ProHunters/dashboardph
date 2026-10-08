@@ -1984,7 +1984,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "mathias",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-01",
     "ultima_compra_em": "2025-10-01",
@@ -1996,8 +1996,14 @@
     "notas": null,
     "criado_em": "2026-09-16T13:32:26.544Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-16T13:32:26.544Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-08T14:04:51.320Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "mathias",
+      "em": "2026-10-08T14:04:51.319Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_736a6c21ebb3a0ba": {
     "id": "acc_736a6c21ebb3a0ba",
