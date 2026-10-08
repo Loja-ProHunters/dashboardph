@@ -84,5 +84,29 @@
     "criado_por": "auxiliar",
     "atualizado_em": "2026-10-01T19:12:48.420Z",
     "atualizado_por": "gerencia"
+  },
+  "rom_20261008_0005": {
+    "id": "rom_20261008_0005",
+    "numero": "0005",
+    "data": "2026-10-08",
+    "transportadora": "ezequiel",
+    "empresa_agrupada": "prohunters",
+    "envio_ids": [
+      "env_prohunters_23885",
+      "env_prohunters_27036",
+      "env_prohunters_27141",
+      "env_prohunters_27163",
+      "env_prohunters_27180"
+    ],
+    "total_volumes": 5,
+    "motorista_nome": null,
+    "motorista_cpf": null,
+    "motorista_placa": null,
+    "motorista_assinado_em": null,
+    "gerado_por": "auxiliar",
+    "criado_em": "2026-10-08T16:50:18.491Z",
+    "criado_por": "auxiliar",
+    "atualizado_em": "2026-10-08T16:50:18.492Z",
+    "atualizado_por": "auxiliar"
   }
 }
