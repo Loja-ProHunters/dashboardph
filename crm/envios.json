@@ -2518,9 +2518,9 @@
     "gt_numero": "202663680846",
     "gt_por": "auxiliar",
     "gt_em": "2026-10-08T11:56:40.301Z",
-    "assinatura_ok": false,
-    "assinatura_por": null,
-    "assinatura_em": null,
+    "assinatura_ok": true,
+    "assinatura_por": "auxiliar",
+    "assinatura_em": "2026-10-08T16:41:13.051Z",
     "liberacao_ok": false,
     "liberacao_por": null,
     "liberacao_em": null,
@@ -2600,11 +2600,19 @@
         "acao": "campo_alterado",
         "campo": "gt_numero",
         "novo": "202663680846"
+      },
+      {
+        "ts": "2026-10-08T16:41:13.051Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "assinatura_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-06T11:39:26.914Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-10-08T11:56:40.301Z",
+    "atualizado_em": "2026-10-08T16:41:13.051Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_27141": {
