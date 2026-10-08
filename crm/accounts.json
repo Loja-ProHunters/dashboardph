@@ -1400,7 +1400,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "dickmann",
     "onboarding_id": null,
     "primeira_compra_em": "2025-09-28",
     "ultima_compra_em": "2025-10-06",
@@ -1412,8 +1412,14 @@
     "notas": null,
     "criado_em": "2026-09-16T13:32:13.581Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-16T13:32:32.533Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-08T14:03:41.129Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "dickmann",
+      "em": "2026-10-08T14:03:41.129Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_939d4bc34b6f5591": {
     "id": "acc_939d4bc34b6f5591",
