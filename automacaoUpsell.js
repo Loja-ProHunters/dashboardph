@@ -259,23 +259,42 @@ async function gerarTarefasDiarias() {
   const dedupados = Object.values(melhorPorAccount);
 
   // Agrupa por vendedor (dono da tarefa). Realoca account/orders órfãos
-  // pro vendedor do rodizio no MESMO passo — evita bug "cliente nao lhe pertence".
+  // pro vendedor do rodizio — mas AGORA EM BATCH, nao mais 1 write por doc.
+  //
+  // ANTES: cada chamada de _realocarAccountSeOrfao fazia read+write no
+  // accounts.json via GitHub API. Com 20+ candidatos orfaos, dava 40+ writes
+  // em sequencia e varios 409 (SHA stale entre read e write subsequente).
+  //
+  // AGORA: coletamos todas as realocacoes em 2 Maps (uma pra accounts, outra
+  // pra orders) enquanto montamos o porOwner. No final chamamos _flushRealoc*
+  // uma unica vez pra cada collection — 1 write ao inves de 20-40, zero 409.
   const porOwner = {};
+  const realocAccounts = new Map(); // accountId -> novoDono
+  const realocOrders = new Map();   // orderId -> novoDono
   for (const c of dedupados) {
     const owner = _resolverVendedor(c.account, ordersPorAccount[c.accountId]);
-    // Se account tava órfão (gerencia/tray/vendedor fora da lista), transfere
+    // Se account tava órfão (gerencia/tray/vendedor fora da lista), marca pra realocar
     const ownerOriginal = _normLogin(c.account && c.account.owner_id);
     if (!_isVendedorReal(ownerOriginal)) {
-      await _realocarAccountSeOrfao(c.accountId, owner, 'automacao-cron-diario');
-      // Também realoca orders dessa conta que estavam órfãos
+      realocAccounts.set(c.accountId, owner);
+      // Também marca orders dessa conta que estavam órfãos
       const peds = ordersPorAccount[c.accountId] || [];
       for (const p of peds) {
         if (!_isVendedorReal(_normLogin(p.vendedor_id))) {
-          await _realocarOrderSeOrfao(p.id, owner, 'automacao-cron-diario');
+          realocOrders.set(p.id, owner);
         }
       }
     }
     (porOwner[owner] = porOwner[owner] || []).push({ ...c, owner_id: owner });
+  }
+  // Faz os flushes em batch — com retry 409 interno (igual na parte de activities)
+  if (realocAccounts.size > 0) {
+    try { await _flushRealocAccountsBatch(realocAccounts, 'automacao-cron-diario'); }
+    catch (e) { console.warn('[automacaoUpsell] batch accounts falhou: ' + (e.message || e)); }
+  }
+  if (realocOrders.size > 0) {
+    try { await _flushRealocOrdersBatch(realocOrders, 'automacao-cron-diario'); }
+    catch (e) { console.warn('[automacaoUpsell] batch orders falhou: ' + (e.message || e)); }
   }
 
   // Pega top TAREFAS_POR_VENDEDOR por vendedor (menor score completa a cota)
@@ -575,6 +594,110 @@ async function _realocarOrderSeOrfao(orderId, novoDono, actor) {
     }, actor || 'automacao-rodizio');
   } catch (e) {
     console.warn('[automacaoUpsell] Falha ao realocar order ' + orderId + ' pra ' + novoDono + ': ' + e.message);
+  }
+}
+
+// ── Versoes em BATCH das realocacoes (uma write por collection) ──────
+// Usadas pelo cron diario pra evitar 409 do GitHub API quando precisa
+// realocar dezenas de accounts/orders de uma vez. A singular acima e mantida
+// pra chamadas isoladas (ex: processarOrderNovo que roda 1 vez por pedido).
+async function _flushRealocAccountsBatch(mapa, actor) {
+  if (!mapa || mapa.size === 0) return;
+  let coll = await crmStore.getCollection('accounts');
+  const now = new Date().toISOString();
+  let changed = 0;
+  function _aplicar(target) {
+    let n = 0;
+    for (const [id, novoDono] of mapa.entries()) {
+      const a = target[id];
+      if (!a) continue;
+      const atual = _normLogin(a.owner_id);
+      // Mesmas protecoes da versao singular: nao sobrescreve vendedor real existente
+      if (atual && _isVendedorReal(atual) && atual !== novoDono) continue;
+      if (atual === novoDono) continue;
+      target[id] = {
+        ...a,
+        owner_id: novoDono,
+        atualizado_em: now,
+        atualizado_por: actor || 'automacao-rodizio',
+        _realocado_por_automacao: {
+          de: atual || null,
+          para: novoDono,
+          em: now,
+          motivo: 'rodizio automatico (vendedor anterior era orfao: ' + (atual || 'vazio') + ')',
+        },
+      };
+      n++;
+    }
+    return n;
+  }
+  changed = _aplicar(coll);
+  if (!changed) return;
+  // Retry 409: se o SHA mudou entre nosso read e write, recarrega e re-aplica
+  let tentativas = 0, salvo = false, ultErr = null;
+  while (tentativas < 3 && !salvo) {
+    tentativas++;
+    try {
+      await crmStore.saveCollection('accounts', coll, 'Rodizio: realoca ' + changed + ' accounts');
+      salvo = true;
+    } catch (e) {
+      ultErr = e;
+      if (String(e.message || '').includes('409')) {
+        crmStore.invalidate('accounts');
+        coll = await crmStore.getCollection('accounts');
+        changed = _aplicar(coll);
+        if (!changed) { salvo = true; break; } // nada mais pra fazer
+      } else break;
+    }
+  }
+  if (!salvo) {
+    console.warn('[automacaoUpsell] _flushRealocAccountsBatch falhou apos ' + tentativas + ' tentativas: ' + (ultErr && ultErr.message));
+  }
+}
+
+async function _flushRealocOrdersBatch(mapa, actor) {
+  if (!mapa || mapa.size === 0) return;
+  let coll = await crmStore.getCollection('orders');
+  const now = new Date().toISOString();
+  let changed = 0;
+  function _aplicar(target) {
+    let n = 0;
+    for (const [id, novoDono] of mapa.entries()) {
+      const o = target[id];
+      if (!o) continue;
+      const atual = _normLogin(o.vendedor_id);
+      if (atual && _isVendedorReal(atual) && atual !== novoDono) continue;
+      if (atual === novoDono) continue;
+      target[id] = {
+        ...o,
+        vendedor_id: novoDono,
+        atualizado_em: now,
+        atualizado_por: actor || 'automacao-rodizio',
+      };
+      n++;
+    }
+    return n;
+  }
+  changed = _aplicar(coll);
+  if (!changed) return;
+  let tentativas = 0, salvo = false, ultErr = null;
+  while (tentativas < 3 && !salvo) {
+    tentativas++;
+    try {
+      await crmStore.saveCollection('orders', coll, 'Rodizio: realoca ' + changed + ' orders');
+      salvo = true;
+    } catch (e) {
+      ultErr = e;
+      if (String(e.message || '').includes('409')) {
+        crmStore.invalidate('orders');
+        coll = await crmStore.getCollection('orders');
+        changed = _aplicar(coll);
+        if (!changed) { salvo = true; break; }
+      } else break;
+    }
+  }
+  if (!salvo) {
+    console.warn('[automacaoUpsell] _flushRealocOrdersBatch falhou apos ' + tentativas + ' tentativas: ' + (ultErr && ultErr.message));
   }
 }
 
