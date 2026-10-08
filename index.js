@@ -2060,13 +2060,42 @@ module.exports = async (req, res) => {
       const body = await readBody(req);
       let payload = {};
       try { payload = JSON.parse(body || '{}'); } catch(e){}
-      const { account_id, titulo, descricao, prazo, hora, owner_id } = payload;
-      if (!account_id) throw new Error('account_id obrigatório');
+      let { account_id, titulo, descricao, prazo, hora, owner_id } = payload;
       if (!descricao || !String(descricao).trim()) throw new Error('Descrição obrigatória');
       if (!prazo) throw new Error('Prazo (data) obrigatório');
       // Vendedor cria pra si mesmo. Admin pode delegar pra outro via owner_id.
       let dono = String(sess.usuario).toLowerCase();
       if (owner_id && crmUtils.canSeeAll(sess)) dono = String(owner_id).toLowerCase();
+
+      // ─── Modo "cliente novo" ───────────────────────────────────────
+      // Vendedor cadastra um prospect que ainda nao esta no Bling (ex: contato
+      // em evento, indicacao, atendimento WhatsApp). Cria o account na hora
+      // com os dados minimos e usa o id dele pra tarefa. Fica tagueado como
+      // 'prospect_vendedor' pra depois a gente conseguir diferenciar de quem
+      // ja veio do Bling. CPF e opcional — se vier, tem que ser valido.
+      if (payload.cliente_novo === true) {
+        if (!payload.cliente_nome || !String(payload.cliente_nome).trim()) {
+          throw new Error('Nome do cliente obrigatório');
+        }
+        if (!payload.cliente_telefone || !String(payload.cliente_telefone).trim()) {
+          throw new Error('Telefone do cliente obrigatório');
+        }
+        const dadosAcc = {
+          tipo: 'pessoa_fisica', // default — vendedor edita depois na ficha se precisar
+          nome: String(payload.cliente_nome).trim().slice(0, 200),
+          telefone: String(payload.cliente_telefone).trim().slice(0, 60),
+          cpf_cnpj: payload.cliente_cpf ? String(payload.cliente_cpf).trim() : null,
+          owner_id: dono,
+          tags: ['prospect_vendedor'],
+          notas: 'Cadastrado manualmente via tarefa manual por ' + sess.usuario +
+                 ' em ' + new Date().toISOString().slice(0, 10),
+        };
+        const buildAcc = crmColl.REGISTRY.accounts.build(dadosAcc);
+        const accSalvo = await crmStore.createDoc('accounts', buildAcc, sess.usuario);
+        account_id = accSalvo.id;
+      }
+
+      if (!account_id) throw new Error('account_id obrigatório (ou use cliente_novo:true + cliente_nome + cliente_telefone)');
       // Busca o account pra validar e enriquecer o título
       const acc = await crmStore.getDoc('accounts', account_id);
       if (!acc) throw new Error('Cliente não encontrado');
@@ -3132,10 +3161,13 @@ module.exports = async (req, res) => {
   // Soft delete — marca status='cancelado' pra tirar da fila. Mantem o doc
   // pra auditoria (quem cancelou, quando, por que). Nao pode cancelar se ja
   // esta em romaneio ou foi enviado/retirado.
+  // PERMISSAO: SOMENTE gerencia (admin/diretor). Vendedor/auxiliar nao pode
+  // cancelar — se precisar, pede pra gerencia. Evita cancelamento acidental
+  // de envios validos por quem opera no dia-a-dia.
   if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/cancelar$/)) {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessControlado(sess)) {
-      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
+    if (!sess || !isAdminOrDiretor(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Somente gerencia (admin/diretor) pode cancelar envios.'})); return;
     }
     try {
       const id = url.split('/')[4];

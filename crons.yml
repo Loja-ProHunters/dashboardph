@@ -1,0 +1,99 @@
+# Cron Jobs — rodando TODOS no GitHub Actions (fallback do limite Hobby da Vercel)
+# ─────────────────────────────────────────────────────────────────────────────
+# A Vercel Hobby so suporta 2 cron jobs por projeto. Como temos 8 crons
+# diferentes rodando, ficava impossivel saber quais 2 a Vercel escolhia e os
+# outros 6 ficavam silenciosamente desativados — por isso o cron de reativacao
+# nao gerava mais tarefas.
+#
+# SOLUCAO: todos os 8 crons rodam aqui no GitHub Actions. O vercel.json ja NAO
+# tem mais o array "crons" (foi removido no mesmo commit). Fica tudo num lugar
+# so, sem ambiguidade.
+#
+# AUTENTICACAO: header "x-cron-secret" com o valor do secret CRON_SECRET
+# (configurado em GitHub Secrets + Vercel env vars com o MESMO valor).
+
+name: Cron Jobs
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'   # Domingo 03h UTC  -> /api/crm/coocorrencia/rebuild
+    - cron: '0 4 * * *'   # Diario   04h UTC -> /api/crm/catalogo/rebuild
+    - cron: '0 5 * * *'   # Diario   05h UTC -> /api/auto-recuperar-bling
+    - cron: '0 7 * * *'   # Diario   07h UTC -> /api/garantias/sync-tally
+    - cron: '0 9 * * *'   # Diario   09h UTC -> /api/bling/cron/sync
+    - cron: '0 10 * * *'  # Diario   10h UTC -> /api/crm/cron/vencimentos
+    - cron: '0 11 * * *'  # Diario   11h UTC -> /api/crm/cron/reativacao
+    - cron: '0 12 * * *'  # Diario   12h UTC -> /api/bling/cron/backfill-tick
+  workflow_dispatch:
+    inputs:
+      which:
+        description: 'Qual cron rodar manualmente'
+        required: true
+        type: choice
+        options:
+          - 'coocorrencia_rebuild'
+          - 'catalogo_rebuild'
+          - 'auto_recuperar_bling'
+          - 'garantias_sync_tally'
+          - 'bling_sync'
+          - 'crm_vencimentos'
+          - 'crm_reativacao'
+          - 'bling_backfill_tick'
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispara o endpoint certo
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          BASE_URL: 'https://dashboardph.vercel.app'
+          SCHED: ${{ github.event.schedule }}
+          MANUAL: ${{ github.event.inputs.which }}
+        run: |
+          set -euo pipefail
+
+          if [ -n "$MANUAL" ]; then
+            case "$MANUAL" in
+              coocorrencia_rebuild) PATH_URL='/api/crm/coocorrencia/rebuild' ;;
+              catalogo_rebuild)     PATH_URL='/api/crm/catalogo/rebuild' ;;
+              auto_recuperar_bling) PATH_URL='/api/auto-recuperar-bling' ;;
+              garantias_sync_tally) PATH_URL='/api/garantias/sync-tally' ;;
+              bling_sync)           PATH_URL='/api/bling/cron/sync' ;;
+              crm_vencimentos)      PATH_URL='/api/crm/cron/vencimentos' ;;
+              crm_reativacao)       PATH_URL='/api/crm/cron/reativacao' ;;
+              bling_backfill_tick)  PATH_URL='/api/bling/cron/backfill-tick' ;;
+              *) echo "Opcao desconhecida: $MANUAL" >&2; exit 1 ;;
+            esac
+          else
+            case "$SCHED" in
+              '0 3 * * 0')  PATH_URL='/api/crm/coocorrencia/rebuild' ;;
+              '0 4 * * *')  PATH_URL='/api/crm/catalogo/rebuild' ;;
+              '0 5 * * *')  PATH_URL='/api/auto-recuperar-bling' ;;
+              '0 7 * * *')  PATH_URL='/api/garantias/sync-tally' ;;
+              '0 9 * * *')  PATH_URL='/api/bling/cron/sync' ;;
+              '0 10 * * *') PATH_URL='/api/crm/cron/vencimentos' ;;
+              '0 11 * * *') PATH_URL='/api/crm/cron/reativacao' ;;
+              '0 12 * * *') PATH_URL='/api/bling/cron/backfill-tick' ;;
+              *) echo "Schedule desconhecido: $SCHED" >&2; exit 1 ;;
+            esac
+          fi
+
+          FULL_URL="${BASE_URL}${PATH_URL}"
+          echo "::group::Chamando $FULL_URL"
+
+          HTTP_CODE=$(curl -sS -o /tmp/resp.txt -w "%{http_code}" \
+            --max-time 300 \
+            -H "x-cron-secret: ${CRON_SECRET}" \
+            "$FULL_URL")
+
+          echo "HTTP $HTTP_CODE"
+          echo "Resposta:"
+          cat /tmp/resp.txt
+          echo
+          echo "::endgroup::"
+
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "::error::Cron falhou com HTTP $HTTP_CODE"
+            exit 1
+          fi
