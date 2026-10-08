@@ -556,5 +556,34 @@
         "por": "auxiliar"
       }
     ]
+  },
+  "69b41ff8-8a08-4976-859f-f887ede01e67": {
+    "id": "69b41ff8-8a08-4976-859f-f887ede01e67",
+    "de": "gerencia",
+    "para": "nicolay",
+    "categoria": "Financeiro",
+    "titulo": "PAGAMENTO INFLUENCIADOR",
+    "descricao": "Ele possui o valor total de R$416,18 para receber, porém vai utilizr parte do valor no pedido 27188 e ficou a diferença de R$141,18 para fazer no pix dele \n\n51009467840",
+    "prazo": "2026-10-09",
+    "status": "pendente",
+    "criado_em": "2026-10-08T13:32:22.394Z",
+    "executado_em": null,
+    "executado_por": null,
+    "aprovado_em": null,
+    "aprovado_por": null,
+    "rejeitado_em": null,
+    "rejeitado_por": null,
+    "rejeitado_motivo": null,
+    "mensagens": [],
+    "ultimaLeitura": {
+      "gerencia": "2026-10-08T13:32:22.394Z"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-08T13:32:22.394Z",
+        "acao": "criada",
+        "por": "gerencia"
+      }
+    ]
   }
 }
