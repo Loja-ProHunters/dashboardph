@@ -1193,7 +1193,7 @@
   "264d772d-cffb-43e5-b715-a0dc8d7fb6ee": {
     "id": "264d772d-cffb-43e5-b715-a0dc8d7fb6ee",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_be0a57dad10da498",
@@ -1213,10 +1213,13 @@
     "dono": "dickmann",
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-08T19:56:43.764Z",
+    "atualizado_por": "dickmann",
     "cliente_nome": "Genaro Lazzaron",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-08T19:56:43.764Z",
+    "concluida_por": "dickmann"
   },
   "a738d308-5233-4488-b69f-e6825d9e1603": {
     "id": "a738d308-5233-4488-b69f-e6825d9e1603",
