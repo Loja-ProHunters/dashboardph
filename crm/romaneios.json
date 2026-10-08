@@ -128,5 +128,25 @@
     "criado_por": "gerencia",
     "atualizado_em": "2026-10-08T17:02:49.326Z",
     "atualizado_por": "gerencia"
+  },
+  "rom_20261008_0007": {
+    "id": "rom_20261008_0007",
+    "numero": "0007",
+    "data": "2026-10-08",
+    "transportadora": "aereo",
+    "empresa_agrupada": "calibre",
+    "envio_ids": [
+      "env_calibre_1489"
+    ],
+    "total_volumes": 1,
+    "motorista_nome": null,
+    "motorista_cpf": null,
+    "motorista_placa": null,
+    "motorista_assinado_em": null,
+    "gerado_por": "gerencia",
+    "criado_em": "2026-10-08T17:04:02.013Z",
+    "criado_por": "gerencia",
+    "atualizado_em": "2026-10-08T17:04:02.013Z",
+    "atualizado_por": "gerencia"
   }
 }
