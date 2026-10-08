@@ -12088,7 +12088,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "boschetto",
     "onboarding_id": null,
     "primeira_compra_em": "2026-02-26",
     "ultima_compra_em": "2026-07-31",
@@ -12100,8 +12100,14 @@
     "notas": null,
     "criado_em": "2026-09-21T18:51:59.500Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T12:17:17.092Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-08T14:06:11.114Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "boschetto",
+      "em": "2026-10-08T14:06:11.113Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_ebd28e1ae2e112e4": {
     "id": "acc_ebd28e1ae2e112e4",
