@@ -38967,7 +38967,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "mathias",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-07",
     "ultima_compra_em": "2025-10-07",
@@ -38979,8 +38979,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:28:20.682Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:28:20.682Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-08T14:12:59.281Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "mathias",
+      "em": "2026-10-08T14:12:59.281Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_df015c5933495eac": {
     "id": "acc_df015c5933495eac",
