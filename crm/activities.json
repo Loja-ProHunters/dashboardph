@@ -1385,7 +1385,7 @@
   "15d98427-93cc-43ad-b841-a56d57a22a3a": {
     "id": "15d98427-93cc-43ad-b841-a56d57a22a3a",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_c36037df28ce48e9",
@@ -1405,10 +1405,13 @@
     "dono": "boschetto",
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-09T13:07:20.172Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "Hugo Pinto Bustamante",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-09T13:07:20.172Z",
+    "concluida_por": "boschetto"
   },
   "d92ef93d-74bb-4680-9db4-be29fd8a6152": {
     "id": "d92ef93d-74bb-4680-9db4-be29fd8a6152",
