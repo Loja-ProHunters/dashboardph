@@ -838,7 +838,7 @@
   "9b34df4b-97d2-47eb-9571-a678580a4732": {
     "id": "9b34df4b-97d2-47eb-9571-a678580a4732",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_62043692a2eb7fd0",
@@ -861,10 +861,13 @@
     "dono": "boschetto",
     "criado_em": "2026-09-25T15:07:04.692Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-09-25T15:07:04.692Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-09T13:07:05.081Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "Davi Eduardo Zimermann",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-09T13:07:05.081Z",
+    "concluida_por": "boschetto"
   },
   "31d5d3a6-da5c-4bb6-bf9c-3029d15406ae": {
     "id": "31d5d3a6-da5c-4bb6-bf9c-3029d15406ae",
@@ -1254,7 +1257,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "CAC IMPORTACAO E COMERCIO DE ARMAS MUNICOES E EQUIPAMENTOS L",
+    "cliente_telefone": null
   },
   "97df0703-3c48-4cff-98c3-4c4f7efab6c5": {
     "id": "97df0703-3c48-4cff-98c3-4c4f7efab6c5",
@@ -1280,7 +1285,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Aguinaldo Miguel Gonçalves",
+    "cliente_telefone": null
   },
   "8703ea8f-b14a-415e-b65c-0800271d6e7a": {
     "id": "8703ea8f-b14a-415e-b65c-0800271d6e7a",
@@ -1306,7 +1313,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Diego Araujo Alves Borges de Oliveira",
+    "cliente_telefone": null
   },
   "73c368ee-0495-4beb-a6a5-3a38ab0cb9ca": {
     "id": "73c368ee-0495-4beb-a6a5-3a38ab0cb9ca",
@@ -1335,7 +1344,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Thiago Dariel",
+    "cliente_telefone": null
   },
   "eada7e0b-6949-4385-a68d-9b2fd939394d": {
     "id": "eada7e0b-6949-4385-a68d-9b2fd939394d",
@@ -1364,7 +1375,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Guilherme Stefanello da silveira",
+    "cliente_telefone": null
   },
   "15d98427-93cc-43ad-b841-a56d57a22a3a": {
     "id": "15d98427-93cc-43ad-b841-a56d57a22a3a",
@@ -1390,7 +1403,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Hugo Pinto Bustamante",
+    "cliente_telefone": null
   },
   "d92ef93d-74bb-4680-9db4-be29fd8a6152": {
     "id": "d92ef93d-74bb-4680-9db4-be29fd8a6152",
@@ -1451,7 +1466,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Davi Eduardo Zimermann",
+    "cliente_telefone": null
   },
   "d2b7ce9f-b6e2-443c-a26c-08b17a1abf68": {
     "id": "d2b7ce9f-b6e2-443c-a26c-08b17a1abf68",
@@ -1480,7 +1497,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Noerci Battistella Junior",
+    "cliente_telefone": null
   },
   "ef7bc53e-03b2-45be-ad05-e29189c7fb16": {
     "id": "ef7bc53e-03b2-45be-ad05-e29189c7fb16",
@@ -1506,7 +1525,9 @@
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Alencar Gentil da Silva",
+    "cliente_telefone": null
   },
   "f1a1b377-cd48-48f4-ae48-6f1167a49be6": {
     "id": "f1a1b377-cd48-48f4-ae48-6f1167a49be6",
