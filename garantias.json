@@ -3135,7 +3135,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:21.483Z",
-    "atualizado_em": "2026-10-06T13:11:07.958Z",
+    "atualizado_em": "2026-10-09T11:38:25.137Z",
     "tally_meta": {
       "eventId": "sync_xV0AzNE",
       "responseId": "xV0AzNE",
@@ -3164,10 +3164,15 @@
         "por": "auxiliar",
         "resultado": "troca",
         "nota": null
+      },
+      {
+        "ts": "2026-10-09T11:38:25.137Z",
+        "acao": "procedimento_interno_concluido",
+        "por": "auxiliar"
       }
     ],
     "procedimento_interno": {
-      "status": "pendente",
+      "status": "concluido",
       "pedido_substituto": null,
       "pedido_substituto_data": null,
       "baixa_estoque_feita": false,
@@ -3178,8 +3183,8 @@
       "nota": null,
       "atualizado_em": null,
       "atualizado_por": null,
-      "concluido_em": null,
-      "concluido_por": null
+      "concluido_em": "2026-10-09T11:38:25.137Z",
+      "concluido_por": "auxiliar"
     }
   },
   "d6215ea9-9411-4929-8ac7-26b28f5eb9ee": {
