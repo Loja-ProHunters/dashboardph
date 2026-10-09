@@ -969,7 +969,7 @@
   "86262c23-e0f4-4e15-ba3e-a298f37e0be7": {
     "id": "86262c23-e0f4-4e15-ba3e-a298f37e0be7",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_51b979a2b6645037",
@@ -989,10 +989,13 @@
     "dono": "dickmann",
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-09T13:47:56.022Z",
+    "atualizado_por": "dickmann",
     "cliente_nome": "Embraer S.A.",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-09T13:47:56.022Z",
+    "concluida_por": "dickmann"
   },
   "3edd738d-bffe-421f-98e3-6af16a57ed93": {
     "id": "3edd738d-bffe-421f-98e3-6af16a57ed93",
