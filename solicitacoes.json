@@ -386,10 +386,10 @@
     "titulo": "Pedido #1961 (Calibre) foi RETIRADO em loja",
     "descricao": "Cliente: Vera Lucia H Pieritz\nCPF: 65837924949\nNF: 002898\nTotal do pedido: R$ 220,80\n\nRetirado por: Vera Lucia H Pieritz (doc: 65837924949)\nRegistrado por: auxiliar\n\nObs: Levou os 2 volumes",
     "prazo": null,
-    "status": "pendente",
+    "status": "executada",
     "criado_em": "2026-10-07T13:16:10.776Z",
-    "executado_em": null,
-    "executado_por": null,
+    "executado_em": "2026-10-09T13:29:43.424Z",
+    "executado_por": "nicolay",
     "aprovado_em": null,
     "aprovado_por": null,
     "rejeitado_em": null,
@@ -404,6 +404,11 @@
         "ts": "2026-10-07T13:16:10.776Z",
         "acao": "criada",
         "por": "auxiliar"
+      },
+      {
+        "ts": "2026-10-09T13:29:43.424Z",
+        "acao": "executada",
+        "por": "nicolay"
       }
     ]
   },
