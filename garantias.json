@@ -4183,8 +4183,8 @@
       "divergiu_do_sistema": false,
       "sugestao_original": "improcedente_prazo"
     },
-    "status": "em_analise",
-    "resultado": null,
+    "status": "resolvido",
+    "resultado": "negada",
     "produto_fisico": {
       "status": "nao_solicitado",
       "rastreio_entrada": null,
@@ -4199,7 +4199,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:29.556Z",
-    "atualizado_em": "2026-10-06T16:04:11.073Z",
+    "atualizado_em": "2026-10-09T12:11:06.030Z",
     "tally_meta": {
       "eventId": "sync_xVyox8r",
       "responseId": "xVyox8r",
@@ -4228,6 +4228,13 @@
         "por": "auxiliar",
         "de": "aberto",
         "para": "em_analise",
+        "nota": null
+      },
+      {
+        "ts": "2026-10-09T12:11:06.030Z",
+        "acao": "resolvida",
+        "por": "auxiliar",
+        "resultado": "negada",
         "nota": null
       }
     ],
