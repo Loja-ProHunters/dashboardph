@@ -220,9 +220,9 @@
     },
     "decisao_operador": {
       "valor": "procedente_troca",
-      "justificativa": "Quer fazer a troca do produto pois não se adaptou",
+      "justificativa": "Cliente não se adaptou",
       "por": "auxiliar",
-      "em": "2026-10-06T15:55:19.336Z",
+      "em": "2026-10-09T12:05:12.353Z",
       "divergiu_do_sistema": true,
       "sugestao_original": "analise_manual"
     },
@@ -242,7 +242,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:00.208Z",
-    "atualizado_em": "2026-10-09T12:03:58.738Z",
+    "atualizado_em": "2026-10-09T12:05:12.353Z",
     "tally_meta": {
       "eventId": "sync_rD1q9Y2",
       "responseId": "rD1q9Y2",
@@ -285,6 +285,13 @@
         "por": "auxiliar",
         "localizacao": null,
         "nota": null
+      },
+      {
+        "ts": "2026-10-09T12:05:12.353Z",
+        "acao": "decisao_registrada",
+        "por": "auxiliar",
+        "valor": "procedente_troca",
+        "divergiu": true
       }
     ],
     "procedimento_interno": {
