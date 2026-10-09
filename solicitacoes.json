@@ -222,7 +222,13 @@
     "rejeitado_em": null,
     "rejeitado_por": null,
     "rejeitado_motivo": null,
-    "mensagens": [],
+    "mensagens": [
+      {
+        "de": "nicolay",
+        "ts": "2026-10-09T13:32:47.785Z",
+        "texto": "Notas Fiscais de Saída"
+      }
+    ],
     "historico": [
       {
         "ts": "2026-10-02T13:29:04.394Z",
