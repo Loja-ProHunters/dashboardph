@@ -2060,13 +2060,42 @@ module.exports = async (req, res) => {
       const body = await readBody(req);
       let payload = {};
       try { payload = JSON.parse(body || '{}'); } catch(e){}
-      const { account_id, titulo, descricao, prazo, hora, owner_id } = payload;
-      if (!account_id) throw new Error('account_id obrigatório');
+      let { account_id, titulo, descricao, prazo, hora, owner_id } = payload;
       if (!descricao || !String(descricao).trim()) throw new Error('Descrição obrigatória');
       if (!prazo) throw new Error('Prazo (data) obrigatório');
       // Vendedor cria pra si mesmo. Admin pode delegar pra outro via owner_id.
       let dono = String(sess.usuario).toLowerCase();
       if (owner_id && crmUtils.canSeeAll(sess)) dono = String(owner_id).toLowerCase();
+
+      // ─── Modo "cliente novo" ───────────────────────────────────────
+      // Vendedor cadastra um prospect que ainda nao esta no Bling (ex: contato
+      // em evento, indicacao, atendimento WhatsApp). Cria o account na hora
+      // com os dados minimos e usa o id dele pra tarefa. Fica tagueado como
+      // 'prospect_vendedor' pra depois a gente conseguir diferenciar de quem
+      // ja veio do Bling. CPF e opcional — se vier, tem que ser valido.
+      if (payload.cliente_novo === true) {
+        if (!payload.cliente_nome || !String(payload.cliente_nome).trim()) {
+          throw new Error('Nome do cliente obrigatório');
+        }
+        if (!payload.cliente_telefone || !String(payload.cliente_telefone).trim()) {
+          throw new Error('Telefone do cliente obrigatório');
+        }
+        const dadosAcc = {
+          tipo: 'pessoa_fisica', // default — vendedor edita depois na ficha se precisar
+          nome: String(payload.cliente_nome).trim().slice(0, 200),
+          telefone: String(payload.cliente_telefone).trim().slice(0, 60),
+          cpf_cnpj: payload.cliente_cpf ? String(payload.cliente_cpf).trim() : null,
+          owner_id: dono,
+          tags: ['prospect_vendedor'],
+          notas: 'Cadastrado manualmente via tarefa manual por ' + sess.usuario +
+                 ' em ' + new Date().toISOString().slice(0, 10),
+        };
+        const buildAcc = crmColl.REGISTRY.accounts.build(dadosAcc);
+        const accSalvo = await crmStore.createDoc('accounts', buildAcc, sess.usuario);
+        account_id = accSalvo.id;
+      }
+
+      if (!account_id) throw new Error('account_id obrigatório (ou use cliente_novo:true + cliente_nome + cliente_telefone)');
       // Busca o account pra validar e enriquecer o título
       const acc = await crmStore.getDoc('accounts', account_id);
       if (!acc) throw new Error('Cliente não encontrado');
@@ -2135,6 +2164,103 @@ module.exports = async (req, res) => {
       await crmStore.updateDoc('activities', id, {
         ...t, status: 'concluida', resultado: resultado || 'concluida',
         concluida_em: new Date().toISOString(), concluida_por: sess.usuario,
+      }, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── POST /api/crm/tarefas/:id/follow-up  body: { prazo, hora, descricao }
+  // Conclui a tarefa atual (resultado='follow_up_agendado') E cria uma NOVA
+  // tarefa de follow-up pro mesmo cliente/vendedor na data informada, com a
+  // descricao que o vendedor escreveu (serve de lembrete do que a tarefa é).
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/tarefas\/[a-zA-Z0-9_\-]+\/follow-up$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!crmUtils.canEditCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Seu perfil pode consultar mas nao criar tarefas.'})); return; }
+    try {
+      const id = url.split('/')[4];
+      const body = await readBody(req);
+      let payload = {};
+      try { payload = JSON.parse(body || '{}'); } catch(e){}
+      const { prazo, hora, descricao } = payload;
+      if (!prazo) throw new Error('Data do follow-up obrigatória');
+      if (!descricao || !String(descricao).trim()) throw new Error('Escreva o motivo do follow-up (serve de lembrete)');
+      const t = await crmStore.getDoc('activities', id);
+      if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
+      const meuLogin = String(sess.usuario || '').toLowerCase();
+      const donoTarefa = String(t.owner_id || t.dono || '').toLowerCase();
+      if (!crmUtils.canSeeAll(sess) && donoTarefa !== meuLogin) {
+        res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa nao esta atribuida a voce.'})); return;
+      }
+      const now = new Date().toISOString();
+      const dono = donoTarefa || meuLogin;
+      const accId = t.account_id || t.entidade_id || null;
+      // Nome do cliente pro titulo (busca o account; se nao achar usa o titulo antigo)
+      let nomeCliente = null;
+      if (accId) { try { const acc = await crmStore.getDoc('accounts', accId); if (acc) nomeCliente = acc.nome || acc.razao_social; } catch(_){} }
+      // 1) Conclui a tarefa atual marcando que gerou follow-up
+      await crmStore.updateDoc('activities', id, {
+        ...t, status: 'concluida', resultado: 'follow_up_agendado',
+        concluida_em: now, concluida_por: sess.usuario,
+      }, sess.usuario);
+      // 2) Cria a tarefa de follow-up
+      const novoId = crmUtils.uuid();
+      const followDoc = {
+        id: novoId,
+        tipo: 'follow_up',
+        status: 'pendente',
+        owner_id: dono,
+        entidade_tipo: 'account',
+        entidade_id: accId,
+        titulo: '📅 Follow-up — ' + (nomeCliente || 'cliente'),
+        descricao: String(descricao).trim().slice(0, 2000),
+        prazo: String(prazo).slice(0, 10),
+        hora: hora ? String(hora).slice(0, 5) : null,
+        concluido_em: null,
+        concluido_com_order_id: null,
+        pontos_base: 10,
+        pontos_bonus: 0,
+        pontos_ganhos: 0,
+        trigger_id: 'followup_' + novoId,
+        gerada_automaticamente: false,
+        fonte: 'follow_up',
+        dono,
+        account_id: accId,
+        origem_tarefa_id: id,
+        criada_por_vendedor: sess.usuario,
+      };
+      await crmStore.createDoc('activities', followDoc, sess.usuario);
+      res.writeHead(201,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, follow_up: followDoc }));
+    } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── POST /api/crm/tarefas/:id/cancelar  body: { motivo }
+  // Marca a tarefa como status='cancelada' (NAO 'concluida'). Diferenca
+  // importante: tarefa cancelada nao conta no cooldown da geracao automatica,
+  // entao o cliente pode voltar ao pool numa proxima rodada. Pra tarefas
+  // julgadas invalidas pelo vendedor.
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/tarefas\/[a-zA-Z0-9_\-]+\/cancelar$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!crmUtils.canEditCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Seu perfil pode consultar mas nao alterar tarefas.'})); return; }
+    try {
+      const id = url.split('/')[4];
+      const body = await readBody(req);
+      let payload = {};
+      try { payload = JSON.parse(body || '{}'); } catch(e){}
+      const t = await crmStore.getDoc('activities', id);
+      if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
+      const meuLogin = String(sess.usuario || '').toLowerCase();
+      const donoTarefa = String(t.owner_id || t.dono || '').toLowerCase();
+      if (!crmUtils.canSeeAll(sess) && donoTarefa !== meuLogin) {
+        res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa nao esta atribuida a voce.'})); return;
+      }
+      await crmStore.updateDoc('activities', id, {
+        ...t, status: 'cancelada', resultado: 'cancelada',
+        cancelada_em: new Date().toISOString(), cancelada_por: sess.usuario,
+        cancelamento_motivo: payload.motivo ? String(payload.motivo).trim().slice(0, 500) : null,
       }, sess.usuario);
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
@@ -3132,10 +3258,13 @@ module.exports = async (req, res) => {
   // Soft delete — marca status='cancelado' pra tirar da fila. Mantem o doc
   // pra auditoria (quem cancelou, quando, por que). Nao pode cancelar se ja
   // esta em romaneio ou foi enviado/retirado.
+  // PERMISSAO: SOMENTE gerencia (admin/diretor). Vendedor/auxiliar nao pode
+  // cancelar — se precisar, pede pra gerencia. Evita cancelamento acidental
+  // de envios validos por quem opera no dia-a-dia.
   if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/cancelar$/)) {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessControlado(sess)) {
-      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
+    if (!sess || !isAdminOrDiretor(sess)) {
+      res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Somente gerencia (admin/diretor) pode cancelar envios.'})); return;
     }
     try {
       const id = url.split('/')[4];
@@ -3177,40 +3306,10 @@ module.exports = async (req, res) => {
       });
       const salvo = await crmStore.updateDoc('envios', id, retirado, sess.usuario);
 
-      // ─── Notificacao pro financeiro + gerencia ───
-      // Pega todos usuarios ativos com role financeiro/admin/diretor e cria uma
-      // solicitacao pra cada (categoria=Financeiro). Nao bloqueia a resposta se
-      // a notificacao falhar — o envio ja foi marcado, so loga o erro.
-      try {
-        const solic = require('../lib/solicitacoes');
-        const all = await getAllUsers();
-        const destinos = Object.entries(all)
-          .filter(([k, v]) => v.ativo !== false && (v.role === 'financeiro' || v.role === 'admin' || v.role === 'diretor'))
-          .map(([k]) => String(k).toLowerCase())
-          .filter(k => k !== String(sess.usuario).toLowerCase());  // nao notifica quem fez
-        const empLbl = salvo.empresa === 'calibre' ? 'Calibre' : 'Pro Hunters';
-        const titulo = 'Pedido #' + salvo.numero + ' (' + empLbl + ') foi RETIRADO em loja';
-        const desc = [
-          'Cliente: ' + (salvo.cliente_nome || '—'),
-          (salvo.cliente_cpf_cnpj_tipo === 'pj' ? 'CNPJ: ' : 'CPF: ') + (salvo.cliente_cpf_cnpj || '—'),
-          'NF: ' + (salvo.nf_numero || '—'),
-          'Total do pedido: R$ ' + Number(salvo.total_pedido || 0).toFixed(2).replace('.', ','),
-          '',
-          'Retirado por: ' + salvo.retirado_cliente_nome + (salvo.retirado_cliente_doc ? ' (doc: ' + salvo.retirado_cliente_doc + ')' : ''),
-          'Registrado por: ' + sess.usuario,
-          nota ? '\nObs: ' + nota : '',
-        ].join('\n');
-        for (const para of destinos) {
-          try {
-            await solic.criar({
-              de: sess.usuario, para, categoria: 'Financeiro',
-              titulo, descricao: desc,
-            });
-          } catch (e) { console.error('[retirada] falha ao notificar ' + para + ':', e.message); }
-        }
-      } catch (e) {
-        console.error('[retirada] falha geral ao notificar:', e.message);
-      }
+      // (Removido) Antes criava notificacao via solicitacao pro financeiro.
+      // Nao gerava valor pratico — financeiro vai consultar diretamente a aba
+      // Op. Controlado -> Retirados quando precisar. Mantemos apenas o registro
+      // no envio (status=retirado + retirado_cliente_nome/doc/em).
 
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ ok: true, envio: salvo }));
