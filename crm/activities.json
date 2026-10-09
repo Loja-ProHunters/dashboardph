@@ -804,7 +804,7 @@
   "7645b53b-3cbf-48ba-b24a-6a42757dcf78": {
     "id": "7645b53b-3cbf-48ba-b24a-6a42757dcf78",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_9e575ad69bbd0db8",
@@ -827,10 +827,13 @@
     "dono": "boschetto",
     "criado_em": "2026-09-25T15:07:04.692Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-09-25T15:07:04.692Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-09T13:06:58.538Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "Thiago Dariel",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-09T13:06:58.537Z",
+    "concluida_por": "boschetto"
   },
   "9b34df4b-97d2-47eb-9571-a678580a4732": {
     "id": "9b34df4b-97d2-47eb-9571-a678580a4732",
