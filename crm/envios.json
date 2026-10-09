@@ -4176,7 +4176,7 @@
     "total_pedido": 302.25,
     "observacoes": "Nº Pedido Loja: 1508756502\nEDIOGENESLOPESGALVO\n\n",
     "vendedor_bling": null,
-    "status": "aberto",
+    "status": "cancelado",
     "confirmado_bling": true,
     "volumes_qtd": null,
     "volumes_por": null,
@@ -4228,21 +4228,28 @@
     "retirado_cliente_nome": null,
     "retirado_cliente_doc": null,
     "retirado_nota": null,
-    "cancelado_motivo": null,
-    "cancelado_por": null,
-    "cancelado_em": null,
+    "cancelado_motivo": "Pedro é burro e colocou errado",
+    "cancelado_por": "gerencia",
+    "cancelado_em": "2026-10-09T11:35:26.716Z",
     "historico": [
       {
         "ts": "2026-10-09T11:34:38.777Z",
         "por": "dickmann",
         "acao": "envio_criado",
         "detalhe": "empresa=prohunters numero=1967"
+      },
+      {
+        "ts": "2026-10-09T11:35:26.716Z",
+        "por": "gerencia",
+        "ip": "170.231.25.101",
+        "acao": "envio_cancelado",
+        "motivo": "Pedro é burro e colocou errado"
       }
     ],
     "criado_em": "2026-10-09T11:34:38.777Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-10-09T11:34:38.777Z",
-    "atualizado_por": "dickmann"
+    "atualizado_em": "2026-10-09T11:35:26.716Z",
+    "atualizado_por": "gerencia"
   },
   "env_calibre_1967": {
     "id": "env_calibre_1967",
