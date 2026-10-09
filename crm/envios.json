@@ -4383,10 +4383,10 @@
     "conferencia_por": "dickmann",
     "conferencia_em": "2026-10-09T12:25:55.208Z",
     "conferencia_notas": null,
-    "transportadora": null,
-    "transporte_valor": null,
-    "transporte_por": null,
-    "transporte_em": null,
+    "transportadora": "rpa",
+    "transporte_valor": 292.5,
+    "transporte_por": "dickmann",
+    "transporte_em": "2026-10-09T12:26:16.531Z",
     "nf_numero": null,
     "nf_por": null,
     "nf_em": null,
@@ -4451,11 +4451,27 @@
         "acao": "campo_alterado",
         "campo": "conferencia_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-09T12:26:16.531Z",
+        "por": "dickmann",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "transportadora",
+        "novo": "rpa"
+      },
+      {
+        "ts": "2026-10-09T12:26:16.531Z",
+        "por": "dickmann",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "transporte_valor",
+        "novo": 292.5
       }
     ],
     "criado_em": "2026-10-09T12:25:43.845Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-10-09T12:25:55.208Z",
+    "atualizado_em": "2026-10-09T12:26:16.533Z",
     "atualizado_por": "dickmann"
   }
 }
