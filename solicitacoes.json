@@ -601,12 +601,12 @@
     "titulo": "PAGAMENTO INFLUENCIADOR",
     "descricao": "Ele possui o valor total de R$416,18 para receber, porém vai utilizr parte do valor no pedido 27188 e ficou a diferença de R$141,18 para fazer no pix dele \n\n51009467840",
     "prazo": "2026-10-09",
-    "status": "executada",
+    "status": "aprovada",
     "criado_em": "2026-10-08T13:32:22.394Z",
     "executado_em": "2026-10-09T13:27:41.820Z",
     "executado_por": "nicolay",
-    "aprovado_em": null,
-    "aprovado_por": null,
+    "aprovado_em": "2026-10-09T13:50:07.889Z",
+    "aprovado_por": "gerencia",
     "rejeitado_em": null,
     "rejeitado_por": null,
     "rejeitado_motivo": null,
@@ -624,6 +624,11 @@
         "ts": "2026-10-09T13:27:41.820Z",
         "acao": "executada",
         "por": "nicolay"
+      },
+      {
+        "ts": "2026-10-09T13:50:07.889Z",
+        "acao": "aprovada",
+        "por": "gerencia"
       }
     ]
   }
