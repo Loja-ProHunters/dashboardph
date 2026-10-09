@@ -1121,7 +1121,7 @@
   "ba5d01cf-1159-4f95-9a65-0d7d1471e53a": {
     "id": "ba5d01cf-1159-4f95-9a65-0d7d1471e53a",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_5f7d437c8ab85f5d",
@@ -1144,10 +1144,13 @@
     "dono": "dickmann",
     "criado_em": "2026-10-08T14:13:16.725Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-08T14:13:16.725Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-09T13:49:13.985Z",
+    "atualizado_por": "dickmann",
     "cliente_nome": "MARCOS FUCHS NOBRE",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-09T13:49:13.985Z",
+    "concluida_por": "dickmann"
   },
   "77e81e3c-f410-4f26-94bd-4b0c0456f908": {
     "id": "77e81e3c-f410-4f26-94bd-4b0c0456f908",
