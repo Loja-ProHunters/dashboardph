@@ -5213,8 +5213,8 @@
       "divergiu_do_sistema": true,
       "sugestao_original": "analise_manual"
     },
-    "status": "aberto",
-    "resultado": null,
+    "status": "resolvido",
+    "resultado": "negada",
     "produto_fisico": {
       "status": "nao_solicitado",
       "rastreio_entrada": null,
@@ -5244,7 +5244,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-08T07:59:26.722Z",
-    "atualizado_em": "2026-10-13T15:53:08.631Z",
+    "atualizado_em": "2026-10-13T15:53:21.770Z",
     "tally_meta": {
       "eventId": "sync_gbx60EP",
       "responseId": "gbx60EP",
@@ -5266,6 +5266,13 @@
         "por": "auxiliar",
         "valor": "improcedente_sem_direito",
         "divergiu": true
+      },
+      {
+        "ts": "2026-10-13T15:53:21.770Z",
+        "acao": "resolvida",
+        "por": "auxiliar",
+        "resultado": "negada",
+        "nota": null
       }
     ]
   },
