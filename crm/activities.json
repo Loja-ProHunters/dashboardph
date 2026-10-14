@@ -2661,7 +2661,7 @@
   "ac1a2ffa-c035-4b80-aab8-8d82aeee4036": {
     "id": "ac1a2ffa-c035-4b80-aab8-8d82aeee4036",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_a97872bbe6554523",
@@ -2681,10 +2681,13 @@
     "dono": "dickmann",
     "criado_em": "2026-10-14T11:40:00.228Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T11:40:00.228Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-14T12:12:32.736Z",
+    "atualizado_por": "dickmann",
     "cliente_nome": "Ivo Knut Anders Junior",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-14T12:12:32.736Z",
+    "concluida_por": "dickmann"
   },
   "dc733b93-df76-4cc5-a7a5-8b7a1619a5da": {
     "id": "dc733b93-df76-4cc5-a7a5-8b7a1619a5da",
