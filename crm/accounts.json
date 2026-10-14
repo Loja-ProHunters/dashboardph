@@ -10,7 +10,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "boschetto",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-21",
     "ultima_compra_em": "2025-10-21",
@@ -22,8 +22,14 @@
     "notas": null,
     "criado_em": "2026-09-16T13:31:51.276Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-16T13:31:51.276Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "boschetto",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_d85ba7c37342e307": {
     "id": "acc_d85ba7c37342e307",
@@ -36,7 +42,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "boschetto",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-21",
     "ultima_compra_em": "2026-09-09",
@@ -48,8 +54,14 @@
     "notas": null,
     "criado_em": "2026-09-16T13:31:51.655Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T12:17:28.762Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "boschetto",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_69ceb7fc63d6f6ec": {
     "id": "acc_69ceb7fc63d6f6ec",
@@ -88,7 +100,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "dickmann",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-20",
     "ultima_compra_em": "2025-10-20",
@@ -100,8 +112,14 @@
     "notas": null,
     "criado_em": "2026-09-16T13:31:52.442Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-16T13:31:52.442Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "dickmann",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_e3f17d1912a30ded": {
     "id": "acc_e3f17d1912a30ded",
@@ -114,7 +132,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "mathias",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-19",
     "ultima_compra_em": "2025-10-19",
@@ -126,8 +144,14 @@
     "notas": null,
     "criado_em": "2026-09-16T13:31:52.828Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-16T13:31:52.828Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "mathias",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_682ed395502d95e3": {
     "id": "acc_682ed395502d95e3",
@@ -140,7 +164,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "dickmann",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-19",
     "ultima_compra_em": "2025-10-19",
@@ -152,8 +176,14 @@
     "notas": null,
     "criado_em": "2026-09-16T13:31:53.221Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-16T13:31:53.221Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "dickmann",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_df4bc9f4421b22c9": {
     "id": "acc_df4bc9f4421b22c9",
@@ -4614,7 +4644,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "mathias",
     "onboarding_id": null,
     "primeira_compra_em": "2026-09-13",
     "ultima_compra_em": "2026-09-13",
@@ -4626,8 +4656,14 @@
     "notas": null,
     "criado_em": "2026-09-21T18:38:38.152Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-21T18:38:59.496Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "mathias",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_20ebd0b5e25c8ca7": {
     "id": "acc_20ebd0b5e25c8ca7",
@@ -5498,7 +5534,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "boschetto",
     "onboarding_id": null,
     "primeira_compra_em": "2026-07-27",
     "ultima_compra_em": "2026-09-09",
@@ -5510,8 +5546,14 @@
     "notas": null,
     "criado_em": "2026-09-21T18:40:32.942Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:37:51.558Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "boschetto",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_435ea146649f25c3": {
     "id": "acc_435ea146649f25c3",
@@ -9742,7 +9784,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "boschetto",
     "onboarding_id": null,
     "primeira_compra_em": "2026-07-20",
     "ultima_compra_em": "2026-08-13",
@@ -9754,8 +9796,14 @@
     "notas": null,
     "criado_em": "2026-09-21T18:46:04.086Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T11:40:04.629Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "boschetto",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_f1512276d40cd829": {
     "id": "acc_f1512276d40cd829",
@@ -38591,7 +38639,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "boschetto",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-24",
     "ultima_compra_em": "2025-10-24",
@@ -38603,8 +38651,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:27:55.313Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:27:55.313Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "boschetto",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_74c0e1d4f8767cbc": {
     "id": "acc_74c0e1d4f8767cbc",
@@ -38617,7 +38671,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "boschetto",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-24",
     "ultima_compra_em": "2025-10-24",
@@ -38629,8 +38683,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:27:56.382Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:27:56.382Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "boschetto",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_10b9cd2fe37c178f": {
     "id": "acc_10b9cd2fe37c178f",
@@ -38643,7 +38703,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "boschetto",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-24",
     "ultima_compra_em": "2025-10-24",
@@ -38655,8 +38715,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:27:57.430Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:27:57.430Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "boschetto",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_0362067e8792f14c": {
     "id": "acc_0362067e8792f14c",
@@ -38669,7 +38735,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "dickmann",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-23",
     "ultima_compra_em": "2025-10-23",
@@ -38681,8 +38747,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:27:58.507Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:27:58.507Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "dickmann",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_e45747b1c940fef9": {
     "id": "acc_e45747b1c940fef9",
@@ -38695,7 +38767,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "mathias",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-23",
     "ultima_compra_em": "2025-10-23",
@@ -38707,8 +38779,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:27:59.585Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:27:59.585Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "mathias",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_8a521e1c74cd8604": {
     "id": "acc_8a521e1c74cd8604",
@@ -38721,7 +38799,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "mathias",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-23",
     "ultima_compra_em": "2025-10-23",
@@ -38733,8 +38811,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:28:00.673Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:28:00.673Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "mathias",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_761a0319d5b7921a": {
     "id": "acc_761a0319d5b7921a",
@@ -38747,7 +38831,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "mathias",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-22",
     "ultima_compra_em": "2025-10-22",
@@ -38759,8 +38843,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:28:01.721Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:28:01.721Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "mathias",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_39a617dd8008e939": {
     "id": "acc_39a617dd8008e939",
@@ -38773,7 +38863,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "mathias",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-22",
     "ultima_compra_em": "2025-10-22",
@@ -38785,8 +38875,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:28:02.813Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:28:02.813Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "mathias",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_107d2e4a755716aa": {
     "id": "acc_107d2e4a755716aa",
@@ -38799,7 +38895,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "dickmann",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-22",
     "ultima_compra_em": "2025-10-22",
@@ -38811,8 +38907,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:28:03.841Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:28:03.841Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "dickmann",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_5a70911b73445d97": {
     "id": "acc_5a70911b73445d97",
@@ -38825,7 +38927,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "dickmann",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-22",
     "ultima_compra_em": "2025-10-22",
@@ -38837,8 +38939,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:28:04.933Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:28:04.933Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "dickmann",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_6d54ce5716844142": {
     "id": "acc_6d54ce5716844142",
@@ -38851,7 +38959,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "dickmann",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-22",
     "ultima_compra_em": "2025-10-22",
@@ -38863,8 +38971,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:28:07.099Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:28:07.099Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "dickmann",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_668df39844e56e4c": {
     "id": "acc_668df39844e56e4c",
@@ -38877,7 +38991,7 @@
     "telefone": null,
     "endereco": null,
     "status": "ativo",
-    "owner_id": "gerencia",
+    "owner_id": "mathias",
     "onboarding_id": null,
     "primeira_compra_em": "2025-10-20",
     "ultima_compra_em": "2025-10-20",
@@ -38889,8 +39003,14 @@
     "notas": null,
     "criado_em": "2026-09-22T16:28:08.138Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-09-22T16:28:08.138Z",
-    "atualizado_por": "bling-sync"
+    "atualizado_em": "2026-10-14T11:39:56.857Z",
+    "atualizado_por": "automacao-cron-diario",
+    "_realocado_por_automacao": {
+      "de": "gerencia",
+      "para": "mathias",
+      "em": "2026-10-14T11:39:56.857Z",
+      "motivo": "rodizio automatico (vendedor anterior era orfao: gerencia)"
+    }
   },
   "acc_f17bf6c970edec30": {
     "id": "acc_f17bf6c970edec30",
