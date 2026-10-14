@@ -6456,9 +6456,14 @@ async function crmRenderTarefas(){
 
     // Header com botão de nova tarefa manual — vendedor pode criar lembrete
     // durante atendimento ("retornar amanhã 14h pra fechar Tanfoglio").
+    var adminResetBtn = (typeof IS_ADMIN !== 'undefined' && IS_ADMIN)
+      ? '<button id="btn-reset-tarefas" onclick="crmResetarRegerar(this)" title="Cancela as tarefas automáticas pendentes de TODOS os vendedores e gera 20 novas variadas (reativação + cross-sell + aniversário) por vendedor" style="background:#242a2c;color:#e6edf0;border:1px solid #3a4245;border-radius:8px;padding:9px 14px;font-size:12.5px;font-weight:700;cursor:pointer">↻ Zerar &amp; regerar tarefas</button>'
+      : '';
     var topBar = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">' +
       '<div style="font-size:12.5px;color:#7b8285">' + tarefas.length + ' tarefa(s) na sua fila</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' + adminResetBtn +
       '<button onclick="crmAbrirModalNovaTarefa()" style="background:linear-gradient(135deg,#1a8bff,#0e6bd4);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(26,139,255,.3)">+ Nova tarefa manual</button>' +
+      '</div>' +
     '</div>';
 
     if (!tarefas.length) {
@@ -6547,6 +6552,35 @@ async function crmRenderTarefas(){
 }
 
 // ─────────────────────────────────────────────────────────────
+// ZERAR & REGERAR TAREFAS (admin/diretor) — cancela as tarefas automáticas
+// pendentes de todos os vendedores e gera 20 novas variadas por vendedor,
+// usando a base de coocorrência atual. Tarefas manuais e concluídas não são
+// tocadas. Confirma antes, porque mexe na fila de todo mundo.
+async function crmResetarRegerar(btn){
+  if (!confirm('Isto vai CANCELAR as tarefas automáticas pendentes de todos os vendedores e gerar 20 novas (variadas) para cada um.\n\nTarefas manuais e já concluídas NÃO são afetadas.\n\nConfirmar?')) return;
+  var txtOrig = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.style.opacity = '.6'; btn.textContent = '↻ Regerando… (pode levar ~20s)'; }
+  try {
+    var r = await fetch('/api/crm/tarefas/resetar-regerar', { method:'POST', headers:{'Content-Type':'application/json'}, body:'{}' });
+    var d = await r.json();
+    if (!r.ok || !d.ok) throw new Error(d.error || 'Falha ao regerar.');
+    var g = d.geracao || {};
+    var pf = g.por_fonte || {};
+    var pv = g.por_vendedor || {};
+    var fonteTxt = Object.keys(pf).map(function(k){ return k + ': ' + pf[k]; }).join(' · ') || '—';
+    var vendTxt = Object.keys(pv).map(function(k){ return k + ': ' + pv[k]; }).join(' · ') || '—';
+    alert('Pronto!\n\nCanceladas: ' + (d.canceladas||0) +
+          '\nNovas criadas: ' + (g.tarefas_criadas||0) +
+          '\nPor vendedor → ' + vendTxt +
+          '\nPor fonte → ' + fonteTxt);
+    crmRenderTarefas();
+  } catch(e) {
+    alert('Erro ao regerar: ' + (e.message || e));
+  } finally {
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.textContent = txtOrig; }
+  }
+}
+
 // NOVA TAREFA MANUAL — vendedor cria lembrete durante atendimento.
 // Fluxo: busca cliente por nome/CPF/telefone/pedido → preenche descrição
 // e data+hora → salva. Vai aparecer na fila de "Minhas tarefas".
