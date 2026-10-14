@@ -2081,7 +2081,7 @@ module.exports = async (req, res) => {
           throw new Error('Telefone do cliente obrigatório');
         }
         const dadosAcc = {
-          tipo: 'pessoa_fisica', // default — vendedor edita depois na ficha se precisar
+          tipo: 'pf', // pessoa fisica (enum account_tipo = ['pf','pj']); vendedor edita depois na ficha se precisar
           nome: String(payload.cliente_nome).trim().slice(0, 200),
           telefone: String(payload.cliente_telefone).trim().slice(0, 60),
           cpf_cnpj: payload.cliente_cpf ? String(payload.cliente_cpf).trim() : null,
@@ -3189,7 +3189,9 @@ module.exports = async (req, res) => {
       const prontos = list.filter(e => (e.status === 'pronto_coleta' || envios.estadoChecklist(e).pronto_coleta) && !e.romaneio_id && e.status !== 'enviado' && e.status !== 'cancelado' && e.status !== 'retirado' && e.transportadora !== 'retirada');
       const grupos = {};
       for (const e of prontos) {
-        const t = e.transportadora || 'sem_transportadora';
+        // Agrupa por FAMILIA: ezequiel + ezequiel_gollog caem no mesmo romaneio
+        // (fisicamente a Ezequiel coleta os dois; o Gollog so entra no destino).
+        const t = romaneios.familiaTransportadora(e.transportadora);
         if (!grupos[t]) grupos[t] = [];
         grupos[t].push({
           id: e.id, empresa: e.empresa, numero: e.numero,
