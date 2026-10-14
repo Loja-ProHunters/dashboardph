@@ -2267,6 +2267,45 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // ── POST /api/crm/tarefas/resetar-regerar — zera as tarefas AUTOMATICAS
+  // pendentes (gerada_automaticamente) marcando-as como canceladas, e roda o
+  // gerador de novo, reenchendo ate 20 variadas por vendedor com a base de
+  // coocorrencia atual. NAO mexe em tarefas manuais nem em concluidas. Como
+  // tarefa cancelada nao conta no cooldown, os clientes voltam ao pool e sao
+  // reavaliados com variedade garantida (rodizio entre fontes). So admin/diretor.
+  if (req.method === 'POST' && url === '/api/crm/tarefas/resetar-regerar') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
+    try {
+      const acts = await crmStore.getCollection('activities');
+      const nowIso = new Date().toISOString();
+      let canceladas = 0;
+      for (const id of Object.keys(acts)) {
+        const a = acts[id];
+        if (a && a.gerada_automaticamente === true && a.status === 'pendente') {
+          a.status = 'cancelada';
+          a.resultado = 'cancelada';
+          a.cancelada_em = nowIso;
+          a.cancelada_por = sess.usuario || 'reset';
+          a.cancelamento_motivo = 'reset-regerar (gerencia)';
+          a.atualizado_em = nowIso;
+          a.atualizado_por = sess.usuario || 'reset';
+          canceladas++;
+        }
+      }
+      if (canceladas > 0) {
+        await crmStore.saveCollection('activities', acts, 'Reset: cancela ' + canceladas + ' tarefas automaticas pendentes');
+        crmStore.invalidate('activities');
+      }
+      const geracao = await automacaoUpsell.gerarTarefasDiarias();
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, canceladas, geracao }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // ── GET /api/crm/ficha/buscar?q=X — busca cliente por nome, CPF/CNPJ,
   // telefone ou número do pedido (Bling). Usado pela nova tarefa manual.
   if (req.method === 'GET' && url.startsWith('/api/crm/ficha/buscar')) {
