@@ -2406,7 +2406,7 @@
   "edfb7f44-6dc5-43d1-86a0-a0a08df2092b": {
     "id": "edfb7f44-6dc5-43d1-86a0-a0a08df2092b",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_fd153639c0c4b092",
@@ -2426,10 +2426,13 @@
     "dono": "dickmann",
     "criado_em": "2026-10-14T11:40:00.228Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T11:40:00.228Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-14T12:07:18.794Z",
+    "atualizado_por": "dickmann",
     "cliente_nome": "Mansoeto Bezerra da silva",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-14T12:07:18.794Z",
+    "concluida_por": "dickmann"
   },
   "42a75a8c-4277-4f0f-b7f0-100e57de921d": {
     "id": "42a75a8c-4277-4f0f-b7f0-100e57de921d",
