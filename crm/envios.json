@@ -4706,9 +4706,9 @@
     },
     "status": "aberto",
     "confirmado_bling": true,
-    "volumes_qtd": null,
-    "volumes_por": null,
-    "volumes_em": null,
+    "volumes_qtd": 1,
+    "volumes_por": "boschetto",
+    "volumes_em": "2026-10-14T14:12:03.874Z",
     "conferencia_ok": false,
     "conferencia_por": null,
     "conferencia_em": null,
@@ -4765,11 +4765,19 @@
         "por": "boschetto",
         "acao": "envio_criado",
         "detalhe": "empresa=calibre numero=1976"
+      },
+      {
+        "ts": "2026-10-14T14:12:03.874Z",
+        "por": "boschetto",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "volumes_qtd",
+        "novo": 1
       }
     ],
     "criado_em": "2026-10-14T14:11:57.693Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-14T14:11:57.693Z",
+    "atualizado_em": "2026-10-14T14:12:03.875Z",
     "atualizado_por": "boschetto"
   }
 }
