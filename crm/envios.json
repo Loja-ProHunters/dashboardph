@@ -4720,9 +4720,9 @@
     "nf_numero": "002915",
     "nf_por": "auxiliar",
     "nf_em": "2026-10-14T14:13:27.385Z",
-    "gt_numero": "",
-    "gt_por": null,
-    "gt_em": null,
+    "gt_numero": "202630582273",
+    "gt_por": "auxiliar",
+    "gt_em": "2026-10-14T14:13:59.818Z",
     "assinatura_ok": false,
     "assinatura_por": null,
     "assinatura_em": null,
@@ -4813,11 +4813,19 @@
         "acao": "campo_alterado",
         "campo": "gt_numero",
         "novo": ""
+      },
+      {
+        "ts": "2026-10-14T14:13:59.818Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "gt_numero",
+        "novo": "202630582273"
       }
     ],
     "criado_em": "2026-10-14T14:11:57.693Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-14T14:13:34.811Z",
+    "atualizado_em": "2026-10-14T14:13:59.818Z",
     "atualizado_por": "auxiliar"
   }
 }
