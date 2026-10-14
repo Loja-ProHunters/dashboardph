@@ -4294,9 +4294,9 @@
     "transporte_valor": 292.5,
     "transporte_por": "dickmann",
     "transporte_em": "2026-10-09T12:26:33.693Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "002903",
+    "nf_por": "auxiliar",
+    "nf_em": "2026-10-14T11:30:49.412Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -4374,12 +4374,20 @@
         "acao": "campo_alterado",
         "campo": "volumes_qtd",
         "novo": 1
+      },
+      {
+        "ts": "2026-10-14T11:30:49.412Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "002903"
       }
     ],
     "criado_em": "2026-10-09T11:35:12.683Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-10-13T18:59:44.661Z",
-    "atualizado_por": "dickmann"
+    "atualizado_em": "2026-10-14T11:30:49.412Z",
+    "atualizado_por": "auxiliar"
   },
   "env_calibre_1780": {
     "id": "env_calibre_1780",
