@@ -4981,7 +4981,7 @@
       "id": 15596916104,
       "nome": null
     },
-    "status": "pronto_coleta",
+    "status": "enviado",
     "confirmado_bling": true,
     "volumes_qtd": 1,
     "volumes_por": "mathias",
@@ -5022,9 +5022,9 @@
     "dimensoes_cm": null,
     "minuta_numero": null,
     "aeroporto_iata": null,
-    "romaneio_id": null,
-    "romaneio_numero": null,
-    "coletado_em": null,
+    "romaneio_id": "rom_20261015_0008",
+    "romaneio_numero": "0008",
+    "coletado_em": "2026-10-15T16:34:22.775Z",
     "coletado_motorista": null,
     "coletado_motorista_cpf": null,
     "coletado_placa": null,
@@ -5106,11 +5106,43 @@
         "acao": "campo_alterado",
         "campo": "liberacao_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-15T16:34:25.241Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "romaneio_id",
+        "novo": "rom_20261015_0008"
+      },
+      {
+        "ts": "2026-10-15T16:34:25.241Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "romaneio_numero",
+        "novo": "0008"
+      },
+      {
+        "ts": "2026-10-15T16:34:25.241Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_em",
+        "novo": "2026-10-15T16:34:22.775Z"
+      },
+      {
+        "ts": "2026-10-15T16:34:25.241Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "status",
+        "novo": "enviado"
       }
     ],
     "criado_em": "2026-10-14T19:52:53.131Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-15T16:33:11.231Z",
+    "atualizado_em": "2026-10-15T16:34:25.241Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_27224": {
