@@ -5270,9 +5270,9 @@
     "gt_numero": "202611355992",
     "gt_por": "auxiliar",
     "gt_em": "2026-10-15T13:42:53.570Z",
-    "assinatura_ok": false,
-    "assinatura_por": null,
-    "assinatura_em": null,
+    "assinatura_ok": true,
+    "assinatura_por": "auxiliar",
+    "assinatura_em": "2026-10-15T16:33:26.528Z",
     "liberacao_ok": false,
     "liberacao_por": null,
     "liberacao_em": null,
@@ -5368,11 +5368,19 @@
         "acao": "campo_alterado",
         "campo": "anexo_p_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-15T16:33:26.528Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "assinatura_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-15T11:21:02.089Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-15T15:26:34.653Z",
+    "atualizado_em": "2026-10-15T16:33:26.528Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_27208": {
@@ -5400,7 +5408,7 @@
       "id": 15596572600,
       "nome": null
     },
-    "status": "pronto_coleta",
+    "status": "aberto",
     "confirmado_bling": true,
     "volumes_qtd": 1,
     "volumes_por": "boschetto",
@@ -5422,9 +5430,9 @@
     "assinatura_ok": true,
     "assinatura_por": "auxiliar",
     "assinatura_em": "2026-10-15T16:33:16.378Z",
-    "liberacao_ok": true,
-    "liberacao_por": "auxiliar",
-    "liberacao_em": "2026-10-15T16:33:20.079Z",
+    "liberacao_ok": false,
+    "liberacao_por": null,
+    "liberacao_em": null,
     "anexo_p_ok": false,
     "anexo_p_por": null,
     "anexo_p_em": null,
@@ -5517,19 +5525,11 @@
         "acao": "campo_alterado",
         "campo": "assinatura_ok",
         "novo": true
-      },
-      {
-        "ts": "2026-10-15T16:33:20.079Z",
-        "por": "auxiliar",
-        "ip": "170.231.25.101",
-        "acao": "campo_alterado",
-        "campo": "liberacao_ok",
-        "novo": true
       }
     ],
     "criado_em": "2026-10-15T12:17:29.166Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-15T16:33:20.080Z",
+    "atualizado_em": "2026-10-15T16:33:16.378Z",
     "atualizado_por": "auxiliar"
   }
 }
