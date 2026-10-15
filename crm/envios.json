@@ -5107,10 +5107,10 @@
     "anexo_p_por": "auxiliar",
     "anexo_p_em": "2026-10-15T15:26:53.164Z",
     "anexo_p_ip": "170.231.25.101",
-    "gru_ok": false,
-    "gru_por": null,
-    "gru_em": null,
-    "gru_ip": null,
+    "gru_ok": true,
+    "gru_por": "auxiliar",
+    "gru_em": "2026-10-15T15:26:56.802Z",
+    "gru_ip": "170.231.25.101",
     "anexo_p_link": null,
     "gru_link": null,
     "comprovante_pix_link": null,
@@ -5195,11 +5195,19 @@
         "acao": "campo_alterado",
         "campo": "anexo_p_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-15T15:26:56.802Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "gru_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-15T11:19:55.687Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-15T15:26:53.165Z",
+    "atualizado_em": "2026-10-15T15:26:56.802Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_27209": {
