@@ -4952,5 +4952,118 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-14T19:53:26.835Z",
     "atualizado_por": "mathias"
+  },
+  "env_prohunters_27224": {
+    "id": "env_prohunters_27224",
+    "empresa": "prohunters",
+    "numero": "27224",
+    "bling_pedido_id": "27130780107",
+    "cliente_nome": "AWM ARMAS E MUNIÇÕES LTDA",
+    "cliente_cpf_cnpj": "28698049000189",
+    "cliente_cpf_cnpj_tipo": "pj",
+    "cliente_endereco": null,
+    "cliente_cidade": null,
+    "cliente_uf": null,
+    "cliente_cep": null,
+    "produtos": [
+      {
+        "sku": "HORN-33210-ID",
+        "descricao": "Projétil Hornady  Calibre .338 230 GR ELD-X",
+        "quantidade": 100
+      },
+      {
+        "sku": "HORN-22791-ID",
+        "descricao": "Projétil Hornady Calibre .224 75 GR Eld Match (1-8\")",
+        "quantidade": 200
+      },
+      {
+        "sku": "HORN-30715-ID",
+        "descricao": "Projétil Hornady Calibre .308 178 GR BTHP Match",
+        "quantidade": 1000
+      },
+      {
+        "sku": "HORN-2279-ID",
+        "descricao": "Projétil Hornady Calibre .224 75 GR BTHP MATCH™",
+        "quantidade": 200
+      },
+      {
+        "sku": "HORN-30501-ID",
+        "descricao": "Projétil Hornady Calibre .308 168 GR BTHP MATCH™",
+        "quantidade": 500
+      }
+    ],
+    "total_pedido": 23109,
+    "observacoes": "valor unitario em ordem de pedido:\n11,250\n5,630\n7,730\n4,920\n7,030\nluis adicionar!!!!!",
+    "vendedor_bling": {
+      "id": 15596742630,
+      "nome": null
+    },
+    "status": "aberto",
+    "confirmado_bling": true,
+    "volumes_qtd": null,
+    "volumes_por": null,
+    "volumes_em": null,
+    "conferencia_ok": false,
+    "conferencia_por": null,
+    "conferencia_em": null,
+    "conferencia_notas": null,
+    "transportadora": null,
+    "transporte_valor": null,
+    "transporte_por": null,
+    "transporte_em": null,
+    "nf_numero": null,
+    "nf_por": null,
+    "nf_em": null,
+    "gt_numero": null,
+    "gt_por": null,
+    "gt_em": null,
+    "assinatura_ok": false,
+    "assinatura_por": null,
+    "assinatura_em": null,
+    "liberacao_ok": false,
+    "liberacao_por": null,
+    "liberacao_em": null,
+    "anexo_p_ok": false,
+    "anexo_p_por": null,
+    "anexo_p_em": null,
+    "anexo_p_ip": null,
+    "gru_ok": false,
+    "gru_por": null,
+    "gru_em": null,
+    "gru_ip": null,
+    "anexo_p_link": null,
+    "gru_link": null,
+    "comprovante_pix_link": null,
+    "pix_baixado": false,
+    "peso_kg": null,
+    "dimensoes_cm": null,
+    "minuta_numero": null,
+    "aeroporto_iata": null,
+    "romaneio_id": null,
+    "romaneio_numero": null,
+    "coletado_em": null,
+    "coletado_motorista": null,
+    "coletado_motorista_cpf": null,
+    "coletado_placa": null,
+    "retirado_em": null,
+    "retirado_por": null,
+    "retirado_cliente_nome": null,
+    "retirado_cliente_doc": null,
+    "retirado_nota": null,
+    "cancelado_motivo": null,
+    "cancelado_por": null,
+    "cancelado_em": null,
+    "historico": [
+      {
+        "ts": "2026-10-15T11:19:55.687Z",
+        "por": "boschetto",
+        "acao": "envio_criado",
+        "detalhe": "empresa=prohunters numero=27224"
+      }
+    ],
+    "criado_em": "2026-10-15T11:19:55.687Z",
+    "criado_por": "boschetto",
+    "atualizado_em": "2026-10-15T11:19:55.687Z",
+    "atualizado_por": "boschetto"
   }
 }
