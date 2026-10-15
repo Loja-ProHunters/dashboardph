@@ -5003,9 +5003,9 @@
     "volumes_qtd": 2,
     "volumes_por": "boschetto",
     "volumes_em": "2026-10-15T11:21:38.344Z",
-    "conferencia_ok": false,
-    "conferencia_por": null,
-    "conferencia_em": null,
+    "conferencia_ok": true,
+    "conferencia_por": "boschetto",
+    "conferencia_em": "2026-10-15T11:21:41.420Z",
     "conferencia_notas": null,
     "transportadora": null,
     "transporte_valor": null,
@@ -5067,11 +5067,19 @@
         "acao": "campo_alterado",
         "campo": "volumes_qtd",
         "novo": 2
+      },
+      {
+        "ts": "2026-10-15T11:21:41.420Z",
+        "por": "boschetto",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "conferencia_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-15T11:19:55.687Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-15T11:21:38.344Z",
+    "atualizado_em": "2026-10-15T11:21:41.420Z",
     "atualizado_por": "boschetto"
   },
   "env_prohunters_27209": {
