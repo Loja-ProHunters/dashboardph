@@ -5417,5 +5417,124 @@
         "nota": null
       }
     ]
+  },
+  "5edbb2c9-9ea4-466f-8627-b3f9a50bd673": {
+    "id": "5edbb2c9-9ea4-466f-8627-b3f9a50bd673",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Ivan Silva Rodrigues",
+      "cpf_cnpj": "02786684102",
+      "whatsapp": "+5561996621515",
+      "email": "ivansrdg@gmail.com",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031455",
+      "data_compra": "2026-09-29",
+      "data_recebimento": "2026-10-02",
+      "nome_produto": "Lanterna Fenix E20 V2.0 350 Lumens",
+      "marca": "Fenix",
+      "modelo": "E20 V2.0 350 Lumens",
+      "numero_serie": "6942870307381-ID",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "A princípio não há problema. Gostaria de devolvê-la e receber o valor em crédito na loja Fenix Store para comprar outro modelo superior.",
+      "data_percebido_problema": "2026-10-12",
+      "chegou_defeito_ou_depois": "Funcionamento Normal",
+      "motivo_troca_devolucao": "Gostaria de devolvê-la e receber o valor em crédito na loja Fenix Store para comprar outro modelo superior.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "20261014_180309.jpg",
+          "url": "https://storage.tally.so/private/20261014_180309.jpg?id=b1ZrZe&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIxWnJaZSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MjA2NTE1OX0.hRqYjqwcwQXRMzQoY3zhx6O4aYz4qvyClhPPWvjCBhY&signature=7941c57c75d24f271f474da490646f4607b1fd1ef4d3d27b8e47fb0beffda2e5",
+          "mimeType": "image/jpeg",
+          "size": 4334132
+        }
+      ]
+    },
+    "preferencia_cliente": "troca",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-10-02",
+      "data_percebido_problema": "2026-10-12",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": true
+      },
+      "_override": {
+        "sugestao": "analise_manual",
+        "justificativa": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+        "score_confianca": "baixa"
+      },
+      "preferencia_cliente": "troca",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-15T11:52:39.879Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-15T11:52:39.879Z",
+    "atualizado_em": "2026-10-15T11:52:39.879Z",
+    "tally_meta": {
+      "eventId": "sync_RW19qWp",
+      "responseId": "RW19qWp",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-10-14T21:04:43.000Z",
+      "raw_onde_comprou": "Site da Fenix Store Brasil",
+      "raw_desejo": "Troca (produto errado ou insatisfação)",
+      "raw_momento": "Funcionamento Normal"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-15T11:52:39.879Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
