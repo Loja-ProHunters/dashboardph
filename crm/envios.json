@@ -5235,9 +5235,9 @@
     "nf_numero": "031557",
     "nf_por": "auxiliar",
     "nf_em": "2026-10-15T13:42:31.635Z",
-    "gt_numero": null,
-    "gt_por": null,
-    "gt_em": null,
+    "gt_numero": "202611355992",
+    "gt_por": "auxiliar",
+    "gt_em": "2026-10-15T13:42:53.570Z",
     "assinatura_ok": false,
     "assinatura_por": null,
     "assinatura_em": null,
@@ -5320,11 +5320,19 @@
         "acao": "campo_alterado",
         "campo": "nf_numero",
         "novo": "031557"
+      },
+      {
+        "ts": "2026-10-15T13:42:53.570Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "gt_numero",
+        "novo": "202611355992"
       }
     ],
     "criado_em": "2026-10-15T11:21:02.089Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-15T13:42:31.635Z",
+    "atualizado_em": "2026-10-15T13:42:53.570Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_27208": {
