@@ -5553,5 +5553,140 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "dbe0e695-dfc4-459d-a71a-d7cd4b64f6bb": {
+    "id": "dbe0e695-dfc4-459d-a71a-d7cd4b64f6bb",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Victor Stone Saraiva Dantas",
+      "cpf_cnpj": "11813704775",
+      "whatsapp": "+5521988670391",
+      "email": "victorstone2011@live.com",
+      "cidade": "Rio de Janeiro",
+      "uf": "RJ",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031485",
+      "data_compra": "2026-10-02",
+      "data_recebimento": "2026-10-13",
+      "nome_produto": "Lanterna Olight baldr mini desert tan",
+      "marca": "Olight",
+      "modelo": "Baldr mini",
+      "numero_serie": "85131090",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Não consegui nem usar o produto, mandei confeccionar um coldre com espaço pra essa lanterna q não foi barato e não consigo pq a bateria do produto não segura carga e pesquisando na internet vi q é um defeito crônico dessa marca, carreto totalmente a lanterna e quando ligo ela não segura nem um minuto ligada, até mesmo as vezes deixando desligada e quando for ligar n��o liga, produto já veio com vício, meu medo é vcs mandarem outra com o mesmo problema ou pior, ou depois de um\nTempo parar de novo, espero uma solução.",
+      "data_percebido_problema": "2026-10-13",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Não consegui nem usar o produto, mandei confeccionar um coldre com espaço pra essa lanterna q não foi barato e não consigo pq a bateria do produto não segura carga e pesquisando na internet vi q é um defeito crônico dessa marca, carreto totalmente a lanterna e quando ligo ela não segura nem um minuto ligada, até mesmo as vezes deixando desligada e quando for ligar não liga, produto já veio com vício, meu medo é vcs mandarem outra com o mesmo problema ou pior, ou depois de um\nTempo parar de novo, espero uma solução.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "IMG_9209.jpeg",
+          "url": "https://storage.tally.so/private/IMG_9209.jpeg?id=Eo58qo&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkVvNThxbyIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MjA4MTMwM30.b5VM4RdFsR-tmHvbpm4i8WFUpPGQfm_2WJdgUA5Q5Wk&signature=d7e2a105f9439525024be864ff1dbc8883a459163ecda29ec3fd2f6095a8f771",
+          "mimeType": "image/jpeg",
+          "size": 5686050
+        },
+        {
+          "tipo": "foto",
+          "nome": "IMG_9210.jpeg",
+          "url": "https://storage.tally.so/private/IMG_9210.jpeg?id=Kre8zM&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IktyZTh6TSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MjA4MTMwM30.ykosXWBtcyOvDHhQWj8b5tsvtdN9Ig5gaDRKy1ae-RY&signature=402102698a3d2d93d422cefd2c0b3ffe0591a101938c313525cd63d3d6157a1d",
+          "mimeType": "image/jpeg",
+          "size": 4216302
+        },
+        {
+          "tipo": "foto",
+          "nome": "IMG_9208.jpeg",
+          "url": "https://storage.tally.so/private/IMG_9208.jpeg?id=MjD8DY&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ik1qRDhEWSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MjA4MTMwM30.kbn8k14mDeiAJIYoJ78Z1VfpkvekuQgnyBY9Caoa7I0&signature=fc352258ce5746209e9a0678098e82d095a234eefcb1d0c8b379388993e6bc74",
+          "mimeType": "image/jpeg",
+          "size": 4651439
+        },
+        {
+          "tipo": "foto",
+          "nome": "IMG_9207.jpeg",
+          "url": "https://storage.tally.so/private/IMG_9207.jpeg?id=o8DlDX&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im84RGxEWCIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MjA4MTMwM30.dWNi72R26-YEcUxdD6xAXxfc6-cOVlB8F0t8Rtqtdck&signature=2441c2a987ef75f0393e968b5216d4c6d7c5614344536e5e193b97c76cf749ab",
+          "mimeType": "image/jpeg",
+          "size": 5885636
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-10-13",
+      "data_percebido_problema": "2026-10-13",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-15T16:21:43.610Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-15T16:21:43.610Z",
+    "atualizado_em": "2026-10-15T16:21:43.610Z",
+    "tally_meta": {
+      "eventId": "sync_Dq9r59j",
+      "responseId": "Dq9r59j",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-10-15T15:23:07.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Garantia (produto com defeito)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-15T16:21:43.610Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
