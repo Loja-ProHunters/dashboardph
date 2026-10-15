@@ -5244,10 +5244,10 @@
     "liberacao_ok": false,
     "liberacao_por": null,
     "liberacao_em": null,
-    "anexo_p_ok": false,
-    "anexo_p_por": null,
-    "anexo_p_em": null,
-    "anexo_p_ip": null,
+    "anexo_p_ok": true,
+    "anexo_p_por": "auxiliar",
+    "anexo_p_em": "2026-10-15T15:26:34.653Z",
+    "anexo_p_ip": "170.231.25.101",
     "gru_ok": false,
     "gru_por": null,
     "gru_em": null,
@@ -5328,11 +5328,19 @@
         "acao": "campo_alterado",
         "campo": "gt_numero",
         "novo": "202611355992"
+      },
+      {
+        "ts": "2026-10-15T15:26:34.653Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "anexo_p_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-15T11:21:02.089Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-15T13:42:53.570Z",
+    "atualizado_em": "2026-10-15T15:26:34.653Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_27208": {
