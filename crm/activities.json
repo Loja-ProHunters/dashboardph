@@ -3959,7 +3959,7 @@
   "5f7f321b-47a8-43a3-a15e-b396dd7cfc10": {
     "id": "5f7f321b-47a8-43a3-a15e-b396dd7cfc10",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "cancelada",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_c5d6be87cebbea30",
@@ -3982,8 +3982,12 @@
     "dono": "dickmann",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_em": "2026-10-15T18:50:27.716Z",
+    "atualizado_por": "dickmann",
+    "resultado": "cancelada",
+    "cancelada_em": "2026-10-15T18:50:27.716Z",
+    "cancelada_por": "dickmann",
+    "cancelamento_motivo": "Lojista ( não da pra prospectar),"
   },
   "8516ce26-0236-46b7-8124-8e26f416eef7": {
     "id": "8516ce26-0236-46b7-8124-8e26f416eef7",
