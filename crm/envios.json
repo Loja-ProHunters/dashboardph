@@ -5103,10 +5103,10 @@
     "liberacao_ok": false,
     "liberacao_por": null,
     "liberacao_em": null,
-    "anexo_p_ok": false,
-    "anexo_p_por": null,
-    "anexo_p_em": null,
-    "anexo_p_ip": null,
+    "anexo_p_ok": true,
+    "anexo_p_por": "auxiliar",
+    "anexo_p_em": "2026-10-15T15:26:53.164Z",
+    "anexo_p_ip": "170.231.25.101",
     "gru_ok": false,
     "gru_por": null,
     "gru_em": null,
@@ -5187,11 +5187,19 @@
         "acao": "campo_alterado",
         "campo": "gt_numero",
         "novo": " 202644044259"
+      },
+      {
+        "ts": "2026-10-15T15:26:53.164Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "anexo_p_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-15T11:19:55.687Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-15T12:56:38.641Z",
+    "atualizado_em": "2026-10-15T15:26:53.165Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_27209": {
@@ -5248,10 +5256,10 @@
     "anexo_p_por": "auxiliar",
     "anexo_p_em": "2026-10-15T15:26:34.653Z",
     "anexo_p_ip": "170.231.25.101",
-    "gru_ok": true,
-    "gru_por": "auxiliar",
-    "gru_em": "2026-10-15T15:26:37.520Z",
-    "gru_ip": "170.231.25.101",
+    "gru_ok": false,
+    "gru_por": null,
+    "gru_em": null,
+    "gru_ip": null,
     "anexo_p_link": null,
     "gru_link": null,
     "comprovante_pix_link": null,
@@ -5336,19 +5344,11 @@
         "acao": "campo_alterado",
         "campo": "anexo_p_ok",
         "novo": true
-      },
-      {
-        "ts": "2026-10-15T15:26:37.520Z",
-        "por": "auxiliar",
-        "ip": "170.231.25.101",
-        "acao": "campo_alterado",
-        "campo": "gru_ok",
-        "novo": true
       }
     ],
     "criado_em": "2026-10-15T11:21:02.089Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-15T15:26:40.549Z",
+    "atualizado_em": "2026-10-15T15:26:34.653Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_27208": {
