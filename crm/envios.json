@@ -4300,9 +4300,9 @@
     "gt_numero": "202644716309",
     "gt_por": "auxiliar",
     "gt_em": "2026-10-14T11:31:12.280Z",
-    "assinatura_ok": false,
-    "assinatura_por": null,
-    "assinatura_em": null,
+    "assinatura_ok": true,
+    "assinatura_por": "auxiliar",
+    "assinatura_em": "2026-10-15T11:42:21.918Z",
     "liberacao_ok": false,
     "liberacao_por": null,
     "liberacao_em": null,
@@ -4390,11 +4390,19 @@
         "acao": "campo_alterado",
         "campo": "gt_numero",
         "novo": "202644716309"
+      },
+      {
+        "ts": "2026-10-15T11:42:21.918Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "assinatura_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-09T11:35:12.683Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-10-14T11:31:12.280Z",
+    "atualizado_em": "2026-10-15T11:42:21.918Z",
     "atualizado_por": "auxiliar"
   },
   "env_calibre_1780": {
