@@ -4281,7 +4281,7 @@
       "id": 15596572601,
       "nome": null
     },
-    "status": "pronto_coleta",
+    "status": "enviado",
     "confirmado_bling": true,
     "volumes_qtd": 1,
     "volumes_por": "dickmann",
@@ -4322,9 +4322,9 @@
     "dimensoes_cm": null,
     "minuta_numero": null,
     "aeroporto_iata": null,
-    "romaneio_id": null,
-    "romaneio_numero": null,
-    "coletado_em": null,
+    "romaneio_id": "rom_20261015_0009",
+    "romaneio_numero": "0009",
+    "coletado_em": "2026-10-15T16:34:27.373Z",
     "coletado_motorista": null,
     "coletado_motorista_cpf": null,
     "coletado_placa": null,
@@ -4406,11 +4406,43 @@
         "acao": "campo_alterado",
         "campo": "liberacao_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-15T16:34:27.373Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "romaneio_id",
+        "novo": "rom_20261015_0009"
+      },
+      {
+        "ts": "2026-10-15T16:34:27.373Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "romaneio_numero",
+        "novo": "0009"
+      },
+      {
+        "ts": "2026-10-15T16:34:27.373Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_em",
+        "novo": "2026-10-15T16:34:27.373Z"
+      },
+      {
+        "ts": "2026-10-15T16:34:27.373Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "status",
+        "novo": "enviado"
       }
     ],
     "criado_em": "2026-10-09T11:35:12.683Z",
     "criado_por": "dickmann",
-    "atualizado_em": "2026-10-15T11:42:26.975Z",
+    "atualizado_em": "2026-10-15T16:34:27.373Z",
     "atualizado_por": "auxiliar"
   },
   "env_calibre_1780": {
@@ -5190,7 +5222,7 @@
       "id": 15596742630,
       "nome": null
     },
-    "status": "pronto_coleta",
+    "status": "enviado",
     "confirmado_bling": true,
     "volumes_qtd": 2,
     "volumes_por": "boschetto",
@@ -5231,9 +5263,9 @@
     "dimensoes_cm": null,
     "minuta_numero": null,
     "aeroporto_iata": null,
-    "romaneio_id": null,
-    "romaneio_numero": null,
-    "coletado_em": null,
+    "romaneio_id": "rom_20261015_0008",
+    "romaneio_numero": "0008",
+    "coletado_em": "2026-10-15T16:34:22.775Z",
     "coletado_motorista": null,
     "coletado_motorista_cpf": null,
     "coletado_placa": null,
@@ -5331,11 +5363,43 @@
         "acao": "campo_alterado",
         "campo": "liberacao_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-15T16:34:26.541Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "romaneio_id",
+        "novo": "rom_20261015_0008"
+      },
+      {
+        "ts": "2026-10-15T16:34:26.541Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "romaneio_numero",
+        "novo": "0008"
+      },
+      {
+        "ts": "2026-10-15T16:34:26.541Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "coletado_em",
+        "novo": "2026-10-15T16:34:22.775Z"
+      },
+      {
+        "ts": "2026-10-15T16:34:26.541Z",
+        "por": "auxiliar",
+        "ip": null,
+        "acao": "campo_alterado",
+        "campo": "status",
+        "novo": "enviado"
       }
     ],
     "criado_em": "2026-10-15T11:19:55.687Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-15T16:33:45.014Z",
+    "atualizado_em": "2026-10-15T16:34:26.541Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_27209": {
