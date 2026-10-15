@@ -148,5 +148,30 @@
     "criado_por": "gerencia",
     "atualizado_em": "2026-10-08T17:23:47.197Z",
     "atualizado_por": "gerencia"
+  },
+  "rom_20261015_0008": {
+    "id": "rom_20261015_0008",
+    "numero": "0008",
+    "data": "2026-10-15",
+    "transportadora": "ezequiel",
+    "empresa_agrupada": "ambas",
+    "envio_ids": [
+      "env_prohunters_27195",
+      "env_calibre_1976",
+      "env_prohunters_27225",
+      "env_prohunters_27224",
+      "env_prohunters_27209",
+      "env_prohunters_27208"
+    ],
+    "total_volumes": 7,
+    "motorista_nome": null,
+    "motorista_cpf": null,
+    "motorista_placa": null,
+    "motorista_assinado_em": null,
+    "gerado_por": "auxiliar",
+    "criado_em": "2026-10-15T16:34:21.734Z",
+    "criado_por": "auxiliar",
+    "atualizado_em": "2026-10-15T16:34:21.734Z",
+    "atualizado_por": "auxiliar"
   }
 }
