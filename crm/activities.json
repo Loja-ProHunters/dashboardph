@@ -3521,7 +3521,7 @@
   "ce97cc7f-2d15-44c0-84e9-12e9b3418765": {
     "id": "ce97cc7f-2d15-44c0-84e9-12e9b3418765",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_2aa250ac2ddb4589",
@@ -3544,10 +3544,13 @@
     "dono": "boschetto",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-16T17:58:52.010Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "Anderson Zucki",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "convertida",
+    "concluida_em": "2026-10-16T17:58:52.010Z",
+    "concluida_por": "boschetto"
   },
   "d2329f1d-c433-4a25-975d-6470bec11521": {
     "id": "d2329f1d-c433-4a25-975d-6470bec11521",
