@@ -3555,7 +3555,7 @@
   "d2329f1d-c433-4a25-975d-6470bec11521": {
     "id": "d2329f1d-c433-4a25-975d-6470bec11521",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_4379089bd21930f8",
@@ -3578,10 +3578,13 @@
     "dono": "boschetto",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-16T17:59:36.275Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "SYNTHER TACTICAL",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "convertida",
+    "concluida_em": "2026-10-16T17:59:36.275Z",
+    "concluida_por": "boschetto"
   },
   "06fc06fa-13b9-43bc-93a2-b07a17962814": {
     "id": "06fc06fa-13b9-43bc-93a2-b07a17962814",
