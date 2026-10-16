@@ -3400,7 +3400,7 @@
   "d232e77a-eda0-4fb0-9f2c-41a8ce0f1011": {
     "id": "d232e77a-eda0-4fb0-9f2c-41a8ce0f1011",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_d85ba7c37342e307",
@@ -3420,10 +3420,13 @@
     "dono": "boschetto",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-16T20:49:24.463Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "Warzone Brazil Comércio Importação e Exportação Ltda",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-16T20:49:24.463Z",
+    "concluida_por": "boschetto"
   },
   "b9d61b92-7154-4a0e-8f2d-62884c9b07d9": {
     "id": "b9d61b92-7154-4a0e-8f2d-62884c9b07d9",
