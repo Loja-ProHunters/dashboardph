@@ -3154,10 +3154,14 @@ module.exports = async (req, res) => {
       });
       let filtrado = enriched;
       if (statusFilter) filtrado = filtrado.filter(x => x.status === statusFilter);
-      else if (modo === 'enviados') filtrado = filtrado.filter(x => x.status === 'enviado');
+      // Um envio com romaneio_id JA foi coletado/enviado — trata como enviado mesmo
+      // que o status tenha ficado travado em 'pronto_coleta' por algum motivo (ex:
+      // revalidacao do checklist que reverteu o status apos a coleta). Isso impede
+      // que pedidos ja romaneados fiquem presos na Fila.
+      else if (modo === 'enviados') filtrado = filtrado.filter(x => x.status === 'enviado' || (x.romaneio_id && x.status !== 'cancelado' && x.status !== 'retirado'));
       else if (modo === 'retirados') filtrado = filtrado.filter(x => x.status === 'retirado');
       else if (modo === 'cancelados') filtrado = filtrado.filter(x => x.status === 'cancelado');
-      else if (modo === 'pendentes') filtrado = filtrado.filter(x => x.status !== 'enviado' && x.status !== 'cancelado' && x.status !== 'retirado');
+      else if (modo === 'pendentes') filtrado = filtrado.filter(x => x.status !== 'enviado' && x.status !== 'cancelado' && x.status !== 'retirado' && !x.romaneio_id);
       if (empresaFilter) filtrado = filtrado.filter(x => x.empresa === empresaFilter);
       if (q) filtrado = filtrado.filter(x => {
         const hay = ((x.cliente_nome||'') + ' ' + (x.numero||'') + ' ' + (x.cliente_cpf_cnpj||'') + ' ' + (x.cliente_cidade||'') + ' ' + (x.nf_numero||'')).toLowerCase();
