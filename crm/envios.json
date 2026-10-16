@@ -5916,10 +5916,10 @@
     "conferencia_por": "boschetto",
     "conferencia_em": "2026-10-16T14:00:14.980Z",
     "conferencia_notas": null,
-    "transportadora": null,
-    "transporte_valor": null,
-    "transporte_por": null,
-    "transporte_em": null,
+    "transportadora": "ezequiel",
+    "transporte_valor": 250,
+    "transporte_por": "boschetto",
+    "transporte_em": "2026-10-16T14:00:28.789Z",
     "nf_numero": null,
     "nf_por": null,
     "nf_em": null,
@@ -5984,11 +5984,27 @@
         "acao": "campo_alterado",
         "campo": "conferencia_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-16T14:00:28.789Z",
+        "por": "boschetto",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "transportadora",
+        "novo": "ezequiel"
+      },
+      {
+        "ts": "2026-10-16T14:00:28.789Z",
+        "por": "boschetto",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "transporte_valor",
+        "novo": 250
       }
     ],
     "criado_em": "2026-10-16T13:59:15.861Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-16T14:00:14.980Z",
+    "atualizado_em": "2026-10-16T14:00:28.790Z",
     "atualizado_por": "boschetto"
   }
 }
