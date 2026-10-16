@@ -5806,9 +5806,9 @@
     },
     "status": "aberto",
     "confirmado_bling": true,
-    "volumes_qtd": null,
-    "volumes_por": null,
-    "volumes_em": null,
+    "volumes_qtd": 1,
+    "volumes_por": "boschetto",
+    "volumes_em": "2026-10-16T14:00:35.568Z",
     "conferencia_ok": false,
     "conferencia_por": null,
     "conferencia_em": null,
@@ -5865,11 +5865,19 @@
         "por": "boschetto",
         "acao": "envio_criado",
         "detalhe": "empresa=prohunters numero=26847"
+      },
+      {
+        "ts": "2026-10-16T14:00:35.568Z",
+        "por": "boschetto",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "volumes_qtd",
+        "novo": 1
       }
     ],
     "criado_em": "2026-10-16T13:58:42.032Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-16T13:58:42.032Z",
+    "atualizado_em": "2026-10-16T14:00:35.568Z",
     "atualizado_por": "boschetto"
   },
   "env_prohunters_26813": {
