@@ -5251,5 +5251,33 @@
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "MECA – Material Elétrico, Controles e Automação Ltda.",
     "cliente_telefone": null
+  },
+  "293a67bd-b965-4141-87ae-3ced6f9385ee": {
+    "id": "293a67bd-b965-4141-87ae-3ced6f9385ee",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_6c98b099c4f112e4",
+    "titulo": "📅 Follow-up — Jeronimo Augusto Fonseca Alencar",
+    "descricao": "Conferir retorno",
+    "prazo": "2026-10-19",
+    "hora": "09:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_293a67bd-b965-4141-87ae-3ced6f9385ee",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_6c98b099c4f112e4",
+    "origem_tarefa_id": "a1dd94a0-34ee-45fc-bf35-2998df424fd8",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-16T18:01:41.987Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-16T18:01:41.987Z",
+    "atualizado_por": "dickmann"
   }
 }
