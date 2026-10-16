@@ -4777,7 +4777,7 @@
   "a80ec854-abeb-4538-a534-60bfeb10272b": {
     "id": "a80ec854-abeb-4538-a534-60bfeb10272b",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_0eb3fc1409ae5165",
@@ -4800,10 +4800,13 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-16T20:55:34.064Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Guilherme C. de Paula",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "convertida",
+    "concluida_em": "2026-10-16T20:55:34.063Z",
+    "concluida_por": "mathias"
   },
   "70189827-a2bb-44b7-b6cf-08d49bfe9b8b": {
     "id": "70189827-a2bb-44b7-b6cf-08d49bfe9b8b",
