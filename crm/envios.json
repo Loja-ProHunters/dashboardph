@@ -6231,9 +6231,9 @@
     "nf_numero": "031561",
     "nf_por": "auxiliar",
     "nf_em": "2026-10-19T15:52:15.184Z",
-    "gt_numero": null,
-    "gt_por": null,
-    "gt_em": null,
+    "gt_numero": "202640141330",
+    "gt_por": "auxiliar",
+    "gt_em": "2026-10-19T16:05:15.357Z",
     "assinatura_ok": false,
     "assinatura_por": null,
     "assinatura_em": null,
@@ -6316,11 +6316,19 @@
         "acao": "campo_alterado",
         "campo": "nf_numero",
         "novo": "031561"
+      },
+      {
+        "ts": "2026-10-19T16:05:15.357Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "gt_numero",
+        "novo": "202640141330"
       }
     ],
     "criado_em": "2026-10-19T15:10:47.682Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-19T15:52:15.185Z",
+    "atualizado_em": "2026-10-19T16:05:15.357Z",
     "atualizado_por": "auxiliar"
   },
   "env_calibre_1985": {
