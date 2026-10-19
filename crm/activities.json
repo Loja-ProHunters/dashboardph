@@ -3525,7 +3525,9 @@
     "atualizado_em": "2026-10-14T14:37:48.520Z",
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "Aguinaldo Miguel Gonçalves",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5
   },
   "ce97cc7f-2d15-44c0-84e9-12e9b3418765": {
     "id": "ce97cc7f-2d15-44c0-84e9-12e9b3418765",
@@ -3621,12 +3623,14 @@
     "atualizado_em": "2026-10-14T14:37:48.520Z",
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "Diego Araujo Alves Borges de Oliveira",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5
   },
   "4c66a1b7-b59e-45a1-874a-fe939e51586f": {
     "id": "4c66a1b7-b59e-45a1-874a-fe939e51586f",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_435ea146649f25c3",
@@ -3649,10 +3653,15 @@
     "dono": "boschetto",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-19T20:11:33.585Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "Rodrigo Moura",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-19T20:11:33.585Z",
+    "concluida_por": "boschetto"
   },
   "af83708e-e295-421a-a8eb-a4401067e91e": {
     "id": "af83708e-e295-421a-a8eb-a4401067e91e",
@@ -3683,7 +3692,9 @@
     "atualizado_em": "2026-10-14T14:37:48.520Z",
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "Yuri Silva Nascimento",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5
   },
   "1b6d2b94-02b9-4866-b996-ff1ad0ea2c3d": {
     "id": "1b6d2b94-02b9-4866-b996-ff1ad0ea2c3d",
@@ -3711,7 +3722,9 @@
     "atualizado_em": "2026-10-14T14:37:48.520Z",
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "Filipe Rachele Tebaldi",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5
   },
   "804eb08d-92ab-4538-8d2a-5d564f43dbb3": {
     "id": "804eb08d-92ab-4538-8d2a-5d564f43dbb3",
@@ -3742,7 +3755,9 @@
     "atualizado_em": "2026-10-14T14:37:48.520Z",
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "Leandro Farias",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5
   },
   "e0935cad-65db-424f-8bda-180696aa9f07": {
     "id": "e0935cad-65db-424f-8bda-180696aa9f07",
@@ -3773,7 +3788,9 @@
     "atualizado_em": "2026-10-14T14:37:48.520Z",
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "José Antonio de Souza Silva",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5
   },
   "eead6296-ac95-47e4-965d-560c31a8010c": {
     "id": "eead6296-ac95-47e4-965d-560c31a8010c",
@@ -3801,7 +3818,9 @@
     "atualizado_em": "2026-10-14T14:37:48.520Z",
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "Alencar Gentil da Silva",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5
   },
   "f2c7bc2b-d39c-45e4-b706-e21377e2cd22": {
     "id": "f2c7bc2b-d39c-45e4-b706-e21377e2cd22",
@@ -3832,7 +3851,9 @@
     "atualizado_em": "2026-10-14T14:37:48.520Z",
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "Roberto Shimizu",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5
   },
   "70799111-0318-4f22-9d2f-f95bec22ec34": {
     "id": "70799111-0318-4f22-9d2f-f95bec22ec34",
@@ -3863,7 +3884,9 @@
     "atualizado_em": "2026-10-14T14:37:48.520Z",
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "andre luiz mereu rodrigues",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5
   },
   "9448c05a-0be3-456f-9fb0-7f049bdffac5": {
     "id": "9448c05a-0be3-456f-9fb0-7f049bdffac5",
@@ -3891,7 +3914,9 @@
     "atualizado_em": "2026-10-14T14:37:48.520Z",
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "Patrícia Vieira Barbosa",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5
   },
   "39f65ff0-37e3-4c51-9918-e2a449a103a8": {
     "id": "39f65ff0-37e3-4c51-9918-e2a449a103a8",
@@ -3922,7 +3947,9 @@
     "atualizado_em": "2026-10-14T14:37:48.520Z",
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "Lucas Silva de Souza",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5
   },
   "1f27ab7f-0b48-4bef-91a8-2b038e3697a1": {
     "id": "1f27ab7f-0b48-4bef-91a8-2b038e3697a1",
@@ -3953,7 +3980,9 @@
     "atualizado_em": "2026-10-14T14:37:48.520Z",
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "STRIKE TACTICAL SOLUTIONS LTDA",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5
   },
   "a282fd68-d874-4eb0-8f16-1fdc6103a51a": {
     "id": "a282fd68-d874-4eb0-8f16-1fdc6103a51a",
@@ -3981,7 +4010,9 @@
     "atualizado_em": "2026-10-14T14:37:48.520Z",
     "atualizado_por": "cron-oportunidades",
     "cliente_nome": "Manoel Horácio Bezerra Guimarães",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 5
   },
   "2d380496-2f1c-4edf-b0cb-43de14d09bc7": {
     "id": "2d380496-2f1c-4edf-b0cb-43de14d09bc7",
@@ -5325,7 +5356,11 @@
     "criado_em": "2026-10-17T11:00:18.511Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-17T11:00:18.511Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "CRISTIANO HIPOLITO CLEMENTE",
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-17",
+    "dias_em_aberto": 2
   },
   "b8d50b86-dbd3-42f5-b86f-e2b101d6c4ff": {
     "id": "b8d50b86-dbd3-42f5-b86f-e2b101d6c4ff",
@@ -5351,7 +5386,11 @@
     "criado_em": "2026-10-17T11:00:18.511Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-17T11:00:18.511Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Laura Torres Marques",
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-17",
+    "dias_em_aberto": 2
   },
   "22a307a0-9914-4454-8c1a-265b94862ee1": {
     "id": "22a307a0-9914-4454-8c1a-265b94862ee1",
@@ -5380,7 +5419,11 @@
     "criado_em": "2026-10-17T11:00:18.511Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-17T11:00:18.511Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "JSJ ARTIGOS ESPORTIVOS LTDA",
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-17",
+    "dias_em_aberto": 2
   },
   "c2f15622-032e-4b34-b6fd-f7f61dcb37ba": {
     "id": "c2f15622-032e-4b34-b6fd-f7f61dcb37ba",
@@ -5406,7 +5449,11 @@
     "criado_em": "2026-10-17T11:00:18.511Z",
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-17T11:00:18.511Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_por": "cron-oportunidades",
+    "cliente_nome": "Leonardo Rodrigues dos Santos",
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-17",
+    "dias_em_aberto": 2
   },
   "524ac113-6c6a-4862-ac91-f6e07ebaae1a": {
     "id": "524ac113-6c6a-4862-ac91-f6e07ebaae1a",
@@ -6316,7 +6363,10 @@
       ],
       "vendedor_pedido": "boschetto",
       "account_id": "acc_d63cdae41562bd07"
-    }
+    },
+    "cliente_nome": "Enzo dos Santos Boschetto",
+    "cliente_telefone": null,
+    "dias_em_aberto": 0
   },
   "bf393fb4-a1bd-4a46-b635-1caacd6a57c2": {
     "id": "bf393fb4-a1bd-4a46-b635-1caacd6a57c2",
@@ -6486,7 +6536,10 @@
       ],
       "vendedor_pedido": "boschetto",
       "account_id": "acc_09a1a4854aa4a5b5"
-    }
+    },
+    "cliente_nome": "ERISON DE FREYN",
+    "cliente_telefone": null,
+    "dias_em_aberto": 0
   },
   "b715f8b8-5343-46ac-aaf6-5028f9706d0b": {
     "id": "b715f8b8-5343-46ac-aaf6-5028f9706d0b",
@@ -7336,7 +7389,10 @@
       ],
       "vendedor_pedido": "boschetto",
       "account_id": "acc_5415486a82892ea2"
-    }
+    },
+    "cliente_nome": "Jose Luiz Inacio",
+    "cliente_telefone": null,
+    "dias_em_aberto": 0
   },
   "aa554654-0756-4645-b76a-6d758025bdff": {
     "id": "aa554654-0756-4645-b76a-6d758025bdff",
