@@ -4364,6 +4364,7 @@ function ctGerar() {
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(blobUrl);
     ctSetStatus(true, 'Contrato gerado com sucesso: ' + filename);
+    if (typeof crmContratoGeradoHook === 'function') crmContratoGeradoHook(filename);
   };
   xhr.onerror = function() { btn.disabled = false; ctSetStatus(false, 'Falha de conexao.'); };
   xhr.send(JSON.stringify(payload));
@@ -6442,11 +6443,15 @@ async function crmAtualizaContadorTarefas(){
 async function crmRenderTarefas(){
   var view = document.getElementById('crm-view');
   try {
+    var pContratos = fetch('/api/crm/contratos/meus', { cache: 'no-store' }).then(function(x){ return x.ok ? x.json() : { cards: [] }; }).catch(function(){ return { cards: [] }; });
     var r = await fetch('/api/crm/tarefas/minhas');
     var d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro ao carregar tarefas.');
-    var tarefas = d.tarefas || [];
-    window.CRM.tarefasCount = tarefas.length;
+    // Contrato de arma e OPERACIONAL: sai da lista comercial e vira um bloco proprio (1 card por venda)
+    var tarefas = (d.tarefas || []).filter(function(t){ return t.fonte !== 'contrato_arma'; });
+    var contratos = ((await pContratos) || {}).cards || [];
+    window.CRM.contratosCards = contratos;
+    window.CRM.tarefasCount = tarefas.length + contratos.length;
     window.CRM.tarefasCache = tarefas; // cache pro modal de follow-up achar o nome do cliente
     var hoje = new Date(Date.now() - 3*3600*1000).toISOString().slice(0,10); // dia em Brasília
     var overdue = tarefas.filter(function(t){ return t.prazo && t.prazo < hoje; }).length;
@@ -6461,23 +6466,24 @@ async function crmRenderTarefas(){
     var topBar = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">' +
       (function(){
         var rs = d.resumo || {};
-        return '<div class="tar-resumo"><span><b>' + tarefas.length + '</b> tarefa(s) na sua fila</span>' +
+        return '<div class="tar-resumo"><span><b>' + tarefas.length + '</b> tarefa(s) comerciais</span>' +
           '<span class="pill">📌 de hoje: <b>' + (rs.de_hoje || 0) + '</b></span>' +
           '<span class="pill' + (rs.acumuladas ? ' warn' : '') + '">📥 acumuladas: <b>' + (rs.acumuladas || 0) + '</b></span>' +
           '<span class="pill' + (rs.vencidas ? ' bad' : '') + '">⚠ vencidas: <b>' + (rs.vencidas || 0) + '</b></span>' +
-          (rs.contratos ? '<span class="pill bad">📝 contratos de arma: <b>' + rs.contratos + '</b></span>' : '') + '</div>';
+          (contratos.length ? '<span class="pill bad">📝 contratos de arma: <b>' + contratos.length + '</b></span>' : '') + '</div>';
       })() +
       '<div style="display:flex;gap:8px;flex-wrap:wrap">' + adminResetBtn +
       '<button onclick="crmAbrirModalNovaTarefa()" style="background:linear-gradient(135deg,#1a8bff,#0e6bd4);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(26,139,255,.3)">+ Nova tarefa manual</button>' +
       '</div>' +
     '</div>';
 
+    var blocoContratos = crmBlocoContratos(contratos);
     if (!tarefas.length) {
       view.innerHTML =
-        topBar +
+        topBar + blocoContratos +
         '<div class="crm-empty">' +
         '<div style="font-size:36px;margin-bottom:8px">🎯</div>' +
-        '<div style="font-weight:700;color:var(--tx);margin-bottom:4px">Sem tarefas pendentes.</div>' +
+        '<div style="font-weight:700;color:var(--tx);margin-bottom:4px">' + (contratos.length ? 'Sem tarefas comerciais pendentes.' : 'Sem tarefas pendentes.') + '</div>' +
         '<div style="font-size:12px">O CRM cria tarefas automáticas quando um cliente compra algo com boas chances de upsell, ou quando fica muito tempo parado. Volte aqui depois — ou dispare manualmente uma sugestão em "🔍 Buscar Cliente", ou crie uma tarefa manual no botão acima.</div>' +
         '</div>';
       // Tooltip primeiro uso
@@ -6487,10 +6493,9 @@ async function crmRenderTarefas(){
       return;
     }
 
-    var html = topBar + '<div class="tar-list">';
+    var html = topBar + blocoContratos + (contratos.length ? '<div class="tar-bloco-h">🎯 Tarefas comerciais <span>' + tarefas.length + '</span></div>' : '') + '<div class="tar-list">';
     var agoraMin = new Date(Date.now() - 3*3600*1000).toISOString().slice(0,16); // YYYY-MM-DDTHH:MM em Brasília
     tarefas.forEach(function(t){
-      if (t.fonte === 'contrato_arma') { html += crmCardContrato(t, hoje); return; }
       var cls = 'tar-card';
       var prazoCls = '';
       var limiteISO = t.prazo ? (t.prazo + 'T' + (t.hora || '23:59')) : null;
@@ -12108,131 +12113,220 @@ async function cartSalvarNotas(id){
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════════
-  CONTRATOS DE ARMA — cards obrigatórios na fila do vendedor
+  CONTRATOS DE ARMA — bloco OPERACIONAL (1 card por venda, com etapas)
+  1 Gerar contrato · 2 Enviar ao cliente · 3 Assinado e salvo na pasta
+  · 4 Conferido pela gestão
 ═══════════════════════════════════════════════════════════════ -->
 <style>
-#tab-crm .tar-card.tar-contrato{border-left:4px solid #d03b3b;background:#fffafa}
-#tab-crm .tar-contrato .tar-obrig{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;background:#d03b3b;color:#fff;border-radius:99px;padding:2px 8px;margin-right:6px;vertical-align:middle}
-#tab-crm .tar-contrato .tar-armas{margin:6px 0;padding:8px 10px;background:#fff;border:1px solid #f0d6d6;border-radius:8px;font-size:12.5px;color:#444846}
-#tab-crm .tar-contrato .tar-armas b{color:#111412}
-#tab-crm .tar-contrato .tar-regra{font-size:12px;color:#7d1d1d;margin:4px 0 8px}
-#tab-crm .tar-contrato .tar-c-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-#tab-crm .tar-contrato .tar-c-acts button,#tab-crm .tar-contrato .tar-c-acts a{border:1px solid #e2e4e2;background:#fff;border-radius:8px;padding:8px 12px;font-size:12.5px;font-weight:700;cursor:pointer;color:#444846;text-decoration:none;font-family:inherit}
-#tab-crm .tar-contrato .tar-c-acts .pri{background:#3d8a49;border-color:#3d8a49;color:#fff}
-#tab-crm .tar-contrato .tar-c-acts .wa{background:#25D366;border-color:#25D366;color:#fff}
+#tab-crm .ct-bloco{margin:4px 0 18px}
+#tab-crm .ct-bloco-h,#tab-crm .tar-bloco-h{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:800;color:#111412;margin:4px 0 10px}
+#tab-crm .ct-bloco-h span,#tab-crm .tar-bloco-h span{background:#111412;color:#fff;border-radius:99px;font-size:11px;padding:1px 8px}
+#tab-crm .ct-bloco-h small{font-weight:500;color:#717571;font-size:12px}
+#tab-crm .ct-op{background:#fff;border:1px solid #e2e4e2;border-left:4px solid #6b7280;border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--sh-1)}
+#tab-crm .ct-op.atrasado{border-left-color:#d03b3b;background:#fffafa}
+#tab-crm .ct-op-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+#tab-crm .ct-op-id{font-size:14px;font-weight:800;color:#111412}
+#tab-crm .ct-op-id small{font-weight:600;color:#717571;font-size:12px;margin-left:6px}
+#tab-crm .ct-op-cli{font-size:12.5px;color:#444846;margin-top:2px}
+#tab-crm .ct-op-arma{font-size:12.5px;color:#111412;margin-top:6px;font-weight:600}
+#tab-crm .ct-op-st{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:99px;white-space:nowrap;background:#f0efec;color:#52514e}
+#tab-crm .ct-op-st.bad{background:#fbe9e9;color:#9e2424}
+#tab-crm .ct-op-st.warn{background:#fff4dc;color:#7a4b06}
+#tab-crm .ct-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:14px 0 4px;counter-reset:st}
+#tab-crm .ct-step{position:relative;padding:0 8px 0 0;font-size:12px;color:#898781}
+#tab-crm .ct-step:before{content:"";position:absolute;top:11px;left:24px;right:0;height:2px;background:#e1e0d9}
+#tab-crm .ct-step:last-child:before{display:none}
+#tab-crm .ct-step.ok:before{background:#3d8a49}
+#tab-crm .ct-step .bol{position:relative;z-index:1;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;background:#fff;border:2px solid #d5d8d5;color:#898781}
+#tab-crm .ct-step.ok .bol{background:#3d8a49;border-color:#3d8a49;color:#fff}
+#tab-crm .ct-step.atual .bol{border-color:#111412;color:#111412;box-shadow:0 0 0 4px rgba(17,20,18,.08)}
+#tab-crm .ct-step.atual.bad .bol{border-color:#d03b3b;color:#d03b3b;box-shadow:0 0 0 4px rgba(208,59,59,.12)}
+#tab-crm .ct-step b{display:block;margin-top:6px;font-size:12px;color:#444846}
+#tab-crm .ct-step.atual b{color:#111412}
+#tab-crm .ct-step small{display:block;font-size:11px;color:#898781}
+#tab-crm .ct-step.atual.bad small{color:#9e2424;font-weight:700}
+#tab-crm .ct-agora{margin-top:12px;background:#f6f6f3;border-radius:10px;padding:10px 12px}
+#tab-crm .ct-agora.bad{background:#fbe9e9}
+#tab-crm .ct-agora-t{font-size:12.5px;color:#111412;font-weight:700;margin-bottom:8px}
+#tab-crm .ct-agora-t small{display:block;font-weight:500;color:#52514e;margin-top:2px}
+#tab-crm .ct-acts{display:flex;gap:8px;flex-wrap:wrap}
+#tab-crm .ct-acts button,#tab-crm .ct-acts a{border:1px solid #d5d8d5;background:#fff;border-radius:8px;padding:8px 12px;font-size:12.5px;font-weight:700;cursor:pointer;color:#444846;text-decoration:none;font-family:inherit}
+#tab-crm .ct-acts .pri{background:#111412;border-color:#111412;color:#fff}
+#tab-crm .ct-acts .wa{background:#25D366;border-color:#25D366;color:#fff}
+#tab-crm .ct-acts .lnk{border:none;background:none;color:#3d6fb0;padding:8px 4px}
+#tab-crm .ct-cob{margin-top:8px;padding:10px 12px;border:1px solid #f0c5c5;border-radius:10px;background:#fff}
+#tab-crm .ct-cob p{margin:0 0 8px;font-size:12.5px;color:#7d1d1d}
+#tab-crm .ct-cob pre{white-space:pre-wrap;font-family:inherit;font-size:12px;color:#444846;background:#f6f6f3;border-radius:8px;padding:8px;margin:0 0 8px}
+#ct-banner{position:relative;background:#111412;color:#fff;border-radius:10px;padding:10px 14px;margin:0 0 14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:13px}
+#ct-banner button{background:#fff;color:#111412;border:none;border-radius:7px;padding:6px 10px;font-weight:700;cursor:pointer;font-family:inherit}
+#ct-banner button.sec{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4)}
 .crm2-decl{display:flex;gap:10px;align-items:flex-start;background:#fff6e5;border:1px solid #f6dcaa;border-radius:10px;padding:12px;margin-top:12px;font-size:13px;color:#5c3a05;cursor:pointer}
 .crm2-decl input{margin-top:3px;width:18px;height:18px;flex:0 0 18px}
+@media(max-width:640px){#tab-crm .ct-steps{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:12px}#tab-crm .ct-step:nth-child(2):before{display:none}}
 </style>
 <script>
 var CRM_CONTRATO_CANAIS_ENVIO = [['whatsapp','💬 WhatsApp'], ['email','✉️ E-mail'], ['presencial','🤝 Presencial']];
 var CRM_CONTRATO_CANAIS_AVISO = [['ligacao','📞 Ligação'], ['whatsapp','💬 WhatsApp'], ['presencial','🤝 Presencial']];
 
-function crmCardContrato(t, hoje){
-  var c = t.contrato || {};
-  var venc = t.prazo && t.prazo < hoje;
-  var prazoTxt = t.prazo ? (venc ? '⚠ Vencida — ' + crmFmtDate(t.prazo) : (t.prazo === hoje ? 'Hoje' : crmFmtDate(t.prazo))) : '';
-  var armas = (c.armas || []).map(function(a){ return '<div>🔫 <b>' + crmEsc((a.quantidade > 1 ? a.quantidade + 'x ' : '') + a.descricao) + '</b></div>'; }).join('');
-  var id = crmEsc(t.id);
-  var acts = '';
-  if (t.tipo === 'contrato_envio') {
-    acts = '<button onclick="crmContratoGerador(\'' + id + '\')">📄 Abrir gerador de contrato</button>' +
-      '<button class="pri" onclick="crmContratoModal(\'' + id + '\',\'enviado\')">✓ Contrato enviado ao cliente</button>';
-  } else if (t.tipo === 'contrato_assinatura') {
-    acts = '<button class="pri" onclick="crmContratoModal(\'' + id + '\',\'salvo_assinado\')">✓ Salvo na pasta (assinado)</button>' +
-      '<button onclick="crmContratoModal(\'' + id + '\',\'nao_devolveu\')">⏳ Cliente ainda não devolveu</button>';
-  } else if (t.tipo === 'contrato_cobranca') {
-    var tel = crmNormalizaTelBR(c.cliente_telefone || t.cliente_telefone);
-    if (tel) acts += '<a class="wa" href="https://wa.me/' + tel + '?text=' + encodeURIComponent(t.pitch_pronto || '') + '" target="_blank" rel="noopener noreferrer" onclick="crmRegistraContato(\'' + id + '\',\'whatsapp\')">💬 WhatsApp com o aviso</a>';
-    if (t.pitch_pronto) acts += '<button onclick="crmCopiarPitch(\'' + id + '\', this)">📋 Copiar aviso</button>';
-    acts += '<button class="pri" onclick="crmContratoModal(\'' + id + '\',\'cliente_avisado\')">✓ Cliente avisado</button>';
-  }
-  var accId = t.account_id || t.entidade_id;
-  if (accId) acts += '<button onclick="crmAbrirFicha(\'' + crmEsc(accId) + '\')">👤 Ver ficha</button>';
-  return '<div class="tar-card tar-contrato' + (venc ? ' overdue' : '') + '" id="tar-' + id + '">' +
-    '<div class="tar-hd"><div class="tar-tit"><span class="tar-obrig">Obrigatório</span>' + crmEsc(t.titulo || 'Contrato de arma') + '</div>' +
-    '<div class="tar-prazo ' + (venc ? 'overdue' : (t.prazo === hoje ? 'hoje' : '')) + '">' + crmEsc(prazoTxt) + '</div></div>' +
-    '<div class="tar-cli">👤 ' + crmEsc(c.cliente_nome || t.cliente_nome || '—') + (c.cliente_telefone ? ' · ' + crmEsc(c.cliente_telefone) : '') +
-      ' · Pedido <b>' + crmEsc(c.bling_numero || '—') + '</b> de ' + crmFmtDate(c.data_pedido) + ' · ' + crmFmtMoeda(c.valor_total) + '</div>' +
-    '<div class="tar-armas">' + armas + '</div>' +
-    '<div class="tar-regra">Toda venda de arma precisa de contrato assinado. Sem contrato assinado, a venda é cancelada e o dinheiro devolvido.</div>' +
-    (t.tipo === 'contrato_cobranca' && t.pitch_pronto ? '<div class="tar-pitch">' + crmEsc(t.pitch_pronto) + '</div>' : '') +
-    '<div class="tar-c-acts">' + acts + '</div></div>';
+function crmCtCard(orderId){ return ((window.CRM && window.CRM.contratosCards) || []).find(function(c){ return c.order_id === orderId; }) || null; }
+function crmCtDataHora(iso){ if (!iso) return ''; try { return new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); } catch(e){ return ''; } }
+
+function crmBlocoContratos(cards){
+  if (!cards || !cards.length) return '';
+  var atr = cards.filter(function(c){ return c.atrasado; }).length;
+  return '<div class="ct-bloco"><div class="ct-bloco-h">📝 Contratos de venda de arma <span>' + cards.length + '</span><small>operacional · obrigatório' + (atr ? ' · <b style="color:#9e2424">' + atr + ' atrasado(s)</b>' : '') + '</small></div>' +
+    cards.map(crmCardContratoOp).join('') + '</div>';
 }
 
-function crmContratoModal(id, acao){
+function crmCardContratoOp(c){
+  var e = c.etapas || {}, oid = crmEsc(c.order_id);
+  var nomes = ['Gerar contrato', 'Enviar ao cliente', 'Assinado e salvo na pasta', 'Conferido pela gestão'];
+  var sub = [
+    e.gerado_em ? 'gerado ' + crmCtDataHora(e.gerado_em) : (c.etapa === 1 ? (c.atrasado ? 'atrasado' : 'agora') : ''),
+    e.enviado_em ? 'enviado ' + crmCtDataHora(e.enviado_em) : (c.etapa === 2 ? (c.atrasado ? 'atrasado' : 'agora') : ''),
+    e.salvo_em ? 'salvo ' + crmCtDataHora(e.salvo_em) : (c.etapa === 3 ? (c.atrasado ? 'devolução atrasada' : 'devolver até ' + crmCtDataHora(e.devolucao_ate)) : ''),
+    e.verificacao === 'conferido' ? 'conferido' : (e.verificacao === 'nao_encontrado' ? 'NÃO estava na pasta' : (c.etapa === 4 ? 'aguardando conferência' : ''))
+  ];
+  var steps = nomes.map(function(n, i){
+    var k = i + 1, cls = k < c.etapa || (k === 4 && e.verificacao === 'conferido') ? 'ok' : (k === c.etapa ? 'atual' + (c.atrasado || (k === 4 && e.verificacao === 'nao_encontrado') ? ' bad' : '') : '');
+    return '<div class="ct-step ' + cls + '"><div class="bol">' + (cls === 'ok' ? '✓' : k) + '</div><b>' + n + '</b><small>' + crmEsc(sub[i]) + '</small></div>';
+  }).join('');
+  var st = c.atrasado ? '<span class="ct-op-st bad">⛔ Atrasado</span>' : '<span class="ct-op-st">Etapa ' + Math.min(c.etapa, 4) + ' de 4</span>';
+  var armas = (c.armas || []).map(function(a){ return (a.quantidade > 1 ? a.quantidade + 'x ' : '') + a.descricao; }).join(' + ');
+  var agora = '';
+  if (c.etapa === 1) {
+    agora = '<div class="ct-agora' + (c.atrasado ? ' bad' : '') + '"><div class="ct-agora-t">Próximo passo: gerar o contrato de venda<small>O gerador abre com cliente, CPF/CNPJ, arma e valor já preenchidos. Confira endereço e forma de pagamento.</small></div>' +
+      '<div class="ct-acts"><button class="pri" onclick="crmContratoGerador(\'' + oid + '\')">📄 Gerar contrato agora</button>' +
+      '<button class="lnk" onclick="crmContratoModal(\'' + oid + '\',\'gerado_fora\')">Já gerei fora do sistema</button></div></div>';
+  } else if (c.etapa === 2) {
+    agora = '<div class="ct-agora' + (c.atrasado ? ' bad' : '') + '"><div class="ct-agora-t">Próximo passo: enviar o contrato ao cliente<small>Depois de enviar, o cliente tem 48h para devolver assinado.</small></div>' +
+      '<div class="ct-acts"><button class="pri" onclick="crmContratoModal(\'' + oid + '\',\'enviado\')">✓ Enviei ao cliente</button>' +
+      '<button onclick="crmContratoGerador(\'' + oid + '\')">📄 Gerar de novo</button>' +
+      '<button class="lnk" onclick="crmContratoModal(\'' + oid + '\',\'salvo_assinado\')">Cliente já assinou na loja</button></div></div>';
+  } else if (c.etapa === 3) {
+    agora = '<div class="ct-agora' + (c.atrasado ? ' bad' : '') + '"><div class="ct-agora-t">' + (c.atrasado ? '⛔ Prazo de devolução vencido' : 'Aguardando o cliente devolver assinado') +
+      '<small>' + (c.atrasado ? 'Sem contrato assinado a venda é cancelada e o dinheiro devolvido. Avise o cliente.' : 'Assim que receber, salve na pasta de contratos e confirme aqui.') + '</small></div>' +
+      '<div class="ct-acts"><button class="pri" onclick="crmContratoModal(\'' + oid + '\',\'salvo_assinado\')">✍️ Recebi assinado e salvei na pasta</button>' +
+      (c.cobranca ? '' : '<button onclick="crmContratoModal(\'' + oid + '\',\'nao_devolveu\')">⏳ Cliente ainda não devolveu</button>') + '</div>';
+    if (c.cobranca) {
+      var tel = crmNormalizaTelBR(c.cliente_telefone);
+      agora += '<div class="ct-cob"><p><b>📞 Ligar para o cliente agora</b> — avisar que, sem o contrato assinado, a venda será cancelada e o dinheiro devolvido.' + (c.avisos_cancelamento ? ' (' + c.avisos_cancelamento + ' aviso(s) já feitos)' : '') + '</p>' +
+        (c.cobranca.pitch ? '<pre>' + crmEsc(c.cobranca.pitch) + '</pre>' : '') +
+        '<div class="ct-acts">' + (tel ? '<a class="wa" href="https://wa.me/' + tel + '?text=' + encodeURIComponent(c.cobranca.pitch || '') + '" target="_blank" rel="noopener noreferrer">💬 Enviar aviso no WhatsApp</a>' : '') +
+        '<button class="pri" onclick="crmContratoModal(\'' + oid + '\',\'cliente_avisado\')">✓ Cliente avisado</button></div></div>';
+    }
+    agora += '</div>';
+  } else if (e.verificacao === 'nao_encontrado') {
+    agora = '<div class="ct-agora bad"><div class="ct-agora-t">⛔ A gestão não encontrou o contrato assinado na pasta<small>Procure a gerência hoje.</small></div></div>';
+  }
+  return '<div class="ct-op' + (c.atrasado ? ' atrasado' : '') + '" id="ct-' + oid + '">' +
+    '<div class="ct-op-top"><div><div class="ct-op-id">Pedido ' + crmEsc(c.bling_numero || '—') + '<small>venda em ' + crmFmtDate(c.data_pedido) + (c.dias_venda != null ? ' · há ' + c.dias_venda + ' dia(s)' : '') + ' · ' + crmFmtMoeda(c.valor_total) + '</small></div>' +
+    '<div class="ct-op-cli">👤 ' + crmEsc(c.cliente_nome || '—') + (c.cliente_telefone ? ' · ' + crmEsc(c.cliente_telefone) : '') +
+    (c.account_id ? ' · <a href="#" onclick="crmAbrirFicha(\'' + crmEsc(c.account_id) + '\');return false">ver ficha</a>' : '') + '</div>' +
+    '<div class="ct-op-arma">🔫 ' + crmEsc(armas) + '</div></div>' + st + '</div>' +
+    '<div class="ct-steps">' + steps + '</div>' + agora + '</div>';
+}
+
+function crmContratoModal(orderId, acao){
   if (document.getElementById('crm2-ct')) return;
-  var t = ((window.CRM && window.CRM.tarefasCache) || []).find(function(x){ return x.id === id; }) || {};
-  var c = t.contrato || {};
+  var c = crmCtCard(orderId) || {};
   var cab = '<p class="sub">Pedido <b>' + crmEsc(c.bling_numero || '—') + '</b> · ' + crmEsc(c.cliente_nome || '') + '</p>';
   var corpo, botao;
-  if (acao === 'enviado') {
-    corpo = '<h3>📄 Contrato enviado</h3>' + cab + '<label class="crm2-lbl">Por onde você enviou o contrato? *</label>' + crm2Chips('canal', CRM_CONTRATO_CANAIS_ENVIO, null) +
+  if (acao === 'gerado_fora') {
+    corpo = '<h3>📄 Contrato gerado fora do sistema</h3>' + cab + '<label class="crm2-lbl">Onde foi gerado? *</label><input class="crm2-in" id="crm2-ct-obs" maxlength="300" placeholder="Ex: modelo Word da pasta, gerado em 20/10">';
+    botao = 'Marcar como gerado';
+  } else if (acao === 'enviado') {
+    corpo = '<h3>📤 Contrato enviado ao cliente</h3>' + cab + '<label class="crm2-lbl">Por onde você enviou? *</label>' + crm2Chips('canal', CRM_CONTRATO_CANAIS_ENVIO, null) +
       '<label class="crm2-lbl">Observação <i>(opcional)</i></label><input class="crm2-in" id="crm2-ct-obs" maxlength="300">' +
-      '<div class="crm2-hint">Em 48h aparece a tarefa de salvar o contrato <b>assinado</b> na pasta.</div>';
-    botao = 'Registrar envio';
+      '<div class="crm2-hint">O prazo de devolução assinada (48h) começa a contar agora.</div>';
+    botao = 'Confirmar envio';
   } else if (acao === 'salvo_assinado') {
-    corpo = '<h3>✍️ Contrato assinado salvo</h3>' + cab +
+    corpo = '<h3>✍️ Contrato assinado salvo na pasta</h3>' + cab +
+      (c.etapa < 3 ? '<label class="crm2-lbl">Como o cliente recebeu e assinou? *</label>' + crm2Chips('canal', CRM_CONTRATO_CANAIS_ENVIO, 'presencial') : '') +
       '<label class="crm2-decl"><input type="checkbox" id="crm2-ct-conf"><span>Declaro que o contrato <b>assinado pelo cliente</b> está salvo na pasta de contratos.</span></label>' +
       '<div class="crm2-hint">A gestão confere os contratos na pasta. Declarar sem ter salvo é falta grave.</div>' +
       '<label class="crm2-lbl">Observação <i>(opcional)</i></label><input class="crm2-in" id="crm2-ct-obs" maxlength="300">';
     botao = 'Confirmar';
   } else if (acao === 'nao_devolveu') {
     corpo = '<h3>⏳ Cliente ainda não devolveu</h3>' + cab +
-      '<p style="font-size:13px;color:#444846;margin:0">Vamos criar agora a tarefa de <b>ligar para o cliente</b> avisando que, sem o contrato assinado, a venda será cancelada e o dinheiro devolvido. Esta tarefa de "salvar assinado" continua aberta até o contrato voltar.</p>';
-    botao = 'Criar ligação de aviso';
+      '<p style="font-size:13px;color:#444846;margin:0">O card passa a pedir a <b>ligação de aviso</b>: sem o contrato assinado, a venda será cancelada e o dinheiro devolvido. A etapa de assinatura continua aberta até o contrato voltar.</p>';
+    botao = 'Gerar aviso ao cliente';
   } else {
-    corpo = '<h3>📞 Cliente avisado</h3>' + cab + '<label class="crm2-lbl">Como você avisou o cliente? *</label>' + crm2Chips('canal', CRM_CONTRATO_CANAIS_AVISO, null) +
+    corpo = '<h3>📞 Cliente avisado</h3>' + cab + '<label class="crm2-lbl">Como você avisou? *</label>' + crm2Chips('canal', CRM_CONTRATO_CANAIS_AVISO, null) +
       '<label class="crm2-lbl">O que o cliente respondeu? *</label><textarea class="crm2-in" id="crm2-ct-obs" rows="3" maxlength="500" placeholder="Ex: vai assinar e devolver hoje à tarde"></textarea>';
     botao = 'Registrar aviso';
   }
   var html = '<div class="crm2-ovl" id="crm2-ct" onclick="if(event.target===this)crm2Fechar(\'crm2-ct\')"><div class="crm2-mdl">' + corpo +
     '<div class="crm2-err"></div><div class="crm2-acts"><button class="crm2-btn sec" onclick="crm2Fechar(\'crm2-ct\')">Voltar</button>' +
-    '<button class="crm2-btn pri" id="crm2-ct-ok" onclick="crmContratoConfirmar(\'' + crmEsc(id) + '\',\'' + acao + '\')">' + botao + '</button></div></div></div>';
+    '<button class="crm2-btn pri" id="crm2-ct-ok" onclick="crmContratoConfirmar(\'' + crmEsc(orderId) + '\',\'' + acao + '\')">' + botao + '</button></div></div></div>';
   document.body.insertAdjacentHTML('beforeend', html);
 }
 
-async function crmContratoConfirmar(id, acao){
+async function crmContratoAcao(taskId, corpo){
+  var r = await fetch('/api/crm/contratos/tarefa/' + encodeURIComponent(taskId), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
+  var d = await r.json(); if (!r.ok) throw new Error(d.error || 'Erro ao registrar.');
+  return d;
+}
+
+async function crmContratoConfirmar(orderId, acao){
+  var c = crmCtCard(orderId); if (!c) return;
   var btn = document.getElementById('crm2-ct-ok');
   var obs = ((document.getElementById('crm2-ct-obs') || {}).value || '').trim();
   var canal = crm2Val('crm2-ct', 'canal');
-  var corpo = { acao: acao, observacao: obs || null };
   crm2Erro('crm2-ct', '');
-  if ((acao === 'enviado' || acao === 'cliente_avisado') && !canal) return crm2Erro('crm2-ct', 'Escolha o canal.');
-  if (acao === 'cliente_avisado' && obs.length < 3) return crm2Erro('crm2-ct', 'Escreva o que o cliente respondeu.');
-  if (acao === 'salvo_assinado') {
+  var alvo, corpo = { observacao: obs || null };
+  if (acao === 'gerado_fora') { if (obs.length < 3) return crm2Erro('crm2-ct', 'Diga onde o contrato foi gerado.'); alvo = c.ids.envio; corpo.acao = 'gerado'; corpo.fora_do_sistema = true; }
+  else if (acao === 'enviado') { if (!canal) return crm2Erro('crm2-ct', 'Escolha por onde enviou.'); alvo = c.ids.envio; corpo.acao = 'enviado'; corpo.canal = canal; }
+  else if (acao === 'salvo_assinado') {
     var cb = document.getElementById('crm2-ct-conf');
     if (!cb || !cb.checked) return crm2Erro('crm2-ct', 'Marque a declaração para confirmar.');
-    corpo.confirmo = true;
+    alvo = c.ids.assinatura; corpo.acao = 'salvo_assinado'; corpo.confirmo = true; if (canal) corpo.canal = canal;
   }
-  if (canal) corpo.canal = canal;
+  else if (acao === 'nao_devolveu') { alvo = c.ids.assinatura; corpo.acao = 'nao_devolveu'; }
+  else { if (!canal) return crm2Erro('crm2-ct', 'Escolha como avisou.'); if (obs.length < 3) return crm2Erro('crm2-ct', 'Escreva o que o cliente respondeu.'); alvo = c.cobranca && c.cobranca.id; corpo.acao = 'cliente_avisado'; corpo.canal = canal; }
+  if (!alvo) return crm2Erro('crm2-ct', 'Etapa indisponível — atualize a página.');
   btn.disabled = true;
   try {
-    var r = await fetch('/api/crm/contratos/tarefa/' + encodeURIComponent(id), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
-    var d = await r.json(); if (!r.ok) throw new Error(d.error || 'Erro ao registrar.');
+    await crmContratoAcao(alvo, corpo);
     crm2Fechar('crm2-ct');
-    var msg = { enviado: 'Envio registrado. Em 48h aparece a tarefa do contrato assinado.', salvo_assinado: '✓ Contrato assinado registrado.', nao_devolveu: 'Tarefa de ligação criada: avise o cliente hoje.', cliente_avisado: 'Aviso registrado.' }[acao];
-    crmToast(msg, 'ok', 4000);
-    if (acao === 'nao_devolveu') { crmRenderTarefas(); if (window.TAREFAS_FAB) TAREFAS_FAB.atualizar(); }
-    else crmTarefaSaiDaFila(id);
+    var msg = { gerado_fora: 'Etapa 1 concluída. Agora envie ao cliente.', enviado: 'Etapa 2 concluída. Prazo de 48h para o cliente devolver assinado.', salvo_assinado: '✓ Contrato assinado registrado. A gestão vai conferir.', nao_devolveu: 'Aviso de cancelamento criado: ligue para o cliente hoje.', cliente_avisado: 'Aviso registrado.' }[acao];
+    crmToast(msg, 'ok', 4500);
+    crmRenderTarefas(); if (window.TAREFAS_FAB) TAREFAS_FAB.atualizar();
   } catch(e){ btn.disabled = false; crm2Erro('crm2-ct', e.message); }
 }
 
-// Abre a aba Documentos → Contratos com os dados do pedido já preenchidos
-function crmContratoGerador(id){
-  var t = ((window.CRM && window.CRM.tarefasCache) || []).find(function(x){ return x.id === id; }) || {};
-  var c = t.contrato || {};
+// ── Gerador: abre Documentos com os dados do pedido e, ao gerar o PDF, conclui a etapa 1 sozinho
+function crmContratoGerador(orderId){
+  var c = crmCtCard(orderId) || {};
+  window.CRM_CONTRATO_CTX = { order_id: orderId, envio_id: c.ids && c.ids.envio, numero: c.bling_numero, ja_gerado: !!(c.etapas && c.etapas.gerado_em) };
   var btn = document.querySelector('.ni[onclick*="\'contratos\'"]');
   if (btn && typeof goTab === 'function') goTab('contratos', btn);
   setTimeout(function(){
-    function put(fid, v){ var e = document.getElementById(fid); if (e && v != null && v !== '') { e.value = v; try { e.dispatchEvent(new Event('change')); } catch(_){} } }
+    function put(fid, v){ var el = document.getElementById(fid); if (el && v != null && v !== '') { el.value = v; try { el.dispatchEvent(new Event('change')); } catch(_){} } }
     put('ctEmpresa', c.bling_conta === 'calibre' ? 'cr' : 'ph');
     if (typeof ctOnEmpresaChange === 'function') { try { ctOnEmpresaChange(); } catch(_){} }
     put('ctClienteNome', c.cliente_nome);
     put('ctClienteDoc', c.cliente_doc);
     put('ctProduto', (c.armas || []).map(function(a){ return (a.quantidade > 1 ? a.quantidade + 'x ' : '') + a.descricao; }).join(' + '));
     put('ctAvValor', c.valor_total ? Number(c.valor_total).toFixed(2) : '');
-    crmToast('Dados do pedido ' + (c.bling_numero || '') + ' preenchidos. Confira endereço e forma de pagamento — ou suba o PDF do pedido do Bling.', '', 7000);
+    var tab = document.getElementById('tab-contratos');
+    var old = document.getElementById('ct-banner'); if (old) old.remove();
+    if (tab) tab.insertAdjacentHTML('afterbegin', '<div id="ct-banner"><span>📝 Contrato do <b>pedido ' + crmEsc(c.bling_numero || '') + '</b> · ' + crmEsc(c.cliente_nome || '') + ' — confira endereço e pagamento e clique em gerar.</span>' +
+      '<span><button class="sec" onclick="crmContratoSairGerador()">Cancelar</button> <button onclick="crmContratoVoltar()">← Voltar às tarefas</button></span></div>');
   }, 400);
+}
+function crmContratoSairGerador(){ window.CRM_CONTRATO_CTX = null; var b = document.getElementById('ct-banner'); if (b) b.remove(); }
+function crmContratoVoltar(){ crmContratoSairGerador(); if (typeof crmIrPara === 'function') crmIrPara('tarefas'); }
+// Chamado pelo ctGerar() quando o PDF sai com sucesso
+async function crmContratoGeradoHook(filename){
+  var ctx = window.CRM_CONTRATO_CTX; if (!ctx || !ctx.envio_id) return;
+  try {
+    if (!ctx.ja_gerado) await crmContratoAcao(ctx.envio_id, { acao: 'gerado', observacao: filename || null });
+    ctx.ja_gerado = true;
+    var b = document.getElementById('ct-banner');
+    if (b) b.innerHTML = '<span>✓ <b>Etapa 1 concluída</b> — contrato do pedido ' + crmEsc(ctx.numero || '') + ' gerado. Próximo passo: enviar ao cliente.</span><span><button onclick="crmContratoVoltar()">← Voltar e marcar envio</button></span>';
+    crmToast('Etapa 1 concluída: contrato gerado. Agora envie ao cliente.', 'ok', 5000);
+  } catch(e){ crmToast('Contrato gerado, mas não consegui registrar a etapa: ' + e.message, 'erro', 6000); }
 }
 </script>
 
