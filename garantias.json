@@ -5688,5 +5688,124 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "e415d10b-4a2b-4fe1-9c18-6e4b8b8767b9": {
+    "id": "e415d10b-4a2b-4fe1-9c18-6e4b8b8767b9",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Guilherme Estevão Breda da cunha",
+      "cpf_cnpj": "09920028932",
+      "whatsapp": "+5547999312932",
+      "email": "guilhermebreda935@gmail.com",
+      "cidade": "Gaspar",
+      "uf": "SC",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "N°031538",
+      "data_compra": "2026-10-13",
+      "data_recebimento": "2026-10-16",
+      "nome_produto": "Trilho com anel para acoplar Luneta/RedDot 30mm",
+      "marca": "Vector óptics",
+      "modelo": "Trilho com anel para acoplar Luneta/RedDot 30mm -Vector optics",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Não compatível com minha luneta",
+      "data_percebido_problema": "2026-10-16",
+      "chegou_defeito_ou_depois": "Funcionamento Normal",
+      "motivo_troca_devolucao": "Não compatível com minha luneta",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "1000331320.jpg",
+          "url": "https://storage.tally.so/private/1000331320.jpg?id=pYD4Wq&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InBZRDRXcSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MjQwODcxMX0.JIbQMdkIzXmUSvD8K04LnunHE7MwQB6QICRBRaB9l5U&signature=cf77ee23ecfdad7f116cdef761340bb4c9bd9a007e1abe034e0c9c09aaed53ae",
+          "mimeType": "image/jpeg",
+          "size": 2003874
+        }
+      ]
+    },
+    "preferencia_cliente": "restituicao",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-10-16",
+      "data_percebido_problema": "2026-10-16",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": true,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": true
+      },
+      "_override": {
+        "sugestao": "analise_manual",
+        "justificativa": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+        "score_confianca": "baixa"
+      },
+      "preferencia_cliente": "restituicao",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-19T11:18:32.240Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-19T11:18:32.240Z",
+    "atualizado_em": "2026-10-19T11:18:32.240Z",
+    "tally_meta": {
+      "eventId": "sync_q5qVBXg",
+      "responseId": "q5qVBXg",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-10-16T18:31:24.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Devolução (arrependimento de compra)",
+      "raw_momento": "Funcionamento Normal"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-19T11:18:32.240Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
