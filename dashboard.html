@@ -3703,16 +3703,7 @@ window.chpwdSubmit = function(){
 
     <!-- PRODUTIVIDADE DA EQUIPE — admin + diretor -->
     <div class="tab" id="tab-produtividade">
-      <div id="prod-equipe-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px">
-        <!-- cards agregados vêm do JS -->
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <h3 style="margin:0;color:#1a1a1a;font-size:16px">Por vendedor</h3>
-        <button class="gar-btn-sec" onclick="PROD.recarregar()" style="padding:6px 12px">↻ Recarregar</button>
-      </div>
-      <div id="prod-vendedores" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px">
-        <div style="color:#7b8285;padding:20px;text-align:center;grid-column:1/-1">Carregando…</div>
-      </div>
+      <div id="pg-root"><div class="pg-vazio">Carregando painel…</div></div>
     </div>
 
     <!-- Modal de nova solicitacao -->
@@ -3774,7 +3765,7 @@ var tabMeta = {
   crm:       ['CRM','Contas, leads, oportunidades, atividades e pedidos'],
   solicitacoes: ['Solicitações','Hub de tarefas entre colaboradores'],
   garantias: ['Garantias, Trocas e Devoluções','Triagem CDC, estoque e envio ao fabricante'],
-  produtividade: ['Produtividade da Equipe','Tarefas em dia e atrasadas por vendedor']
+  produtividade: ['Produtividade da Equipe','Execução das tarefas, alertas e contratos de arma']
 };
 
 // Mapa de permissoes por role — quais abas cada perfil ve.
@@ -6473,7 +6464,8 @@ async function crmRenderTarefas(){
         return '<div class="tar-resumo"><span><b>' + tarefas.length + '</b> tarefa(s) na sua fila</span>' +
           '<span class="pill">📌 de hoje: <b>' + (rs.de_hoje || 0) + '</b></span>' +
           '<span class="pill' + (rs.acumuladas ? ' warn' : '') + '">📥 acumuladas: <b>' + (rs.acumuladas || 0) + '</b></span>' +
-          '<span class="pill' + (rs.vencidas ? ' bad' : '') + '">⚠ vencidas: <b>' + (rs.vencidas || 0) + '</b></span></div>';
+          '<span class="pill' + (rs.vencidas ? ' bad' : '') + '">⚠ vencidas: <b>' + (rs.vencidas || 0) + '</b></span>' +
+          (rs.contratos ? '<span class="pill bad">📝 contratos de arma: <b>' + rs.contratos + '</b></span>' : '') + '</div>';
       })() +
       '<div style="display:flex;gap:8px;flex-wrap:wrap">' + adminResetBtn +
       '<button onclick="crmAbrirModalNovaTarefa()" style="background:linear-gradient(135deg,#1a8bff,#0e6bd4);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(26,139,255,.3)">+ Nova tarefa manual</button>' +
@@ -6498,6 +6490,7 @@ async function crmRenderTarefas(){
     var html = topBar + '<div class="tar-list">';
     var agoraMin = new Date(Date.now() - 3*3600*1000).toISOString().slice(0,16); // YYYY-MM-DDTHH:MM em Brasília
     tarefas.forEach(function(t){
+      if (t.fonte === 'contrato_arma') { html += crmCardContrato(t, hoje); return; }
       var cls = 'tar-card';
       var prazoCls = '';
       var limiteISO = t.prazo ? (t.prazo + 'T' + (t.hora || '23:59')) : null;
@@ -9671,6 +9664,108 @@ window.addEventListener('load', function(){
 .gar-estoque-marca { font-size: 16px; font-weight: 700; color: #0e4b7a; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
 .gar-estoque-marca-cnt { font-size: 11px; background: #0e4b7a; color: #fff; padding: 2px 8px; border-radius: 10px; }
 
+/* ──────── PAINEL DE EXECUÇÃO (Produtividade v3) ──────── */
+#pg-root{transition:opacity .2s;--pg-ink:#0b0b0b;--pg-ink2:#52514e;--pg-mut:#898781;--pg-grid:#e1e0d9;--pg-axis:#c3c2b7;--pg-surf:#fcfcfb}
+.pg-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.pg-top h2{margin:0;font-size:19px;color:var(--pg-ink)}
+.pg-top span{font-size:12px;color:var(--pg-mut)}
+.pg-btn{background:#3d8a49;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:12.5px;cursor:pointer}
+.pg-btn.sec{background:#fff;color:#3d8a49;border:1px solid #c2e6c8;margin-left:auto}
+.pg-btn:disabled{opacity:.6;cursor:wait}
+.pg-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.pg-tile{background:var(--pg-surf);border:1px solid rgba(11,11,11,.10);border-radius:12px;padding:14px 16px}
+.pg-tile-l{font-size:12px;color:var(--pg-ink2);font-weight:600}
+.pg-tile-v{font-size:30px;font-weight:700;color:var(--pg-ink);line-height:1.15;margin:4px 0 2px}
+.pg-tile-v small{font-size:15px;color:var(--pg-mut);font-weight:600}
+.pg-tile-s{font-size:12px;color:var(--pg-ink2)}
+.pg-tx-warn{color:#9a5b00}.pg-tx-bad{color:#b02525}
+.pg-meter{height:6px;background:#e3edf9;border-radius:4px;margin:6px 0 5px;overflow:hidden}
+.pg-meter i{display:block;height:100%;background:#2a78d6;border-radius:4px}
+.pg-card{background:var(--pg-surf);border:1px solid rgba(11,11,11,.10);border-radius:12px;padding:14px 16px;min-width:0}
+.pg-card-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.pg-card-h b{font-size:14px;color:var(--pg-ink)}
+.pg-card-h span{font-size:12px;color:var(--pg-mut)}
+.pg-card-sub{font-size:12px;color:var(--pg-mut);margin:2px 0 10px}
+.pg-link{background:none;border:none;color:#3d6fb0;font-size:12px;font-weight:600;cursor:pointer;padding:2px 0}
+.pg-acoes{margin-bottom:14px}
+.pg-acao{display:grid;grid-template-columns:118px 92px minmax(0,1fr) minmax(0,.8fr);gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--pg-grid)}
+.pg-acao:first-of-type{margin-top:8px}
+.pg-acao-quem{font-weight:700;font-size:13px;color:var(--pg-ink)}
+.pg-acao-o b{display:block;font-size:13px;color:var(--pg-ink)}
+.pg-acao-o small{font-size:12px;color:var(--pg-ink2)}
+.pg-acao-faca{font-size:12px;color:var(--pg-ink2)}
+.pg-ok-geral{padding:12px 0 4px;font-size:13px;color:#006300;font-weight:600}
+.pg-chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;border:1px solid transparent}
+.pg-st-acao{background:#fbe9e9;color:#9e2424;border-color:#f0c5c5}
+.pg-st-atencao{background:#fff4dc;color:#7a4b06;border-color:#f6dda5}
+.pg-st-ok{background:#e8f6e8;color:#006300;border-color:#c7e8c7}
+.pg-st-neutro{background:#f0efec;color:#52514e;border-color:#e1e0d9}
+.pg-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.pg-chart{width:100%;min-height:60px;overflow:hidden}
+.pg-chart svg{display:block;max-width:100%}
+.pg-ax{font-size:10.5px;fill:var(--pg-mut);font-variant-numeric:tabular-nums}
+.pg-ax-l{font-size:12px;fill:var(--pg-ink2);font-weight:600}
+.pg-ax-v{font-size:11.5px;fill:var(--pg-ink);font-weight:700}
+.pg-in{font-size:11px;fill:#fff;font-weight:700;pointer-events:none}
+.pg-in-dk{font-size:11px;fill:#0b0b0b;font-weight:700;pointer-events:none}
+.pg-base{stroke:var(--pg-axis);stroke-width:1}
+.pg-grid{stroke:var(--pg-grid);stroke-width:1}
+.pg-meta{stroke:#52514e;stroke-width:1;opacity:.55}
+.pg-cross{stroke:#898781;stroke-width:1}
+.pg-mark{transition:opacity .12s}
+.pg-mark.on,.pg-mark:hover{opacity:.75}
+.pg-leg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--pg-ink2);margin-bottom:8px}
+.pg-leg span{display:inline-flex;align-items:center;gap:6px}
+.pg-leg i.sq{width:10px;height:10px;border-radius:2px;display:inline-block}
+.pg-leg i.ln{width:14px;height:2px;border-radius:1px;display:inline-block}
+.pg-vazio,.pg-vazio-chart{padding:22px 8px;text-align:center;color:var(--pg-mut);font-size:13px}
+#pg-tip{position:fixed;z-index:10080;display:none;background:#fff;border:1px solid rgba(11,11,11,.12);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:8px 10px;font-size:12px;pointer-events:none;min-width:140px}
+#pg-tip .pg-tip-h{font-weight:600;color:#52514e;margin-bottom:4px}
+#pg-tip .pg-tip-r{display:flex;align-items:center;gap:6px;color:#52514e}
+#pg-tip .pg-tip-r b{color:#0b0b0b;font-variant-numeric:tabular-nums}
+#pg-tip .pg-tip-r i{width:12px;height:2px;border-radius:1px;display:inline-block}
+.pg-tab-wrap{overflow-x:auto}
+.pg-tab{width:100%;border-collapse:collapse;font-size:12.5px}
+#pg-root .pg-tab th{text-align:left;font-size:11px;color:var(--pg-mut);background:transparent;font-weight:700;padding:6px 8px;border-bottom:1px solid var(--pg-grid);white-space:nowrap;text-transform:none;letter-spacing:0}
+.pg-tab td{padding:8px;border-bottom:1px solid #f0efec;color:var(--pg-ink);vertical-align:top;font-variant-numeric:tabular-nums}
+.pg-tab td small{display:block;color:var(--pg-mut);font-size:11px}
+.pg-arma{max-width:280px}
+.pg-acts{white-space:nowrap}
+.pg-mini{border:1px solid var(--pg-grid);background:#fff;border-radius:6px;padding:4px 8px;font-size:11.5px;font-weight:700;cursor:pointer;margin-right:4px}
+.pg-mini.ok{color:#006300;border-color:#c7e8c7}.pg-mini.bad{color:#9e2424;border-color:#f0c5c5}
+.pg-sec{display:flex;align-items:baseline;gap:10px;font-size:15px;font-weight:700;color:var(--pg-ink);margin:18px 0 10px;flex-wrap:wrap}
+.pg-sec small{font-size:12px;font-weight:500;color:var(--pg-mut)}
+.pg-vends{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;align-items:start}
+.pg-vend{background:var(--pg-surf);border:1px solid rgba(11,11,11,.10);border-radius:12px;padding:14px 16px;min-width:0}
+.pg-vend-top{display:flex;align-items:center;gap:8px}
+.pg-vend-top b{font-size:14px;color:var(--pg-ink);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pg-dot{width:10px;height:10px;border-radius:50%;flex:0 0 10px}
+.pg-vend-motivo{font-size:12.5px;color:var(--pg-ink2);margin:4px 0 10px}
+.pg-vend-nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:6px}
+.pg-num{background:#f6f6f3;border-radius:9px;padding:8px 10px;min-width:0}
+.pg-num b{display:block;font-size:20px;color:var(--pg-ink);line-height:1.2}
+.pg-num b small{display:inline;font-size:12px;color:var(--pg-mut)}
+.pg-num span{display:block;font-size:11.5px;color:var(--pg-ink2);font-weight:600}
+.pg-num small{display:block;font-size:11px;color:var(--pg-mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pg-num.warn{background:#fff4dc}.pg-num.bad{background:#fbe9e9}
+.pg-det{border-top:1px solid var(--pg-grid);margin-top:8px;padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.pg-det-al{display:flex;gap:8px;align-items:flex-start}
+.pg-det-al b{display:block;font-size:12.5px;color:var(--pg-ink)}
+.pg-det-al small{display:block;font-size:12px;color:var(--pg-ink2)}
+.pg-det-al em{display:block;font-size:12px;color:#3d6fb0;font-style:normal}
+.pg-det-obs{font-size:11.5px;color:var(--pg-mut)}
+.pg-det-row{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--pg-ink2);flex-wrap:wrap}
+.pg-det-row b{color:var(--pg-ink)}
+.pg-det-lista b{display:block;font-size:12px;color:var(--pg-ink);margin-bottom:4px}
+.pg-det-lista div{display:flex;justify-content:space-between;font-size:12px;color:var(--pg-ink2);padding:3px 0;border-bottom:1px solid #f0efec}
+.pg-det-lista em{font-style:normal;color:#9a5b00;font-weight:700}
+.pg-cont-resumo{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:10px}
+.pg-filtros{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.pg-fil{border:1px solid var(--pg-grid);background:#fff;border-radius:99px;padding:5px 11px;font-size:12px;cursor:pointer;color:var(--pg-ink2)}
+.pg-fil.on{background:#3d8a49;border-color:#3d8a49;color:#fff;font-weight:700}
+@media(max-width:1100px){.pg-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.pg-grid2{grid-template-columns:1fr}.pg-acao{grid-template-columns:110px 80px minmax(0,1fr)}.pg-acao-faca{grid-column:3}}
+@media(max-width:600px){.pg-kpis{grid-template-columns:1fr}.pg-acao{grid-template-columns:1fr}.pg-acao-faca{grid-column:auto}}
+
 /* ──────── PRODUTIVIDADE DA EQUIPE ──────── */
 .prod-kpi {
   background: #fff; border: 1px solid #e0e4e7; border-radius: 10px;
@@ -10664,11 +10759,36 @@ window.GAR = (function(){
 // ═══════════════════════════════════════════════════════════════
 // PRODUTIVIDADE DA EQUIPE — admin + diretor
 // ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// PAINEL DE EXECUÇÃO (Produtividade v3) — admin + diretor
+// Gerencial: 4 indicadores · o que exige ação · 4 gráficos · vendedores ·
+// contratos de arma. Todos os números vêm de /api/crm/produtividade, que usa
+// a mesma regra do vendedor (lib/crm/disciplina.js).
+// ═══════════════════════════════════════════════════════════════
 window.PROD = (function(){
-  var state = { dados: null, inicializado: false };
+  var state = { dados: null, inicializado: false, tabelas: {}, abertos: {} };
+  // Cores: vendedores = slots 1-3 da paleta categórica validada (CVD ok, todos os pares)
+  var COR_VEND = ['#2a78d6', '#eb6834', '#1baf7a'];
+  var COR_RES = { convertida: '#2a78d6', follow_up: '#1baf7a', nao_convertida: '#eb6834', cancelada: '#b9b8b0' };
+  var NOME_RES = { convertida: 'Venda', follow_up: 'Follow-up', nao_convertida: 'Sem venda', cancelada: 'Cancelada' };
+  var STATUS = {
+    acao:    { ic: '⛔', txt: 'Agir agora', cls: 'pg-st-acao' },
+    atencao: { ic: '⚠️', txt: 'Atenção',   cls: 'pg-st-atencao' },
+    ok:      { ic: '✓',  txt: 'Em dia',    cls: 'pg-st-ok' }
+  };
+  var SIT_CONTRATO = {
+    nao_encontrado:          { txt: 'Não estava na pasta', cls: 'pg-st-acao', ic: '⛔' },
+    sem_assinatura_atrasado: { txt: 'Sem assinatura +48h', cls: 'pg-st-acao', ic: '⛔' },
+    aguardando_envio:        { txt: 'Falta enviar',        cls: 'pg-st-atencao', ic: '⚠️' },
+    aguardando_assinatura:   { txt: 'Aguardando assinatura', cls: 'pg-st-neutro', ic: '⏳' },
+    assinado_a_conferir:     { txt: 'Assinado · conferir', cls: 'pg-st-neutro', ic: '📁' },
+    conferido:               { txt: 'Conferido',           cls: 'pg-st-ok', ic: '✓' }
+  };
 
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function fmtDate(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleDateString('pt-BR'); }catch(e){ return String(iso).slice(0,10); } }
+  function dm(iso){ var p = String(iso||'').slice(0,10).split('-'); return p.length===3 ? p[2]+'/'+p[1] : ''; }
+  function moeda(v){ try { return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}); } catch(e){ return 'R$ '+Math.round(v||0); } }
+  function el(id){ return document.getElementById(id); }
 
   async function init(){
     if (state.inicializado) { recarregar(); return; }
@@ -10677,169 +10797,355 @@ window.PROD = (function(){
   }
 
   async function recarregar(){
+    var root = el('pg-root');
+    if (root && state.dados) root.style.opacity = '.55'; // mantém o quadro enquanto recarrega
     try {
-      var r = await fetch('/api/crm/produtividade');
-      if (!r.ok) {
-        var e = await r.json();
-        throw new Error(e.error || r.status);
-      }
-      state.dados = await r.json();
+      var r = await fetch('/api/crm/produtividade', { cache: 'no-store' });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error || r.status);
+      state.dados = d;
       render();
     } catch(e) {
-      document.getElementById('prod-vendedores').innerHTML =
-        '<div style="padding:20px;color:#c62828;grid-column:1/-1">Erro: ' + esc(e.message) + '</div>';
-    }
+      if (root) root.innerHTML = '<div class="pg-vazio">Erro ao carregar: ' + esc(e.message) + '</div>';
+    } finally { if (root) root.style.opacity = ''; }
   }
 
+  // ─── Render principal ──────────────────────────────────────────
   function render(){
-    renderEquipe();
-    renderVendedores();
+    var d = state.dados, root = el('pg-root'); if (!d || !root) return;
+    var vend = d.vendedores || [];
+    vend.forEach(function(v, i){ v._cor = COR_VEND[i % COR_VEND.length]; });
+    // cor segue o vendedor (ordem alfabética fixa, não muda com status)
+    var ordemFixa = vend.slice().sort(function(a,b){ return a.login.localeCompare(b.login); });
+    ordemFixa.forEach(function(v, i){ v._cor = COR_VEND[i % COR_VEND.length]; });
+    state.vendFixos = ordemFixa;
+
+    var hora = new Date(d.gerado_em).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    var h = '<div class="pg-top"><div><h2>Execução da equipe</h2><span>Atualizado às ' + hora + ' · regras iguais às que o vendedor vê</span></div>' +
+      '<button class="pg-btn" onclick="PROD.recarregar()">↻ Atualizar</button></div>';
+    h += kpis(d);
+    h += acoes(d);
+    h += '<div class="pg-grid2">' +
+      cardChart('ch-exec', 'Tarefas finalizadas por dia', 'Últimos ' + d.janela_dias + ' dias · linha = meta de ' + d.cota_dia + '/dia', '') +
+      cardChart('ch-fila', 'Fila em aberto', 'Se a linha sobe, o vendedor está acumulando', '') +
+      cardChart('ch-res', 'Como as tarefas foram finalizadas', 'Últimos ' + d.janela_dias + ' dias · só ações do próprio vendedor', '') +
+      cardChart('ch-mot', 'Por que o cliente não comprou', 'Motivos registrados desde ' + dm(d.rastreio_desde), '') +
+    '</div>';
+    h += '<div class="pg-sec">Vendedores</div><div class="pg-vends">' + vend.map(cardVendedor).join('') + '</div>';
+    h += contratos(d);
+    root.innerHTML = h;
+    chartExec(); chartFila(); chartRes(); chartMot();
   }
 
-  function renderEquipe(){
-    var eq = state.dados.equipe;
-    var kpis = [
-      { lbl: 'Pendentes em dia', val: eq.pendentes_em_dia, cls: '' },
-      { lbl: 'Atrasadas', val: eq.atrasadas, cls: eq.atrasadas > 0 ? 'alerta' : 'bom' },
-      { lbl: 'Concluídas hoje', val: eq.concluidas_hoje, cls: eq.concluidas_hoje > 0 ? 'bom' : '' },
-      { lbl: 'Últimos 7 dias', val: eq.concluidas_7d, cls: '' },
-      { lbl: 'Mês atual', val: eq.concluidas_mes, cls: '' },
-      { lbl: 'Acumuladas (dias anteriores)', val: eq.acumuladas || 0, cls: (eq.acumuladas || 0) > 0 ? 'alerta' : 'bom' },
-      { lbl: 'Alertas críticos', val: eq.alertas_criticos || 0, cls: (eq.alertas_criticos || 0) > 0 ? 'alerta' : 'bom' },
-    ];
-    var html = kpis.map(function(k){
-      return '<div class="prod-kpi ' + k.cls + '">' +
-        '<div class="prod-kpi-label">' + esc(k.lbl) + '</div>' +
-        '<div class="prod-kpi-value">' + esc(k.val) + '</div>' +
-      '</div>';
-    }).join('');
-    document.getElementById('prod-equipe-row').innerHTML = html;
+  // ─── 4 indicadores ─────────────────────────────────────────────
+  function kpis(d){
+    var e = d.equipe, c = e.contratos || {};
+    var pct = e.meta_hoje ? Math.min(100, Math.round(e.finalizadas_hoje / e.meta_hoje * 100)) : 0;
+    var contrAtr = (c.sem_assinatura_atrasado || 0) + (c.nao_encontrado || 0);
+    return '<div class="pg-kpis">' +
+      tile('Finalizadas hoje', e.finalizadas_hoje + '<small> / ' + e.meta_hoje + '</small>', '<div class="pg-meter"><i style="width:' + pct + '%"></i></div>meta: ' + d.cota_dia + ' por vendedor') +
+      tile('Fila em aberto', e.abertas, (e.acumuladas ? '<b class="pg-tx-warn">' + e.acumuladas + ' de dias anteriores</b>' : 'nenhuma de dias anteriores') + (e.vencidas ? ' · ' + e.vencidas + ' vencidas' : '')) +
+      tile('Conversão (14 dias)', e.conversao_14d == null ? '—' : e.conversao_14d + '%', e.convertidas_14d + ' vendas em ' + (e.convertidas_14d + e.nao_convertidas_14d) + ' contatos com resultado') +
+      tile('Contratos de arma pendentes', (c.aguardando_envio || 0) + (c.aguardando_assinatura || 0) + (c.sem_assinatura_atrasado || 0),
+        contrAtr ? '<b class="pg-tx-bad">⛔ ' + contrAtr + ' em situação irregular</b>' : (c.total ? c.assinados + ' de ' + c.total + ' assinados' : 'nenhuma venda de arma no período')) +
+    '</div>';
   }
+  function tile(l, v, s){ return '<div class="pg-tile"><div class="pg-tile-l">' + l + '</div><div class="pg-tile-v">' + v + '</div><div class="pg-tile-s">' + s + '</div></div>'; }
 
-  function renderVendedores(){
-    var vendedores = state.dados.vendedores || [];
-    if (!vendedores.length) {
-      document.getElementById('prod-vendedores').innerHTML =
-        '<div style="padding:20px;color:#7b8285;grid-column:1/-1">Nenhum vendedor ativo encontrado.</div>';
-      return;
-    }
-    var html = vendedores.map(cardVendedor).join('');
-    document.getElementById('prod-vendedores').innerHTML = html;
-  }
-
-  function cardVendedor(v){
-    var taxaCls = 'na', taxaTxt = '—';
-    if (v.taxa_conclusao != null) {
-      taxaCls = v.taxa_conclusao >= 80 ? 'alta' : (v.taxa_conclusao >= 50 ? 'media' : 'baixa');
-      taxaTxt = v.taxa_conclusao + '% conclusão';
-    }
-    var listaId = 'prod-atr-' + v.login;
-    var atrasadasHtml = '';
-    if (v.lista_atrasadas && v.lista_atrasadas.length) {
-      atrasadasHtml =
-        '<div class="prod-atrasadas-toggle" onclick="PROD.toggleAtrasadas(\'' + v.login + '\')" id="' + listaId + '-tog">' +
-          '▼ Ver ' + v.lista_atrasadas.length + ' tarefa(s) atrasada(s)' + (v.lista_atrasadas_total > v.lista_atrasadas.length ? ' (as ' + v.lista_atrasadas.length + ' mais antigas de ' + v.lista_atrasadas_total + ')' : '') +
-        '</div>' +
-        '<div class="prod-atrasadas-lista" id="' + listaId + '">' +
-          v.lista_atrasadas.map(function(t){
-            return '<div class="prod-atrasada-item">' +
-              '<div style="flex:1;min-width:0">' +
-                '<div class="prod-atrasada-titulo">' + esc(t.titulo || t.tipo) + '</div>' +
-                '<div class="prod-atrasada-cli">' + (t.cliente_nome ? esc(t.cliente_nome) + ' · ' : '') +
-                  'prazo ' + fmtDate(t.prazo) +
-                '</div>' +
-              '</div>' +
-              '<div class="prod-atrasada-dias">' + t.dias_atraso + 'd</div>' +
-            '</div>';
-          }).join('') +
-        '</div>';
-    } else if (v.atrasadas > 0) {
-      atrasadasHtml =
-        '<div style="color:#7b8285;font-size:11px;text-align:center;padding:6px;background:#f8f9fa;border-radius:6px;margin-top:8px">' +
-          v.atrasadas + ' atrasada(s) sem detalhes de cliente' +
-        '</div>';
-    }
-
-    return '<div class="prod-card">' +
-      '<div class="prod-card-top">' +
-        '<div>' +
-          '<div class="prod-card-nome">' + esc(v.nome) + '</div>' +
-          '<div class="prod-card-login">@' + esc(v.login) + '</div>' +
-        '</div>' +
-        '<span class="prod-card-taxa ' + taxaCls + '">' + esc(taxaTxt) + '</span>' +
-      '</div>' +
-      '<div class="prod-mini-row">' +
-        '<div class="prod-mini"><div class="prod-mini-lbl">Em dia</div><div class="prod-mini-val">' + v.pendentes_em_dia + '</div></div>' +
-        '<div class="prod-mini ' + (v.atrasadas > 0 ? 'danger' : '') + '"><div class="prod-mini-lbl">Atrasadas</div><div class="prod-mini-val">' + v.atrasadas + '</div></div>' +
-        '<div class="prod-mini ' + (v.concluidas_hoje > 0 ? 'sucess' : '') + '"><div class="prod-mini-lbl">Hoje</div><div class="prod-mini-val">' + v.concluidas_hoje + '</div></div>' +
-      '</div>' +
-      '<div style="display:flex;justify-content:space-between;font-size:11px;color:#7b8285;padding:6px 0;border-top:1px solid #eef0f1">' +
-        '<span>7 dias: <b style="color:#1a1a1a">' + v.concluidas_7d + '</b></span>' +
-        '<span>mês: <b style="color:#1a1a1a">' + v.concluidas_mes + '</b></span>' +
-      '</div>' +
-      discHtml(v) +
-      atrasadasHtml +
+  // ─── O que exige ação ─────────────────────────────────────────
+  function acoes(d){
+    var a = d.acoes || [];
+    if (!a.length) return '<div class="pg-card pg-acoes"><div class="pg-card-h"><b>O que exige ação</b></div><div class="pg-ok-geral">✓ Nada exige ação agora. Equipe executando dentro das regras.</div></div>';
+    var max = 6, extra = a.length - max;
+    return '<div class="pg-card pg-acoes"><div class="pg-card-h"><b>O que exige ação</b><span>' + a.length + ' ponto(s) · o mais grave primeiro</span></div>' +
+      a.slice(0, state.verTodasAcoes ? a.length : max).map(function(x){
+        var st = x.nivel === 'critico' ? STATUS.acao : STATUS.atencao;
+        return '<div class="pg-acao">' +
+          '<span class="pg-chip ' + st.cls + '">' + st.ic + ' ' + st.txt + '</span>' +
+          '<span class="pg-acao-quem">' + esc(x.nome) + '</span>' +
+          '<span class="pg-acao-o"><b>' + esc(x.titulo) + '</b><small>' + esc(x.detalhe || '') + '</small></span>' +
+          '<span class="pg-acao-faca">' + (x.acao ? '→ ' + esc(x.acao) : '') + '</span></div>';
+      }).join('') +
+      (extra > 0 && !state.verTodasAcoes ? '<button class="pg-link" onclick="PROD._todasAcoes()">ver mais ' + extra + '</button>' : '') +
     '</div>';
   }
 
-  // Bloco de disciplina (como as tarefas estão sendo finalizadas) + carteira
-  function discHtml(v){
-    var d = v.disciplina; if (!d) return '';
-    var f = d.fila || {}, x = d.execucao || {};
-    var sCls = d.saude >= 80 ? 'ok' : (d.saude >= 50 ? 'mid' : 'low');
-    var labels = (state.dados && state.dados.motivos_labels) || {};
-    var h = '<div class="prod-disc">' +
-      '<div class="prod-disc-h"><span>Execução das tarefas (14 dias)</span><span class="prod-saude ' + sCls + '">Saúde ' + d.saude + '/100</span></div>' +
-      '<div class="prod-disc-grid">' +
-        '<div><b>' + (f.abertas || 0) + '</b>abertas</div>' +
-        '<div class="' + (f.acumuladas ? 'warn' : '') + '"><b>' + (f.acumuladas || 0) + '</b>acumuladas</div>' +
-        '<div class="' + (f.vencidas ? 'bad' : '') + '"><b>' + (f.vencidas || 0) + '</b>vencidas</div>' +
-        '<div><b>' + (x.taxa_conversao == null ? '—' : x.taxa_conversao + '%') + '</b>conversão</div>' +
-        '<div class="' + (x.pct_nao_convertido >= 75 ? 'bad' : '') + '"><b>' + (x.pct_nao_convertido || 0) + '%</b>não convertido</div>' +
-        '<div class="' + (x.pct_sem_contato >= 50 ? 'bad' : '') + '"><b>' + (x.pct_sem_contato || 0) + '%</b>sem contato</div>' +
-        '<div><b>' + (x.executadas_hoje || 0) + '</b>feitas hoje</div>' +
-        '<div class="' + (x.pico_rajada_10min >= 8 ? 'bad' : '') + '"><b>' + (x.pico_rajada_10min || 0) + '</b>pico em 10 min</div>' +
-        '<div class="' + ((f.mais_antiga_dias || 0) >= 5 ? 'warn' : '') + '"><b>' + (f.mais_antiga_dias || 0) + 'd</b>mais antiga</div>' +
-      '</div>';
-    if ((d.alertas || []).length) {
-      h += '<div class="prod-alertas">' + d.alertas.map(function(a){
-        return '<div class="prod-alerta ' + esc(a.nivel) + '"><b>' + (a.nivel === 'critico' ? '🚨 ' : '⚠️ ') + esc(a.titulo) + '</b> — ' + esc(a.mensagem_gestao || a.mensagem || '') + '</div>';
-      }).join('') + '</div>';
+  function cardChart(id, tit, sub){
+    return '<div class="pg-card"><div class="pg-card-h"><b>' + tit + '</b><button class="pg-link" onclick="PROD._tabela(\'' + id + '\')">' + (state.tabelas[id] ? 'ver gráfico' : 'ver tabela') + '</button></div>' +
+      '<div class="pg-card-sub">' + sub + '</div><div class="pg-chart" id="' + id + '"></div></div>';
+  }
+
+  // ─── Tooltip único ─────────────────────────────────────────────
+  function tip(){ var t = el('pg-tip'); if (!t) { t = document.createElement('div'); t.id = 'pg-tip'; document.body.appendChild(t); } return t; }
+  function mostraTip(ev, linhas){
+    var t = tip(); t.textContent = '';
+    linhas.forEach(function(l, i){
+      var row = document.createElement('div'); row.className = i === 0 ? 'pg-tip-h' : 'pg-tip-r';
+      if (l.cor) { var k = document.createElement('i'); k.style.background = l.cor; row.appendChild(k); }
+      if (l.v != null) { var b = document.createElement('b'); b.textContent = l.v; row.appendChild(b); }
+      var s = document.createElement('span'); s.textContent = l.t; row.appendChild(s);
+      t.appendChild(row);
+    });
+    t.style.display = 'block';
+    var x = ev.clientX + 14, y = ev.clientY + 14, w = t.offsetWidth, hh = t.offsetHeight;
+    if (x + w > window.innerWidth - 8) x = ev.clientX - w - 14;
+    if (y + hh > window.innerHeight - 8) y = ev.clientY - hh - 14;
+    t.style.left = x + 'px'; t.style.top = y + 'px';
+  }
+  function escondeTip(){ var t = el('pg-tip'); if (t) t.style.display = 'none'; }
+
+  function svgEl(tag, at){ var e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (var k in at) e.setAttribute(k, at[k]); return e; }
+  // indices de rotulo do eixo X: a cada `k`, sempre o ultimo, sem encostar nele
+  function rotulosX(n, k){ var out = []; for (var i = 0; i < n; i += k) if (n - 1 - i >= k || i === n - 1) out.push(i); if (out[out.length-1] !== n-1) out.push(n-1); return out; }
+  function niceMax(v){ if (v <= 5) return 5; var p = Math.pow(10, Math.floor(Math.log10(v))); var n = v / p; return (n <= 2 ? 2 : n <= 5 ? 5 : 10) * p; }
+  // barra com topo arredondado (4px) e base reta
+  function barPath(x, y, w, h, r){ r = Math.min(r, w/2, h); if (h <= 0) return ''; return 'M'+x+','+(y+h)+'V'+(y+r)+'Q'+x+','+y+' '+(x+r)+','+y+'H'+(x+w-r)+'Q'+(x+w)+','+y+' '+(x+w)+','+(y+r)+'V'+(y+h)+'Z'; }
+  function hbarPath(x, y, w, h, r){ r = Math.min(r, h/2, w); if (w <= 0) return ''; return 'M'+x+','+y+'H'+(x+w-r)+'Q'+(x+w)+','+y+' '+(x+w)+','+(y+r)+'V'+(y+h-r)+'Q'+(x+w)+','+(y+h)+' '+(x+w-r)+','+(y+h)+'H'+x+'Z'; }
+
+  function tabela(id, cab, linhas){
+    var c = el(id); if (!c) return;
+    c.innerHTML = '<table class="pg-tab"><thead><tr>' + cab.map(function(x){ return '<th>' + esc(x) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      linhas.map(function(l){ return '<tr>' + l.map(function(x){ return '<td>' + esc(x) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
+  }
+  function legenda(itens, tipo){
+    return '<div class="pg-leg">' + itens.map(function(i){ return '<span><i class="' + (tipo === 'linha' ? 'ln' : 'sq') + '" style="background:' + i.cor + '"></i>' + esc(i.nome) + '</span>'; }).join('') + '</div>';
+  }
+
+  // ─── Gráfico 1: finalizadas por dia (small multiples, 1 linha por vendedor) ──
+  function chartExec(){
+    var d = state.dados, vend = state.vendFixos || [], id = 'ch-exec', c = el(id); if (!c) return;
+    if (state.tabelas[id]) {
+      var dias = (vend[0] && vend[0].serie || []).map(function(s){ return dm(s.dia); });
+      tabela(id, ['Vendedor'].concat(dias), vend.map(function(v){ return [v.primeiro_nome].concat(v.serie.map(function(s){ return s.finalizadas; })); }));
+      return;
     }
-    var mot = x.motivos_nao_conversao || {};
-    var motKeys = Object.keys(mot).sort(function(a, b){ return mot[b] - mot[a]; });
-    if (motKeys.length) {
-      h += '<div class="prod-motivos">Motivos de não conversão: ' + motKeys.slice(0, 4).map(function(k){ return esc(labels[k] || k) + ' <b>' + mot[k] + '</b>'; }).join(' · ') + '</div>';
-    }
+    c.innerHTML = '';
+    var W = c.clientWidth || 520, rowH = 64, padL = 70, padR = 64, meta = d.cota_dia;
+    var maxV = meta * 1.25; vend.forEach(function(v){ v.serie.forEach(function(s){ if (s.finalizadas > maxV) maxV = s.finalizadas; }); });
+    var svg = svgEl('svg', { width: W, height: vend.length * rowH + 22, role: 'img', 'aria-label': 'Finalizadas por dia por vendedor' });
+    vend.forEach(function(v, r){
+      var y0 = r * rowH + 6, h = rowH - 18, n = v.serie.length, bw = Math.min(24, (W - padL - padR) / n - 2);
+      var step = (W - padL - padR) / n;
+      var nm = svgEl('text', { x: 0, y: y0 + h/2 + 4, 'class': 'pg-ax-l' }); nm.textContent = v.primeiro_nome; svg.appendChild(nm);
+      svg.appendChild(svgEl('line', { x1: padL, x2: W - padR, y1: y0 + h, y2: y0 + h, 'class': 'pg-base' }));
+      var ym = y0 + h - (meta / maxV) * h;
+      svg.appendChild(svgEl('line', { x1: padL, x2: W - padR, y1: ym, y2: ym, 'class': 'pg-meta' }));
+      if (r === 0) { var mt = svgEl('text', { x: padL - 6, y: ym + 4, 'text-anchor': 'end', 'class': 'pg-ax' }); mt.textContent = 'meta ' + meta; svg.appendChild(mt); }
+      v.serie.forEach(function(s, i){
+        var bh = (s.finalizadas / maxV) * h, x = padL + i * step + (step - bw) / 2;
+        var p = svgEl('path', { d: barPath(x, y0 + h - bh, bw, bh, 4), fill: v._cor, 'class': 'pg-mark' });
+        svg.appendChild(p);
+        var hit = svgEl('rect', { x: padL + i * step, y: y0, width: step, height: h, fill: 'transparent', tabindex: 0 });
+        var linhas = [{ t: v.primeiro_nome + ' · ' + dm(s.dia) }, { v: s.finalizadas, t: ' finalizadas (meta ' + meta + ')', cor: v._cor },
+          { v: s.convertida, t: ' venda(s)' }, { v: s.nao_convertida, t: ' sem venda' }, { v: s.follow_up, t: ' follow-up' }, { v: s.cancelada, t: ' cancelada(s)' }];
+        hit.addEventListener('pointermove', function(ev){ p.classList.add('on'); mostraTip(ev, linhas); });
+        hit.addEventListener('pointerleave', function(){ p.classList.remove('on'); escondeTip(); });
+        hit.addEventListener('focus', function(ev){ var b = hit.getBoundingClientRect(); mostraTip({ clientX: b.left + b.width/2, clientY: b.top }, linhas); });
+        hit.addEventListener('blur', escondeTip);
+        svg.appendChild(hit);
+      });
+      // rótulo seletivo: só o valor de hoje
+      var ult = v.serie[v.serie.length - 1];
+      var tx = svgEl('text', { x: W - padR + 8, y: y0 + h - 4, 'class': 'pg-ax-v' }); tx.textContent = 'hoje ' + ult.finalizadas; svg.appendChild(tx);
+    });
+    var dias = (vend[0] && vend[0].serie) || [];
+    var step = (W - padL - padR) / Math.max(1, dias.length);
+    rotulosX(dias.length, 3).forEach(function(i){ var t = svgEl('text', { x: padL + i * step + step/2, y: vend.length * rowH + 16, 'text-anchor': 'middle', 'class': 'pg-ax' }); t.textContent = i === dias.length - 1 ? 'hoje' : dm(dias[i].dia); svg.appendChild(t); });
+    c.appendChild(svg);
+  }
+
+  // ─── Gráfico 2: fila em aberto (linhas, crosshair) ─────────────
+  function chartFila(){
+    var vend = state.vendFixos || [], id = 'ch-fila', c = el(id); if (!c) return;
+    var dias = (vend[0] && vend[0].serie || []).map(function(s){ return s.dia; });
+    if (state.tabelas[id]) { tabela(id, ['Dia'].concat(vend.map(function(v){ return v.primeiro_nome; })), dias.map(function(dd, i){ return [dm(dd)].concat(vend.map(function(v){ return v.serie[i].fila_fim_dia; })); })); return; }
+    c.innerHTML = legenda(vend.map(function(v){ return { nome: v.primeiro_nome, cor: v._cor }; }), 'linha');
+    var W = c.clientWidth || 520, H = 200, pl = 34, pr = 60, pt = 10, pb = 22;
+    var maxV = 5; vend.forEach(function(v){ v.serie.forEach(function(s){ if (s.fila_fim_dia > maxV) maxV = s.fila_fim_dia; }); });
+    maxV = niceMax(maxV);
+    var X = function(i){ return pl + (dias.length <= 1 ? 0 : i * (W - pl - pr) / (dias.length - 1)); };
+    var Y = function(v){ return pt + (H - pt - pb) * (1 - v / maxV); };
+    var svg = svgEl('svg', { width: W, height: H, role: 'img', 'aria-label': 'Fila em aberto por dia' });
+    [0, maxV/2, maxV].forEach(function(g){ svg.appendChild(svgEl('line', { x1: pl, x2: W - pr, y1: Y(g), y2: Y(g), 'class': g === 0 ? 'pg-base' : 'pg-grid' }));
+      var t = svgEl('text', { x: pl - 6, y: Y(g) + 4, 'text-anchor': 'end', 'class': 'pg-ax' }); t.textContent = Math.round(g); svg.appendChild(t); });
+    rotulosX(dias.length, 3).forEach(function(i){ var t = svgEl('text', { x: X(i), y: H - 6, 'text-anchor': 'middle', 'class': 'pg-ax' }); t.textContent = i === dias.length - 1 ? 'hoje' : dm(dias[i]); svg.appendChild(t); });
+    var ends = [];
+    vend.forEach(function(v){
+      var pts = v.serie.map(function(s, i){ return X(i) + ',' + Y(s.fila_fim_dia); }).join(' ');
+      svg.appendChild(svgEl('polyline', { points: pts, fill: 'none', stroke: v._cor, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+      var last = v.serie[v.serie.length - 1];
+      svg.appendChild(svgEl('circle', { cx: X(dias.length - 1), cy: Y(last.fila_fim_dia), r: 4, fill: v._cor, stroke: '#fff', 'stroke-width': 2 }));
+      ends.push({ y: Y(last.fila_fim_dia), txt: v.primeiro_nome + ' ' + last.fila_fim_dia });
+    });
+    // rótulos no fim: se colidirem, a legenda + tooltip carregam (não empilha)
+    ends.sort(function(a,b){ return a.y - b.y; });
+    var colide = ends.some(function(e, i){ return i && e.y - ends[i-1].y < 13; });
+    if (!colide) ends.forEach(function(e){ var t = svgEl('text', { x: W - pr + 8, y: e.y + 4, 'class': 'pg-ax-v' }); t.textContent = e.txt; svg.appendChild(t); });
+    var cross = svgEl('line', { x1: 0, x2: 0, y1: pt, y2: H - pb, 'class': 'pg-cross', style: 'display:none' }); svg.appendChild(cross);
+    var hit = svgEl('rect', { x: pl, y: 0, width: W - pl - pr, height: H, fill: 'transparent' }); svg.appendChild(hit);
+    hit.addEventListener('pointermove', function(ev){
+      var b = svg.getBoundingClientRect(), mx = ev.clientX - b.left;
+      var i = Math.max(0, Math.min(dias.length - 1, Math.round((mx - pl) / ((W - pl - pr) / Math.max(1, dias.length - 1)))));
+      cross.setAttribute('x1', X(i)); cross.setAttribute('x2', X(i)); cross.style.display = '';
+      mostraTip(ev, [{ t: 'Fila no fim de ' + dm(dias[i]) }].concat(vend.map(function(v){ return { v: v.serie[i].fila_fim_dia, t: ' ' + v.primeiro_nome, cor: v._cor }; })));
+    });
+    hit.addEventListener('pointerleave', function(){ cross.style.display = 'none'; escondeTip(); });
+    c.appendChild(svg);
+  }
+
+  // ─── Gráfico 3: como finalizaram (100% empilhado por vendedor) ─
+  function chartRes(){
+    var vend = state.vendFixos || [], id = 'ch-res', c = el(id); if (!c) return;
+    var chaves = ['convertida', 'follow_up', 'nao_convertida', 'cancelada'];
+    var dados = vend.map(function(v){ var f = v.execucao.finalizacoes || {}; return { v: v, n: { convertida: f.convertida||0, follow_up: f.follow_up_agendado||0, nao_convertida: f.nao_convertida||0, cancelada: f.cancelada||0 } }; });
+    if (state.tabelas[id]) { tabela(id, ['Vendedor'].concat(chaves.map(function(k){ return NOME_RES[k]; })).concat(['Total']), dados.map(function(x){ var t = 0; chaves.forEach(function(k){ t += x.n[k]; }); return [x.v.primeiro_nome].concat(chaves.map(function(k){ return x.n[k]; })).concat([t]); })); return; }
+    c.innerHTML = legenda(chaves.map(function(k){ return { nome: NOME_RES[k], cor: COR_RES[k] }; }), 'sq');
+    var W = c.clientWidth || 520, pl = 70, pr = 44, bh = 22, gap = 18;
+    var svg = svgEl('svg', { width: W, height: dados.length * (bh + gap) + 4, role: 'img', 'aria-label': 'Resultado das finalizações por vendedor' });
+    dados.forEach(function(x, r){
+      var y = r * (bh + gap) + 4, tot = 0; chaves.forEach(function(k){ tot += x.n[k]; });
+      var nm = svgEl('text', { x: 0, y: y + bh/2 + 4, 'class': 'pg-ax-l' }); nm.textContent = x.v.primeiro_nome; svg.appendChild(nm);
+      var tt = svgEl('text', { x: W - pr + 6, y: y + bh/2 + 4, 'class': 'pg-ax-v' }); tt.textContent = tot ? tot + '' : '0'; svg.appendChild(tt);
+      if (!tot) { var z = svgEl('text', { x: pl, y: y + bh/2 + 4, 'class': 'pg-ax' }); z.textContent = 'nenhuma finalização no período'; svg.appendChild(z); return; }
+      var x0 = pl, larg = W - pl - pr;
+      chaves.forEach(function(k){
+        if (!x.n[k]) return;
+        var w = Math.max(2, larg * x.n[k] / tot - 2);
+        var rect = svgEl('rect', { x: x0, y: y, width: w, height: bh, rx: 3, fill: COR_RES[k], 'class': 'pg-mark', tabindex: 0 });
+        var pct = Math.round(x.n[k] / tot * 100);
+        var linhas = [{ t: x.v.primeiro_nome + ' · ' + NOME_RES[k] }, { v: x.n[k], t: ' de ' + tot + ' (' + pct + '%)', cor: COR_RES[k] }];
+        rect.addEventListener('pointermove', function(ev){ mostraTip(ev, linhas); });
+        rect.addEventListener('pointerleave', escondeTip);
+        svg.appendChild(rect);
+        if (w > 34) { var lb = svgEl('text', { x: x0 + w/2, y: y + bh/2 + 4, 'text-anchor': 'middle', 'class': k === 'cancelada' ? 'pg-in-dk' : 'pg-in' }); lb.textContent = pct + '%'; svg.appendChild(lb); }
+        x0 += w + 2;
+      });
+    });
+    c.appendChild(svg);
+  }
+
+  // ─── Gráfico 4: motivos de não conversão (barras horizontais) ──
+  function chartMot(){
+    var d = state.dados, id = 'ch-mot', c = el(id); if (!c) return;
+    var m = d.motivos_equipe || {}, lab = d.motivos_labels || {};
+    var itens = Object.keys(m).map(function(k){ return { k: k, n: m[k], t: lab[k] || k }; }).sort(function(a,b){ return b.n - a.n; });
+    if (!itens.length) { c.innerHTML = '<div class="pg-vazio-chart">Ainda sem motivos registrados.<br><small>O registro começou em ' + dm(d.rastreio_desde) + ': os dados aparecem conforme os vendedores finalizam "sem venda".</small></div>'; return; }
+    if (state.tabelas[id]) { tabela(id, ['Motivo', 'Qtd'], itens.map(function(i){ return [i.t, i.n]; })); return; }
+    c.innerHTML = '';
+    var W = c.clientWidth || 520, pl = 200, pr = 36, bh = 18, gap = 10, max = itens[0].n, tot = 0;
+    itens.forEach(function(i){ tot += i.n; });
+    var svg = svgEl('svg', { width: W, height: itens.length * (bh + gap), role: 'img', 'aria-label': 'Motivos de não conversão' });
+    itens.forEach(function(i, r){
+      var y = r * (bh + gap), w = (W - pl - pr) * i.n / max;
+      var t = svgEl('text', { x: pl - 8, y: y + bh/2 + 4, 'text-anchor': 'end', 'class': 'pg-ax-l' }); t.textContent = i.t; svg.appendChild(t);
+      var p = svgEl('path', { d: hbarPath(pl, y, w, bh, 4), fill: COR_VEND[0], 'class': 'pg-mark' }); svg.appendChild(p);
+      var v = svgEl('text', { x: pl + w + 6, y: y + bh/2 + 4, 'class': 'pg-ax-v' }); v.textContent = i.n; svg.appendChild(v);
+      var linhas = [{ t: i.t }, { v: i.n, t: ' (' + Math.round(i.n / tot * 100) + '% dos motivos)', cor: COR_VEND[0] }];
+      p.addEventListener('pointermove', function(ev){ mostraTip(ev, linhas); }); p.addEventListener('pointerleave', escondeTip);
+    });
+    c.appendChild(svg);
+  }
+
+  // ─── Cards de vendedor (enxutos, detalhe sob demanda) ──────────
+  function cardVendedor(v){
+    var st = STATUS[v.status] || STATUS.ok, x = v.execucao, f = v.fila, aberto = state.abertos[v.login];
+    var h = '<div class="pg-vend"><div class="pg-vend-top"><span class="pg-dot" style="background:' + v._cor + '"></span><b>' + esc(v.nome) + '</b>' +
+      '<span class="pg-chip ' + st.cls + '">' + st.ic + ' ' + st.txt + '</span></div>' +
+      '<div class="pg-vend-motivo">' + esc(v.motivo_status) + '</div>' +
+      '<div class="pg-vend-nums">' +
+        num(f.abertas, 'na fila', f.acumuladas ? f.acumuladas + ' antigas · ' + f.mais_antiga_dias + 'd' : 'nenhuma antiga', f.acumuladas >= 40 ? 'warn' : '') +
+        num(x.executadas_hoje + '<small>/' + state.dados.cota_dia + '</small>', 'feitas hoje', x.ultima_finalizacao_em ? 'última: ' + new Date(x.ultima_finalizacao_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : 'nenhuma ainda', '') +
+        num(x.taxa_conversao == null ? '—' : x.taxa_conversao + '%', 'conversão 14d', (x.finalizacoes.convertida || 0) + ' venda(s)', '') +
+      '</div>' +
+      '<button class="pg-link" onclick="PROD._abrir(\'' + v.login + '\')">' + (aberto ? 'ocultar detalhes ▴' : 'ver detalhes ▾') + '</button>';
+    if (aberto) h += detalhe(v);
+    return h + '</div>';
+  }
+  function num(v, l, s, cls){ return '<div class="pg-num ' + (cls||'') + '"><b>' + v + '</b><span>' + l + '</span><small>' + esc(s) + '</small></div>'; }
+
+  function detalhe(v){
+    var h = '<div class="pg-det">';
+    if (v.alertas.length) h += v.alertas.map(function(a){ var st = a.nivel === 'critico' ? STATUS.acao : STATUS.atencao;
+      return '<div class="pg-det-al"><span class="pg-chip ' + st.cls + '">' + st.ic + ' ' + st.txt + '</span><div><b>' + esc(a.titulo) + '</b><small>' + esc(a.mensagem_gestao) + '</small>' + (a.acao ? '<em>→ ' + esc(a.acao) + '</em>' : '') + '</div></div>'; }).join('');
+    var x = v.execucao;
+    var obs = [];
+    if (x.canceladas_pela_gestao) obs.push(x.canceladas_pela_gestao + ' tarefa(s) canceladas pela gestão/sistema não contam contra o vendedor');
+    if (x.nao_convertidas_rastreadas) obs.push('contato registrado em ' + (x.nao_convertidas_rastreadas - x.nao_convertidas_sem_contato) + ' de ' + x.nao_convertidas_rastreadas + ' "sem venda" desde ' + dm(x.rastreio_desde));
+    if (obs.length) h += '<div class="pg-det-obs">' + obs.map(esc).join(' · ') + '</div>';
     var c = v.carteira;
-    if (c) {
-      h += '<div class="prod-disc-h" style="margin-top:10px"><span>💼 Carteira</span>' +
-        '<button class="prod-cart-link" onclick="crmIrPara(\'carteira\',{vendedor:\'' + esc(v.login) + '\'})">Ver carteira →</button></div>' +
-        '<div class="prod-disc-grid">' +
-          '<div><b>' + (c.total || 0) + '</b>clientes</div>' +
-          '<div><b>' + (c.quentes || 0) + '</b>quentes</div>' +
-          '<div class="' + (c.esfriando ? 'bad' : '') + '"><b>' + (c.esfriando || 0) + '</b>esfriando</div>' +
-          '<div><b>' + (c.novos_mes || 0) + '</b>novos no mês</div>' +
-          '<div><b>' + (c.compraram_mes || 0) + '</b>compraram</div>' +
-          '<div class="' + (c.sem_proximo_passo ? 'warn' : '') + '"><b>' + (c.sem_proximo_passo || 0) + '</b>sem próx. passo</div>' +
-        '</div>';
+    if (c) h += '<div class="pg-det-row"><b>💼 Carteira</b><span>' + c.total + ' clientes · ' + c.quentes + ' quentes · ' + c.esfriando + ' esfriando · ' + c.novos_mes + ' novos no mês · ' + c.compraram_mes + ' compraram</span>' +
+      '<button class="pg-link" onclick="crmIrPara(\'carteira\',{vendedor:\'' + esc(v.login) + '\'})">abrir →</button></div>';
+    var k = v.contratos || {};
+    if (k.total) h += '<div class="pg-det-row"><b>📝 Contratos de arma</b><span>' + k.total + ' venda(s) · ' + (k.pendentes||0) + ' pendente(s) · ' + (k.atrasados||0) + ' atrasado(s)</span></div>';
+    if (v.mais_antigas && v.mais_antigas.length) {
+      h += '<div class="pg-det-lista"><b>Tarefas mais antigas na fila (' + v.abertas_total + ' abertas)</b>' + v.mais_antigas.slice(0, 8).map(function(t){
+        return '<div><span>' + esc(t.cliente_nome || t.titulo || 'Tarefa') + '</span><em>' + t.dias + 'd</em></div>'; }).join('') + '</div>';
     }
     return h + '</div>';
   }
 
-  function toggleAtrasadas(login){
-    var el = document.getElementById('prod-atr-' + login);
-    var tog = document.getElementById('prod-atr-' + login + '-tog');
-    if (!el) return;
-    var aberto = el.classList.toggle('aberto');
-    if (tog) {
-      tog.classList.toggle('aberto', aberto);
-      tog.textContent = (aberto ? '▲ Ocultar' : '▼ Ver') + ' ' +
-        (el.querySelectorAll('.prod-atrasada-item').length) + ' tarefa(s) atrasada(s)';
-    }
+  // ─── Contratos de arma ─────────────────────────────────────────
+  function contratos(d){
+    var c = d.contratos || { totais: {}, linhas: [] }, t = c.totais || {};
+    var h = '<div class="pg-sec">Contratos de venda de arma <small>regra: toda venda de arma precisa de contrato assinado</small>' +
+      '<button class="pg-btn sec" onclick="PROD._varrer(this)">Verificar vendas de arma agora</button></div>';
+    if (!t.total) return h + '<div class="pg-card"><div class="pg-ok-geral">Nenhuma venda de arma nos últimos 90 dias com contrato em aberto.</div></div>';
+    var filtro = state.filtroContrato || 'pendentes';
+    var linhas = (c.linhas || []).filter(function(l){
+      if (filtro === 'todos') return true;
+      if (filtro === 'conferir') return l.situacao === 'assinado_a_conferir';
+      return ['nao_encontrado','sem_assinatura_atrasado','aguardando_envio','aguardando_assinatura'].indexOf(l.situacao) !== -1;
+    });
+    h += '<div class="pg-card"><div class="pg-cont-resumo">' +
+      resumoC('Falta enviar', t.aguardando_envio, t.aguardando_envio ? 'warn' : '') +
+      resumoC('Aguardando assinatura', t.aguardando_assinatura, '') +
+      resumoC('Sem assinatura +48h', t.sem_assinatura_atrasado, t.sem_assinatura_atrasado ? 'bad' : '') +
+      resumoC('Assinados (a conferir)', (t.assinados||0) + ' (' + (t.a_conferir||0) + ')', '') +
+      (t.nao_encontrado ? resumoC('Não estava na pasta', t.nao_encontrado, 'bad') : '') +
+    '</div><div class="pg-filtros">' +
+      ['pendentes','conferir','todos'].map(function(f){ return '<button class="pg-fil' + (filtro === f ? ' on' : '') + '" onclick="PROD._filtroC(\'' + f + '\')">' + ({pendentes:'Pendentes',conferir:'A conferir na pasta',todos:'Todos'})[f] + '</button>'; }).join('') + '</div>';
+    if (!linhas.length) h += '<div class="pg-ok-geral">✓ Nada neste filtro.</div>';
+    else h += '<div class="pg-tab-wrap"><table class="pg-tab"><thead><tr><th>Situação</th><th>Pedido</th><th>Cliente</th><th>Arma</th><th>Vendedor</th><th>Desde a venda</th><th></th></tr></thead><tbody>' +
+      linhas.map(function(l){ var s = SIT_CONTRATO[l.situacao] || { txt: l.situacao, cls: 'pg-st-neutro', ic: '' };
+        var acoes = l.situacao === 'assinado_a_conferir' && l.tarefa_assinatura_id ?
+          '<button class="pg-mini ok" onclick="PROD._conferir(\'' + l.tarefa_assinatura_id + '\',true,this)">✓ Está na pasta</button><button class="pg-mini bad" onclick="PROD._conferir(\'' + l.tarefa_assinatura_id + '\',false,this)">✗ Não está</button>' : '';
+        return '<tr><td><span class="pg-chip ' + s.cls + '">' + s.ic + ' ' + s.txt + '</span></td><td>' + esc(l.bling_numero || '—') + '<small>' + dm(l.data_pedido) + '</small></td><td>' + esc(l.cliente_nome || '—') + '<small>' + moeda(l.valor_total) + '</small></td>' +
+          '<td class="pg-arma">' + esc((l.armas || []).join(' + ')) + '</td><td>' + esc(l.vendedor) + '</td><td>' + (l.dias_venda != null ? l.dias_venda : l.dias) + 'd' + (l.avisos_cancelamento ? '<small>' + l.avisos_cancelamento + ' aviso(s)</small>' : '') + '</td><td class="pg-acts">' + acoes + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+    return h + '</div>';
+  }
+  function resumoC(l, v, cls){ return '<div class="pg-num ' + cls + '"><b>' + (v || 0) + '</b><span>' + l + '</span></div>'; }
+
+  // ─── Ações da UI ───────────────────────────────────────────────
+  function _abrir(login){ state.abertos[login] = !state.abertos[login]; render(); }
+  function _tabela(id){ state.tabelas[id] = !state.tabelas[id]; render(); }
+  function _todasAcoes(){ state.verTodasAcoes = true; render(); }
+  function _filtroC(f){ state.filtroContrato = f; render(); }
+  async function _conferir(id, ok, btn){
+    if (btn) btn.disabled = true;
+    try {
+      var r = await fetch('/api/crm/contratos/' + encodeURIComponent(id) + '/verificar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: ok }) });
+      var d = await r.json(); if (!r.ok) throw new Error(d.error || 'Erro');
+      if (typeof crmToast === 'function') crmToast(ok ? 'Contrato conferido.' : 'Registrado: contrato NÃO estava na pasta.', ok ? 'ok' : 'erro', 3500);
+      recarregar();
+    } catch(e){ if (btn) btn.disabled = false; if (typeof crmToast === 'function') crmToast('Erro: ' + e.message, 'erro', 5000); }
+  }
+  async function _varrer(btn){
+    if (btn) { btn.disabled = true; btn.textContent = 'Verificando…'; }
+    try {
+      var r = await fetch('/api/crm/contratos/processar', { method: 'POST' });
+      var d = await r.json(); if (!r.ok) throw new Error(d.error || 'Erro');
+      if (typeof crmToast === 'function') crmToast(d.pedidos_arma_no_periodo + ' venda(s) de arma nos últimos 90 dias · ' + d.tarefas_criadas + ' tarefa(s) nova(s) criada(s).', 'ok', 5000);
+      recarregar();
+    } catch(e){ if (typeof crmToast === 'function') crmToast('Erro: ' + e.message, 'erro', 5000); }
+    finally { if (btn) { btn.disabled = false; btn.textContent = 'Verificar vendas de arma agora'; } }
   }
 
-  return { init: init, recarregar: recarregar, toggleAtrasadas: toggleAtrasadas };
+  var _rz = null;
+  window.addEventListener('resize', function(){ clearTimeout(_rz); _rz = setTimeout(function(){ var t = el('tab-produtividade'); if (state.dados && t && t.classList.contains('on')) { chartExec(); chartFila(); chartRes(); chartMot(); } }, 200); });
+
+  return { init: init, recarregar: recarregar, _abrir: _abrir, _tabela: _tabela, _todasAcoes: _todasAcoes, _filtroC: _filtroC, _conferir: _conferir, _varrer: _varrer,
+    toggleAtrasadas: function(){} };
 })();
 </script>
 
@@ -11122,6 +11428,7 @@ window.CHAT_WIDGET = (function(){
 .tf-sec{padding:4px 16px 2px;font-size:10.5px;font-weight:800;color:#717571;text-transform:uppercase;letter-spacing:.4px}
 .tf-item{display:block;width:calc(100% - 24px);margin:4px 12px;text-align:left;background:#fff;border:1px solid #eef0ee;border-radius:9px;padding:8px 10px;cursor:pointer;font-family:inherit}
 .tf-item:hover{border-color:#c2e6c8;background:#fafdfa}
+.tf-item.contrato{border-color:#f0c5c5;background:#fff8f8}
 .tf-item .t{font-size:12.5px;font-weight:600;color:#111412;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tf-item .m{font-size:11px;color:#717571;margin-top:2px}
 .tf-item .m.v{color:#c22f2f;font-weight:700}
@@ -11420,10 +11727,23 @@ window.TAREFAS_FAB = (function(){
     } catch(e){}
   }
 
+  // Os dois balões ficam LADO A LADO (tarefas à esquerda do chat), nunca um
+  // atrás do outro. Abrir um painel fecha o do outro.
+  function chatVisivel(){
+    var chat = el('chat-widget');
+    return !!(chat && window.getComputedStyle(chat).display !== 'none');
+  }
   function posicionar(){
-    var wrap = el('tarefas-fab-wrap'); var chat = el('chat-widget');
-    var chatVisivel = chat && chat.style.display !== 'none' && chat.offsetParent !== null;
-    wrap.style.bottom = chatVisivel ? '88px' : '20px';
+    var wrap = el('tarefas-fab-wrap'); if (!wrap) return;
+    wrap.style.bottom = '20px';
+    wrap.style.right = chatVisivel() ? '92px' : '20px';
+  }
+  function observarChat(){
+    var chat = el('chat-widget'); if (!chat || !window.MutationObserver) return;
+    new MutationObserver(posicionar).observe(chat, { attributes: true, attributeFilter: ['style', 'class'] });
+    // abrir o painel do chat fecha o de tarefas
+    var fabChat = el('chat-widget-fab');
+    if (fabChat) fabChat.addEventListener('click', function(){ if (st.aberto) fecharPainel(); }, true);
   }
 
   function render(){
@@ -11443,17 +11763,19 @@ window.TAREFAS_FAB = (function(){
       el('tarefas-fab-panel').innerHTML = painelGestao(eq);
       return;
     }
-    if (!d.abertas && !alertas.length) { wrap.style.display = 'none'; fecharPainel(); return; }
+    var total = (d.abertas || 0) + (d.cota_dia ? (d.contratos_abertos || 0) : 0);
+    if (!total && !alertas.length) { wrap.style.display = 'none'; fecharPainel(); return; }
     wrap.style.display = 'block'; posicionar();
     fab.querySelector('.tf-ic').textContent = '🎯';
-    var cls = (d.vencidas > 0 || temCritico) ? 'red' : ((d.acumuladas > 0 || alertas.length) ? 'amber' : '');
-    fab.className = cls + (d.abertas ? ' pulse' : '');
-    badge.textContent = d.abertas > 99 ? '99+' : d.abertas;
-    fab.title = d.abertas + ' tarefa(s) em aberto' + (d.vencidas ? ' · ' + d.vencidas + ' vencida(s)' : '');
+    var cls = (d.vencidas > 0 || temCritico || d.contratos_abertos > 0) ? 'red' : ((d.acumuladas > 0 || alertas.length) ? 'amber' : '');
+    fab.className = cls + (total ? ' pulse' : '');
+    badge.textContent = total > 99 ? '99+' : total;
+    fab.title = total + ' tarefa(s) em aberto' + (d.contratos_abertos ? ' · ' + d.contratos_abertos + ' contrato(s) de arma' : '') + (d.vencidas ? ' · ' + d.vencidas + ' vencida(s)' : '');
     el('tarefas-fab-panel').innerHTML = painel(d);
     // Lembrete ativo: abre sozinho de tempos em tempos (respeita "lembrar depois")
     var intervalo = d.vencidas > 0 ? NUDGE_VENCIDA_MS : NUDGE_MS;
-    if (d.abertas > 0 && !st.aberto && !naFilaAgora() && Date.now() > snoozeAte() && Date.now() - st.ultimoNudge >= intervalo) {
+    var chatAberto = !!(el('chat-widget-panel') && el('chat-widget-panel').classList.contains('aberto'));
+    if (d.abertas > 0 && !st.aberto && !chatAberto && !naFilaAgora() && Date.now() > snoozeAte() && Date.now() - st.ultimoNudge >= intervalo) {
       st.ultimoNudge = Date.now();
       st.nudgeTxt = FRASES[Math.floor(Math.random() * FRASES.length)];
       el('tarefas-fab-panel').innerHTML = painel(d);
@@ -11464,12 +11786,21 @@ window.TAREFAS_FAB = (function(){
 
   function painel(d){
     var alertas = d.alertas || [];
+    if (!d.cota_dia) { // gestão: só contratos de arma que caíram na fila dela
+      var eq = d.equipe || {};
+      var hg = '<div class="tf-head"><div><h4>📝 Contratos de arma com você</h4><small>' + d.abertas + ' venda(s) sem vendedor mapeado no Bling</small></div>' +
+        '<button class="tf-x" onclick="TAREFAS_FAB.toggle()" aria-label="Fechar">×</button></div>';
+      (d.proximas || []).forEach(function(p){ hg += '<button class="tf-item" onclick="TAREFAS_FAB.irTarefas(\'' + crmEsc(p.id) + '\')"><div class="t">' + crmEsc(p.titulo || 'Contrato') + '</div><div class="m' + (p.vencida ? ' v' : '') + '">prazo ' + crmFmtDia(p.prazo) + '</div></button>'; });
+      if (eq.vendedores_com_alerta) hg += '<div class="tf-alert ' + (eq.alertas_criticos ? 'critico' : 'atencao') + '" style="margin-top:8px"><b>' + eq.vendedores_com_alerta + ' vendedor(es) com alerta</b>Veja no painel de produtividade.</div>';
+      return hg + '<div class="tf-foot"><button class="tf-go" onclick="TAREFAS_FAB.irTarefas()">Abrir minhas tarefas →</button>' + (eq.vendedores_com_alerta ? '<button class="tf-snz" onclick="TAREFAS_FAB.irProdutividade()">Produtividade</button>' : '') + '</div>';
+    }
     var feitas = d.executadas_hoje || 0;
     var meta = d.cota_dia || 20;
     var pct = Math.min(100, Math.round(feitas / meta * 100));
     var h = '<div class="tf-head"><div><h4>🎯 Suas tarefas</h4><small>' + (d.abertas ? d.abertas + ' em aberto — elas acumulam até serem feitas' : 'Fila em dia 👏') + '</small></div>' +
       '<button class="tf-x" onclick="TAREFAS_FAB.toggle()" aria-label="Fechar">×</button></div>';
     if (st.nudgeTxt) h += '<div class="tf-nudge">⏰ ' + crmEsc(st.nudgeTxt) + '</div>';
+    if (d.contratos_abertos) h += '<div class="tf-alert critico" style="margin-top:10px"><b>📝 ' + d.contratos_abertos + ' contrato(s) de arma pendente(s)</b>Obrigatório: sem contrato assinado a venda é cancelada e o dinheiro devolvido.</div>';
     h += '<div class="tf-stats">' +
       '<div class="tf-stat"><b>' + (d.abertas||0) + '</b><span>Abertas</span></div>' +
       '<div class="tf-stat"><b>' + (d.de_hoje||0) + '</b><span>De hoje</span></div>' +
@@ -11484,7 +11815,7 @@ window.TAREFAS_FAB = (function(){
       d.proximas.forEach(function(p){
         var meta2 = p.vencida ? '<div class="m v">⚠ vencida — prazo ' + crmFmtDia(p.prazo) + '</div>'
           : '<div class="m">prazo ' + crmFmtDia(p.prazo) + (p.hora ? ' ' + crmEsc(p.hora) : '') + (p.dias_em_aberto ? ' · aberta há ' + p.dias_em_aberto + 'd' : '') + '</div>';
-        h += '<button class="tf-item" onclick="TAREFAS_FAB.irTarefas(\'' + crmEsc(p.id) + '\')"><div class="t">' + crmEsc(p.cliente_nome || p.titulo || 'Tarefa') + '</div>' + meta2 + '</button>';
+        h += '<button class="tf-item' + (p.contrato ? ' contrato' : '') + '" onclick="TAREFAS_FAB.irTarefas(\'' + crmEsc(p.id) + '\')"><div class="t">' + (p.contrato ? crmEsc(p.titulo || '📝 Contrato de arma') : crmEsc(p.cliente_nome || p.titulo || 'Tarefa')) + '</div>' + meta2 + '</button>';
       });
     }
     h += '<div class="tf-foot"><button class="tf-go" onclick="TAREFAS_FAB.irTarefas()">Ir para minhas tarefas →</button>' +
@@ -11513,9 +11844,12 @@ window.TAREFAS_FAB = (function(){
     document.body.insertAdjacentHTML('beforeend', h);
   }
 
-  function abrirPainel(){ st.aberto = true; el('tarefas-fab-panel').classList.add('aberto'); }
+  function abrirPainel(){ fecharChat(); st.aberto = true; el('tarefas-fab-panel').classList.add('aberto'); }
   function fecharPainel(){ st.aberto = false; st.nudgeTxt = null; var p = el('tarefas-fab-panel'); if (p) p.classList.remove('aberto'); }
-  function toggle(){ if (st.aberto) fecharPainel(); else { st.nudgeTxt = null; if (st.dados) el('tarefas-fab-panel').innerHTML = ehGestao() && !st.dados.abertas ? painelGestao(st.dados.equipe || {}) : painel(st.dados); abrirPainel(); } }
+  function fecharChat(){
+    try { var p = el('chat-widget-panel'); if (p && p.classList.contains('aberto') && window.CHAT_WIDGET) CHAT_WIDGET.togglePanel(); } catch(e){}
+  }
+  function toggle(){ if (st.aberto) fecharPainel(); else { fecharChat(); st.nudgeTxt = null; if (st.dados) el('tarefas-fab-panel').innerHTML = ehGestao() && !st.dados.abertas ? painelGestao(st.dados.equipe || {}) : painel(st.dados); abrirPainel(); } }
   function adiar(){ CRM_LS.set('tf_snooze', String(Date.now() + NUDGE_MS)); st.ultimoNudge = Date.now(); fecharPainel(); crmToast('Ok — lembro de novo em 20 minutos.', '', 2500); }
   function irTarefas(id){
     fecharPainel(); crmIrPara('tarefas');
@@ -11526,6 +11860,7 @@ window.TAREFAS_FAB = (function(){
 
   function init(){
     if (!habilitado()) return;
+    observarChat();
     atualizar();
     st.timer = setInterval(atualizar, POLL_MS);
     document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible') atualizar(); });
@@ -11769,6 +12104,135 @@ async function cartSalvarNotas(id){
     var c = cartCliente(id); if (c) { c.notas = body.notas; c.cidade = body.cidade || c.cidade; if (org) c.origem = org; }
     crm2Fechar('crm2-cart-notas'); cartDesenharLista();
   } catch(e){ btn.disabled = false; crm2Erro('crm2-cart-notas', e.message); }
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  CONTRATOS DE ARMA — cards obrigatórios na fila do vendedor
+═══════════════════════════════════════════════════════════════ -->
+<style>
+#tab-crm .tar-card.tar-contrato{border-left:4px solid #d03b3b;background:#fffafa}
+#tab-crm .tar-contrato .tar-obrig{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;background:#d03b3b;color:#fff;border-radius:99px;padding:2px 8px;margin-right:6px;vertical-align:middle}
+#tab-crm .tar-contrato .tar-armas{margin:6px 0;padding:8px 10px;background:#fff;border:1px solid #f0d6d6;border-radius:8px;font-size:12.5px;color:#444846}
+#tab-crm .tar-contrato .tar-armas b{color:#111412}
+#tab-crm .tar-contrato .tar-regra{font-size:12px;color:#7d1d1d;margin:4px 0 8px}
+#tab-crm .tar-contrato .tar-c-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+#tab-crm .tar-contrato .tar-c-acts button,#tab-crm .tar-contrato .tar-c-acts a{border:1px solid #e2e4e2;background:#fff;border-radius:8px;padding:8px 12px;font-size:12.5px;font-weight:700;cursor:pointer;color:#444846;text-decoration:none;font-family:inherit}
+#tab-crm .tar-contrato .tar-c-acts .pri{background:#3d8a49;border-color:#3d8a49;color:#fff}
+#tab-crm .tar-contrato .tar-c-acts .wa{background:#25D366;border-color:#25D366;color:#fff}
+.crm2-decl{display:flex;gap:10px;align-items:flex-start;background:#fff6e5;border:1px solid #f6dcaa;border-radius:10px;padding:12px;margin-top:12px;font-size:13px;color:#5c3a05;cursor:pointer}
+.crm2-decl input{margin-top:3px;width:18px;height:18px;flex:0 0 18px}
+</style>
+<script>
+var CRM_CONTRATO_CANAIS_ENVIO = [['whatsapp','💬 WhatsApp'], ['email','✉️ E-mail'], ['presencial','🤝 Presencial']];
+var CRM_CONTRATO_CANAIS_AVISO = [['ligacao','📞 Ligação'], ['whatsapp','💬 WhatsApp'], ['presencial','🤝 Presencial']];
+
+function crmCardContrato(t, hoje){
+  var c = t.contrato || {};
+  var venc = t.prazo && t.prazo < hoje;
+  var prazoTxt = t.prazo ? (venc ? '⚠ Vencida — ' + crmFmtDate(t.prazo) : (t.prazo === hoje ? 'Hoje' : crmFmtDate(t.prazo))) : '';
+  var armas = (c.armas || []).map(function(a){ return '<div>🔫 <b>' + crmEsc((a.quantidade > 1 ? a.quantidade + 'x ' : '') + a.descricao) + '</b></div>'; }).join('');
+  var id = crmEsc(t.id);
+  var acts = '';
+  if (t.tipo === 'contrato_envio') {
+    acts = '<button onclick="crmContratoGerador(\'' + id + '\')">📄 Abrir gerador de contrato</button>' +
+      '<button class="pri" onclick="crmContratoModal(\'' + id + '\',\'enviado\')">✓ Contrato enviado ao cliente</button>';
+  } else if (t.tipo === 'contrato_assinatura') {
+    acts = '<button class="pri" onclick="crmContratoModal(\'' + id + '\',\'salvo_assinado\')">✓ Salvo na pasta (assinado)</button>' +
+      '<button onclick="crmContratoModal(\'' + id + '\',\'nao_devolveu\')">⏳ Cliente ainda não devolveu</button>';
+  } else if (t.tipo === 'contrato_cobranca') {
+    var tel = crmNormalizaTelBR(c.cliente_telefone || t.cliente_telefone);
+    if (tel) acts += '<a class="wa" href="https://wa.me/' + tel + '?text=' + encodeURIComponent(t.pitch_pronto || '') + '" target="_blank" rel="noopener noreferrer" onclick="crmRegistraContato(\'' + id + '\',\'whatsapp\')">💬 WhatsApp com o aviso</a>';
+    if (t.pitch_pronto) acts += '<button onclick="crmCopiarPitch(\'' + id + '\', this)">📋 Copiar aviso</button>';
+    acts += '<button class="pri" onclick="crmContratoModal(\'' + id + '\',\'cliente_avisado\')">✓ Cliente avisado</button>';
+  }
+  var accId = t.account_id || t.entidade_id;
+  if (accId) acts += '<button onclick="crmAbrirFicha(\'' + crmEsc(accId) + '\')">👤 Ver ficha</button>';
+  return '<div class="tar-card tar-contrato' + (venc ? ' overdue' : '') + '" id="tar-' + id + '">' +
+    '<div class="tar-hd"><div class="tar-tit"><span class="tar-obrig">Obrigatório</span>' + crmEsc(t.titulo || 'Contrato de arma') + '</div>' +
+    '<div class="tar-prazo ' + (venc ? 'overdue' : (t.prazo === hoje ? 'hoje' : '')) + '">' + crmEsc(prazoTxt) + '</div></div>' +
+    '<div class="tar-cli">👤 ' + crmEsc(c.cliente_nome || t.cliente_nome || '—') + (c.cliente_telefone ? ' · ' + crmEsc(c.cliente_telefone) : '') +
+      ' · Pedido <b>' + crmEsc(c.bling_numero || '—') + '</b> de ' + crmFmtDate(c.data_pedido) + ' · ' + crmFmtMoeda(c.valor_total) + '</div>' +
+    '<div class="tar-armas">' + armas + '</div>' +
+    '<div class="tar-regra">Toda venda de arma precisa de contrato assinado. Sem contrato assinado, a venda é cancelada e o dinheiro devolvido.</div>' +
+    (t.tipo === 'contrato_cobranca' && t.pitch_pronto ? '<div class="tar-pitch">' + crmEsc(t.pitch_pronto) + '</div>' : '') +
+    '<div class="tar-c-acts">' + acts + '</div></div>';
+}
+
+function crmContratoModal(id, acao){
+  if (document.getElementById('crm2-ct')) return;
+  var t = ((window.CRM && window.CRM.tarefasCache) || []).find(function(x){ return x.id === id; }) || {};
+  var c = t.contrato || {};
+  var cab = '<p class="sub">Pedido <b>' + crmEsc(c.bling_numero || '—') + '</b> · ' + crmEsc(c.cliente_nome || '') + '</p>';
+  var corpo, botao;
+  if (acao === 'enviado') {
+    corpo = '<h3>📄 Contrato enviado</h3>' + cab + '<label class="crm2-lbl">Por onde você enviou o contrato? *</label>' + crm2Chips('canal', CRM_CONTRATO_CANAIS_ENVIO, null) +
+      '<label class="crm2-lbl">Observação <i>(opcional)</i></label><input class="crm2-in" id="crm2-ct-obs" maxlength="300">' +
+      '<div class="crm2-hint">Em 48h aparece a tarefa de salvar o contrato <b>assinado</b> na pasta.</div>';
+    botao = 'Registrar envio';
+  } else if (acao === 'salvo_assinado') {
+    corpo = '<h3>✍️ Contrato assinado salvo</h3>' + cab +
+      '<label class="crm2-decl"><input type="checkbox" id="crm2-ct-conf"><span>Declaro que o contrato <b>assinado pelo cliente</b> está salvo na pasta de contratos.</span></label>' +
+      '<div class="crm2-hint">A gestão confere os contratos na pasta. Declarar sem ter salvo é falta grave.</div>' +
+      '<label class="crm2-lbl">Observação <i>(opcional)</i></label><input class="crm2-in" id="crm2-ct-obs" maxlength="300">';
+    botao = 'Confirmar';
+  } else if (acao === 'nao_devolveu') {
+    corpo = '<h3>⏳ Cliente ainda não devolveu</h3>' + cab +
+      '<p style="font-size:13px;color:#444846;margin:0">Vamos criar agora a tarefa de <b>ligar para o cliente</b> avisando que, sem o contrato assinado, a venda será cancelada e o dinheiro devolvido. Esta tarefa de "salvar assinado" continua aberta até o contrato voltar.</p>';
+    botao = 'Criar ligação de aviso';
+  } else {
+    corpo = '<h3>📞 Cliente avisado</h3>' + cab + '<label class="crm2-lbl">Como você avisou o cliente? *</label>' + crm2Chips('canal', CRM_CONTRATO_CANAIS_AVISO, null) +
+      '<label class="crm2-lbl">O que o cliente respondeu? *</label><textarea class="crm2-in" id="crm2-ct-obs" rows="3" maxlength="500" placeholder="Ex: vai assinar e devolver hoje à tarde"></textarea>';
+    botao = 'Registrar aviso';
+  }
+  var html = '<div class="crm2-ovl" id="crm2-ct" onclick="if(event.target===this)crm2Fechar(\'crm2-ct\')"><div class="crm2-mdl">' + corpo +
+    '<div class="crm2-err"></div><div class="crm2-acts"><button class="crm2-btn sec" onclick="crm2Fechar(\'crm2-ct\')">Voltar</button>' +
+    '<button class="crm2-btn pri" id="crm2-ct-ok" onclick="crmContratoConfirmar(\'' + crmEsc(id) + '\',\'' + acao + '\')">' + botao + '</button></div></div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+async function crmContratoConfirmar(id, acao){
+  var btn = document.getElementById('crm2-ct-ok');
+  var obs = ((document.getElementById('crm2-ct-obs') || {}).value || '').trim();
+  var canal = crm2Val('crm2-ct', 'canal');
+  var corpo = { acao: acao, observacao: obs || null };
+  crm2Erro('crm2-ct', '');
+  if ((acao === 'enviado' || acao === 'cliente_avisado') && !canal) return crm2Erro('crm2-ct', 'Escolha o canal.');
+  if (acao === 'cliente_avisado' && obs.length < 3) return crm2Erro('crm2-ct', 'Escreva o que o cliente respondeu.');
+  if (acao === 'salvo_assinado') {
+    var cb = document.getElementById('crm2-ct-conf');
+    if (!cb || !cb.checked) return crm2Erro('crm2-ct', 'Marque a declaração para confirmar.');
+    corpo.confirmo = true;
+  }
+  if (canal) corpo.canal = canal;
+  btn.disabled = true;
+  try {
+    var r = await fetch('/api/crm/contratos/tarefa/' + encodeURIComponent(id), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
+    var d = await r.json(); if (!r.ok) throw new Error(d.error || 'Erro ao registrar.');
+    crm2Fechar('crm2-ct');
+    var msg = { enviado: 'Envio registrado. Em 48h aparece a tarefa do contrato assinado.', salvo_assinado: '✓ Contrato assinado registrado.', nao_devolveu: 'Tarefa de ligação criada: avise o cliente hoje.', cliente_avisado: 'Aviso registrado.' }[acao];
+    crmToast(msg, 'ok', 4000);
+    if (acao === 'nao_devolveu') { crmRenderTarefas(); if (window.TAREFAS_FAB) TAREFAS_FAB.atualizar(); }
+    else crmTarefaSaiDaFila(id);
+  } catch(e){ btn.disabled = false; crm2Erro('crm2-ct', e.message); }
+}
+
+// Abre a aba Documentos → Contratos com os dados do pedido já preenchidos
+function crmContratoGerador(id){
+  var t = ((window.CRM && window.CRM.tarefasCache) || []).find(function(x){ return x.id === id; }) || {};
+  var c = t.contrato || {};
+  var btn = document.querySelector('.ni[onclick*="\'contratos\'"]');
+  if (btn && typeof goTab === 'function') goTab('contratos', btn);
+  setTimeout(function(){
+    function put(fid, v){ var e = document.getElementById(fid); if (e && v != null && v !== '') { e.value = v; try { e.dispatchEvent(new Event('change')); } catch(_){} } }
+    put('ctEmpresa', c.bling_conta === 'calibre' ? 'cr' : 'ph');
+    if (typeof ctOnEmpresaChange === 'function') { try { ctOnEmpresaChange(); } catch(_){} }
+    put('ctClienteNome', c.cliente_nome);
+    put('ctClienteDoc', c.cliente_doc);
+    put('ctProduto', (c.armas || []).map(function(a){ return (a.quantidade > 1 ? a.quantidade + 'x ' : '') + a.descricao; }).join(' + '));
+    put('ctAvValor', c.valor_total ? Number(c.valor_total).toFixed(2) : '');
+    crmToast('Dados do pedido ' + (c.bling_numero || '') + ' preenchidos. Confira endereço e forma de pagamento — ou suba o PDF do pedido do Bling.', '', 7000);
+  }, 400);
 }
 </script>
 
