@@ -6711,9 +6711,9 @@
     "nf_numero": "2930",
     "nf_por": "mathias",
     "nf_em": "2026-10-19T18:27:56.353Z",
-    "gt_numero": null,
-    "gt_por": null,
-    "gt_em": null,
+    "gt_numero": "627620",
+    "gt_por": "mathias",
+    "gt_em": "2026-10-19T18:28:19.505Z",
     "assinatura_ok": false,
     "assinatura_por": null,
     "assinatura_em": null,
@@ -6796,11 +6796,19 @@
         "acao": "campo_alterado",
         "campo": "nf_numero",
         "novo": "2930"
+      },
+      {
+        "ts": "2026-10-19T18:28:19.505Z",
+        "por": "mathias",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "gt_numero",
+        "novo": "627620"
       }
     ],
     "criado_em": "2026-10-19T15:37:03.038Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-19T18:27:56.353Z",
+    "atualizado_em": "2026-10-19T18:28:19.506Z",
     "atualizado_por": "mathias"
   }
 }
