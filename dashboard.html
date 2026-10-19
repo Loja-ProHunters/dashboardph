@@ -7618,12 +7618,15 @@ function ctrlRenderRoot(){
       '</div>' +
       '<div class="ctrl-tabs">' +
         '<button class="ctrl-tab '+(window.CTRL.subtab==='cotacao'?'on':'')+'" onclick="ctrlGoTab(\'cotacao\')"><span class="ctrl-tab-ic">📦</span> Cotação</button>' +
-        '<button class="ctrl-tab '+(window.CTRL.subtab==='fila'?'on':'')+'" onclick="ctrlGoTab(\'fila\')"><span class="ctrl-tab-ic">🚚</span> Fila de envio</button>' +
+        '<button class="ctrl-tab '+(window.CTRL.subtab==='fila'?'on':'')+'" onclick="ctrlGoTab(\'fila\')"><span class="ctrl-tab-ic">🚚</span> Fila de envio <span class="ctrl-tab-cnt" id="ctrl-cnt-fila"></span></button>' +
+        '<button class="ctrl-tab '+(window.CTRL.subtab==='prontos'?'on':'')+'" onclick="ctrlGoTab(\'prontos\')"><span class="ctrl-tab-ic">📦</span> Prontos para envio <span class="ctrl-tab-cnt verde" id="ctrl-cnt-prontos" style="display:none"></span></button>' +
         '<button class="ctrl-tab '+(window.CTRL.subtab==='enviados'?'on':'')+'" onclick="ctrlGoTab(\'enviados\')"><span class="ctrl-tab-ic">✅</span> Enviados</button>' +
         '<button class="ctrl-tab '+(window.CTRL.subtab==='matriz'?'on':'')+'" onclick="ctrlGoTab(\'matriz\')"><span class="ctrl-tab-ic">🗺️</span> Matriz de cidades</button>' +
       '</div>' +
       '<div id="ctrl-panel" class="ctrl-panel-fade"></div>' +
     '</div>';
+  if (window.CTRL.contagem) ctrlAtualizaContagem(window.CTRL.contagem);
+  else fetch('/api/crm/envios?modo=prontos').then(function(r){ return r.json(); }).then(function(d){ ctrlAtualizaContagem(d.contagem); }).catch(function(){});
   ctrlRenderPanel();
 }
 function ctrlGoTab(t){ window.CTRL.subtab = t; ctrlRenderRoot(); }
@@ -7632,6 +7635,7 @@ function ctrlRenderPanel(){
   if (!p) return;
   if (window.CTRL.subtab === 'cotacao') return ctrlRenderCotacao();
   if (window.CTRL.subtab === 'fila')    return ctrlRenderFila();
+  if (window.CTRL.subtab === 'prontos') return ctrlRenderProntos();
   if (window.CTRL.subtab === 'enviados') return ctrlRenderEnviados();
   if (window.CTRL.subtab === 'matriz')  return ctrlRenderMatriz();
 }
@@ -7967,9 +7971,8 @@ async function ctrlRenderFila(){
         '<div class="ctrl-fld" style="flex:1;min-width:150px"><label>Nº do pedido</label>' +
           '<input id="ctrl-numero" type="text" placeholder="Ex: 4132" /></div>' +
         '<button class="crm-btn" onclick="ctrlAbrirEnvio()">Abrir envio</button>' +
-        '<button class="crm-btn ghost" onclick="ctrlAbrirRomaneioModal()" style="margin-left:auto">📋 Gerar romaneio</button>' +
       '</div>' +
-      '<div style="font-size:11.5px;color:var(--gy);margin-top:8px">Digite empresa + número — puxa cliente, endereço e produtos do Bling. Após liberação final, aparece o botão "Gerar romaneio" pra montar o pacote da coleta.</div>' +
+      '<div style="font-size:11.5px;color:var(--gy);margin-top:8px">Digite empresa + número — puxa cliente, endereço e produtos do Bling. Concluída a liberação final (pronto para coleta), o envio sai daqui e vai para <b>📦 Prontos para envio</b>, onde o romaneio é gerado quando a transportadora chegar.</div>' +
     '</div>' +
     '<div id="ctrl-fila-mensagem"></div>' +
     '<div class="ctrl-fila-layout">' +
@@ -7979,17 +7982,21 @@ async function ctrlRenderFila(){
   await ctrlCarregarFila();
 }
 async function ctrlCarregarFila(){
+  if (window.CTRL.subtab === 'prontos') return ctrlCarregarProntos();
   try {
     var r = await fetch('/api/crm/envios?modo=pendentes');
     var d = await r.json();
     window.CTRL.fila = d.envios || [];
+    ctrlAtualizaContagem(d.contagem);
     ctrlRenderFilaLista();
   } catch (e) {
     document.getElementById('ctrl-fila-list').innerHTML = '<div style="color:var(--r);font-size:12px">Erro: '+crmEsc(e.message)+'</div>';
   }
 }
 function ctrlRenderFilaLista(){
+  if (window.CTRL.subtab === 'prontos') return ctrlProntosDesenhar();
   var list = document.getElementById('ctrl-fila-list');
+  if (!list) return;
   if (!window.CTRL.fila.length) {
     list.innerHTML = '<div style="padding:14px;color:var(--gy);font-size:12.5px">Nenhum envio na fila. Digite empresa + número em cima pra abrir o primeiro.</div>';
     return;
@@ -8440,8 +8447,15 @@ async function ctrlPatch(patch){
   } catch (e) { alert('Erro: '+e.message); }
 }
 async function ctrlMarcarLiberacao(){
-  if (!confirm('Marcar liberação final? Isso muda o status pra "pronto para coleta".')) return;
+  if (!confirm('Marcar como PRONTO PARA COLETA?\n\nO envio sai da Fila e vai para "Prontos para envio", onde o romaneio é gerado quando a transportadora chegar.')) return;
   await ctrlPatch({ liberacao_ok: true });
+  var cl = window.CTRL.envioChecklist;
+  if (cl && cl.pronto_coleta && window.CTRL.subtab === 'fila') {
+    window.CTRL.envioAberto = null; window.CTRL.envioChecklist = null;
+    var det = document.getElementById('ctrl-fila-detail');
+    if (det) det.innerHTML = '<div style="padding:18px;text-align:center"><div style="font-size:26px">📦</div><b>Pronto para coleta!</b><div style="font-size:12.5px;color:var(--gy);margin-top:4px">O envio foi para <a href="#" onclick="ctrlGoTab(\'prontos\');return false">Prontos para envio</a>.</div></div>';
+    if (typeof crmToast === 'function') crmToast('📦 Envio movido para "Prontos para envio".', 'ok', 4000);
+  }
 }
 // Reverte um passo do checklist — usado quando algo foi marcado por engano.
 // Confirma com o usuario antes de disparar (perde dados do passo — ex: numero
@@ -8541,6 +8555,127 @@ async function ctrlRomaneiosCarregar(){
         '</div>';
       }).join('') + '</div></div>';
   } catch (e) { box.innerHTML = ''; }
+}
+
+/* ── PRONTOS PARA ENVIO ─────────────────────────────────────────────
+   Envio com checklist completo + liberação final ("pronto para coleta")
+   sai da Fila e espera aqui. Quando a transportadora chega, uma pessoa
+   escolhe quem chegou e gera o romaneio com 1 clique → vão para Enviados. */
+async function ctrlRenderProntos(){
+  var p = document.getElementById('ctrl-panel');
+  p.innerHTML =
+    '<div class="ctrl-card ctrl-pr-intro"><div><b>📦 Prontos para envio</b><span>Tudo que já passou pela liberação final e espera a coleta. Quando a transportadora chegar: escolha quem chegou e gere o romaneio.</span></div>' +
+      '<button class="crm-btn ghost" onclick="ctrlCarregarProntos()">↻ Atualizar</button></div>' +
+    '<div class="ctrl-fila-layout ctrl-pr-layout">' +
+      '<div id="ctrl-prontos-list"><div class="crm-loading">Carregando…</div></div>' +
+      '<div id="ctrl-fila-detail" class="ctrl-card" style="color:var(--gy);font-size:13px">Clique num envio para conferir o checklist.</div>' +
+    '</div>';
+  await ctrlCarregarProntos();
+}
+
+async function ctrlCarregarProntos(){
+  var box = document.getElementById('ctrl-prontos-list'); if (!box) return;
+  try {
+    var r = await fetch('/api/crm/envios?modo=prontos', { cache: 'no-store' });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    window.CTRL.prontos = d.envios || [];
+    ctrlAtualizaContagem(d.contagem);
+    ctrlProntosDesenhar();
+  } catch (e) { box.innerHTML = '<div style="color:var(--r);font-size:12px">Erro: ' + crmEsc(e.message) + '</div>'; }
+}
+
+function ctrlProntosGrupos(){
+  var g = {};
+  (window.CTRL.prontos || []).forEach(function(e){
+    var k = e.transportadora === 'retirada' ? 'retirada' : ctrlFamilia(e.transportadora);
+    (g[k] = g[k] || []).push(e);
+  });
+  return g;
+}
+function ctrlFamilia(t){ return (t === 'ezequiel_gollog') ? 'ezequiel' : (t || 'sem_transportadora'); }
+function ctrlLabelFamilia(k){
+  if (k === 'ezequiel') return 'Ezequiel (inclui Ezequiel + Gollog)';
+  if (k === 'retirada') return 'Retirada na loja';
+  if (k === 'sem_transportadora') return 'Sem transportadora';
+  return ctrlLabelRota(k);
+}
+
+function ctrlProntosDesenhar(){
+  var box = document.getElementById('ctrl-prontos-list'); if (!box) return;
+  var g = ctrlProntosGrupos(), chaves = Object.keys(g);
+  if (!chaves.length) {
+    box.innerHTML = '<div class="ctrl-card" style="text-align:center;padding:30px;color:var(--gy);font-size:13px">Nenhum envio pronto agora.<br><span style="font-size:12px">Quando um envio recebe a liberação final na Fila, ele aparece aqui.</span></div>';
+    return;
+  }
+  // ordem: grupos com mais envios primeiro; retirada por último
+  chaves.sort(function(a, b){ if (a === 'retirada') return 1; if (b === 'retirada') return -1; return g[b].length - g[a].length; });
+  var sel = window.CTRL.prontoTransp;
+  if (!sel || !g[sel]) sel = window.CTRL.prontoTransp = chaves[0];
+  if (!window.CTRL.prontoDesmarcados) window.CTRL.prontoDesmarcados = {};
+  var des = window.CTRL.prontoDesmarcados;
+  var h = '<div class="ctrl-pr-q">Qual transportadora chegou?</div><div class="ctrl-pr-trans">' + chaves.map(function(k){
+    var vol = g[k].reduce(function(s, e){ return s + (e.volumes_qtd || 0); }, 0);
+    return '<button class="ctrl-pr-t' + (k === sel ? ' on' : '') + '" onclick="window.CTRL.prontoTransp=\'' + k + '\';ctrlProntosDesenhar()"><b>' + crmEsc(ctrlLabelFamilia(k)) + '</b><span>' + g[k].length + ' envio(s)' + (k === 'retirada' ? '' : ' · ' + vol + ' vol.') + '</span></button>';
+  }).join('') + '</div>';
+  var lista = g[sel];
+  var marcados = lista.filter(function(e){ return !des[e.id]; });
+  var volMarc = marcados.reduce(function(s, e){ return s + (e.volumes_qtd || 0); }, 0);
+  var aberto = window.CTRL.envioAberto && window.CTRL.envioAberto.id;
+  h += '<div class="ctrl-card ctrl-pr-box">';
+  if (sel !== 'retirada') {
+    h += '<button class="ctrl-pr-gerar" ' + (marcados.length ? '' : 'disabled') + ' onclick="ctrlGerarRomaneioProntos(\'' + sel + '\', this)">📋 Gerar romaneio · ' + crmEsc(ctrlLabelFamilia(sel).replace(/ \(.*\)$/, '')) + '<small>' + marcados.length + ' envio(s) · ' + volMarc + ' volume(s)</small></button>' +
+      '<div class="ctrl-pr-hint">Gere só com a transportadora aqui. Os envios marcados vão para <b>Enviados</b> e a folha do romaneio abre para impressão e assinatura do motorista.</div>';
+  } else {
+    h += '<div class="ctrl-pr-hint">Retirada na loja não tem romaneio: quando o cliente buscar, abra o envio e clique em <b>Cliente retirou</b>.</div>';
+  }
+  h += '<div class="ctrl-pr-lista">' + lista.map(function(e){
+    var empLbl = e.empresa === 'calibre' ? 'CR' : 'PH';
+    var chk = sel !== 'retirada' ? '<input type="checkbox" ' + (des[e.id] ? '' : 'checked') + ' onclick="event.stopPropagation();ctrlProntoToggle(\'' + e.id + '\', this.checked)" title="Incluir no romaneio">' : '';
+    var desde = e.liberacao_em ? 'pronto desde ' + new Date(e.liberacao_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+    return '<div class="ctrl-pr-row' + (aberto === e.id ? ' on' : '') + (des[e.id] ? ' off' : '') + '" onclick="ctrlAbrirDetalhe(\'' + e.id + '\')">' + chk +
+      '<div class="ctrl-pr-txt"><b>' + empLbl + ' #' + crmEsc(e.numero) + ' — ' + crmEsc(e.cliente_nome || '—') + '</b>' +
+      '<span>' + crmEsc((e.cliente_cidade || '—') + '/' + (e.cliente_uf || '')) + ' · ' + (e.volumes_qtd || 0) + ' vol. · NF ' + crmEsc(e.nf_numero || '—') + (e.transportadora === 'ezequiel_gollog' ? ' · ✈️ Gollog' : '') + (desde ? ' · ' + desde : '') + '</span></div></div>';
+  }).join('') + '</div></div>';
+  box.innerHTML = h;
+}
+function ctrlProntoToggle(id, marcado){
+  window.CTRL.prontoDesmarcados = window.CTRL.prontoDesmarcados || {};
+  if (marcado) delete window.CTRL.prontoDesmarcados[id]; else window.CTRL.prontoDesmarcados[id] = true;
+  ctrlProntosDesenhar();
+}
+
+async function ctrlGerarRomaneioProntos(familia, btn){
+  var g = ctrlProntosGrupos(), des = window.CTRL.prontoDesmarcados || {};
+  var envs = (g[familia] || []).filter(function(e){ return !des[e.id]; });
+  if (!envs.length) return;
+  var vol = envs.reduce(function(s, e){ return s + (e.volumes_qtd || 0); }, 0);
+  if (!confirm('Gerar romaneio ' + ctrlLabelFamilia(familia).replace(/ \(.*\)$/, '') + ' com ' + envs.length + ' envio(s) e ' + vol + ' volume(s)?\n\nConfirme que o motorista está aqui: os envios vão para "Enviados".')) return;
+  if (btn) { btn.disabled = true; btn.firstChild.textContent = 'Gerando…'; }
+  try {
+    var r = await fetch('/api/crm/romaneios', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transportadora: familia, envio_ids: envs.map(function(e){ return e.id; }) }) });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    window.open('/api/crm/romaneios/' + encodeURIComponent(d.romaneio.id) + '/pdf', '_blank');
+    window.CTRL.prontoDesmarcados = {};
+    window.CTRL.envioAberto = null; window.CTRL.envioChecklist = null;
+    var det = document.getElementById('ctrl-fila-detail'); if (det) det.innerHTML = '';
+    if (typeof crmToast === 'function') crmToast('✓ Romaneio nº ' + d.romaneio.numero + ' gerado com ' + envs.length + ' envio(s). A folha de impressão abriu em nova aba.', 'ok', 7000);
+    await ctrlCarregarProntos();
+  } catch (e) {
+    alert('Erro: ' + e.message);
+    if (btn) btn.disabled = false;
+    ctrlProntosDesenhar();
+  }
+}
+
+// Contadores nas sub-abas (Fila / Prontos)
+function ctrlAtualizaContagem(c){
+  if (!c) return;
+  window.CTRL.contagem = c;
+  var a = document.getElementById('ctrl-cnt-fila'); if (a) a.textContent = c.fila ? c.fila : '';
+  var b = document.getElementById('ctrl-cnt-prontos'); if (b) { b.textContent = c.prontos ? c.prontos : ''; b.style.display = c.prontos ? '' : 'none'; }
 }
 
 /* ── GERAR ROMANEIO ─────────────────────────────────────────────── */
@@ -9327,6 +9462,36 @@ window.addEventListener('load', function(){
 .ctrl-anim-slide { animation: ctrlFadeIn .5s var(--ez) both; }
 
 /* ═════ Fila ═════ */
+.ctrl-fila-layout.ctrl-pr-layout{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+@media (max-width: 960px){.ctrl-fila-layout.ctrl-pr-layout{grid-template-columns:1fr}}
+.ctrl-tab-cnt{display:inline-block;min-width:18px;padding:0 6px;border-radius:99px;background:rgba(0,0,0,.08);font-size:11px;font-weight:800;line-height:18px;text-align:center;margin-left:4px}
+.ctrl-tab-cnt:empty{display:none}
+.ctrl-tab-cnt.verde{background:#3d8a49;color:#fff}
+.ctrl-pr-intro{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.ctrl-pr-intro b{display:block;font-size:14.5px;color:#111412}
+.ctrl-pr-intro span{display:block;font-size:12.5px;color:var(--gy);margin-top:2px;max-width:640px}
+.ctrl-pr-q{font-size:12px;font-weight:800;color:#52514e;text-transform:uppercase;letter-spacing:.4px;margin:2px 0 8px}
+.ctrl-pr-trans{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.ctrl-pr-t{background:#fff;border:1.5px solid #e2e4e2;border-radius:12px;padding:10px 14px;text-align:left;cursor:pointer;font-family:inherit;min-width:150px}
+.ctrl-pr-t b{display:block;font-size:13.5px;color:#111412}
+.ctrl-pr-t span{display:block;font-size:12px;color:var(--gy);margin-top:2px}
+.ctrl-pr-t:hover{border-color:#9aa09a}
+.ctrl-pr-t.on{border-color:#3d8a49;background:#f3faf4;box-shadow:0 0 0 3px rgba(90,170,102,.18)}
+.ctrl-pr-box{padding:14px 16px}
+.ctrl-pr-gerar{width:100%;display:flex;flex-direction:column;align-items:center;gap:2px;background:#3d8a49;color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(61,138,73,.3)}
+.ctrl-pr-gerar small{font-size:12.5px;font-weight:600;opacity:.9}
+.ctrl-pr-gerar:hover{background:#327a3d}
+.ctrl-pr-gerar:disabled{background:#b9bdb9;box-shadow:none;cursor:not-allowed}
+.ctrl-pr-hint{font-size:12px;color:var(--gy);margin:8px 2px 12px}
+.ctrl-pr-lista{border:1px solid #eef0ee;border-radius:10px;overflow:hidden}
+.ctrl-pr-row{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-top:1px solid #eef0ee;cursor:pointer;background:#fff}
+.ctrl-pr-row:first-child{border-top:none}
+.ctrl-pr-row:hover{background:#fafbfa}
+.ctrl-pr-row.on{background:#f3faf4}
+.ctrl-pr-row.off{opacity:.55}
+.ctrl-pr-row input{margin-top:3px;width:17px;height:17px;flex:0 0 17px;accent-color:#3d8a49;cursor:pointer}
+.ctrl-pr-txt b{display:block;font-size:13px;color:#111412}
+.ctrl-pr-txt span{display:block;font-size:12px;color:var(--gy);margin-top:2px}
 .ctrl-fila-layout { display: grid; grid-template-columns: 360px minmax(0,1fr); gap: 18px; align-items: start; }
 @media (max-width: 960px) { .ctrl-fila-layout { grid-template-columns: 1fr; } }
 .ctrl-env-card {
