@@ -3666,7 +3666,7 @@
   "af83708e-e295-421a-a8eb-a4401067e91e": {
     "id": "af83708e-e295-421a-a8eb-a4401067e91e",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_9752f7c15288b1a9",
@@ -3689,12 +3689,18 @@
     "dono": "boschetto",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-19T20:12:23.240Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "Yuri Silva Nascimento",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 5
+    "dias_em_aberto": 5,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-19T20:12:23.240Z",
+    "concluida_por": "boschetto",
+    "canal_contato": "whatsapp",
+    "motivo_nao_conversao": "outro",
+    "observacao_conclusao": "CLIENTE PEDRO"
   },
   "1b6d2b94-02b9-4866-b996-ff1ad0ea2c3d": {
     "id": "1b6d2b94-02b9-4866-b996-ff1ad0ea2c3d",
@@ -7633,6 +7639,10 @@
     "criado_em": "2026-10-19T20:11:35.115Z",
     "criado_por": "boschetto",
     "atualizado_em": "2026-10-19T20:11:35.115Z",
-    "atualizado_por": "boschetto"
+    "atualizado_por": "boschetto",
+    "cliente_nome": "Rodrigo Moura",
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-19",
+    "dias_em_aberto": 0
   }
 }
