@@ -3382,6 +3382,8 @@ module.exports = async (req, res) => {
           nf_numero: e.nf_numero,
           gt_numero: e.gt_numero,
           volumes_qtd: e.volumes_qtd,
+          liberacao_em: e.liberacao_em || null,
+          liberacao_por: e.liberacao_por || null,
           romaneio_id: e.romaneio_id,
           romaneio_numero: e.romaneio_numero,
           coletado_em: e.coletado_em,
@@ -3398,6 +3400,13 @@ module.exports = async (req, res) => {
           atualizado_em: e.atualizado_em,
         };
       });
+      // Ciclo: Fila de envio (em andamento) -> Prontos para envio (liberacao final
+      // feita, aguardando a transportadora) -> Enviados (romaneio gerado na coleta)
+      const _ativo = x => x.status !== 'enviado' && x.status !== 'cancelado' && x.status !== 'retirado' && !x.romaneio_id;
+      const contagem = {
+        fila: enriched.filter(x => _ativo(x) && !x.pronto_coleta).length,
+        prontos: enriched.filter(x => _ativo(x) && x.pronto_coleta).length,
+      };
       let filtrado = enriched;
       if (statusFilter) filtrado = filtrado.filter(x => x.status === statusFilter);
       // Um envio com romaneio_id JA foi coletado/enviado — trata como enviado mesmo
@@ -3407,7 +3416,9 @@ module.exports = async (req, res) => {
       else if (modo === 'enviados') filtrado = filtrado.filter(x => x.status === 'enviado' || (x.romaneio_id && x.status !== 'cancelado' && x.status !== 'retirado'));
       else if (modo === 'retirados') filtrado = filtrado.filter(x => x.status === 'retirado');
       else if (modo === 'cancelados') filtrado = filtrado.filter(x => x.status === 'cancelado');
-      else if (modo === 'pendentes') filtrado = filtrado.filter(x => x.status !== 'enviado' && x.status !== 'cancelado' && x.status !== 'retirado' && !x.romaneio_id);
+      else if (modo === 'pendentes') filtrado = filtrado.filter(x => _ativo(x) && !x.pronto_coleta);
+      else if (modo === 'prontos') filtrado = filtrado.filter(x => _ativo(x) && x.pronto_coleta);
+      else if (modo === 'ativos') filtrado = filtrado.filter(x => _ativo(x));
       if (empresaFilter) filtrado = filtrado.filter(x => x.empresa === empresaFilter);
       if (q) filtrado = filtrado.filter(x => {
         const hay = ((x.cliente_nome||'') + ' ' + (x.numero||'') + ' ' + (x.cliente_cpf_cnpj||'') + ' ' + (x.cliente_cidade||'') + ' ' + (x.nf_numero||'')).toLowerCase();
@@ -3419,10 +3430,11 @@ module.exports = async (req, res) => {
         if (modo === 'enviados') return String(b.coletado_em || b.atualizado_em || '').localeCompare(String(a.coletado_em || a.atualizado_em || ''));
         if (modo === 'retirados') return String(b.retirado_em || b.atualizado_em || '').localeCompare(String(a.retirado_em || a.atualizado_em || ''));
         if (modo === 'cancelados') return String(b.cancelado_em || b.atualizado_em || '').localeCompare(String(a.cancelado_em || a.atualizado_em || ''));
+        if (modo === 'prontos') return String(a.liberacao_em || a.atualizado_em || '').localeCompare(String(b.liberacao_em || b.atualizado_em || ''));
         if (a.pronto_coleta !== b.pronto_coleta) return a.pronto_coleta ? 1 : -1;
         return String(b.atualizado_em || '').localeCompare(String(a.atualizado_em || ''));
       });
-      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envios: filtrado }));
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envios: filtrado, contagem }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
@@ -3633,6 +3645,9 @@ module.exports = async (req, res) => {
       for (const eid of envio_ids) {
         const e = await crmStore.getDoc('envios', eid);
         if (!e) throw new Error('Envio não encontrado: ' + eid);
+        // So entra no romaneio o que esta em "Prontos para envio"
+        if (e.status === 'cancelado' || e.status === 'retirado' || e.status === 'enviado') throw new Error('Envio #' + e.numero + ' não está mais disponível (' + e.status + ').');
+        if (!envios.estadoChecklist(e).pronto_coleta) throw new Error('Envio #' + e.numero + ' ainda não está pronto para coleta (falta concluir o checklist).');
         envDocs.push(e);
       }
       const rom = await romaneios.criar({ envios: envDocs, transportadora, gerado_por: sess.usuario });
