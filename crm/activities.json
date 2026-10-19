@@ -7606,5 +7606,33 @@
       "vendedor_pedido": "gerencia",
       "account_id": "acc_18625e77f4221957"
     }
+  },
+  "6aad1404-1af0-4b72-b3f4-2e69bf27dd39": {
+    "id": "6aad1404-1af0-4b72-b3f4-2e69bf27dd39",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "boschetto",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_435ea146649f25c3",
+    "titulo": "📅 Follow-up — Rodrigo Moura",
+    "descricao": "Comprou Lanterna Camping Fenix C… — completa c/ Lanterna Camping Fenix CL09 C…\n\nCliente: Rodrigo Moura\nUltima compra: 2026-09-09\nPedidos: 1\nValor historico: R$ 177.82\n\nProduto sugerido: Lanterna Camping Fenix CL09 Cinza 200 Lúmens (SKU 6942870304816)\nConfianca: 50%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-20",
+    "hora": "10:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_6aad1404-1af0-4b72-b3f4-2e69bf27dd39",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "boschetto",
+    "account_id": "acc_435ea146649f25c3",
+    "origem_tarefa_id": "4c66a1b7-b59e-45a1-874a-fe939e51586f",
+    "criada_por_vendedor": "boschetto",
+    "criado_em": "2026-10-19T20:11:35.115Z",
+    "criado_por": "boschetto",
+    "atualizado_em": "2026-10-19T20:11:35.115Z",
+    "atualizado_por": "boschetto"
   }
 }
