@@ -3980,7 +3980,7 @@
   "2d380496-2f1c-4edf-b0cb-43de14d09bc7": {
     "id": "2d380496-2f1c-4edf-b0cb-43de14d09bc7",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_1ab47cf96a5d293d",
@@ -4003,10 +4003,16 @@
     "dono": "boschetto",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-19T20:06:32.834Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "João Vitor Bizutti Rolim Corrêa",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-19T20:06:32.834Z",
+    "concluida_por": "boschetto",
+    "canal_contato": "whatsapp",
+    "motivo_nao_conversao": "outro",
+    "observacao_conclusao": "influencer da PRO HUNTERS!"
   },
   "5f7f321b-47a8-43a3-a15e-b396dd7cfc10": {
     "id": "5f7f321b-47a8-43a3-a15e-b396dd7cfc10",
