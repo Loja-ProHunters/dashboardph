@@ -34,6 +34,7 @@ const automacaoUpsell   = require('../lib/crm/automacaoUpsell');
 const catalogoBling     = require('../lib/crm/catalogoBling');
 const disciplina        = require('../lib/crm/disciplina');
 const carteira          = require('../lib/crm/carteira');
+const contratosArma     = require('../lib/crm/contratosArma');
 
 // Bling API v3
 const blingOauth      = require('../lib/bling/oauth');
@@ -553,7 +554,10 @@ module.exports = async (req, res) => {
   // Exclui tambem /mensagens — senao o handler generico captura o GET das
   // mensagens de uma solicitacao especifica (bug: estava retornando a lista
   // inteira de solicitacoes em vez do array de mensagens, chat ficava vazio).
-  if (url.startsWith('/api/solicitacoes') && req.method === 'GET' && !url.match(/\/(contador|categorias|usuarios|mensagens)(\?|$)/)) {
+  // BUG CORRIGIDO: /chats-nao-lidos caia AQUI e devolvia { total: nº de
+  // solicitacoes recebidas } — o balao do chat mostrava "3" sem nenhuma
+  // mensagem nao lida. Agora ele vai pro handler certo (logo abaixo).
+  if (url.startsWith('/api/solicitacoes') && req.method === 'GET' && !url.match(/\/(contador|categorias|usuarios|mensagens|chats-nao-lidos)(\?|$)/)) {
     const sess = getSession(req);
     if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
     try {
@@ -1298,7 +1302,7 @@ module.exports = async (req, res) => {
       && crmMatch[1] !== 'coocorrencia' && crmMatch[1] !== 'sugerir' && crmMatch[1] !== 'tarefas' && crmMatch[1] !== 'ficha'
       && crmMatch[1] !== 'catalogo' && crmMatch[1] !== 'prospeccao' && crmMatch[1] !== 'vendedores' && crmMatch[1] !== 'bling'
       && crmMatch[1] !== 'frete' && crmMatch[1] !== 'envios' && crmMatch[1] !== 'controlado' && crmMatch[1] !== 'romaneios'
-      && crmMatch[1] !== 'carteira') {
+      && crmMatch[1] !== 'carteira' && crmMatch[1] !== 'contratos') {
     const colName = crmMatch[1];
     const docId = crmMatch[2] || null;
     const reg = crmColl.REGISTRY[colName];
@@ -1905,9 +1909,12 @@ module.exports = async (req, res) => {
     const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
     if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
     try {
+      // Contratos de arma primeiro (obrigacao legal) — falha aqui nao trava o lote
+      let contratosRes = null;
+      try { contratosRes = await contratosArma.processar(); } catch (e) { contratosRes = { ok: false, erro: e.message }; }
       const r = await automacaoUpsell.disparaReativacao();
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify(r));
+      res.end(JSON.stringify(Object.assign({}, r, { contratos_arma: contratosRes })));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
   }
@@ -1979,6 +1986,67 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // ═════════════════════════════════════════════════════════════
+  // CONTRATOS DE ARMA DE FOGO (lib/crm/contratosArma.js)
+  // Toda venda de arma gera: "gerar e enviar contrato" (na hora) e "salvar
+  // contrato assinado" (aparece 48h depois). Sem assinatura -> ligacao de aviso
+  // de cancelamento pro vendedor responsavel.
+  // ═════════════════════════════════════════════════════════════
+  // GET /api/crm/cron/contratos — puxa pedidos novos do Bling (ultimo dia) e cria
+  // as tarefas de contrato. Pra rodar de hora em hora no cron-job.org.
+  if (req.method === 'GET' && url === '/api/crm/cron/contratos') {
+    const sess = getSession(req);
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const cronToken = req.headers['x-cron-secret'];
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+    const out = { ok: true };
+    try {
+      const usersJson = await _loadUsersMap();
+      out.bling = await blingBackfill.syncIncrementalTodas({ dias: 1, usersJson });
+    } catch (e) { out.bling = { ok: false, erro: e.message }; }
+    try { out.contratos = await contratosArma.processar(); } catch (e) { out.ok = false; out.contratos = { ok: false, erro: e.message }; }
+    res.writeHead(out.ok ? 200 : 500,{'Content-Type':'application/json'}); res.end(JSON.stringify(out));
+    return;
+  }
+
+  if (url === '/api/crm/contratos' || url.startsWith('/api/crm/contratos/') || url.startsWith('/api/crm/contratos?')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    const enviar = (code, obj) => { res.writeHead(code,{'Content-Type':'application/json','Cache-Control':'no-store'}); res.end(JSON.stringify(obj)); };
+    const pathOnly = url.split('?')[0];
+    try {
+      // GET /api/crm/contratos/painel — gestao ve todos; vendedor ve os dele
+      if (req.method === 'GET' && pathOnly === '/api/crm/contratos/painel') {
+        const acts = await crmStore.listDocs('activities', a => a && a.fonte === 'contrato_arma');
+        const login = String(sess.usuario || '').toLowerCase();
+        const meus = crmUtils.canSeeAll(sess) ? acts : acts.filter(a => String(a.owner_id || a.dono || '').toLowerCase() === login);
+        enviar(200, contratosArma.painel(meus)); return;
+      }
+      // POST /api/crm/contratos/processar — gestao forca a varredura agora
+      if (req.method === 'POST' && pathOnly === '/api/crm/contratos/processar') {
+        if (!crmUtils.canSeeAll(sess)) { enviar(403, { error: 'Só gestão.' }); return; }
+        enviar(200, await contratosArma.processar()); return;
+      }
+      // POST /api/crm/contratos/tarefa/:id  body: { acao, canal?, observacao?, confirmo? }
+      const mT = pathOnly.match(/^\/api\/crm\/contratos\/tarefa\/([A-Za-z0-9_\-]+)$/);
+      if (req.method === 'POST' && mT) {
+        if (!crmUtils.canEditCRM(sess)) { enviar(403, { error: 'Seu perfil pode consultar mas não alterar.' }); return; }
+        let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch (_) {}
+        enviar(200, await contratosArma.registrarAcao(mT[1], String(payload.acao || ''), sess, payload)); return;
+      }
+      // POST /api/crm/contratos/:tarefaId/verificar  body: { ok: true|false, obs? } — gestao confere a pasta
+      const mV = pathOnly.match(/^\/api\/crm\/contratos\/([A-Za-z0-9_\-]+)\/verificar$/);
+      if (req.method === 'POST' && mV) {
+        if (!crmUtils.canSeeAll(sess)) { enviar(403, { error: 'Só gestão confere contratos.' }); return; }
+        let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch (_) {}
+        enviar(200, await contratosArma.verificar(mV[1], sess, payload.ok === true, payload.obs)); return;
+      }
+      enviar(404, { error: 'Rota de contratos não encontrada' });
+    } catch (e) { enviar(e.status || 500, { error: e.message }); }
+    return;
+  }
+
   // ── GET /api/crm/tarefas/minhas — fila do PROPRIO usuario logado.
   // Admin ve so as tarefas dele (login==gerencia). Se quiser ver TODAS as
   // tarefas de todos os vendedores, passa ?todos=1 na URL — util pra dashboard
@@ -1997,11 +2065,15 @@ module.exports = async (req, res) => {
       // devolve vazio. Com ?todos=1, ve a fila consolidada de todos.
       let tarefas = [];
       if (ehAdmin && !verTodas) {
-        tarefas = [];
+        // Gestao nao tem fila comercial propria — mas contrato de arma de venda
+        // sem vendedor mapeado cai pra ela e PRECISA aparecer.
+        tarefas = await crmStore.listDocs('activities', a =>
+          a.status === 'pendente' && disciplina.ehContrato(a) && disciplina.disponivel(a) &&
+          String(a.owner_id || a.dono || '').toLowerCase() === login);
       } else {
         const scopeAll = verTodas && ehAdmin;
         tarefas = await crmStore.listDocs('activities', a =>
-          a.status === 'pendente' && (scopeAll || String(a.owner_id || a.dono || '').toLowerCase() === login));
+          a.status === 'pendente' && disciplina.disponivel(a) && (scopeAll || String(a.owner_id || a.dono || '').toLowerCase() === login));
       }
       // Ordena: vencidas (prazo+hora < agora) primeiro, depois por prazo+hora
       const agora = new Date();
@@ -2012,6 +2084,9 @@ module.exports = async (req, res) => {
       }
       const agoraISO = agora.toISOString().slice(0, 16);
       tarefas.sort((a, b) => {
+        // Contrato de arma (obrigatorio) sempre no topo
+        const aC = disciplina.ehContrato(a) ? 0 : 1, bC = disciplina.ehContrato(b) ? 0 : 1;
+        if (aC !== bC) return aC - bC;
         const aLim = _tsLimite(a);
         const bLim = _tsLimite(b);
         const aOver = aLim < agoraISO ? 0 : 1;
@@ -2045,8 +2120,9 @@ module.exports = async (req, res) => {
       // Acumulo: ha quantos dias cada tarefa esta aberta (dia BRT). Tarefa de
       // dia anterior NAO some — fica na fila marcada como "acumulada".
       const hojeBRT = disciplina.hojeBRT();
-      let deHoje = 0, acumuladas = 0, vencidas = 0;
+      let deHoje = 0, acumuladas = 0, vencidas = 0, contratosAbertos = 0;
       for (const t of tarefas) {
+        if (disciplina.ehContrato(t)) { contratosAbertos++; t.dias_em_aberto = 0; if (t.prazo && t.prazo < hojeBRT) vencidas++; continue; }
         const origem = t.lote_dia || disciplina.dataBRT(t.criado_em);
         t.dia_origem = origem || null;
         t.dias_em_aberto = origem ? Math.max(0, Math.round((Date.parse(hojeBRT) - Date.parse(origem)) / 86400000)) : 0;
@@ -2054,7 +2130,7 @@ module.exports = async (req, res) => {
         if (t.prazo && t.prazo < hojeBRT) vencidas++;
       }
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ tarefas, total: tarefas.length, resumo: { de_hoje: deHoje, acumuladas, vencidas } }));
+      res.end(JSON.stringify({ tarefas, total: tarefas.length, resumo: { de_hoje: deHoje, acumuladas, vencidas, contratos: contratosAbertos } }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
   }
@@ -2185,8 +2261,14 @@ module.exports = async (req, res) => {
       const acts = await crmStore.listDocs('activities');
       const d = disciplina.calcular(acts, login);
       const hoje = d.hoje;
-      const abertas = acts.filter(a => a.status === 'pendente' && String(a.owner_id || a.dono || '').toLowerCase() === login);
-      abertas.sort((x, y) => String((x.prazo || '9999') + (x.hora || '')).localeCompare(String((y.prazo || '9999') + (y.hora || ''))));
+      const ehGestao = crmUtils.canSeeAll(sess);
+      const abertas = acts.filter(a => a.status === 'pendente' && disciplina.disponivel(a) &&
+        String(a.owner_id || a.dono || '').toLowerCase() === login && (!ehGestao || disciplina.ehContrato(a)));
+      abertas.sort((x, y) => {
+        const cx = disciplina.ehContrato(x) ? 0 : 1, cy = disciplina.ehContrato(y) ? 0 : 1;
+        if (cx !== cy) return cx - cy;
+        return String((x.prazo || '9999') + (x.hora || '')).localeCompare(String((y.prazo || '9999') + (y.hora || '')));
+      });
       const top = abertas.slice(0, 3);
       let accMap = {};
       if (top.length) {
@@ -2196,15 +2278,21 @@ module.exports = async (req, res) => {
       }
       const proximas = top.map(t => {
         const acc = accMap[t.account_id || t.entidade_id] || {};
-        return { id: t.id, titulo: t.titulo, prazo: t.prazo, hora: t.hora || null, vencida: !!(t.prazo && t.prazo < hoje),
+        return { id: t.id, titulo: t.titulo, prazo: t.prazo, hora: t.hora || null, vencida: !!(t.prazo && t.prazo < hoje), contrato: disciplina.ehContrato(t),
           cliente_nome: acc.nome || acc.razao_social || null, dias_em_aberto: Math.max(0, Math.round((Date.parse(hoje) - Date.parse(t.lote_dia || disciplina.dataBRT(t.criado_em) || hoje)) / 86400000)) };
       });
-      const out = { ok: true, ...d.fila, executadas_hoje: d.execucao.executadas_hoje, cota_dia: disciplina.COTA_DIA,
-        saude: d.saude, alertas: d.alertas.map(a => ({ codigo: a.codigo, nivel: a.nivel, titulo: a.titulo, mensagem: a.mensagem_vendedor })), proximas };
-      if (crmUtils.canSeeAll(sess)) {
+      const fila = ehGestao ? { abertas: abertas.length, de_hoje: 0, acumuladas: 0, vencidas: abertas.filter(t => t.prazo && t.prazo < hoje).length, mais_antiga_dias: 0 } : d.fila;
+      const out = { ok: true, ...fila, contratos_abertos: abertas.filter(t => disciplina.ehContrato(t)).length,
+        executadas_hoje: d.execucao.executadas_hoje, cota_dia: ehGestao ? 0 : disciplina.COTA_DIA,
+        saude: d.saude, alertas: ehGestao ? [] : d.alertas.map(a => ({ codigo: a.codigo, nivel: a.nivel, titulo: a.titulo, mensagem: a.mensagem_vendedor })), proximas };
+      if (ehGestao) {
         const eq = disciplina.paraEquipeSync(acts, automacaoUpsell.VENDEDORES_ATIVOS);
         let criticos = 0, comAlerta = 0;
-        for (const v of Object.values(eq)) { if (v.alertas.length) comAlerta++; criticos += v.alertas.filter(a => a.nivel === 'critico').length; }
+        for (const v of Object.values(eq)) {
+          const g = v.alertas.filter(a => !a.so_vendedor);
+          if (g.length) comAlerta++;
+          criticos += g.filter(a => a.nivel === 'critico').length;
+        }
         out.equipe = { vendedores_com_alerta: comAlerta, alertas_criticos: criticos };
       }
       res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'}); res.end(JSON.stringify(out));
@@ -2307,6 +2395,7 @@ module.exports = async (req, res) => {
       }
       const t = await crmStore.getDoc('activities', id);
       if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
+      if (disciplina.ehContrato(t)) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa de contrato: use os botões do contrato (atualize a página com F5).'})); return; }
       // SEGURANÇA IDOR: so o DONO da tarefa (ou admin/diretor) pode concluir.
       // Antes qualquer vendedor podia concluir tarefa alheia via curl, sabotando
       // o ranking do colega e a automacao de renovacao de docs regulatorios.
@@ -2358,6 +2447,7 @@ module.exports = async (req, res) => {
       if (!crmUtils.canSeeAll(sess) && donoTarefa !== meuLogin) {
         res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa nao esta atribuida a voce.'})); return;
       }
+      if (disciplina.ehContrato(t)) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa de contrato não aceita follow-up: use os botões do contrato.'})); return; }
       const now = new Date().toISOString();
       const dono = donoTarefa || meuLogin;
       const accId = t.account_id || t.entidade_id || null;
@@ -2421,6 +2511,9 @@ module.exports = async (req, res) => {
       const donoTarefa = String(t.owner_id || t.dono || '').toLowerCase();
       if (!crmUtils.canSeeAll(sess) && donoTarefa !== meuLogin) {
         res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa nao esta atribuida a voce.'})); return;
+      }
+      if (disciplina.ehContrato(t) && !crmUtils.canSeeAll(sess)) {
+        res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Contrato de arma é obrigatório e não pode ser cancelado pelo vendedor. Se a venda foi cancelada, avise a gerência.'})); return;
       }
       await crmStore.updateDoc('activities', id, {
         ...t, status: 'cancelada', resultado: 'cancelada',
@@ -4038,6 +4131,7 @@ module.exports = async (req, res) => {
     try {
       const usersJson = await _loadUsersMap();
       const r = await blingBackfill.syncIncrementalTodas({ dias: 1, usersJson });
+      try { r.contratos_arma = await contratosArma.processar(); } catch (e) { r.contratos_arma = { ok: false, erro: e.message }; }
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
