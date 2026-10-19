@@ -3774,7 +3774,7 @@
   "e0935cad-65db-424f-8bda-180696aa9f07": {
     "id": "e0935cad-65db-424f-8bda-180696aa9f07",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_643f2a1cee6298c0",
@@ -3797,12 +3797,15 @@
     "dono": "boschetto",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-19T20:28:06.031Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "José Antonio de Souza Silva",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 5
+    "dias_em_aberto": 5,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-19T20:28:06.031Z",
+    "concluida_por": "boschetto"
   },
   "eead6296-ac95-47e4-965d-560c31a8010c": {
     "id": "eead6296-ac95-47e4-965d-560c31a8010c",
