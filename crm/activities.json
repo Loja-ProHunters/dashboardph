@@ -7653,5 +7653,33 @@
     "cliente_telefone": null,
     "dia_origem": "2026-10-19",
     "dias_em_aberto": 0
+  },
+  "a4048d36-a3c0-4b94-b86a-05171f63b3a3": {
+    "id": "a4048d36-a3c0-4b94-b86a-05171f63b3a3",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "boschetto",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_643f2a1cee6298c0",
+    "titulo": "📅 Follow-up — José Antonio de Souza Silva",
+    "descricao": "Sumido ha 112d — ideal p/ Lanterna de cabeça Fenix HL55 900 Lumen…\n\nCliente: José Antonio de Souza Silva\nUltima compra: 2026-06-24\nPedidos: 5\nValor historico: R$ 4221.04\n\nProduto sugerido: Lanterna de cabeça Fenix HL55 900 Lumens preto (SKU 6942870304618)\nConfianca: 14%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-20",
+    "hora": "09:30",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_a4048d36-a3c0-4b94-b86a-05171f63b3a3",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "boschetto",
+    "account_id": "acc_643f2a1cee6298c0",
+    "origem_tarefa_id": "e0935cad-65db-424f-8bda-180696aa9f07",
+    "criada_por_vendedor": "boschetto",
+    "criado_em": "2026-10-19T20:28:07.846Z",
+    "criado_por": "boschetto",
+    "atualizado_em": "2026-10-19T20:28:07.846Z",
+    "atualizado_por": "boschetto"
   }
 }
