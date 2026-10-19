@@ -6708,9 +6708,9 @@
     "transporte_valor": 490,
     "transporte_por": "mathias",
     "transporte_em": "2026-10-19T17:49:00.392Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "2930",
+    "nf_por": "mathias",
+    "nf_em": "2026-10-19T18:27:56.353Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -6788,11 +6788,19 @@
         "acao": "campo_alterado",
         "campo": "transporte_valor",
         "novo": 490
+      },
+      {
+        "ts": "2026-10-19T18:27:56.353Z",
+        "por": "mathias",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "2930"
       }
     ],
     "criado_em": "2026-10-19T15:37:03.038Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-19T17:49:00.392Z",
+    "atualizado_em": "2026-10-19T18:27:56.353Z",
     "atualizado_por": "mathias"
   }
 }
