@@ -6342,9 +6342,9 @@
     },
     "status": "aberto",
     "confirmado_bling": true,
-    "volumes_qtd": null,
-    "volumes_por": null,
-    "volumes_em": null,
+    "volumes_qtd": 1,
+    "volumes_por": "mathias",
+    "volumes_em": "2026-10-19T15:35:03.198Z",
     "conferencia_ok": false,
     "conferencia_por": null,
     "conferencia_em": null,
@@ -6401,11 +6401,19 @@
         "por": "mathias",
         "acao": "envio_criado",
         "detalhe": "empresa=calibre numero=1985"
+      },
+      {
+        "ts": "2026-10-19T15:35:03.198Z",
+        "por": "mathias",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "volumes_qtd",
+        "novo": 1
       }
     ],
     "criado_em": "2026-10-19T15:34:58.288Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-19T15:34:58.288Z",
+    "atualizado_em": "2026-10-19T15:35:03.198Z",
     "atualizado_por": "mathias"
   }
 }
