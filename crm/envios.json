@@ -6695,7 +6695,7 @@
       "id": 15596916109,
       "nome": null
     },
-    "status": "aberto",
+    "status": "pronto_coleta",
     "confirmado_bling": true,
     "volumes_qtd": 1,
     "volumes_por": "mathias",
@@ -6717,9 +6717,9 @@
     "assinatura_ok": true,
     "assinatura_por": "mathias",
     "assinatura_em": "2026-10-19T18:28:22.066Z",
-    "liberacao_ok": false,
-    "liberacao_por": null,
-    "liberacao_em": null,
+    "liberacao_ok": true,
+    "liberacao_por": "mathias",
+    "liberacao_em": "2026-10-19T18:28:26.380Z",
     "anexo_p_ok": false,
     "anexo_p_por": null,
     "anexo_p_em": null,
@@ -6812,11 +6812,19 @@
         "acao": "campo_alterado",
         "campo": "assinatura_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-19T18:28:26.380Z",
+        "por": "mathias",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "liberacao_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-19T15:37:03.038Z",
     "criado_por": "mathias",
-    "atualizado_em": "2026-10-19T18:28:22.066Z",
+    "atualizado_em": "2026-10-19T18:28:26.380Z",
     "atualizado_por": "mathias"
   }
 }
