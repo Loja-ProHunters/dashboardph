@@ -194,5 +194,27 @@
     "criado_por": "auxiliar",
     "atualizado_em": "2026-10-15T16:34:26.359Z",
     "atualizado_por": "auxiliar"
+  },
+  "rom_20261019_0010": {
+    "id": "rom_20261019_0010",
+    "numero": "0010",
+    "data": "2026-10-19",
+    "transportadora": "rpa",
+    "empresa_agrupada": "ambas",
+    "envio_ids": [
+      "env_prohunters_27113",
+      "env_calibre_1944",
+      "env_calibre_1952"
+    ],
+    "total_volumes": 3,
+    "motorista_nome": null,
+    "motorista_cpf": null,
+    "motorista_placa": null,
+    "motorista_assinado_em": null,
+    "gerado_por": "gerencia",
+    "criado_em": "2026-10-19T18:29:22.899Z",
+    "criado_por": "gerencia",
+    "atualizado_em": "2026-10-19T18:29:22.899Z",
+    "atualizado_por": "gerencia"
   }
 }
