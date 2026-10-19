@@ -2023,6 +2023,15 @@ module.exports = async (req, res) => {
         const meus = crmUtils.canSeeAll(sess) ? acts : acts.filter(a => String(a.owner_id || a.dono || '').toLowerCase() === login);
         enviar(200, contratosArma.painel(meus)); return;
       }
+      // GET /api/crm/contratos/meus[?todos=1] — cards operacionais (1 por venda de arma)
+      if (req.method === 'GET' && pathOnly === '/api/crm/contratos/meus') {
+        const u = new URL('http://x' + (req.url || ''));
+        const acts = await crmStore.listDocs('activities', a => a && a.fonte === 'contrato_arma');
+        const login = String(sess.usuario || '').toLowerCase();
+        const todos = u.searchParams.get('todos') === '1' && crmUtils.canSeeAll(sess);
+        const lista = contratosArma.cards(acts, todos ? null : login);
+        enviar(200, { cards: lista, total: lista.length }); return;
+      }
       // POST /api/crm/contratos/processar — gestao forca a varredura agora
       if (req.method === 'POST' && pathOnly === '/api/crm/contratos/processar') {
         if (!crmUtils.canSeeAll(sess)) { enviar(403, { error: 'Só gestão.' }); return; }
@@ -2281,8 +2290,8 @@ module.exports = async (req, res) => {
         return { id: t.id, titulo: t.titulo, prazo: t.prazo, hora: t.hora || null, vencida: !!(t.prazo && t.prazo < hoje), contrato: disciplina.ehContrato(t),
           cliente_nome: acc.nome || acc.razao_social || null, dias_em_aberto: Math.max(0, Math.round((Date.parse(hoje) - Date.parse(t.lote_dia || disciplina.dataBRT(t.criado_em) || hoje)) / 86400000)) };
       });
-      const fila = ehGestao ? { abertas: abertas.length, de_hoje: 0, acumuladas: 0, vencidas: abertas.filter(t => t.prazo && t.prazo < hoje).length, mais_antiga_dias: 0 } : d.fila;
-      const out = { ok: true, ...fila, contratos_abertos: abertas.filter(t => disciplina.ehContrato(t)).length,
+      const fila = ehGestao ? { abertas: contratosArma.cards(acts, login).length, de_hoje: 0, acumuladas: 0, vencidas: abertas.filter(t => t.prazo && t.prazo < hoje).length, mais_antiga_dias: 0 } : d.fila;
+      const out = { ok: true, ...fila, contratos_abertos: contratosArma.cards(acts, login).length,
         executadas_hoje: d.execucao.executadas_hoje, cota_dia: ehGestao ? 0 : disciplina.COTA_DIA,
         saude: d.saude, alertas: ehGestao ? [] : d.alertas.map(a => ({ codigo: a.codigo, nivel: a.nivel, titulo: a.titulo, mensagem: a.mensagem_vendedor })), proximas };
       if (ehGestao) {
