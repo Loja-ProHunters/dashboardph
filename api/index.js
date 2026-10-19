@@ -32,6 +32,8 @@ const coocorrencia      = require('../lib/crm/coocorrencia');
 const { sugerirParaCliente } = require('../lib/crm/sugerir');
 const automacaoUpsell   = require('../lib/crm/automacaoUpsell');
 const catalogoBling     = require('../lib/crm/catalogoBling');
+const disciplina        = require('../lib/crm/disciplina');
+const carteira          = require('../lib/crm/carteira');
 
 // Bling API v3
 const blingOauth      = require('../lib/bling/oauth');
@@ -1295,7 +1297,8 @@ module.exports = async (req, res) => {
   if (crmMatch && crmMatch[1] !== 'session-info' && crmMatch[1] !== 'migrate-parceiros' && crmMatch[1] !== 'docs' && crmMatch[1] !== 'cron' && crmMatch[1] !== 'fenix'
       && crmMatch[1] !== 'coocorrencia' && crmMatch[1] !== 'sugerir' && crmMatch[1] !== 'tarefas' && crmMatch[1] !== 'ficha'
       && crmMatch[1] !== 'catalogo' && crmMatch[1] !== 'prospeccao' && crmMatch[1] !== 'vendedores' && crmMatch[1] !== 'bling'
-      && crmMatch[1] !== 'frete' && crmMatch[1] !== 'envios' && crmMatch[1] !== 'controlado' && crmMatch[1] !== 'romaneios') {
+      && crmMatch[1] !== 'frete' && crmMatch[1] !== 'envios' && crmMatch[1] !== 'controlado' && crmMatch[1] !== 'romaneios'
+      && crmMatch[1] !== 'carteira') {
     const colName = crmMatch[1];
     const docId = crmMatch[2] || null;
     const reg = crmColl.REGISTRY[colName];
@@ -2039,8 +2042,19 @@ module.exports = async (req, res) => {
           }
         }
       }
+      // Acumulo: ha quantos dias cada tarefa esta aberta (dia BRT). Tarefa de
+      // dia anterior NAO some — fica na fila marcada como "acumulada".
+      const hojeBRT = disciplina.hojeBRT();
+      let deHoje = 0, acumuladas = 0, vencidas = 0;
+      for (const t of tarefas) {
+        const origem = t.lote_dia || disciplina.dataBRT(t.criado_em);
+        t.dia_origem = origem || null;
+        t.dias_em_aberto = origem ? Math.max(0, Math.round((Date.parse(hojeBRT) - Date.parse(origem)) / 86400000)) : 0;
+        if (t.dias_em_aberto > 0) acumuladas++; else deHoje++;
+        if (t.prazo && t.prazo < hojeBRT) vencidas++;
+      }
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ tarefas, total: tarefas.length }));
+      res.end(JSON.stringify({ tarefas, total: tarefas.length, resumo: { de_hoje: deHoje, acumuladas, vencidas } }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
   }
@@ -2134,6 +2148,133 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // ── POST /api/crm/tarefas/:id/contato  body: { canal: 'whatsapp'|'ligacao'|'presencial' }
+  // Registra que o vendedor ENTROU EM CONTATO (o botao WhatsApp chama sozinho).
+  // E a evidencia usada pra separar "nao convertido de verdade" de "tirei da frente".
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/tarefas\/[a-zA-Z0-9_\-]+\/contato$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const id = url.split('/')[4];
+      let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch(_){}
+      const canal = disciplina.CANAIS[payload.canal] ? payload.canal : 'whatsapp';
+      const t = await crmStore.getDoc('activities', id);
+      if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
+      const meuLogin = String(sess.usuario || '').toLowerCase();
+      const donoTarefa = String(t.owner_id || t.dono || '').toLowerCase();
+      if (donoTarefa !== meuLogin) { res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, ignorado: 'nao_e_dono' })); return; }
+      const now = new Date().toISOString();
+      const contatos = Array.isArray(t.contatos) ? t.contatos.slice(-19) : [];
+      contatos.push({ canal, em: now });
+      await crmStore.updateDoc('activities', id, {
+        contatos, primeiro_contato_em: t.primeiro_contato_em || now, ultimo_contato_em: now,
+      }, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/tarefas/resumo — leve, pro BALAO FLUTUANTE (polling).
+  // Vendedor: sua fila (abertas/hoje/acumuladas/vencidas), 3 mais urgentes e
+  // os alertas de disciplina. Gestao: contagem de alertas da equipe.
+  if (req.method === 'GET' && url === '/api/crm/tarefas/resumo') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const login = String(sess.usuario || '').toLowerCase();
+      const acts = await crmStore.listDocs('activities');
+      const d = disciplina.calcular(acts, login);
+      const hoje = d.hoje;
+      const abertas = acts.filter(a => a.status === 'pendente' && String(a.owner_id || a.dono || '').toLowerCase() === login);
+      abertas.sort((x, y) => String((x.prazo || '9999') + (x.hora || '')).localeCompare(String((y.prazo || '9999') + (y.hora || ''))));
+      const top = abertas.slice(0, 3);
+      let accMap = {};
+      if (top.length) {
+        const ids = new Set(top.map(t => t.account_id || t.entidade_id).filter(Boolean));
+        const accs = await crmStore.listDocs('accounts', a => ids.has(a.id));
+        for (const a of accs) accMap[a.id] = a;
+      }
+      const proximas = top.map(t => {
+        const acc = accMap[t.account_id || t.entidade_id] || {};
+        return { id: t.id, titulo: t.titulo, prazo: t.prazo, hora: t.hora || null, vencida: !!(t.prazo && t.prazo < hoje),
+          cliente_nome: acc.nome || acc.razao_social || null, dias_em_aberto: Math.max(0, Math.round((Date.parse(hoje) - Date.parse(t.lote_dia || disciplina.dataBRT(t.criado_em) || hoje)) / 86400000)) };
+      });
+      const out = { ok: true, ...d.fila, executadas_hoje: d.execucao.executadas_hoje, cota_dia: disciplina.COTA_DIA,
+        saude: d.saude, alertas: d.alertas.map(a => ({ codigo: a.codigo, nivel: a.nivel, titulo: a.titulo, mensagem: a.mensagem_vendedor })), proximas };
+      if (crmUtils.canSeeAll(sess)) {
+        const eq = disciplina.paraEquipeSync(acts, automacaoUpsell.VENDEDORES_ATIVOS);
+        let criticos = 0, comAlerta = 0;
+        for (const v of Object.values(eq)) { if (v.alertas.length) comAlerta++; criticos += v.alertas.filter(a => a.nivel === 'critico').length; }
+        out.equipe = { vendedores_com_alerta: comAlerta, alertas_criticos: criticos };
+      }
+      res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'}); res.end(JSON.stringify(out));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/tarefas/disciplina[?vendedor=login] — metricas completas.
+  // Vendedor ve as proprias; admin/diretor pode pedir de qualquer vendedor.
+  if (req.method === 'GET' && url.startsWith('/api/crm/tarefas/disciplina')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      let alvo = String(sess.usuario || '').toLowerCase();
+      if (u.searchParams.get('vendedor') && crmUtils.canSeeAll(sess)) alvo = String(u.searchParams.get('vendedor')).toLowerCase();
+      const d = await disciplina.paraVendedor(alvo);
+      d.motivos_labels = disciplina.MOTIVOS_NAO_CONVERSAO;
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(d));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // MINHA CARTEIRA — livro de clientes do consultor (lib/crm/carteira.js)
+  // ═════════════════════════════════════════════════════════════
+  if (url === '/api/crm/carteira' || url.startsWith('/api/crm/carteira?') || url.startsWith('/api/crm/carteira/')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    const login = String(sess.usuario || '').toLowerCase();
+    const enviar = (code, obj) => { res.writeHead(code,{'Content-Type':'application/json','Cache-Control':'no-store'}); res.end(JSON.stringify(obj)); };
+    const falhar = (e) => enviar(e.status || 500, { error: e.message, account_id: e.account_id || undefined });
+    const pathOnly = url.split('?')[0];
+    try {
+      // GET /api/crm/carteira[?vendedor=login]
+      if (req.method === 'GET' && pathOnly === '/api/crm/carteira') {
+        const u = new URL('http://x' + (req.url || ''));
+        let alvo = login;
+        const pedido = u.searchParams.get('vendedor');
+        if (crmUtils.canSeeAll(sess)) alvo = String(pedido || automacaoUpsell.VENDEDORES_ATIVOS[0] || login).toLowerCase();
+        const dados = await carteira.listar(alvo);
+        dados.opcoes = { temperaturas: carteira.TEMPERATURAS, origens: carteira.ORIGENS, limite_esfriando: carteira.LIMITE_ESFRIANDO };
+        dados.somente_leitura = alvo !== login;
+        if (crmUtils.canSeeAll(sess)) dados.vendedores = automacaoUpsell.VENDEDORES_ATIVOS;
+        enviar(200, dados); return;
+      }
+      if (!crmUtils.canEditCRM(sess)) { enviar(403, { error: 'Seu perfil pode consultar mas não alterar a carteira.' }); return; }
+      // POST /api/crm/carteira/cliente — cadastra cliente novo + proximo passo
+      if (req.method === 'POST' && pathOnly === '/api/crm/carteira/cliente') {
+        let body = {}; try { body = JSON.parse((await readBody(req)) || '{}'); } catch(_){}
+        const r = await carteira.adicionarCliente(login, body, automacaoUpsell.VENDEDORES_ATIVOS);
+        enviar(201, { ok: true, account_id: r.account.id, tarefa_id: r.tarefa ? r.tarefa.id : null, assumido: r.assumido }); return;
+      }
+      const mPasso = pathOnly.match(/^\/api\/crm\/carteira\/([a-zA-Z0-9_\-]+)\/proximo-passo$/);
+      if (req.method === 'POST' && mPasso) {
+        let body = {}; try { body = JSON.parse((await readBody(req)) || '{}'); } catch(_){}
+        const t = await carteira.definirProximoPasso(login, mPasso[1], body);
+        enviar(200, { ok: true, tarefa_id: t.id, prazo: t.prazo }); return;
+      }
+      const mAcc = pathOnly.match(/^\/api\/crm\/carteira\/([a-zA-Z0-9_\-]+)$/);
+      if ((req.method === 'PATCH' || req.method === 'POST') && mAcc) {
+        let body = {}; try { body = JSON.parse((await readBody(req)) || '{}'); } catch(_){}
+        await carteira.atualizar(login, mAcc[1], body);
+        enviar(200, { ok: true }); return;
+      }
+      enviar(404, { error: 'Rota da carteira não encontrada' });
+    } catch (e) { falhar(e); }
+    return;
+  }
+
   // ── POST /api/crm/tarefas/:id/concluir  body: { resultado: 'convertida'|'nao_convertida' }
   if (req.method === 'POST' && url.match(/^\/api\/crm\/tarefas\/[a-zA-Z0-9_\-]+\/concluir$/)) {
     const sess = getSession(req);
@@ -2149,6 +2290,21 @@ module.exports = async (req, res) => {
       let payload = {};
       try { payload = JSON.parse(body || '{}'); } catch(e){}
       const resultado = payload.resultado;
+      // Registro de COMO a tarefa foi trabalhada — base das metricas de
+      // disciplina. "Nao convertido" exige motivo (anti "tirar da frente").
+      const canal = payload.canal && disciplina.CANAIS[payload.canal] ? payload.canal : null;
+      const motivo = payload.motivo && disciplina.MOTIVOS_NAO_CONVERSAO[payload.motivo] ? payload.motivo : null;
+      const observacao = payload.observacao ? String(payload.observacao).trim().slice(0, 1000) : null;
+      if (resultado === 'nao_convertida' && !motivo) {
+        res.writeHead(400,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Informe o motivo do "não convertido" (se a tela não mostrar o campo, atualize a página com F5).'}));
+        return;
+      }
+      if (resultado === 'nao_convertida' && motivo === 'outro' && !observacao) {
+        res.writeHead(400,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Descreva o motivo em "observação".'}));
+        return;
+      }
       const t = await crmStore.getDoc('activities', id);
       if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
       // SEGURANÇA IDOR: so o DONO da tarefa (ou admin/diretor) pode concluir.
@@ -2161,10 +2317,19 @@ module.exports = async (req, res) => {
         res.end(JSON.stringify({error:'Esta tarefa nao esta atribuida a voce.'}));
         return;
       }
-      await crmStore.updateDoc('activities', id, {
+      if (t.status !== 'pendente') {
+        res.writeHead(409,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa já foi finalizada.'})); return;
+      }
+      const fimPatch = {
         ...t, status: 'concluida', resultado: resultado || 'concluida',
         concluida_em: new Date().toISOString(), concluida_por: sess.usuario,
-      }, sess.usuario);
+      };
+      if (canal) fimPatch.canal_contato = canal;
+      if (motivo) fimPatch.motivo_nao_conversao = motivo;
+      if (observacao) fimPatch.observacao_conclusao = observacao;
+      if (payload.pedido_numero) fimPatch.pedido_numero_informado = String(payload.pedido_numero).trim().slice(0, 30);
+      await crmStore.updateDoc('activities', id, fimPatch, sess.usuario);
+      // Se a tarefa era de um cliente da carteira, atualiza o "ultimo contato"
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
@@ -2267,39 +2432,18 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // ── POST /api/crm/tarefas/resetar-regerar — zera as tarefas AUTOMATICAS
-  // pendentes (gerada_automaticamente) marcando-as como canceladas, e roda o
-  // gerador de novo, reenchendo ate 20 variadas por vendedor com a base de
-  // coocorrencia atual. NAO mexe em tarefas manuais nem em concluidas. Como
-  // tarefa cancelada nao conta no cooldown, os clientes voltam ao pool e sao
-  // reavaliados com variedade garantida (rodizio entre fontes). So admin/diretor.
-  if (req.method === 'POST' && url === '/api/crm/tarefas/resetar-regerar') {
+  // ── POST /api/crm/tarefas/gerar-lote (alias legado: /resetar-regerar)
+  // Dispara AGORA a geracao do lote do dia (mesmo motor do cron das 8h).
+  // NAO cancela nada: as pendentes de dias anteriores continuam na fila e
+  // acumulam (regra da gestao). Idempotente no dia — se o lote de hoje ja
+  // saiu (20 por vendedor), nao cria mais nada. So admin/diretor.
+  if (req.method === 'POST' && (url === '/api/crm/tarefas/gerar-lote' || url === '/api/crm/tarefas/resetar-regerar')) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
     try {
-      const acts = await crmStore.getCollection('activities');
-      const nowIso = new Date().toISOString();
-      let canceladas = 0;
-      for (const id of Object.keys(acts)) {
-        const a = acts[id];
-        if (a && a.gerada_automaticamente === true && a.status === 'pendente') {
-          a.status = 'cancelada';
-          a.resultado = 'cancelada';
-          a.cancelada_em = nowIso;
-          a.cancelada_por = sess.usuario || 'reset';
-          a.cancelamento_motivo = 'reset-regerar (gerencia)';
-          a.atualizado_em = nowIso;
-          a.atualizado_por = sess.usuario || 'reset';
-          canceladas++;
-        }
-      }
-      if (canceladas > 0) {
-        await crmStore.saveCollection('activities', acts, 'Reset: cancela ' + canceladas + ' tarefas automaticas pendentes');
-        crmStore.invalidate('activities');
-      }
       const geracao = await automacaoUpsell.gerarTarefasDiarias();
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ ok: true, canceladas, geracao }));
+      res.end(JSON.stringify({ ok: true, canceladas: 0, geracao }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
