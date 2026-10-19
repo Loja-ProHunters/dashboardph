@@ -3735,7 +3735,7 @@
   "804eb08d-92ab-4538-8d2a-5d564f43dbb3": {
     "id": "804eb08d-92ab-4538-8d2a-5d564f43dbb3",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_dce8ff808f69ed34",
@@ -3758,12 +3758,18 @@
     "dono": "boschetto",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-19T20:13:51.789Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "Leandro Farias",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 5
+    "dias_em_aberto": 5,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-19T20:13:51.789Z",
+    "concluida_por": "boschetto",
+    "canal_contato": "whatsapp",
+    "motivo_nao_conversao": "sem_interesse",
+    "observacao_conclusao": "Cliente alegou espera mudar o governo"
   },
   "e0935cad-65db-424f-8bda-180696aa9f07": {
     "id": "e0935cad-65db-424f-8bda-180696aa9f07",
