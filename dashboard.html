@@ -5130,6 +5130,11 @@ function crmRenderSubTabs(){
   }
   // Se a sub-aba atual foi cortada pelo filtro (ex: vendedor caiu em 'painel'
   // no primeiro load), redireciona pra primeira permitida
+  // Gestao (admin/diretor) nao tem fila propria: tarefas sao dos vendedores.
+  // Acompanhamento fica na aba Produtividade.
+  if (window.CRM.session && (window.CRM.session.role === 'admin' || window.CRM.session.role === 'diretor')) {
+    subs = subs.filter(function(s){ return s !== 'tarefas'; });
+  }
   if (subs.indexOf(window.CRM.currentSub) === -1) {
     window.CRM.currentSub = subs[0];
   }
@@ -6440,128 +6445,178 @@ async function crmAtualizaContadorTarefas(){
   } catch(e){}
 }
 
+// ═══════════════════════════════════════════════════════════════
+// MINHAS TAREFAS v4 — caixa de entrada enxuta (divulgação progressiva)
+//  • 1 linha por tarefa: quem, por quê, há quanto tempo + 1 ação principal
+//  • detalhes, pitch e finalização só ao abrir a linha (uma por vez)
+//  • filtros no lugar de pílulas; contratos de arma como linhas operacionais
+// ═══════════════════════════════════════════════════════════════
+window.TQ = window.TQ || { filtro: 'todas', aberto: null, limite: 15, dados: null };
+var TQ_ICONE = { reativacao: '♻️', aniversario: '🎉', cross_sell: '🛒', carteira_parado: '💼', carteira: '💼', follow_up: '📅', manual: '✍️', pos_venda: '📦', vencimento: '🪪' };
+
+function tqIcone(t){ return TQ_ICONE[t.fonte] || TQ_ICONE[t.tipo] || '🎯'; }
+function tqMotivo(t){
+  var tit = String(t.titulo || '').replace(/^[^\wÀ-ú]+/, '');
+  if (t.cliente_nome) tit = tit.replace(' — ' + t.cliente_nome, '').replace(t.cliente_nome, '').replace(/\s[—-]\s*$/, '');
+  return tit.trim() || 'Contato com o cliente';
+}
+function tqLimite(t){ return t.prazo ? t.prazo + 'T' + (t.hora || '23:59') : null; }
+function tqAgoraBRT(){ return new Date(Date.now() - 3*3600*1000).toISOString().slice(0,16); }
+
 async function crmRenderTarefas(){
   var view = document.getElementById('crm-view');
   try {
-    var pContratos = fetch('/api/crm/contratos/meus', { cache: 'no-store' }).then(function(x){ return x.ok ? x.json() : { cards: [] }; }).catch(function(){ return { cards: [] }; });
+    var pC = fetch('/api/crm/contratos/meus', { cache: 'no-store' }).then(function(x){ return x.ok ? x.json() : { cards: [] }; }).catch(function(){ return { cards: [] }; });
+    var pR = fetch('/api/crm/tarefas/resumo', { cache: 'no-store' }).then(function(x){ return x.ok ? x.json() : {}; }).catch(function(){ return {}; });
     var r = await fetch('/api/crm/tarefas/minhas');
     var d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro ao carregar tarefas.');
-    // Contrato de arma e OPERACIONAL: sai da lista comercial e vira um bloco proprio (1 card por venda)
     var tarefas = (d.tarefas || []).filter(function(t){ return t.fonte !== 'contrato_arma'; });
-    var contratos = ((await pContratos) || {}).cards || [];
+    var contratos = ((await pC) || {}).cards || [];
+    var resumo = (await pR) || {};
+    window.CRM.tarefasCache = tarefas;
     window.CRM.contratosCards = contratos;
     window.CRM.tarefasCount = tarefas.length + contratos.length;
-    window.CRM.tarefasCache = tarefas; // cache pro modal de follow-up achar o nome do cliente
-    var hoje = new Date(Date.now() - 3*3600*1000).toISOString().slice(0,10); // dia em Brasília
-    var overdue = tarefas.filter(function(t){ return t.prazo && t.prazo < hoje; }).length;
-    window.CRM.tarefasOverdue = overdue;
+    var agora = tqAgoraBRT();
+    window.CRM.tarefasOverdue = tarefas.filter(function(t){ var l = tqLimite(t); return l && l < agora; }).length + contratos.filter(function(c){ return c.atrasado; }).length;
+    TQ.dados = { tarefas: tarefas, contratos: contratos, resumo: resumo };
     crmRenderSubTabs();
-
-    // Header com botão de nova tarefa manual — vendedor pode criar lembrete
-    // durante atendimento ("retornar amanhã 14h pra fechar Tanfoglio").
-    var adminResetBtn = (typeof IS_ADMIN !== 'undefined' && IS_ADMIN)
-      ? '<button id="btn-reset-tarefas" onclick="crmResetarRegerar(this)" title="Gera agora o lote de hoje (20 novas por vendedor). Não apaga nada: o que está pendente continua na fila." style="background:#242a2c;color:#e6edf0;border:1px solid #3a4245;border-radius:8px;padding:9px 14px;font-size:12.5px;font-weight:700;cursor:pointer">⚡ Gerar lote de hoje</button>'
-      : '';
-    var topBar = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">' +
-      (function(){
-        var rs = d.resumo || {};
-        return '<div class="tar-resumo"><span><b>' + tarefas.length + '</b> tarefa(s) comerciais</span>' +
-          '<span class="pill">📌 de hoje: <b>' + (rs.de_hoje || 0) + '</b></span>' +
-          '<span class="pill' + (rs.acumuladas ? ' warn' : '') + '">📥 acumuladas: <b>' + (rs.acumuladas || 0) + '</b></span>' +
-          '<span class="pill' + (rs.vencidas ? ' bad' : '') + '">⚠ vencidas: <b>' + (rs.vencidas || 0) + '</b></span>' +
-          (contratos.length ? '<span class="pill bad">📝 contratos de arma: <b>' + contratos.length + '</b></span>' : '') + '</div>';
-      })() +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap">' + adminResetBtn +
-      '<button onclick="crmAbrirModalNovaTarefa()" style="background:linear-gradient(135deg,#1a8bff,#0e6bd4);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(26,139,255,.3)">+ Nova tarefa manual</button>' +
-      '</div>' +
-    '</div>';
-
-    var blocoContratos = crmBlocoContratos(contratos);
-    if (!tarefas.length) {
-      view.innerHTML =
-        topBar + blocoContratos +
-        '<div class="crm-empty">' +
-        '<div style="font-size:36px;margin-bottom:8px">🎯</div>' +
-        '<div style="font-weight:700;color:var(--tx);margin-bottom:4px">' + (contratos.length ? 'Sem tarefas comerciais pendentes.' : 'Sem tarefas pendentes.') + '</div>' +
-        '<div style="font-size:12px">O CRM cria tarefas automáticas quando um cliente compra algo com boas chances de upsell, ou quando fica muito tempo parado. Volte aqui depois — ou dispare manualmente uma sugestão em "🔍 Buscar Cliente", ou crie uma tarefa manual no botão acima.</div>' +
-        '</div>';
-      // Tooltip primeiro uso
-      crmMostraTooltipUmaVez('tarefas_vazias',
-        '🎯 Minhas Tarefas',
-        'Esta é sua fila de trabalho. O CRM analisa vendas do Bling e histórico dos clientes, e cria tarefas prontas com o pitch de WhatsApp já escrito. Você só precisa contatar o cliente e marcar como concluída.');
-      return;
-    }
-
-    var html = topBar + blocoContratos + (contratos.length ? '<div class="tar-bloco-h">🎯 Tarefas comerciais <span>' + tarefas.length + '</span></div>' : '') + '<div class="tar-list">';
-    var agoraMin = new Date(Date.now() - 3*3600*1000).toISOString().slice(0,16); // YYYY-MM-DDTHH:MM em Brasília
-    tarefas.forEach(function(t){
-      var cls = 'tar-card';
-      var prazoCls = '';
-      var limiteISO = t.prazo ? (t.prazo + 'T' + (t.hora || '23:59')) : null;
-      var temHora = !!t.hora;
-      var prazoTxt = t.prazo ? crmFmtDate(t.prazo) + (temHora ? ' às ' + t.hora : '') : 'sem prazo';
-      if (limiteISO && limiteISO < agoraMin) {
-        cls += ' overdue'; prazoCls = 'overdue';
-        prazoTxt = '⚠ Vencida — ' + crmFmtDate(t.prazo) + (temHora ? ' ' + t.hora : '');
-      }
-      else if (t.prazo === hoje) { cls += ' upcoming'; prazoCls = 'hoje'; prazoTxt = temHora ? 'Hoje ' + t.hora : 'Hoje'; }
-      else if (t.prazo) {
-        var diasAte = Math.round((new Date(t.prazo)-new Date(hoje))/86400000);
-        if (diasAte <= 3) cls += ' upcoming';
-        prazoTxt = 'D+' + diasAte + ' (' + crmFmtDate(t.prazo) + (temHora ? ' ' + t.hora : '') + ')';
-      }
-      var pitch = t.pitch_pronto || '';
-      var pitchBlock = pitch ? '<div class="tar-pitch">' + crmEsc(pitch) + '</div>' : '';
-      var descBlock = t.descricao ? '<div class="tar-desc">' + crmEsc(t.descricao) + '</div>' : '';
-      var accId = t.entidade_id || t.account_id || '';
-      // Botão WhatsApp — aparece se o account tem telefone cadastrado no Bling.
-      // Monta wa.me/55DDDNUM?text=pitch_url_encoded (abre WA Web ou app).
-      var waBtn = '';
-      if (t.cliente_telefone) {
-        var telNormalizado = crmNormalizaTelBR(t.cliente_telefone);
-        if (telNormalizado) {
-          var textoWa = pitch || ('Olá! Falamos de ' + (t.titulo || 'uma oportunidade na Pro Hunters'));
-          var waUrl = 'https://wa.me/' + telNormalizado + '?text=' + encodeURIComponent(textoWa);
-          waBtn = '<a class="tar-wa-btn" href="' + waUrl + '" target="_blank" rel="noopener noreferrer" title="Abrir WhatsApp com pitch pronto" onclick="crmRegistraContato(\'' + crmEsc(t.id) + '\',\'whatsapp\')">' +
-                    '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.511 5.26l-.999 3.648 3.977-1.044zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>' +
-                    ' WhatsApp' +
-                  '</a>';
-        }
-      }
-      html += '<div class="'+cls+'" id="tar-'+crmEsc(t.id)+'">' +
-        '<div class="tar-hd">' +
-          '<div class="tar-tit">'+crmEsc(t.titulo || '(sem título)')+'</div>' +
-          '<div class="tar-prazo '+prazoCls+'">'+crmEsc(prazoTxt)+'</div>' +
-        '</div>' +
-        (t.cliente_nome ? '<div class="tar-cli">👤 ' + crmEsc(t.cliente_nome) + (t.cliente_telefone ? ' · ' + crmEsc(t.cliente_telefone) : '') + '</div>' : '') +
-        (t.dias_em_aberto > 0 ? '<span class="tar-acum' + (t.dias_em_aberto >= 3 ? ' velha' : '') + '">📥 acumulada há ' + t.dias_em_aberto + ' dia' + (t.dias_em_aberto > 1 ? 's' : '') + (t.dia_origem ? ' (de ' + crmFmtDia(t.dia_origem) + ')' : '') + '</span>' : '') +
-        descBlock +
-        pitchBlock +
-        '<div class="tar-actions">' +
-          waBtn +
-          (pitch ? '<button class="primary" onclick="crmCopiarPitch(\''+crmEsc(t.id)+'\', this)">📋 Copiar pitch</button>' : '') +
-          (accId ? '<button onclick="crmAbrirFicha(\''+crmEsc(accId)+'\')">👤 Ver ficha</button>' : '') +
-        '</div>' +
-        // Box de finalização — 4 opções: converteu / não converteu / agenda follow-up / cancela
-        '<div class="tar-finaliza">' +
-          '<button class="tar-fin-conv" onclick="crmConcluirTarefa(\''+crmEsc(t.id)+'\', \'convertida\')">✓ Convertido</button>' +
-          '<button class="tar-fin-nao" onclick="crmFinalizarModal(\''+crmEsc(t.id)+'\', \'nao\')">✗ Não convertido</button>' +
-          '<button class="tar-fin-follow" onclick="crmAbrirFollowUp(\''+crmEsc(t.id)+'\')">📅 Agendar follow-up</button>' +
-          '<button class="tar-fin-cancel" onclick="crmFinalizarModal(\''+crmEsc(t.id)+'\', \'cancelar\')">🗑 Cancelar tarefa</button>' +
-        '</div>' +
-      '</div>';
-    });
-    html += '</div>';
-    view.innerHTML = html;
-
-    // Tooltip primeiro uso (só quando há tarefas)
-    crmMostraTooltipUmaVez('tarefas_primeira_vez',
-      '🎯 Minhas Tarefas',
-      'Cada card é uma sugestão pronta. O botão "📋 Copiar pitch" copia a mensagem de WhatsApp pra você colar no cliente. Depois de falar com ele, marque como "Convertida" (virou venda) ou "Não convertida" (falou, mas não fechou). Isso ajuda o CRM a aprender.');
+    tqDesenhar();
+    crmMostraTooltipUmaVez('tarefas_v4',
+      '🎯 Sua fila, mais simples',
+      'Cada linha é um cliente. Clique na linha para ver o pitch e finalizar. O botão da direita faz a ação principal (WhatsApp ou o próximo passo do contrato).');
   } catch (e) {
-    view.innerHTML = '<div class="crm-empty">Erro: '+crmEsc(e.message)+'</div>';
+    view.innerHTML = '<div class="crm-empty">Erro: ' + crmEsc(e.message) + '</div>';
   }
+}
+
+function tqFiltrar(){
+  var D = TQ.dados, agora = tqAgoraBRT(), f = TQ.filtro;
+  var linhas = [];
+  if (f === 'todas' || f === 'contratos') D.contratos.forEach(function(c){ linhas.push({ k: 'ct:' + c.order_id, ct: c }); });
+  if (f !== 'contratos') D.tarefas.forEach(function(t){
+    var l = tqLimite(t), venc = !!(l && l < agora), antiga = (t.dias_em_aberto || 0) > 0;
+    if (f === 'vencidas' && !venc) return;
+    if (f === 'antigas' && !antiga) return;
+    if (f === 'hoje' && antiga) return;
+    linhas.push({ k: 't:' + t.id, t: t, venc: venc });
+  });
+  return linhas;
+}
+
+function tqDesenhar(){
+  var view = document.getElementById('crm-view'); if (!view || !TQ.dados) return;
+  var D = TQ.dados, agora = tqAgoraBRT(), rs = D.resumo || {};
+  var nVenc = D.tarefas.filter(function(t){ var l = tqLimite(t); return l && l < agora; }).length;
+  var nAnt = D.tarefas.filter(function(t){ return (t.dias_em_aberto || 0) > 0; }).length;
+  var nHoje = D.tarefas.length - nAnt;
+  var feitas = rs.executadas_hoje || 0, meta = rs.cota_dia || 0;
+  var total = D.tarefas.length + D.contratos.length;
+  var h = '<div class="tq-head"><div class="tq-head-l"><h3>' + (total ? total + ' para fazer' : 'Fila em dia') + '</h3>' +
+    (meta ? '<div class="tq-prog"><span>Feitas hoje <b>' + feitas + '</b> de ' + meta + '</span><i><b style="width:' + Math.min(100, Math.round(feitas / meta * 100)) + '%"></b></i></div>' : '') + '</div>' +
+    '<button class="tq-btn-sec" onclick="crmAbrirModalNovaTarefa()">+ Nova tarefa</button></div>';
+  var fs = [['todas', 'Tudo', total], ['contratos', '📝 Contratos', D.contratos.length], ['vencidas', 'Vencidas', nVenc], ['antigas', 'Antigas', nAnt], ['hoje', 'De hoje', nHoje]];
+  h += '<div class="tq-filtros">' + fs.filter(function(x){ return x[0] === 'todas' || x[2] > 0; }).map(function(x){
+    return '<button class="tq-fil' + (TQ.filtro === x[0] ? ' on' : '') + (x[0] === 'vencidas' || (x[0] === 'contratos' && D.contratos.some(function(c){ return c.atrasado; })) ? ' alerta' : '') + '" onclick="tqFiltro(\'' + x[0] + '\')">' + x[1] + ' <span>' + x[2] + '</span></button>';
+  }).join('') + '</div>';
+  var linhas = tqFiltrar();
+  if (!linhas.length) {
+    h += '<div class="tq-vazio"><div>✓</div><b>' + (total ? 'Nada neste filtro.' : 'Nenhuma tarefa pendente.') + '</b><span>' + (total ? '' : 'Novas tarefas chegam todo dia às 8h.') + '</span></div>';
+    view.innerHTML = h; return;
+  }
+  h += '<div class="tq-lista">' + linhas.slice(0, TQ.limite).map(function(x){ return x.ct ? tqLinhaContrato(x.ct) : tqLinhaTarefa(x.t, x.venc); }).join('') + '</div>';
+  if (linhas.length > TQ.limite) h += '<button class="tq-mais" onclick="TQ.limite+=15;tqDesenhar()">Mostrar mais ' + Math.min(15, linhas.length - TQ.limite) + ' (de ' + (linhas.length - TQ.limite) + ')</button>';
+  view.innerHTML = h;
+}
+function tqFiltro(f){ TQ.filtro = f; TQ.limite = 15; TQ.aberto = null; tqDesenhar(); }
+function tqToggle(k){ TQ.aberto = TQ.aberto === k ? null : k; tqDesenhar(); var el = document.querySelector('[data-k="' + k + '"]'); if (el && TQ.aberto) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+
+// ── Linha de tarefa comercial
+function tqLinhaTarefa(t, venc){
+  var k = 't:' + t.id, aberto = TQ.aberto === k, id = crmEsc(t.id);
+  var tag = venc ? '<span class="tq-tag bad">Vencida</span>' :
+    ((t.dias_em_aberto || 0) > 0 ? '<span class="tq-tag warn">há ' + t.dias_em_aberto + 'd</span>' :
+    (t.hora ? '<span class="tq-tag">' + crmEsc(t.hora) + '</span>' : ''));
+  var tel = t.cliente_telefone ? crmNormalizaTelBR(t.cliente_telefone) : null;
+  var pitch = t.pitch_pronto || '';
+  var cta = tel ? '<a class="tq-cta wa" href="https://wa.me/' + tel + '?text=' + encodeURIComponent(pitch || ('Olá! Aqui é da Pro Hunters.')) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();crmRegistraContato(\'' + id + '\',\'whatsapp\')" title="Abrir WhatsApp com a mensagem pronta">💬 WhatsApp</a>'
+    : '<button class="tq-cta" onclick="tqToggle(\'' + k + '\')">Abrir</button>';
+  var h = '<div class="tq-row' + (aberto ? ' aberto' : '') + (venc ? ' venc' : '') + '" id="tar-' + id + '" data-k="' + k + '">' +
+    '<button class="tq-main" onclick="tqToggle(\'' + k + '\')" aria-expanded="' + aberto + '">' +
+      '<span class="tq-ic">' + tqIcone(t) + '</span>' +
+      '<span class="tq-txt"><b class="tar-tit">' + crmEsc(t.cliente_nome || 'Cliente') + '</b><small>' + crmEsc(tqMotivo(t)) + '</small></span>' + tag +
+      '<span class="tq-chev">' + (aberto ? '▴' : '▾') + '</span></button>' + cta + '</div>';
+  if (!aberto) return h;
+  var accId = t.entidade_id || t.account_id || '';
+  var desc = t.descricao ? String(t.descricao).split(/\n?💡/)[0].trim() : '';
+  h += '<div class="tq-det">' +
+    (desc ? '<div class="tq-desc">' + crmEsc(desc) + '</div>' : '') +
+    (pitch ? '<div class="tq-pitch"><div class="tar-pitch">' + crmEsc(pitch) + '</div><button onclick="crmCopiarPitch(\'' + id + '\', this)">📋 Copiar</button></div>' : '') +
+    '<div class="tq-links">' + (t.cliente_telefone ? '<span>📞 ' + crmEsc(t.cliente_telefone) + '</span>' : '') +
+      (accId ? '<a href="#" onclick="crmAbrirFicha(\'' + crmEsc(accId) + '\');return false">Ver ficha do cliente</a>' : '') +
+      (t.prazo ? '<span>Prazo ' + crmFmtDate(t.prazo) + (t.hora ? ' ' + crmEsc(t.hora) : '') + '</span>' : '') + '</div>' +
+    '<div class="tq-fim"><span>Como terminou?</span>' +
+      '<button class="ok" onclick="crmConcluirTarefa(\'' + id + '\', \'convertida\')">✓ Vendeu</button>' +
+      '<button onclick="crmFinalizarModal(\'' + id + '\', \'nao\')">Não vendeu</button>' +
+      '<button onclick="crmAbrirFollowUp(\'' + id + '\')">📅 Retornar depois</button>' +
+      '<button class="lnk" onclick="crmFinalizarModal(\'' + id + '\', \'cancelar\')">Tarefa inválida</button></div>' +
+  '</div>';
+  return h;
+}
+
+// ── Linha de contrato de arma (operacional)
+function tqLinhaContrato(c){
+  var k = 'ct:' + c.order_id, aberto = TQ.aberto === k, oid = crmEsc(c.order_id);
+  var dots = [1,2,3,4].map(function(i){ return '<i class="' + (i < c.etapa ? 'ok' : (i === c.etapa ? 'at' : '')) + '"></i>'; }).join('');
+  var nomeEtapa = ['', 'Gerar contrato', 'Enviar ao cliente', c.cobranca ? 'Avisar cliente' : 'Aguardando assinatura', 'Conferência'][c.etapa] || '';
+  var tag = c.atrasado ? '<span class="tq-tag bad">Atrasado</span>' : (c.cobranca ? '<span class="tq-tag bad">Avisar cliente</span>' : '');
+  var cta = '';
+  if (c.etapa === 1) cta = '<button class="tq-cta pri" onclick="crmContratoGerador(\'' + oid + '\')">Gerar contrato</button>';
+  else if (c.etapa === 2) cta = '<button class="tq-cta pri" onclick="crmContratoModal(\'' + oid + '\',\'enviado\')">Marcar enviado</button>';
+  else if (c.etapa === 3) cta = c.cobranca ? '<button class="tq-cta bad" onclick="tqToggle(\'' + k + '\')">Avisar cliente</button>'
+    : '<button class="tq-cta pri" onclick="crmContratoModal(\'' + oid + '\',\'salvo_assinado\')">Recebi assinado</button>';
+  else cta = '<button class="tq-cta" onclick="tqToggle(\'' + k + '\')">Ver</button>';
+  var arma = (c.armas || []).map(function(a){ return a.descricao; }).join(' + ');
+  var h = '<div class="tq-row ct' + (aberto ? ' aberto' : '') + (c.atrasado ? ' venc' : '') + '" id="ct-' + oid + '" data-k="' + k + '">' +
+    '<button class="tq-main" onclick="tqToggle(\'' + k + '\')" aria-expanded="' + aberto + '">' +
+      '<span class="tq-ic">📝</span>' +
+      '<span class="tq-txt"><b>Contrato · ' + crmEsc(c.cliente_nome || 'Cliente') + '</b><small>Pedido ' + crmEsc(c.bling_numero || '—') + ' · ' + crmEsc(arma) + '</small></span>' +
+      '<span class="tq-dots" title="Etapa ' + c.etapa + ' de 4">' + dots + '</span>' + tag +
+      '<span class="tq-chev">' + (aberto ? '▴' : '▾') + '</span></button>' + cta + '</div>';
+  if (!aberto) return h;
+  return h + '<div class="tq-det ct">' + crmCardContratoOp(c) +
+    (c.distribuido ? '<div class="tq-nota">Venda sem vendedor no Bling — distribuída automaticamente para você.</div>' : '') +
+    '<div class="tq-anular"><button class="lnk" onclick="crmContratoAnularModal(\'' + oid + '\')">Anular este contrato…</button></div></div>';
+}
+
+// ── Anular contrato (vendedor explica; some da fila, gestão vê na auditoria)
+var CRM_MOTIVOS_ANULACAO = [['nao_exige_contrato', 'Venda não exige contrato'], ['arma_ja_enviada', 'Arma já enviada / contrato já resolvido'], ['venda_cancelada', 'Venda cancelada ou devolvida'], ['outro', 'Outro motivo']];
+function crmContratoAnularModal(orderId){
+  if (document.getElementById('crm2-anul')) return;
+  var c = crmCtCard(orderId) || {};
+  var html = '<div class="crm2-ovl" id="crm2-anul" onclick="if(event.target===this)crm2Fechar(\'crm2-anul\')"><div class="crm2-mdl">' +
+    '<h3>Anular contrato</h3><p class="sub">Pedido <b>' + crmEsc(c.bling_numero || '—') + '</b> · ' + crmEsc(c.cliente_nome || '') + '<br>Use só quando esta venda <b>não precisa</b> do fluxo de contrato. O contrato sai da sua fila.</p>' +
+    '<label class="crm2-lbl">Motivo *</label>' + crm2Chips('motivo', CRM_MOTIVOS_ANULACAO, null) +
+    '<label class="crm2-lbl">Descreva a situação * <i>(mín. 15 caracteres)</i></label><textarea class="crm2-in" id="crm2-anul-desc" rows="3" maxlength="600" placeholder="Ex: arma entregue em 02/08 com contrato assinado na loja, arquivado na pasta física"></textarea>' +
+    '<div class="crm2-hint">A gestão vê todas as anulações, com o motivo e a descrição.</div>' +
+    '<div class="crm2-err"></div><div class="crm2-acts"><button class="crm2-btn sec" onclick="crm2Fechar(\'crm2-anul\')">Voltar</button>' +
+    '<button class="crm2-btn dng" id="crm2-anul-ok" onclick="crmContratoAnular(\'' + crmEsc(orderId) + '\')">Anular contrato</button></div></div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+async function crmContratoAnular(orderId){
+  var c = crmCtCard(orderId); if (!c) return;
+  var motivo = crm2Val('crm2-anul', 'motivo');
+  var desc = ((document.getElementById('crm2-anul-desc') || {}).value || '').trim();
+  crm2Erro('crm2-anul', '');
+  if (!motivo) return crm2Erro('crm2-anul', 'Escolha o motivo.');
+  if (desc.length < 15) return crm2Erro('crm2-anul', 'Descreva a situação (mínimo 15 caracteres).');
+  var btn = document.getElementById('crm2-anul-ok'); btn.disabled = true;
+  try {
+    await crmContratoAcao(c.ids.envio || c.ids.assinatura, { acao: 'anular', motivo: motivo, descricao: desc });
+    crm2Fechar('crm2-anul'); TQ.aberto = null;
+    crmToast('Contrato anulado.', 'ok', 3000);
+    crmRenderTarefas(); if (window.TAREFAS_FAB) TAREFAS_FAB.atualizar();
+  } catch(e){ btn.disabled = false; crm2Erro('crm2-anul', e.message); }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -6583,7 +6638,8 @@ async function crmResetarRegerar(btn){
       ? 'O lote de hoje (' + (g.lote_dia||'') + ') já foi gerado — 20 por vendedor.\nNada novo criado. As pendentes continuam na fila.'
       : 'Lote de ' + (g.lote_dia||'hoje') + ' gerado: ' + g.tarefas_criadas + ' tarefas novas.\n\n' + linhasV + '\n\nPor fonte → ' + fontes;
     crmToast(msg, 'ok', 9000);
-    crmRenderTarefas();
+    if (window.PROD && document.getElementById('tab-produtividade') && document.getElementById('tab-produtividade').classList.contains('on')) PROD.recarregar();
+    else if (window.CRM && window.CRM.currentSub === 'tarefas') crmRenderTarefas();
   } catch(e) {
     crmToast('Erro ao gerar lote: ' + (e.message || e), 'erro', 7000);
   } finally {
@@ -9676,6 +9732,8 @@ window.addEventListener('load', function(){
 .pg-top span{font-size:12px;color:var(--pg-mut)}
 .pg-btn{background:#3d8a49;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:12.5px;cursor:pointer}
 .pg-btn.sec{background:#fff;color:#3d8a49;border:1px solid #c2e6c8;margin-left:auto}
+.pg-top-acts{display:flex;gap:8px;flex-wrap:wrap}
+.pg-top-acts .pg-btn.sec{margin-left:0}
 .pg-btn:disabled{opacity:.6;cursor:wait}
 .pg-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
 .pg-tile{background:var(--pg-surf);border:1px solid rgba(11,11,11,.10);border-radius:12px;padding:14px 16px}
@@ -10787,7 +10845,8 @@ window.PROD = (function(){
     aguardando_envio:        { txt: 'Falta enviar',        cls: 'pg-st-atencao', ic: '⚠️' },
     aguardando_assinatura:   { txt: 'Aguardando assinatura', cls: 'pg-st-neutro', ic: '⏳' },
     assinado_a_conferir:     { txt: 'Assinado · conferir', cls: 'pg-st-neutro', ic: '📁' },
-    conferido:               { txt: 'Conferido',           cls: 'pg-st-ok', ic: '✓' }
+    conferido:               { txt: 'Conferido',           cls: 'pg-st-ok', ic: '✓' },
+    anulado:                 { txt: 'Anulado',             cls: 'pg-st-neutro', ic: '⊘' }
   };
 
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -10827,7 +10886,8 @@ window.PROD = (function(){
 
     var hora = new Date(d.gerado_em).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     var h = '<div class="pg-top"><div><h2>Execução da equipe</h2><span>Atualizado às ' + hora + ' · regras iguais às que o vendedor vê</span></div>' +
-      '<button class="pg-btn" onclick="PROD.recarregar()">↻ Atualizar</button></div>';
+      '<div class="pg-top-acts">' + ((typeof IS_ADMIN !== 'undefined' && IS_ADMIN) ? '<button class="pg-btn sec" onclick="crmResetarRegerar(this)" title="Gera agora as 20 tarefas do dia de cada vendedor (não apaga nada; idempotente no dia)">⚡ Gerar lote de hoje</button>' : '') +
+      '<button class="pg-btn" onclick="PROD.recarregar()">↻ Atualizar</button></div></div>';
     h += kpis(d);
     h += acoes(d);
     h += '<div class="pg-grid2">' +
@@ -11097,7 +11157,8 @@ window.PROD = (function(){
     if (!t.total) return h + '<div class="pg-card"><div class="pg-ok-geral">Nenhuma venda de arma nos últimos 90 dias com contrato em aberto.</div></div>';
     var filtro = state.filtroContrato || 'pendentes';
     var linhas = (c.linhas || []).filter(function(l){
-      if (filtro === 'todos') return true;
+      if (filtro === 'anulados') return l.situacao === 'anulado';
+      if (filtro === 'todos') return l.situacao !== 'anulado';
       if (filtro === 'conferir') return l.situacao === 'assinado_a_conferir';
       return ['nao_encontrado','sem_assinatura_atrasado','aguardando_envio','aguardando_assinatura'].indexOf(l.situacao) !== -1;
     });
@@ -11108,13 +11169,14 @@ window.PROD = (function(){
       resumoC('Assinados (a conferir)', (t.assinados||0) + ' (' + (t.a_conferir||0) + ')', '') +
       (t.nao_encontrado ? resumoC('Não estava na pasta', t.nao_encontrado, 'bad') : '') +
     '</div><div class="pg-filtros">' +
-      ['pendentes','conferir','todos'].map(function(f){ return '<button class="pg-fil' + (filtro === f ? ' on' : '') + '" onclick="PROD._filtroC(\'' + f + '\')">' + ({pendentes:'Pendentes',conferir:'A conferir na pasta',todos:'Todos'})[f] + '</button>'; }).join('') + '</div>';
+      ['pendentes','conferir','todos','anulados'].filter(function(f){ return f !== 'anulados' || t.anulados; }).map(function(f){ return '<button class="pg-fil' + (filtro === f ? ' on' : '') + '" onclick="PROD._filtroC(\'' + f + '\')">' + ({pendentes:'Pendentes',conferir:'A conferir na pasta',todos:'Todos',anulados:'Anulados (' + (t.anulados||0) + ')'})[f] + '</button>'; }).join('') + '</div>';
     if (!linhas.length) h += '<div class="pg-ok-geral">✓ Nada neste filtro.</div>';
     else h += '<div class="pg-tab-wrap"><table class="pg-tab"><thead><tr><th>Situação</th><th>Pedido</th><th>Cliente</th><th>Arma</th><th>Vendedor</th><th>Desde a venda</th><th></th></tr></thead><tbody>' +
       linhas.map(function(l){ var s = SIT_CONTRATO[l.situacao] || { txt: l.situacao, cls: 'pg-st-neutro', ic: '' };
         var acoes = l.situacao === 'assinado_a_conferir' && l.tarefa_assinatura_id ?
           '<button class="pg-mini ok" onclick="PROD._conferir(\'' + l.tarefa_assinatura_id + '\',true,this)">✓ Está na pasta</button><button class="pg-mini bad" onclick="PROD._conferir(\'' + l.tarefa_assinatura_id + '\',false,this)">✗ Não está</button>' : '';
-        return '<tr><td><span class="pg-chip ' + s.cls + '">' + s.ic + ' ' + s.txt + '</span></td><td>' + esc(l.bling_numero || '—') + '<small>' + dm(l.data_pedido) + '</small></td><td>' + esc(l.cliente_nome || '—') + '<small>' + moeda(l.valor_total) + '</small></td>' +
+        var an = l.anulacao ? '<small><b>' + esc(l.anulacao.motivo_label || l.anulacao.motivo) + '</b> — ' + esc(l.anulacao.descricao) + ' (' + esc(l.anulacao.por) + ', ' + dm(l.anulacao.em) + ')</small>' : '';
+        return '<tr><td><span class="pg-chip ' + s.cls + '">' + s.ic + ' ' + s.txt + '</span>' + an + '</td><td>' + esc(l.bling_numero || '—') + '<small>' + dm(l.data_pedido) + '</small></td><td>' + esc(l.cliente_nome || '—') + '<small>' + moeda(l.valor_total) + '</small></td>' +
           '<td class="pg-arma">' + esc((l.armas || []).join(' + ')) + '</td><td>' + esc(l.vendedor) + '</td><td>' + (l.dias_venda != null ? l.dias_venda : l.dias) + 'd' + (l.avisos_cancelamento ? '<small>' + l.avisos_cancelamento + ' aviso(s)</small>' : '') + '</td><td class="pg-acts">' + acoes + '</td></tr>';
       }).join('') + '</tbody></table></div>';
     return h + '</div>';
@@ -11434,6 +11496,9 @@ window.CHAT_WIDGET = (function(){
 .tf-item{display:block;width:calc(100% - 24px);margin:4px 12px;text-align:left;background:#fff;border:1px solid #eef0ee;border-radius:9px;padding:8px 10px;cursor:pointer;font-family:inherit}
 .tf-item:hover{border-color:#c2e6c8;background:#fafdfa}
 .tf-item.contrato{border-color:#f0c5c5;background:#fff8f8}
+.tf-head small b.c,.tf-head small b.v{color:#b02525}
+.tf-item{display:flex!important;justify-content:space-between;align-items:center;gap:8px}
+.tf-item .m{margin-top:0!important;white-space:nowrap}
 .tf-item .t{font-size:12.5px;font-weight:600;color:#111412;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tf-item .m{font-size:11px;color:#717571;margin-top:2px}
 .tf-item .m.v{color:#c22f2f;font-weight:700}
@@ -11797,34 +11862,32 @@ window.TAREFAS_FAB = (function(){
         '<button class="tf-x" onclick="TAREFAS_FAB.toggle()" aria-label="Fechar">×</button></div>';
       (d.proximas || []).forEach(function(p){ hg += '<button class="tf-item" onclick="TAREFAS_FAB.irTarefas(\'' + crmEsc(p.id) + '\')"><div class="t">' + crmEsc(p.titulo || 'Contrato') + '</div><div class="m' + (p.vencida ? ' v' : '') + '">prazo ' + crmFmtDia(p.prazo) + '</div></button>'; });
       if (eq.vendedores_com_alerta) hg += '<div class="tf-alert ' + (eq.alertas_criticos ? 'critico' : 'atencao') + '" style="margin-top:8px"><b>' + eq.vendedores_com_alerta + ' vendedor(es) com alerta</b>Veja no painel de produtividade.</div>';
-      return hg + '<div class="tf-foot"><button class="tf-go" onclick="TAREFAS_FAB.irTarefas()">Abrir minhas tarefas →</button>' + (eq.vendedores_com_alerta ? '<button class="tf-snz" onclick="TAREFAS_FAB.irProdutividade()">Produtividade</button>' : '') + '</div>';
+      return hg + '<div class="tf-foot"><button class="tf-go" onclick="TAREFAS_FAB.irProdutividade()">Abrir produtividade →</button></div>';
     }
+    // Enxuto: 1 linha de status, a barra do dia, no máximo 1 alerta e 3 próximas
     var feitas = d.executadas_hoje || 0;
     var meta = d.cota_dia || 20;
     var pct = Math.min(100, Math.round(feitas / meta * 100));
-    var h = '<div class="tf-head"><div><h4>🎯 Suas tarefas</h4><small>' + (d.abertas ? d.abertas + ' em aberto — elas acumulam até serem feitas' : 'Fila em dia 👏') + '</small></div>' +
+    var total = (d.abertas || 0) + (d.contratos_abertos || 0);
+    var linha = [];
+    if (d.contratos_abertos) linha.push('<b class="c">' + d.contratos_abertos + ' contrato(s)</b>');
+    if (d.vencidas) linha.push('<b class="v">' + d.vencidas + ' vencida(s)</b>');
+    if (d.acumuladas) linha.push(d.acumuladas + ' de dias anteriores');
+    var h = '<div class="tf-head"><div><h4>' + (total ? total + ' para fazer' : 'Fila em dia 👏') + '</h4><small>' + (linha.join(' · ') || 'Bom trabalho') + '</small></div>' +
       '<button class="tf-x" onclick="TAREFAS_FAB.toggle()" aria-label="Fechar">×</button></div>';
     if (st.nudgeTxt) h += '<div class="tf-nudge">⏰ ' + crmEsc(st.nudgeTxt) + '</div>';
-    if (d.contratos_abertos) h += '<div class="tf-alert critico" style="margin-top:10px"><b>📝 ' + d.contratos_abertos + ' contrato(s) de arma pendente(s)</b>Obrigatório: sem contrato assinado a venda é cancelada e o dinheiro devolvido.</div>';
-    h += '<div class="tf-stats">' +
-      '<div class="tf-stat"><b>' + (d.abertas||0) + '</b><span>Abertas</span></div>' +
-      '<div class="tf-stat"><b>' + (d.de_hoje||0) + '</b><span>De hoje</span></div>' +
-      '<div class="tf-stat ' + (d.acumuladas ? 'warn' : '') + '"><b>' + (d.acumuladas||0) + '</b><span>Acumul.</span></div>' +
-      '<div class="tf-stat ' + (d.vencidas ? 'bad' : '') + '"><b>' + (d.vencidas||0) + '</b><span>Vencidas</span></div></div>';
-    h += '<div class="tf-prog">Finalizadas hoje: <b>' + feitas + '</b> de ' + meta + ' do dia' +
-      (d.mais_antiga_dias ? ' · mais antiga há <b>' + d.mais_antiga_dias + 'd</b>' : '') +
-      '<div class="tf-bar"><i style="width:' + pct + '%"></i></div></div>';
-    alertas.forEach(function(a){ h += '<div class="tf-alert ' + a.nivel + '"><b>' + (a.nivel === 'critico' ? '🚨 ' : '⚠️ ') + crmEsc(a.titulo) + '</b>' + crmEsc(a.mensagem) + '</div>'; });
+    h += '<div class="tf-prog">Feitas hoje <b>' + feitas + '</b> de ' + meta + '<div class="tf-bar"><i style="width:' + pct + '%"></i></div></div>';
+    var al = alertas.slice().sort(function(a, b){ return (a.nivel === 'critico' ? 0 : 1) - (b.nivel === 'critico' ? 0 : 1); })[0];
+    if (al) h += '<div class="tf-alert ' + al.nivel + '"><b>' + (al.nivel === 'critico' ? '🚨 ' : '⚠️ ') + crmEsc(al.titulo) + '</b>' + (al.nivel === 'critico' ? crmEsc(al.mensagem) : '') + '</div>';
     if ((d.proximas || []).length) {
-      h += '<div class="tf-sec">Comece por aqui</div>';
+      h += '<div class="tf-sec">Próximas</div>';
       d.proximas.forEach(function(p){
-        var meta2 = p.vencida ? '<div class="m v">⚠ vencida — prazo ' + crmFmtDia(p.prazo) + '</div>'
-          : '<div class="m">prazo ' + crmFmtDia(p.prazo) + (p.hora ? ' ' + crmEsc(p.hora) : '') + (p.dias_em_aberto ? ' · aberta há ' + p.dias_em_aberto + 'd' : '') + '</div>';
-        h += '<button class="tf-item' + (p.contrato ? ' contrato' : '') + '" onclick="TAREFAS_FAB.irTarefas(\'' + crmEsc(p.id) + '\')"><div class="t">' + (p.contrato ? crmEsc(p.titulo || '📝 Contrato de arma') : crmEsc(p.cliente_nome || p.titulo || 'Tarefa')) + '</div>' + meta2 + '</button>';
+        var meta2 = p.vencida ? '<div class="m v">vencida</div>' : (p.dias_em_aberto ? '<div class="m">há ' + p.dias_em_aberto + 'd</div>' : '');
+        h += '<button class="tf-item' + (p.contrato ? ' contrato' : '') + '" onclick="TAREFAS_FAB.irTarefas(\'' + crmEsc(p.id) + '\')"><div class="t">' + (p.contrato ? '📝 Contrato · ' + crmEsc(p.cliente_nome || 'arma') : crmEsc(p.cliente_nome || p.titulo || 'Tarefa')) + '</div>' + meta2 + '</button>';
       });
     }
-    h += '<div class="tf-foot"><button class="tf-go" onclick="TAREFAS_FAB.irTarefas()">Ir para minhas tarefas →</button>' +
-      '<button class="tf-snz" onclick="TAREFAS_FAB.adiar()" title="Para de abrir sozinho por 20 minutos">Lembrar em 20 min</button></div>';
+    h += '<div class="tf-foot"><button class="tf-go" onclick="TAREFAS_FAB.irTarefas()">Abrir minha fila →</button>' +
+      '<button class="tf-snz" onclick="TAREFAS_FAB.adiar()" title="Para de abrir sozinho por 20 minutos">Depois</button></div>';
     return h;
   }
 
@@ -11857,6 +11920,7 @@ window.TAREFAS_FAB = (function(){
   function toggle(){ if (st.aberto) fecharPainel(); else { fecharChat(); st.nudgeTxt = null; if (st.dados) el('tarefas-fab-panel').innerHTML = ehGestao() && !st.dados.abertas ? painelGestao(st.dados.equipe || {}) : painel(st.dados); abrirPainel(); } }
   function adiar(){ CRM_LS.set('tf_snooze', String(Date.now() + NUDGE_MS)); st.ultimoNudge = Date.now(); fecharPainel(); crmToast('Ok — lembro de novo em 20 minutos.', '', 2500); }
   function irTarefas(id){
+    if (id && window.TQ) { TQ.aberto = 't:' + id; TQ.filtro = 'todas'; }
     fecharPainel(); crmIrPara('tarefas');
     if (id) setTimeout(function(){ var c = document.getElementById('tar-' + id); if (c) { c.scrollIntoView({ behavior: 'smooth', block: 'center' }); c.style.boxShadow = '0 0 0 3px #5aaa66'; setTimeout(function(){ c.style.boxShadow = ''; }, 2200); } }, 1400);
   }
@@ -11927,42 +11991,43 @@ function cartFiltrados(){
 function cartDesenhar(){
   var view = document.getElementById('crm-view'); var d = CART.dados; if (!d) return;
   var p = d.placar; var ro = d.somente_leitura;
-  var h = '<div class="cart-hero"><div><h3>💼 ' + (ro ? 'Carteira de ' + crmEsc(d.login) : 'Minha Carteira') + '</h3>' +
-    '<p>' + (ro ? 'Visão da gerência (somente leitura).' : 'Seu livro de clientes — é o seu patrimônio como consultor. Todo cliente com próximo passo vira tarefa na sua fila.') + '</p></div>';
-  if (d.vendedores) {
-    h += '<select onchange="CART.vendedor=this.value;CART.filtro=\'todos\';crmRenderCarteira()">' + d.vendedores.map(function(v){ return '<option value="' + crmEsc(v) + '"' + (v === d.login ? ' selected' : '') + '>' + crmEsc(v) + '</option>'; }).join('') + '</select>';
-  }
-  if (!ro) h += '<button class="cart-add" onclick="cartNovoCliente()">+ Novo cliente</button>';
-  h += '</div>';
+  // Cabeçalho enxuto: título, seletor (gestão) e 1 ação
+  var h = '<div class="cv-head"><div><h3>' + (ro ? 'Carteira de ' + crmEsc(d.login) : 'Minha Carteira') + '</h3>' +
+    '<span>' + p.total + ' clientes' + (ro ? ' · somente leitura' : '') + '</span></div><div class="cv-head-acts">';
+  if (d.vendedores) h += '<select class="cv-sel" onchange="CART.vendedor=this.value;CART.filtro=\'todos\';crmRenderCarteira()">' + d.vendedores.map(function(v){ return '<option value="' + crmEsc(v) + '"' + (v === d.login ? ' selected' : '') + '>' + crmEsc(v) + '</option>'; }).join('') + '</select>';
+  if (!ro) h += '<button class="cv-add" onclick="cartNovoCliente()">+ Novo cliente</button>';
+  h += '</div></div>';
 
+  // 3 números que pedem ação (o resto fica em "ver metas")
   var pctNovos = Math.min(100, Math.round(p.novos_mes / (d.metas.novos_mes || 1) * 100));
   var pctCompras = Math.min(100, Math.round(p.compraram_mes / (d.metas.compras_mes || 1) * 100));
-  h += '<div class="cart-placar">' +
-    '<div class="cart-tile"><div class="l">Clientes</div><div class="v">' + p.total + '</div><div class="s">' + p.prospects + ' prospect(s)</div></div>' +
-    '<div class="cart-tile"><div class="l">🔥 Quentes</div><div class="v">' + p.quentes + '</div><div class="s">' + p.mornos + ' mornos · ' + p.frios + ' frios</div></div>' +
-    '<div class="cart-tile"><div class="l">🌱 Novos no mês</div><div class="v">' + p.novos_mes + '<span style="font-size:13px;color:#717571"> / ' + d.metas.novos_mes + '</span></div><div class="tf-bar"><i style="width:' + pctNovos + '%"></i></div></div>' +
-    '<div class="cart-tile"><div class="l">💰 Compraram no mês</div><div class="v">' + p.compraram_mes + '<span style="font-size:13px;color:#717571"> / ' + d.metas.compras_mes + '</span></div><div class="s">' + crmFmtMoeda(p.valor_mes) + ' vendidos</div><div class="tf-bar"><i style="width:' + pctCompras + '%"></i></div></div>' +
-    '<div class="cart-tile ' + (p.esfriando ? 'bad' : '') + '"><div class="l">⚠ Esfriando</div><div class="v">' + p.esfriando + '</div><div class="s">sem contato além do prazo</div></div>' +
-    '<div class="cart-tile ' + (p.sem_proximo_passo ? 'warn' : '') + '"><div class="l">📅 Sem próximo passo</div><div class="v">' + p.sem_proximo_passo + '</div><div class="s">' + p.sem_temperatura + ' sem temperatura</div></div>' +
+  h += '<div class="cv-kpis">' +
+    '<button class="cv-kpi' + (p.esfriando ? ' bad' : '') + (CART.filtro === 'esfriando' ? ' on' : '') + '" onclick="CART.filtro=\'esfriando\';CART.limite=40;cartDesenhar()"><b>' + p.esfriando + '</b><span>esfriando</span></button>' +
+    '<button class="cv-kpi' + (p.sem_proximo_passo ? ' warn' : '') + (CART.filtro === 'sem_passo' ? ' on' : '') + '" onclick="CART.filtro=\'sem_passo\';CART.limite=40;cartDesenhar()"><b>' + p.sem_proximo_passo + '</b><span>sem próximo passo</span></button>' +
+    '<button class="cv-kpi' + (CART.filtro === 'quente' ? ' on' : '') + '" onclick="CART.filtro=\'quente\';CART.limite=40;cartDesenhar()"><b>' + p.quentes + '</b><span>quentes 🔥</span></button>' +
+    '<button class="cv-kpi meta" onclick="CART.verMetas=!CART.verMetas;cartDesenhar()"><b>' + p.compraram_mes + '<small>/' + d.metas.compras_mes + '</small></b><span>compraram no mês ' + (CART.verMetas ? '▴' : '▾') + '</span></button>' +
   '</div>';
-
-  // Comemoração: compras novas de clientes da carteira (últimos 7 dias)
+  if (CART.verMetas) {
+    h += '<div class="cv-metas"><div><span>Novos clientes no mês</span><b>' + p.novos_mes + ' / ' + d.metas.novos_mes + '</b><i><em style="width:' + pctNovos + '%"></em></i></div>' +
+      '<div><span>Compraram no mês</span><b>' + p.compraram_mes + ' / ' + d.metas.compras_mes + ' · ' + crmFmtMoeda(p.valor_mes) + '</b><i><em style="width:' + pctCompras + '%"></em></i></div>' +
+      '<div class="cv-conq">' + (d.conquistas || []).map(function(c){ return '<span class="' + (c.conquistada ? 'on' : '') + '" title="' + crmEsc(c.titulo) + '">' + c.icone + ' ' + crmEsc(c.titulo) + (c.conquistada ? ' ✓' : ' ' + c.atual + '/' + c.alvo) + '</span>'; }).join('') + '</div></div>';
+  }
+  // Comemoração discreta (1 linha) + toast uma vez
   if ((d.novidades || []).length) {
-    h += '<div class="cart-novas">🎉 <b>Compras recentes na sua carteira:</b> ' + d.novidades.slice(0, 4).map(function(n){ return crmEsc(n.nome) + ' (' + crmFmtMoeda(n.valor) + ', ' + crmFmtDia(n.data) + ')'; }).join(' · ') + '</div>';
+    h += '<div class="cv-festa">🎉 ' + crmEsc(d.novidades[0].nome) + ' comprou ' + crmFmtMoeda(d.novidades[0].valor) + (d.novidades.length > 1 ? ' · +' + (d.novidades.length - 1) + ' compra(s) recente(s)' : '') + '</div>';
     if (!ro) {
       var chaveNov = 'cart_festa_' + d.novidades.map(function(n){ return n.account_id + n.data; }).join('|').slice(0, 300);
       if (!CRM_LS.get(chaveNov)) { CRM_LS.set(chaveNov, '1'); crmToast('🎉 ' + d.novidades[0].nome + ' comprou ' + crmFmtMoeda(d.novidades[0].valor) + '! Cliente da sua carteira.', 'festa', 6500); }
     }
   }
-
-  h += '<div class="cart-conq">' + (d.conquistas || []).map(function(c){
-    return '<div class="cart-badge ' + (c.conquistada ? 'on' : 'off') + '" title="' + crmEsc(c.titulo) + '"><span class="ico">' + c.icone + '</span>' + crmEsc(c.titulo) + (c.conquistada ? ' ✓' : ' <span style="color:#717571">' + c.atual + '/' + c.alvo + '</span>') + '</div>';
-  }).join('') + '</div>';
-
-  var filtros = [['todos', 'Todos (' + p.total + ')'], ['quente', '🔥 Quentes (' + p.quentes + ')'], ['morno', '🙂 Mornos (' + p.mornos + ')'], ['frio', '❄️ Frios (' + p.frios + ')'],
-    ['sem_temp', 'Sem temperatura (' + p.sem_temperatura + ')'], ['prospects', '🌱 Prospects (' + p.prospects + ')'], ['esfriando', '⚠ Esfriando (' + p.esfriando + ')'], ['sem_passo', '📅 Sem próximo passo (' + p.sem_proximo_passo + ')']];
-  h += '<div class="cart-tools"><input class="crm2-in" id="cart-busca" placeholder="Buscar por nome, cidade, telefone ou CPF…" value="' + crmEsc(CART.busca) + '" oninput="CART.busca=this.value;CART.limite=60;cartDesenharLista()"></div>' +
-    '<div class="crm2-chips" style="margin-bottom:12px">' + filtros.map(function(f){ return '<button type="button" class="crm2-chip' + (CART.filtro === f[0] ? ' on' : '') + '" onclick="CART.filtro=\'' + f[0] + '\';CART.limite=60;cartDesenhar()">' + crmEsc(f[1]) + '</button>'; }).join('') + '</div>' +
+  // Busca + filtros principais; os demais num seletor
+  var principais = [['todos', 'Todos', p.total], ['quente', '🔥 Quentes', p.quentes], ['esfriando', 'Esfriando', p.esfriando], ['sem_passo', 'Sem passo', p.sem_proximo_passo]];
+  var outros = [['morno', '🙂 Mornos', p.mornos], ['frio', '❄️ Frios', p.frios], ['sem_temp', 'Sem temperatura', p.sem_temperatura], ['prospects', '🌱 Prospects', p.prospects]];
+  var outroSel = outros.some(function(o){ return o[0] === CART.filtro; });
+  h += '<div class="cv-tools"><input class="cv-busca" id="cart-busca" placeholder="Buscar nome, cidade, telefone ou CPF…" value="' + crmEsc(CART.busca) + '" oninput="CART.busca=this.value;CART.limite=40;cartDesenharLista()">' +
+    '<div class="cv-fils">' + principais.map(function(f){ return '<button class="tq-fil' + (CART.filtro === f[0] ? ' on' : '') + '" onclick="CART.filtro=\'' + f[0] + '\';CART.limite=40;cartDesenhar()">' + f[1] + ' <span>' + f[2] + '</span></button>'; }).join('') +
+    '<select class="cv-mais' + (outroSel ? ' on' : '') + '" onchange="if(this.value){CART.filtro=this.value;CART.limite=40;cartDesenhar()}"><option value="">Mais filtros…</option>' +
+      outros.map(function(o){ return '<option value="' + o[0] + '"' + (CART.filtro === o[0] ? ' selected' : '') + '>' + o[1] + ' (' + o[2] + ')</option>'; }).join('') + '</select></div></div>' +
     '<div id="cart-lista"></div>';
   view.innerHTML = h;
   cartDesenharLista();
@@ -11972,35 +12037,41 @@ function cartDesenharLista(){
   var box = document.getElementById('cart-lista'); if (!box) return;
   var d = CART.dados; var ro = d.somente_leitura;
   var lista = cartFiltrados();
+  if (!CART.limite || CART.limite > 400) CART.limite = 40;
   if (!lista.length) {
-    box.innerHTML = '<div class="cart-vazio">' + (d.placar.total ? 'Nenhum cliente neste filtro.' : 'Sua carteira ainda está vazia. Comece cadastrando quem você já atende — indicações, contatos do WhatsApp, clientes do balcão.' + (ro ? '' : '<br><br><button class="crm2-btn pri" onclick="cartNovoCliente()">+ Cadastrar primeiro cliente</button>')) + '</div>';
+    box.innerHTML = '<div class="tq-vazio"><div>💼</div><b>' + (d.placar.total ? 'Nenhum cliente neste filtro.' : 'Sua carteira ainda está vazia.') + '</b>' +
+      (d.placar.total || ro ? '' : '<span>Cadastre quem você já atende: indicações, contatos do WhatsApp, clientes do balcão.</span><br><br><button class="cv-add" onclick="cartNovoCliente()">+ Cadastrar primeiro cliente</button>') + '</div>';
     return;
   }
-  var hoje = crmHojeBRT();
-  var html = '<div class="cart-grid">' + lista.slice(0, CART.limite).map(function(c){
-    var temp = CART_TEMP.map(function(t){ return '<button type="button" class="' + t[0] + (c.temperatura === t[0] ? ' on' : '') + '"' + (ro ? ' disabled' : ' onclick="cartTemperatura(\'' + crmEsc(c.id) + '\',\'' + t[0] + '\')"') + '>' + t[1] + '</button>'; }).join('');
-    var compra = c.ultima_compra_em ? 'Última compra <b>' + crmFmtDate(c.ultima_compra_em) + '</b> · ' + crmFmtMoeda(c.valor_total_compras) + ' em ' + c.pedidos_count + ' pedido(s)' : '<span style="color:#717571">Ainda não comprou</span>';
-    var contato = c.ultimo_contato_em ? 'Último contato há <span class="' + (c.esfriando ? 'bad' : '') + '">' + c.dias_sem_contato + ' dia(s)</span>' : (c.esfriando ? '<span class="bad">Sem contato registrado</span>' : 'Sem contato registrado');
-    var passo;
-    if (c.proximo_passo) {
-      var pp = c.proximo_passo;
-      passo = '<div class="cart-passo ' + (pp.vencido ? 'venc' : '') + '">📅 <b>' + crmFmtDia(pp.prazo) + (pp.hora ? ' ' + crmEsc(pp.hora) : '') + '</b>' + (pp.vencido ? ' (vencido)' : '') + ' — ' + crmEsc(cartTxtPasso(pp)) + '</div>';
-    } else {
-      passo = '<div class="cart-passo vazio">⚠ Sem próximo passo — defina o que fazer e quando.</div>';
-    }
-    var tel = c.telefone ? (typeof crmNormalizaTelBR === 'function' ? crmNormalizaTelBR(c.telefone) : null) : null;
-    var tarefaRef = c.proximo_passo ? c.proximo_passo.tarefa_id : '';
-    var wa = tel ? '<a class="wa" href="https://wa.me/' + tel + '" target="_blank" rel="noopener noreferrer"' + (tarefaRef && !ro ? ' onclick="crmRegistraContato(\'' + crmEsc(tarefaRef) + '\')"' : '') + '>💬 WhatsApp</a>' : '';
-    var botoes = (ro ? '' : '<button class="' + (c.proximo_passo ? '' : 'pri') + '" onclick="cartProximoPasso(\'' + crmEsc(c.id) + '\')">' + (c.proximo_passo ? '✎ Alterar passo' : '📅 Definir próximo passo') + '</button>') + wa +
-      '<button onclick="crmAbrirFicha(\'' + crmEsc(c.id) + '\')">👤 Ficha</button>' + (ro ? '' : '<button onclick="cartNotas(\'' + crmEsc(c.id) + '\')">📝 Notas</button>');
-    return '<div class="cart-card' + (c.esfriando ? ' esfr' : '') + '">' +
-      '<div class="cart-nome">' + crmEsc(c.nome) + (c.prospect ? ' <span class="cart-tag">prospect</span>' : '') + (c.comprou_no_mes ? ' <span class="cart-tag" style="background:#eaf6ec;color:#1f6b2c">comprou no mês</span>' : '') + '</div>' +
-      '<div class="cart-meta">' + [c.cidade, c.telefone, (d.opcoes.origens[c.origem] || '')].filter(Boolean).map(crmEsc).join(' · ') + '</div>' +
-      '<div class="cart-temp">' + temp + '</div>' +
-      '<div class="cart-info">' + compra + '<br>' + contato + (c.notas ? '<br><span style="color:#717571">📝 ' + crmEsc(c.notas).slice(0, 140) + '</span>' : '') + '</div>' +
-      passo + '<div class="cart-acts">' + botoes + '</div></div>';
+  var TEMP_IC = { quente: '🔥', morno: '🙂', frio: '❄️' };
+  var html = '<div class="tq-lista">' + lista.slice(0, CART.limite).map(function(c){
+    var k = c.id, aberto = CART.aberto === k, id = crmEsc(c.id);
+    var pp = c.proximo_passo;
+    var sub = pp ? '📅 ' + crmFmtDia(pp.prazo) + ' — ' + cartTxtPasso(pp) : (c.ultima_compra_em ? 'Última compra ' + crmFmtDate(c.ultima_compra_em) + ' · ' + crmFmtMoeda(c.valor_total_compras) : 'Ainda não comprou');
+    var tag = c.esfriando ? '<span class="tq-tag bad">esfriando</span>' : (pp && pp.vencido ? '<span class="tq-tag bad">passo vencido</span>' : '');
+    var tel = c.telefone ? crmNormalizaTelBR(c.telefone) : null;
+    var tarefaRef = pp ? pp.tarefa_id : '';
+    var cta = ro ? '' : (!pp ? '<button class="tq-cta" onclick="cartProximoPasso(\'' + id + '\')">Definir passo</button>'
+      : (tel ? '<a class="tq-cta wa" href="https://wa.me/' + tel + '" target="_blank" rel="noopener noreferrer"' + (tarefaRef ? ' onclick="crmRegistraContato(\'' + crmEsc(tarefaRef) + '\')"' : '') + '>💬 WhatsApp</a>' : ''));
+    var row = '<div class="tq-row' + (aberto ? ' aberto' : '') + (c.esfriando ? ' venc' : '') + '" data-k="cv:' + id + '">' +
+      '<button class="tq-main" onclick="CART.aberto=CART.aberto===\'' + id + '\'?null:\'' + id + '\';cartDesenharLista()" aria-expanded="' + aberto + '">' +
+        '<span class="tq-ic" title="' + (c.temperatura || 'sem temperatura') + '">' + (TEMP_IC[c.temperatura] || '<span style="color:#b9bdb9">○</span>') + '</span>' +
+        '<span class="tq-txt"><b>' + crmEsc(c.nome) + (c.prospect ? ' <em class="cv-tag">prospect</em>' : '') + (c.comprou_no_mes ? ' <em class="cv-tag ok">comprou no mês</em>' : '') + '</b><small>' + crmEsc(sub) + '</small></span>' + tag +
+        '<span class="tq-chev">' + (aberto ? '▴' : '▾') + '</span></button>' + cta + '</div>';
+    if (!aberto) return row;
+    var temp = CART_TEMP.map(function(t){ return '<button type="button" class="' + t[0] + (c.temperatura === t[0] ? ' on' : '') + '"' + (ro ? ' disabled' : ' onclick="cartTemperatura(\'' + id + '\',\'' + t[0] + '\')"') + '>' + t[1] + '</button>'; }).join('');
+    var contato = c.ultimo_contato_em ? 'Último contato há ' + c.dias_sem_contato + ' dia(s)' : 'Sem contato registrado';
+    var compra = c.ultima_compra_em ? 'Última compra ' + crmFmtDate(c.ultima_compra_em) + ' · ' + crmFmtMoeda(c.valor_total_compras) + ' em ' + c.pedidos_count + ' pedido(s)' : 'Ainda não comprou';
+    return row + '<div class="tq-det">' +
+      '<div class="cv-det-l"><span>Temperatura</span><div class="cart-temp">' + temp + '</div></div>' +
+      '<div class="tq-links"><span>' + crmEsc(compra) + '</span><span>' + crmEsc(contato) + '</span>' + (c.cidade ? '<span>' + crmEsc(c.cidade) + '</span>' : '') + (c.telefone ? '<span>📞 ' + crmEsc(c.telefone) + '</span>' : '') + '</div>' +
+      (pp ? '<div class="tq-desc">📅 <b>' + crmFmtDia(pp.prazo) + (pp.hora ? ' ' + crmEsc(pp.hora) : '') + '</b>' + (pp.vencido ? ' (vencido)' : '') + ' — ' + crmEsc(cartTxtPasso(pp)) + '</div>' : '') +
+      (c.notas ? '<div class="tq-desc" style="color:#717571">📝 ' + crmEsc(c.notas) + '</div>' : '') +
+      '<div class="tq-fim">' + (ro ? '' : '<button class="ok" onclick="cartProximoPasso(\'' + id + '\')">' + (pp ? '✎ Alterar próximo passo' : '📅 Definir próximo passo') + '</button>') +
+        '<button onclick="crmAbrirFicha(\'' + id + '\')">Ficha</button>' + (ro ? '' : '<button onclick="cartNotas(\'' + id + '\')">Notas</button>') + '</div>' +
+    '</div>';
   }).join('') + '</div>';
-  if (lista.length > CART.limite) html += '<button class="cart-mais" onclick="CART.limite+=60;cartDesenharLista()">Ver mais (' + (lista.length - CART.limite) + ' restantes)</button>';
+  if (lista.length > CART.limite) html += '<button class="tq-mais" onclick="CART.limite+=40;cartDesenharLista()">Mostrar mais (' + (lista.length - CART.limite) + ' restantes)</button>';
   box.innerHTML = html;
 }
 
@@ -12118,6 +12189,100 @@ async function cartSalvarNotas(id){
   · 4 Conferido pela gestão
 ═══════════════════════════════════════════════════════════════ -->
 <style>
+/* ── Minhas Tarefas v4 (lista enxuta) ─────────────────── */
+#tab-crm .tq-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:2px 0 12px;flex-wrap:wrap}
+#tab-crm .tq-head h3{margin:0;font-size:18px;color:#111412}
+#tab-crm .tq-prog{display:flex;align-items:center;gap:10px;margin-top:4px;font-size:12.5px;color:#52514e}
+#tab-crm .tq-prog i{display:block;width:140px;height:6px;background:#e7ebe7;border-radius:4px;overflow:hidden}
+#tab-crm .tq-prog i b{display:block;height:100%;background:#3d8a49;border-radius:4px}
+#tab-crm .tq-btn-sec{background:#fff;border:1px solid #d5d8d5;color:#111412;border-radius:8px;padding:8px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+#tab-crm .tq-btn-sec:hover{border-color:#9aa09a}
+#tab-crm .tq-filtros{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+#tab-crm .tq-fil{background:transparent;border:1px solid transparent;border-radius:99px;padding:6px 12px;font-size:12.5px;font-weight:600;color:#52514e;cursor:pointer;font-family:inherit}
+#tab-crm .tq-fil span{color:#898781;font-weight:700;margin-left:2px}
+#tab-crm .tq-fil:hover{background:#eef0ee}
+#tab-crm .tq-fil.on{background:#111412;color:#fff}
+#tab-crm .tq-fil.on span{color:#cfd3cf}
+#tab-crm .tq-fil.alerta span{color:#c22f2f}
+#tab-crm .tq-fil.on.alerta span{color:#ffb3b3}
+#tab-crm .tq-lista{background:#fff;border:1px solid #e2e4e2;border-radius:12px;overflow:hidden}
+#tab-crm .tq-row{display:flex;align-items:center;gap:8px;padding:0 12px 0 0;border-top:1px solid #eef0ee;min-height:56px}
+#tab-crm .tq-lista > .tq-row:first-child{border-top:none}
+#tab-crm .tq-row.aberto{background:#fafbfa}
+#tab-crm .tq-row.venc{box-shadow:inset 3px 0 0 #d03b3b}
+#tab-crm .tq-row.ct{box-shadow:inset 3px 0 0 #111412}
+#tab-crm .tq-row.ct.venc{box-shadow:inset 3px 0 0 #d03b3b}
+#tab-crm .tq-main{flex:1;min-width:0;display:flex;align-items:center;gap:12px;background:none;border:none;padding:10px 0 10px 14px;cursor:pointer;text-align:left;font-family:inherit;color:inherit}
+#tab-crm .tq-ic{width:32px;height:32px;flex:0 0 32px;border-radius:8px;background:#f3f4f3;display:flex;align-items:center;justify-content:center;font-size:16px}
+#tab-crm .tq-txt{flex:1;min-width:0}
+#tab-crm .tq-txt b{display:block;font-size:13.5px;color:#111412;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tab-crm .tq-txt small{display:block;font-size:12px;color:#717571;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tab-crm .tq-tag{flex:0 0 auto;font-size:11.5px;font-weight:700;color:#52514e;background:#f0efec;border-radius:99px;padding:2px 9px;white-space:nowrap}
+#tab-crm .tq-tag.warn{background:#fff4dc;color:#7a4b06}
+#tab-crm .tq-tag.bad{background:#fbe9e9;color:#9e2424}
+#tab-crm .tq-chev{flex:0 0 14px;color:#9aa09a;font-size:11px}
+#tab-crm .tq-dots{display:flex;gap:3px;flex:0 0 auto}
+#tab-crm .tq-dots i{width:7px;height:7px;border-radius:50%;background:#dcdedc;display:block}
+#tab-crm .tq-dots i.ok{background:#3d8a49}
+#tab-crm .tq-dots i.at{background:#111412}
+#tab-crm .tq-cta{flex:0 0 auto;border:1px solid #d5d8d5;background:#fff;color:#111412;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;font-family:inherit}
+#tab-crm .tq-cta.wa{background:#25D366;border-color:#25D366;color:#fff}
+#tab-crm .tq-cta.pri{background:#111412;border-color:#111412;color:#fff}
+#tab-crm .tq-cta.bad{background:#d03b3b;border-color:#d03b3b;color:#fff}
+#tab-crm .tq-det{padding:4px 16px 14px 58px;background:#fafbfa;border-top:1px dashed #e7ebe7}
+#tab-crm .tq-desc{font-size:12.5px;color:#444846;white-space:pre-line;margin:8px 0}
+#tab-crm .tq-pitch{display:flex;gap:10px;align-items:flex-start;margin:8px 0}
+#tab-crm .tq-pitch .tar-pitch{flex:1;margin:0;font-size:12.5px;background:#fff;border:1px solid #e2e4e2;border-radius:8px;padding:9px 11px;white-space:pre-line;color:#111412}
+#tab-crm .tq-pitch button{border:1px solid #d5d8d5;background:#fff;border-radius:8px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+#tab-crm .tq-links{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#717571;margin:6px 0 10px}
+#tab-crm .tq-links a{color:#3d6fb0;font-weight:600}
+#tab-crm .tq-fim{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding-top:10px;border-top:1px solid #eef0ee}
+#tab-crm .tq-fim span{font-size:12px;font-weight:700;color:#52514e;margin-right:4px}
+#tab-crm .tq-fim button{border:1px solid #d5d8d5;background:#fff;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;color:#444846;font-family:inherit}
+#tab-crm .tq-fim button.ok{background:#3d8a49;border-color:#3d8a49;color:#fff}
+#tab-crm .tq-fim button.lnk,#tab-crm .tq-anular .lnk{border:none;background:none;color:#898781;font-weight:600;text-decoration:underline;padding:7px 4px;cursor:pointer;font-family:inherit;font-size:12px}
+#tab-crm .tq-det.ct .ct-op{border:none;box-shadow:none;background:transparent;padding:0;margin:6px 0 0}
+#tab-crm .tq-det.ct .ct-op-arma,#tab-crm .tq-det.ct .ct-op-st{display:none}
+#tab-crm .tq-det.ct .ct-op-id{font-size:12.5px;font-weight:600}
+#tab-crm .tq-nota{font-size:11.5px;color:#717571;margin-top:8px}
+#tab-crm .tq-anular{text-align:right;margin-top:4px}
+#tab-crm .tq-mais{display:block;width:100%;margin-top:8px;background:#fff;border:1px dashed #d5d8d5;border-radius:10px;padding:10px;font-weight:700;font-size:12.5px;color:#52514e;cursor:pointer;font-family:inherit}
+#tab-crm .tq-vazio{background:#fff;border:1px solid #e2e4e2;border-radius:12px;padding:32px 16px;text-align:center;color:#717571}
+#tab-crm .tq-vazio div{font-size:26px;color:#3d8a49}
+#tab-crm .tq-vazio b{display:block;color:#111412;margin:4px 0}
+@media(max-width:640px){#tab-crm .tq-tag,#tab-crm .tq-dots{display:none}#tab-crm .tq-det{padding-left:16px}#tab-crm .tq-cta{padding:7px 9px}}
+/* ── Carteira v2 (enxuta) ── */
+#tab-crm .cv-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:2px 0 12px;flex-wrap:wrap}
+#tab-crm .cv-head h3{margin:0;font-size:18px;color:#111412}
+#tab-crm .cv-head span{font-size:12.5px;color:#717571}
+#tab-crm .cv-head-acts{display:flex;gap:8px;align-items:center}
+#tab-crm .cv-sel{border:1px solid #d5d8d5;border-radius:8px;padding:7px 10px;font-size:12.5px;font-family:inherit;background:#fff}
+#tab-crm .cv-add{background:#111412;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
+#tab-crm .cv-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+#tab-crm .cv-kpi{background:#fff;border:1px solid #e2e4e2;border-radius:10px;padding:10px 12px;text-align:left;cursor:pointer;font-family:inherit}
+#tab-crm .cv-kpi:hover{border-color:#b9bdb9}
+#tab-crm .cv-kpi.on{border-color:#111412;box-shadow:0 0 0 1px #111412}
+#tab-crm .cv-kpi b{display:block;font-size:20px;color:#111412;line-height:1.2}
+#tab-crm .cv-kpi b small{font-size:12px;color:#898781}
+#tab-crm .cv-kpi span{font-size:12px;color:#52514e;font-weight:600}
+#tab-crm .cv-kpi.bad b{color:#b02525}#tab-crm .cv-kpi.warn b{color:#9a5b00}
+#tab-crm .cv-metas{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;background:#fff;border:1px solid #e2e4e2;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:12.5px;color:#52514e}
+#tab-crm .cv-metas b{display:block;color:#111412}
+#tab-crm .cv-metas i{display:block;height:6px;background:#e7ebe7;border-radius:4px;margin-top:4px;overflow:hidden}
+#tab-crm .cv-metas i em{display:block;height:100%;background:#3d8a49}
+#tab-crm .cv-conq{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+#tab-crm .cv-conq span{font-size:11.5px;padding:3px 9px;border-radius:99px;background:#f3f4f3;color:#898781}
+#tab-crm .cv-conq span.on{background:#eaf6ec;color:#1f5e2a;font-weight:700}
+#tab-crm .cv-festa{font-size:12.5px;color:#1f5e2a;background:#eaf6ec;border-radius:8px;padding:7px 12px;margin-bottom:12px}
+#tab-crm .cv-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+#tab-crm .cv-busca{flex:1;min-width:220px;border:1px solid #d5d8d5;border-radius:8px;padding:8px 11px;font-size:13px;font-family:inherit}
+#tab-crm .cv-fils{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+#tab-crm .cv-mais{border:1px solid #d5d8d5;border-radius:99px;padding:5px 10px;font-size:12.5px;font-family:inherit;background:#fff;color:#52514e}
+#tab-crm .cv-mais.on{background:#111412;color:#fff;border-color:#111412}
+#tab-crm .cv-tag{font-style:normal;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;padding:1px 6px;border-radius:99px;background:#eef3ff;color:#2a56c6;margin-left:4px;vertical-align:middle}
+#tab-crm .cv-tag.ok{background:#eaf6ec;color:#1f6b2c}
+#tab-crm .cv-det-l{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:12px;color:#52514e;font-weight:700}
+@media(max-width:760px){#tab-crm .cv-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}#tab-crm .cv-metas{grid-template-columns:1fr}}
 #tab-crm .ct-bloco{margin:4px 0 18px}
 #tab-crm .ct-bloco-h,#tab-crm .tar-bloco-h{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:800;color:#111412;margin:4px 0 10px}
 #tab-crm .ct-bloco-h span,#tab-crm .tar-bloco-h span{background:#111412;color:#fff;border-radius:99px;font-size:11px;padding:1px 8px}
