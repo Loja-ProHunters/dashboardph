@@ -9247,7 +9247,7 @@
   "c0d2d293-889b-4c73-8e69-9878cf466736": {
     "id": "c0d2d293-889b-4c73-8e69-9878cf466736",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_df917391a0e74044",
@@ -9271,12 +9271,15 @@
     "lote_dia": "2026-10-20",
     "criado_em": "2026-10-20T11:00:19.950Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-20T11:00:19.950Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T18:19:45.789Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "CEU AZUL ALIMENTOS LTDA",
     "cliente_telefone": null,
     "dia_origem": "2026-10-20",
-    "dias_em_aberto": 0
+    "dias_em_aberto": 0,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:19:45.148Z",
+    "concluida_por": "boschetto"
   },
   "96b1b23a-6de8-46ab-9fe6-d3807a9bcdb5": {
     "id": "96b1b23a-6de8-46ab-9fe6-d3807a9bcdb5",
