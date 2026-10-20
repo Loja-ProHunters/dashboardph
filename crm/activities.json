@@ -6091,15 +6091,15 @@
   },
   "d1e00ca3-45a8-4b3f-a518-a7b3cbf59923": {
     "id": "d1e00ca3-45a8-4b3f-a518-a7b3cbf59923",
-    "status": "pendente",
+    "status": "concluida",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.959Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T13:44:52.723Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T14:51:19.667Z",
+    "atualizado_por": "mathias",
     "tipo": "contrato_assinatura",
     "owner_id": "mathias",
     "dono": "mathias",
@@ -6136,7 +6136,19 @@
       "nome": "Wesley Mathias Ciesielsky",
       "conta": "prohunters",
       "origem": "vendedor"
-    }
+    },
+    "resultado": "contrato_assinado",
+    "concluida_em": "2026-10-20T14:51:19.667Z",
+    "concluida_por": "mathias",
+    "declaracao": {
+      "texto": "Declaro que o contrato assinado pelo cliente está salvo na pasta de contratos.",
+      "por": "mathias",
+      "em": "2026-10-20T14:51:19.667Z"
+    },
+    "verificacao": {
+      "status": "pendente"
+    },
+    "observacao_conclusao": null
   },
   "831f3791-01db-41a2-a806-a87427ca625c": {
     "id": "831f3791-01db-41a2-a806-a87427ca625c",
