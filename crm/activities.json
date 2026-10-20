@@ -5034,7 +5034,7 @@
   "47128649-ddd9-4884-8fb6-d9dc69597765": {
     "id": "47128649-ddd9-4884-8fb6-d9dc69597765",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_81fc5286543b6c6f",
@@ -5057,12 +5057,15 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T15:49:12.316Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "PAULO HENRIQUE DE ARAÚJO E SILVA",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T15:49:12.177Z",
+    "concluida_por": "mathias"
   },
   "27477b26-d27f-4ca3-a385-199ce22e8173": {
     "id": "27477b26-d27f-4ca3-a385-199ce22e8173",
