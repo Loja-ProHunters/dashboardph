@@ -5616,7 +5616,7 @@
   "c2f15622-032e-4b34-b6fd-f7f61dcb37ba": {
     "id": "c2f15622-032e-4b34-b6fd-f7f61dcb37ba",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_f557fdc91ca67d21",
@@ -5636,14 +5636,17 @@
     "dono": "mathias",
     "criado_em": "2026-10-17T11:00:18.511Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-20T13:44:46.399Z",
-    "atualizado_por": "reatribuicao-v3",
+    "atualizado_em": "2026-10-20T18:59:02.407Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Leonardo Rodrigues dos Santos",
     "cliente_telefone": null,
     "dia_origem": "2026-10-17",
     "dias_em_aberto": 3,
     "reatribuido_de": "boschetto",
-    "reatribuido_em": "2026-10-20T13:44:46.399Z"
+    "reatribuido_em": "2026-10-20T13:44:46.399Z",
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:59:02.039Z",
+    "concluida_por": "mathias"
   },
   "524ac113-6c6a-4862-ac91-f6e07ebaae1a": {
     "id": "524ac113-6c6a-4862-ac91-f6e07ebaae1a",
