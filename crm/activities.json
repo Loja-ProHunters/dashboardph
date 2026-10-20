@@ -4616,7 +4616,7 @@
   "9d2301ea-86eb-4b20-8c2a-ffec71f9d4fa": {
     "id": "9d2301ea-86eb-4b20-8c2a-ffec71f9d4fa",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_809fab28155ccbc5",
@@ -4636,10 +4636,13 @@
     "dono": "dickmann",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T18:38:49.646Z",
+    "atualizado_por": "dickmann",
     "cliente_nome": "Rafael da Silva Fernandes De Oliveira",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:38:49.042Z",
+    "concluida_por": "dickmann"
   },
   "d68f44f7-7f3a-4c1e-8eac-7dbd2750b3b1": {
     "id": "d68f44f7-7f3a-4c1e-8eac-7dbd2750b3b1",
