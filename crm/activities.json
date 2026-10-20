@@ -9016,7 +9016,7 @@
   "d15e8be6-e7c6-4431-b41a-2d2d2e1e8d92": {
     "id": "d15e8be6-e7c6-4431-b41a-2d2d2e1e8d92",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_40ee4797649aaf6d",
@@ -9040,10 +9040,13 @@
     "lote_dia": "2026-10-20",
     "criado_em": "2026-10-20T11:00:19.950Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-20T13:44:46.399Z",
-    "atualizado_por": "reatribuicao-v3",
+    "atualizado_em": "2026-10-20T18:14:59.972Z",
+    "atualizado_por": "mathias",
     "reatribuido_de": "dickmann",
-    "reatribuido_em": "2026-10-20T13:44:46.399Z"
+    "reatribuido_em": "2026-10-20T13:44:46.399Z",
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:14:59.046Z",
+    "concluida_por": "mathias"
   },
   "f06d8164-4f3c-4d22-b88f-fc5961b266a4": {
     "id": "f06d8164-4f3c-4d22-b88f-fc5961b266a4",
