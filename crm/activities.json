@@ -3975,7 +3975,7 @@
   "1f27ab7f-0b48-4bef-91a8-2b038e3697a1": {
     "id": "1f27ab7f-0b48-4bef-91a8-2b038e3697a1",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_5e90e42c839f26ad",
@@ -3998,12 +3998,15 @@
     "dono": "boschetto",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T12:21:09.077Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "STRIKE TACTICAL SOLUTIONS LTDA",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T12:21:09.077Z",
+    "concluida_por": "boschetto"
   },
   "a282fd68-d874-4eb0-8f16-1fdc6103a51a": {
     "id": "a282fd68-d874-4eb0-8f16-1fdc6103a51a",
