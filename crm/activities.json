@@ -4317,7 +4317,7 @@
   "ad538dca-4244-4bb0-9362-adfa5e9fabd3": {
     "id": "ad538dca-4244-4bb0-9362-adfa5e9fabd3",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_9eba7fbf879e81ef",
@@ -4337,12 +4337,17 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-20T13:44:46.399Z",
-    "atualizado_por": "reatribuicao-v3",
+    "atualizado_em": "2026-10-20T18:31:05.504Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Fabio R de Oliveira",
     "cliente_telefone": null,
     "reatribuido_de": "dickmann",
-    "reatribuido_em": "2026-10-20T13:44:46.399Z"
+    "reatribuido_em": "2026-10-20T13:44:46.399Z",
+    "dia_origem": "2026-10-14",
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:31:05.228Z",
+    "concluida_por": "mathias"
   },
   "a1dd94a0-34ee-45fc-bf35-2998df424fd8": {
     "id": "a1dd94a0-34ee-45fc-bf35-2998df424fd8",
