@@ -11812,5 +11812,31 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T19:06:15.745Z",
     "atualizado_por": "mathias"
+  },
+  "6dda6bbe-94d4-4a96-9ec4-f5a0c2e332ac": {
+    "id": "6dda6bbe-94d4-4a96-9ec4-f5a0c2e332ac",
+    "tipo": "manual",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "66bd4465-7d42-4424-a717-635edca730d7",
+    "titulo": "📞 Tarefa manual — Adriano Neves",
+    "descricao": "Formalizar venda de armas Taurus",
+    "prazo": "2026-10-23",
+    "hora": "15:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "manual_6dda6bbe-94d4-4a96-9ec4-f5a0c2e332ac",
+    "gerada_automaticamente": false,
+    "dono": "dickmann",
+    "account_id": "66bd4465-7d42-4424-a717-635edca730d7",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T19:23:24.175Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T19:23:24.175Z",
+    "atualizado_por": "dickmann"
   }
 }
