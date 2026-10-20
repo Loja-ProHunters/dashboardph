@@ -5700,8 +5700,8 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.957Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.957Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T12:51:20.583Z",
+    "atualizado_por": "mathias",
     "tipo": "contrato_envio",
     "owner_id": "mathias",
     "dono": "mathias",
@@ -5734,7 +5734,10 @@
     },
     "cliente_nome": "José Juliano de Souza Brizola",
     "cliente_telefone": null,
-    "dias_em_aberto": 0
+    "dias_em_aberto": 0,
+    "contrato_gerado_em": "2026-10-20T12:51:20.583Z",
+    "contrato_gerado_por": "mathias",
+    "contrato_gerado_fora": true
   },
   "42b52ebd-9083-4d48-882e-1d8aab16f29f": {
     "id": "42b52ebd-9083-4d48-882e-1d8aab16f29f",
