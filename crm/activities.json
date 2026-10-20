@@ -10890,5 +10890,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T17:46:12.495Z",
     "atualizado_por": "mathias"
+  },
+  "dfe6e63d-c499-40ab-a4ba-adf71d82541c": {
+    "id": "dfe6e63d-c499-40ab-a4ba-adf71d82541c",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_49cd6c4fed0189f3",
+    "titulo": "📅 Follow-up — Marcio Jose Boff",
+    "descricao": "Sumido ha 96d — ideal p/ Bateria 21700 Recarregável Fenix - ARB-…\n\nCliente: Marcio Jose Boff\nUltima compra: 2026-07-13\nPedidos: 1\nValor historico: R$ 5617.97\n\nProduto sugerido: Bateria 21700 Recarregável Fenix - ARB-L21-5000U (SKU 6942870369358)\nConfianca: 22%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_dfe6e63d-c499-40ab-a4ba-adf71d82541c",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_49cd6c4fed0189f3",
+    "origem_tarefa_id": "eed644e0-ac66-4b1c-8634-f8c2b4848db6",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T17:49:39.646Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T17:49:39.646Z",
+    "atualizado_por": "mathias"
   }
 }
