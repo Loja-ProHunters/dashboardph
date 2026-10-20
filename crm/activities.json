@@ -5582,7 +5582,7 @@
   "328d71f7-4627-456b-b1c6-97abe58012a9": {
     "id": "328d71f7-4627-456b-b1c6-97abe58012a9",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "cancelada",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_670defda8b86da0d",
@@ -5605,8 +5605,12 @@
     "dono": "dickmann",
     "criado_em": "2026-10-17T11:00:18.511Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-17T11:00:18.511Z",
-    "atualizado_por": "cron-oportunidades"
+    "atualizado_em": "2026-10-20T17:11:43.307Z",
+    "atualizado_por": "dickmann",
+    "resultado": "cancelada",
+    "cancelada_em": "2026-10-20T17:11:43.177Z",
+    "cancelada_por": "dickmann",
+    "cancelamento_motivo": "Número errado"
   },
   "27dc60db-5ab4-40e3-bd98-258f91fc800c": {
     "id": "27dc60db-5ab4-40e3-bd98-258f91fc800c",
