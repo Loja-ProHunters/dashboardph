@@ -4968,7 +4968,7 @@
   "864f9d94-3c84-419f-a267-46ec73b31572": {
     "id": "864f9d94-3c84-419f-a267-46ec73b31572",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_ed585275ae941b59",
@@ -4991,12 +4991,15 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T15:38:04.362Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Tiago Rodrigues da Costa",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T15:38:04.133Z",
+    "concluida_por": "mathias"
   },
   "5c39ffa9-160c-4115-ad39-069deea07ac0": {
     "id": "5c39ffa9-160c-4115-ad39-069deea07ac0",
