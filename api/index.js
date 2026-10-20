@@ -1060,6 +1060,23 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // POST /api/garantias/:id/observacao body: { texto } — sobrescreve a observação do caso
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/observacao$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { texto } = JSON.parse(body || '{}');
+      const g = await gar.salvarObservacao(id, texto, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // POST /api/garantias/:id/reavaliar body: { tipo_produto, forma_compra, ... }
   if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/reavaliar$/)) {
     const sess = getSession(req);
