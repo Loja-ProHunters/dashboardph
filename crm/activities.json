@@ -11266,5 +11266,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T18:17:45.154Z",
     "atualizado_por": "dickmann"
+  },
+  "f08194d1-eff7-4b2d-a17d-53ae883f958d": {
+    "id": "f08194d1-eff7-4b2d-a17d-53ae883f958d",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "boschetto",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_df917391a0e74044",
+    "titulo": "📅 Follow-up — CEU AZUL ALIMENTOS LTDA",
+    "descricao": "Sumido ha 94d — ideal p/ Canivete Ruike M11-B\n\nCliente: CEU AZUL ALIMENTOS LTDA\nUltima compra: 2026-07-18\nPedidos: 1\nValor historico: R$ 3231.05\n\nProduto sugerido: Canivete Ruike M11-B (SKU RUIKE-M11-B)\nConfianca: 20%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_f08194d1-eff7-4b2d-a17d-53ae883f958d",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "boschetto",
+    "account_id": "acc_df917391a0e74044",
+    "origem_tarefa_id": "c0d2d293-889b-4c73-8e69-9878cf466736",
+    "criada_por_vendedor": "boschetto",
+    "criado_em": "2026-10-20T18:19:47.940Z",
+    "criado_por": "boschetto",
+    "atualizado_em": "2026-10-20T18:19:47.940Z",
+    "atualizado_por": "boschetto"
   }
 }
