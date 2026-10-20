@@ -6157,11 +6157,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.960Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.960Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_envio",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_1071a6e836a02223",
     "account_id": "acc_1071a6e836a02223",
     "order_id": "ord_ed8dd827fdb96edf",
@@ -6188,7 +6188,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_1071a6e836a02223"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "d49b6921-5279-41bb-b7c2-dd8a85623f22": {
     "id": "d49b6921-5279-41bb-b7c2-dd8a85623f22",
@@ -6199,11 +6202,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.960Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.960Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_assinatura",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_1071a6e836a02223",
     "account_id": "acc_1071a6e836a02223",
     "order_id": "ord_ed8dd827fdb96edf",
@@ -6231,7 +6234,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_1071a6e836a02223"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "546b88b4-e018-4270-b1f0-de6373184175": {
     "id": "546b88b4-e018-4270-b1f0-de6373184175",
@@ -6608,11 +6614,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.961Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.961Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_envio",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_dd38ec5d0e002bd0",
     "account_id": "acc_dd38ec5d0e002bd0",
     "order_id": "ord_dd0d35d3301a28d5",
@@ -6639,7 +6645,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_dd38ec5d0e002bd0"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "008fcfc4-6362-494b-9ec8-a36334c7f6ed": {
     "id": "008fcfc4-6362-494b-9ec8-a36334c7f6ed",
@@ -6650,11 +6659,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.961Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.961Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_assinatura",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_dd38ec5d0e002bd0",
     "account_id": "acc_dd38ec5d0e002bd0",
     "order_id": "ord_dd0d35d3301a28d5",
@@ -6682,7 +6691,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_dd38ec5d0e002bd0"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "223f207e-02d8-4165-859a-ccc0c64debb7": {
     "id": "223f207e-02d8-4165-859a-ccc0c64debb7",
@@ -6693,11 +6705,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.961Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.961Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_envio",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_f1505c89a0f7d21e",
     "account_id": "acc_f1505c89a0f7d21e",
     "order_id": "ord_03b3e0225fe432d9",
@@ -6724,7 +6736,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_f1505c89a0f7d21e"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "cb67938d-f25d-4b7f-a863-c895c02e90af": {
     "id": "cb67938d-f25d-4b7f-a863-c895c02e90af",
@@ -6735,11 +6750,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.961Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.961Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_assinatura",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_f1505c89a0f7d21e",
     "account_id": "acc_f1505c89a0f7d21e",
     "order_id": "ord_03b3e0225fe432d9",
@@ -6767,7 +6782,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_f1505c89a0f7d21e"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "90710d88-42f3-4dd8-a502-18ee608fe05d": {
     "id": "90710d88-42f3-4dd8-a502-18ee608fe05d",
@@ -6778,11 +6796,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.961Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.961Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_envio",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "boschetto",
+    "dono": "boschetto",
     "entidade_id": "acc_05f9952454493dc8",
     "account_id": "acc_05f9952454493dc8",
     "order_id": "ord_e9bbc08159820cee",
@@ -6809,7 +6827,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_05f9952454493dc8"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "e7df7d80-a486-465b-8fe4-10342ab5ce21": {
     "id": "e7df7d80-a486-465b-8fe4-10342ab5ce21",
@@ -6820,11 +6841,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.961Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.961Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_assinatura",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "boschetto",
+    "dono": "boschetto",
     "entidade_id": "acc_05f9952454493dc8",
     "account_id": "acc_05f9952454493dc8",
     "order_id": "ord_e9bbc08159820cee",
@@ -6852,7 +6873,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_05f9952454493dc8"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "d1d05aa2-3904-47e8-a397-558aa3033025": {
     "id": "d1d05aa2-3904-47e8-a397-558aa3033025",
@@ -6863,11 +6887,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.962Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_envio",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_05f9952454493dc8",
     "account_id": "acc_05f9952454493dc8",
     "order_id": "ord_8b2e253ee426fadf",
@@ -6894,7 +6918,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_05f9952454493dc8"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "6142398f-d244-42a6-a110-40e4a56e6ea6": {
     "id": "6142398f-d244-42a6-a110-40e4a56e6ea6",
@@ -6905,11 +6932,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.962Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_assinatura",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_05f9952454493dc8",
     "account_id": "acc_05f9952454493dc8",
     "order_id": "ord_8b2e253ee426fadf",
@@ -6937,7 +6964,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_05f9952454493dc8"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "762422b0-a6f3-47e4-bd53-114111d3c672": {
     "id": "762422b0-a6f3-47e4-bd53-114111d3c672",
@@ -6948,11 +6978,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.962Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_envio",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "boschetto",
+    "dono": "boschetto",
     "entidade_id": "acc_05f9952454493dc8",
     "account_id": "acc_05f9952454493dc8",
     "order_id": "ord_078f00e11fc3173e",
@@ -6979,7 +7009,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_05f9952454493dc8"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "cf25ff64-09f9-477b-bf48-e62f8b0ab493": {
     "id": "cf25ff64-09f9-477b-bf48-e62f8b0ab493",
@@ -6990,11 +7023,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.962Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_assinatura",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "boschetto",
+    "dono": "boschetto",
     "entidade_id": "acc_05f9952454493dc8",
     "account_id": "acc_05f9952454493dc8",
     "order_id": "ord_078f00e11fc3173e",
@@ -7022,7 +7055,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_05f9952454493dc8"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "63db7931-7933-4460-8198-f03b04caee24": {
     "id": "63db7931-7933-4460-8198-f03b04caee24",
@@ -7118,11 +7154,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.962Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_envio",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "boschetto",
+    "dono": "boschetto",
     "entidade_id": "acc_0298c5ba15c1f27f",
     "account_id": "acc_0298c5ba15c1f27f",
     "order_id": "ord_bd0b1d8620eea66e",
@@ -7149,7 +7185,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_0298c5ba15c1f27f"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "f0031407-9cd3-4a99-9d82-2bf80539924d": {
     "id": "f0031407-9cd3-4a99-9d82-2bf80539924d",
@@ -7160,11 +7199,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.962Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_assinatura",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "boschetto",
+    "dono": "boschetto",
     "entidade_id": "acc_0298c5ba15c1f27f",
     "account_id": "acc_0298c5ba15c1f27f",
     "order_id": "ord_bd0b1d8620eea66e",
@@ -7192,7 +7231,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_0298c5ba15c1f27f"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "69c98a2a-7bab-4a6f-ba77-7173f3422e9d": {
     "id": "69c98a2a-7bab-4a6f-ba77-7173f3422e9d",
@@ -7203,11 +7245,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.962Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_envio",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_6a1541cfc2476b8c",
     "account_id": "acc_6a1541cfc2476b8c",
     "order_id": "ord_0ad32535833f55f3",
@@ -7234,7 +7276,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_6a1541cfc2476b8c"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "e831e390-88d1-4829-abba-dd17c3835f07": {
     "id": "e831e390-88d1-4829-abba-dd17c3835f07",
@@ -7245,11 +7290,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.962Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_assinatura",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_6a1541cfc2476b8c",
     "account_id": "acc_6a1541cfc2476b8c",
     "order_id": "ord_0ad32535833f55f3",
@@ -7277,7 +7322,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_6a1541cfc2476b8c"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "2e8921cd-14b2-45e1-a937-d0f7e110d1d5": {
     "id": "2e8921cd-14b2-45e1-a937-d0f7e110d1d5",
@@ -7288,11 +7336,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.962Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_envio",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "boschetto",
+    "dono": "boschetto",
     "entidade_id": "acc_31187a492fe3cffd",
     "account_id": "acc_31187a492fe3cffd",
     "order_id": "ord_bd70e80facbd6d89",
@@ -7319,7 +7367,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_31187a492fe3cffd"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "f5eb756f-a8c2-4cf7-92e9-2ce72cf645e8": {
     "id": "f5eb756f-a8c2-4cf7-92e9-2ce72cf645e8",
@@ -7330,11 +7381,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.962Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_assinatura",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "boschetto",
+    "dono": "boschetto",
     "entidade_id": "acc_31187a492fe3cffd",
     "account_id": "acc_31187a492fe3cffd",
     "order_id": "ord_bd70e80facbd6d89",
@@ -7362,7 +7413,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_31187a492fe3cffd"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "0044a431-0da5-4719-a280-8dd20651907b": {
     "id": "0044a431-0da5-4719-a280-8dd20651907b",
@@ -7461,11 +7515,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.962Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_envio",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_05f9952454493dc8",
     "account_id": "acc_05f9952454493dc8",
     "order_id": "ord_4cc6d30610c404c5",
@@ -7492,7 +7546,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_05f9952454493dc8"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "cf0faa58-0c1a-4e8c-bc0f-8421e488fd27": {
     "id": "cf0faa58-0c1a-4e8c-bc0f-8421e488fd27",
@@ -7503,11 +7560,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.962Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_assinatura",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_05f9952454493dc8",
     "account_id": "acc_05f9952454493dc8",
     "order_id": "ord_4cc6d30610c404c5",
@@ -7535,7 +7592,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_05f9952454493dc8"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "8dcb0bfb-43b2-40e1-8ac0-0308409c8a54": {
     "id": "8dcb0bfb-43b2-40e1-8ac0-0308409c8a54",
@@ -7546,11 +7606,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.963Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.963Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_envio",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_18625e77f4221957",
     "account_id": "acc_18625e77f4221957",
     "order_id": "ord_9bb438fcf98ed9e6",
@@ -7577,7 +7637,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_18625e77f4221957"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "72b7f6a2-5de6-4ab7-894a-cb78fb646921": {
     "id": "72b7f6a2-5de6-4ab7-894a-cb78fb646921",
@@ -7588,11 +7651,11 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.963Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.963Z",
+    "atualizado_em": "2026-10-20T11:00:13.500Z",
     "atualizado_por": "contratos-arma",
     "tipo": "contrato_assinatura",
-    "owner_id": "gerencia",
-    "dono": "gerencia",
+    "owner_id": "dickmann",
+    "dono": "dickmann",
     "entidade_id": "acc_18625e77f4221957",
     "account_id": "acc_18625e77f4221957",
     "order_id": "ord_9bb438fcf98ed9e6",
@@ -7620,7 +7683,10 @@
       ],
       "vendedor_pedido": "gerencia",
       "account_id": "acc_18625e77f4221957"
-    }
+    },
+    "distribuido_automaticamente": true,
+    "distribuido_de": "gerencia",
+    "sem_vendedor_bling": true
   },
   "6aad1404-1af0-4b72-b3f4-2e69bf27dd39": {
     "id": "6aad1404-1af0-4b72-b3f4-2e69bf27dd39",
