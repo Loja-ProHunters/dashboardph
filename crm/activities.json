@@ -6353,8 +6353,8 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.960Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.960Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T11:50:22.620Z",
+    "atualizado_por": "boschetto",
     "tipo": "contrato_envio",
     "owner_id": "boschetto",
     "dono": "boschetto",
@@ -6387,7 +6387,10 @@
     },
     "cliente_nome": "Enzo dos Santos Boschetto",
     "cliente_telefone": null,
-    "dias_em_aberto": 0
+    "dias_em_aberto": 0,
+    "contrato_gerado_em": "2026-10-20T11:50:22.620Z",
+    "contrato_gerado_por": "boschetto",
+    "contrato_gerado_fora": true
   },
   "bf393fb4-a1bd-4a46-b635-1caacd6a57c2": {
     "id": "bf393fb4-a1bd-4a46-b635-1caacd6a57c2",
