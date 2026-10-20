@@ -10471,5 +10471,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T15:38:06.109Z",
     "atualizado_por": "mathias"
+  },
+  "f752204d-cd7c-43f2-873f-71297e62be6f": {
+    "id": "f752204d-cd7c-43f2-873f-71297e62be6f",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_81fc5286543b6c6f",
+    "titulo": "📅 Follow-up — PAULO HENRIQUE DE ARAÚJO E SILVA",
+    "descricao": "Sumido ha 113d — ideal p/ Trilho para acoplar Luneta/RedDot Vecto…\n\nCliente: PAULO HENRIQUE DE ARAÚJO E SILVA\nUltima compra: 2026-06-23\nPedidos: 3\nValor historico: R$ 544.49\n\nProduto sugerido: Trilho para acoplar Luneta/RedDot Vector Optics SCRAAM-53P 4\" (SKU VEC-SCRAAM-53)\nConfianca: 40%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_f752204d-cd7c-43f2-873f-71297e62be6f",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_81fc5286543b6c6f",
+    "origem_tarefa_id": "47128649-ddd9-4884-8fb6-d9dc69597765",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T15:49:14.887Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T15:49:14.887Z",
+    "atualizado_por": "mathias"
   }
 }
