@@ -5058,7 +5058,7 @@
   "5c39ffa9-160c-4115-ad39-069deea07ac0": {
     "id": "5c39ffa9-160c-4115-ad39-069deea07ac0",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_e1c95cab7f8eb125",
@@ -5078,12 +5078,17 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T18:42:59.480Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Jaquisandro Quirino sales",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-20T18:42:59.332Z",
+    "concluida_por": "mathias",
+    "canal_contato": "whatsapp",
+    "motivo_nao_conversao": "numero_errado"
   },
   "47128649-ddd9-4884-8fb6-d9dc69597765": {
     "id": "47128649-ddd9-4884-8fb6-d9dc69597765",
