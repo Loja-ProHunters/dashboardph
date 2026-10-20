@@ -9869,6 +9869,23 @@ window.addEventListener('load', function(){
 }
 .gar-sug-box.alta { background: #d1fae5; border-color: #059669; }
 .gar-sug-box.baixa { background: #e0e7ff; border-color: #4f46e5; }
+/* Observacao do caso (campo livre, sobrescreve a anterior) */
+.gar-obs-box { background: #fff7ed; border-left: 4px solid #ea580c; padding: 12px 14px; border-radius: 6px; margin: 10px 0; }
+.gar-obs-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.gar-obs-tit { font-size: 12px; font-weight: 700; color: #9a3412; letter-spacing: .2px; }
+.gar-obs-btn { background: #fff; border: 1px solid #fdba74; color: #9a3412; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.gar-obs-btn:hover { background: #ffedd5; }
+.gar-obs-txt { font-size: 13px; color: #1f2937; white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
+.gar-obs-vazia { font-size: 12.5px; color: #9a3412; opacity: .75; font-style: italic; cursor: pointer; }
+.gar-obs-meta { margin-top: 6px; font-size: 11px; color: #9a3412; opacity: .8; }
+.gar-obs-box textarea { width: 100%; box-sizing: border-box; min-height: 96px; resize: vertical; border: 1px solid #fdba74; border-radius: 6px; padding: 8px 10px; font: inherit; font-size: 13px; line-height: 1.5; background: #fff; }
+.gar-obs-box textarea:focus { outline: none; border-color: #ea580c; box-shadow: 0 0 0 3px rgba(234,88,12,.15); }
+.gar-obs-acts { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.gar-obs-acts .gar-obs-dica { margin-right: auto; font-size: 11px; color: #9a3412; opacity: .75; }
+.gar-obs-salvar { background: #ea580c; color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.gar-obs-salvar:disabled { opacity: .6; cursor: wait; }
+.gar-obs-cancelar { background: transparent; border: none; color: #6b7280; font-size: 12.5px; font-weight: 600; cursor: pointer; padding: 7px 8px; }
+.gar-card-obs { margin-top: 4px; font-size: 11.5px; color: #9a3412; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .gar-timeline { border-left: 2px solid #ccd0d3; padding-left: 14px; margin-top: 14px; }
 .gar-tl-item { position: relative; margin-bottom: 10px; font-size: 12px; }
 .gar-tl-item::before {
@@ -10222,6 +10239,7 @@ window.GAR = (function(){
         '</div>' +
         '<div class="gar-card-cli">' + esc(g.cliente.nome) + '</div>' +
         '<div class="gar-card-prod">' + esc(g.pedido.nome_produto || '—') + ' <span style="color:#888">· ' + esc(g.pedido.marca || '—') + '</span></div>' +
+        (g.observacao && g.observacao.texto ? '<div class="gar-card-obs" title="' + esc(g.observacao.texto) + '">📝 ' + esc(g.observacao.texto.replace(/\s+/g, ' ')) + '</div>' : '') +
         '<div class="gar-card-meta">' +
           '<span>NF ' + esc(g.pedido.nf || '—') + '</span>' +
           '<span>Aberta em ' + fmtDate(g.criado_em) + '</span>' +
@@ -10396,6 +10414,7 @@ window.GAR = (function(){
           '<div style="font-size:12.5px">' + esc(sug.justificativa_sistema) + '</div>' +
         '</div>') : '') +
         decTxt +
+        renderObservacao(g) +
         (g.status !== 'resolvido' ? renderAcoes(g) : '') +
         renderProcedimentoInterno(g) +
         produtoFisicoBox +
@@ -10406,6 +10425,79 @@ window.GAR = (function(){
         '</div>' +
       '</div></div>';
     document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  // ──────── OBSERVAÇÃO DO CASO ────────
+  // Campo livre: cada vez que o caso evolui, o operador reescreve a
+  // observação (a nova substitui a antiga; a antiga fica no Histórico).
+  function renderObservacao(g){
+    return '<div class="gar-obs-box" id="gar-obs-box">' + obsView(g) + '</div>';
+  }
+  function obsView(g){
+    var o = g.observacao;
+    var tem = o && o.texto;
+    return '<div class="gar-obs-head">' +
+        '<span class="gar-obs-tit">📝 OBSERVAÇÃO DO CASO</span>' +
+        '<button class="gar-obs-btn" onclick="GAR.editarObs(\'' + g.id + '\')">' + (tem ? '✏️ Editar' : '+ Escrever') + '</button>' +
+      '</div>' +
+      (tem
+        ? '<div class="gar-obs-txt">' + esc(o.texto) + '</div>' +
+          '<div class="gar-obs-meta">Atualizada por ' + esc(o.por || '—') + ' em ' + fmtDateTime(o.em) + '</div>'
+        : '<div class="gar-obs-vazia" onclick="GAR.editarObs(\'' + g.id + '\')">Nenhuma observação ainda. Registre aqui como o caso está andando.</div>');
+  }
+  function editarObs(id){
+    var box = document.getElementById('gar-obs-box');
+    var g = state.detalheAberto;
+    if (!box || !g || g.id !== id) return;
+    var atual = (g.observacao && g.observacao.texto) || '';
+    box.innerHTML =
+      '<div class="gar-obs-head"><span class="gar-obs-tit">📝 OBSERVAÇÃO DO CASO</span></div>' +
+      '<textarea id="gar-obs-ta" maxlength="3000" placeholder="Ex.: Cliente enviou vídeo novo em 21/10. Aguardando retorno da Ruike sobre a peça.">' + esc(atual) + '</textarea>' +
+      '<div class="gar-obs-acts">' +
+        '<span class="gar-obs-dica">A nova observação substitui a anterior (a antiga fica no Histórico). Ctrl+Enter salva.</span>' +
+        '<button class="gar-obs-cancelar" onclick="GAR.cancelarObs()">Cancelar</button>' +
+        '<button class="gar-obs-salvar" id="gar-obs-salvar" onclick="GAR.salvarObs(\'' + id + '\')">Salvar observação</button>' +
+      '</div>';
+    var ta = document.getElementById('gar-obs-ta');
+    ta.dataset.original = atual;
+    ta.addEventListener('keydown', function(ev){
+      if ((ev.ctrlKey || ev.metaKey) && ev.key === 'Enter') { ev.preventDefault(); salvarObs(id); }
+      else if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); cancelarObs(); }
+    });
+    ta.focus();
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+  }
+  function cancelarObs(){
+    var box = document.getElementById('gar-obs-box');
+    if (box && state.detalheAberto) box.innerHTML = obsView(state.detalheAberto);
+  }
+  function obsEmEdicaoAlterada(){
+    var ta = document.getElementById('gar-obs-ta');
+    return !!ta && ta.value.trim() !== (ta.dataset.original || '').trim();
+  }
+  async function salvarObs(id){
+    var ta = document.getElementById('gar-obs-ta');
+    var bt = document.getElementById('gar-obs-salvar');
+    if (!ta) return;
+    var texto = ta.value.trim();
+    var antigo = (ta.dataset.original || '').trim();
+    if (!texto && antigo && !confirm('Apagar a observação deste caso?')) return;
+    if (bt) { bt.disabled = true; bt.textContent = 'Salvando…'; }
+    try {
+      var r = await fetch('/api/garantias/' + encodeURIComponent(id) + '/observacao', {
+        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ texto: texto }) });
+      var d = await r.json().catch(function(){ return {}; });
+      if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+      state.detalheAberto = d.garantia;
+      var box = document.getElementById('gar-obs-box');
+      if (box) box.innerHTML = obsView(d.garantia);
+      // Atualiza o item na lista sem fechar o modal
+      (state.lista || []).forEach(function(x, i, arr){ if (x && x.id === id) arr[i] = d.garantia; });
+      try { recarregar(); } catch(_) {}
+    } catch(e) {
+      if (bt) { bt.disabled = false; bt.textContent = 'Salvar observação'; }
+      alert('Não foi possível salvar a observação: ' + e.message);
+    }
   }
 
   function renderAcoes(g){
@@ -10954,6 +11046,7 @@ window.GAR = (function(){
   }
 
   function fecharModal(id){
+    if (id === 'gar-mdl-det' && obsEmEdicaoAlterada() && !confirm('A observação não foi salva. Fechar mesmo assim?')) return;
     var m = document.getElementById(id);
     if (m) m.remove();
   }
@@ -10972,6 +11065,7 @@ window.GAR = (function(){
     toggleSel: toggleSel, imprimirSelecionadas: imprimirSelecionadas,
     abrirModalEnvio: abrirModalEnvio, confirmarEnvio: confirmarEnvio,
     fecharModal: fecharModal,
+    editarObs: editarObs, cancelarObs: cancelarObs, salvarObs: salvarObs,
   };
 })();
 </script>
