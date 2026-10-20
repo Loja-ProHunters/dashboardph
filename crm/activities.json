@@ -11142,5 +11142,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T18:13:39.249Z",
     "atualizado_por": "dickmann"
+  },
+  "3cdf54c2-e905-4e78-8539-331666973894": {
+    "id": "3cdf54c2-e905-4e78-8539-331666973894",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_40ee4797649aaf6d",
+    "titulo": "📅 Follow-up — Douglas Marques de Macedo",
+    "descricao": "Sumido ha 169d — ideal p/ Lanterna Fenix E18R 750 Lumens Preta\n\nCliente: Douglas Marques de Macedo\nUltima compra: 2026-05-04\nPedidos: 3\nValor historico: R$ 1130.28\n\nProduto sugerido: Lanterna Fenix E18R 750 Lumens Preta (SKU 6942870306087)\nConfianca: 50%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_3cdf54c2-e905-4e78-8539-331666973894",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_40ee4797649aaf6d",
+    "origem_tarefa_id": "d15e8be6-e7c6-4431-b41a-2d2d2e1e8d92",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T18:15:02.032Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T18:15:02.032Z",
+    "atualizado_por": "mathias"
   }
 }
