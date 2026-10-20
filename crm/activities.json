@@ -5803,7 +5803,7 @@
   "c130565f-719e-4d9f-aab6-1bd9720570bd": {
     "id": "c130565f-719e-4d9f-aab6-1bd9720570bd",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_af67307a388094cb",
@@ -5823,12 +5823,15 @@
     "dono": "mathias",
     "criado_em": "2026-10-17T11:00:18.511Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-17T11:00:18.511Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T18:52:43.659Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Valter Jose Poloni",
     "cliente_telefone": null,
     "dia_origem": "2026-10-17",
-    "dias_em_aberto": 3
+    "dias_em_aberto": 3,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:52:43.117Z",
+    "concluida_por": "mathias"
   },
   "de059bd6-06cc-4e2f-b468-d00285192218": {
     "id": "de059bd6-06cc-4e2f-b468-d00285192218",
