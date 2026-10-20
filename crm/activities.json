@@ -5277,7 +5277,7 @@
   "873cd98a-3caa-4142-ab93-49c6ff716216": {
     "id": "873cd98a-3caa-4142-ab93-49c6ff716216",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_dc845d2988173221",
@@ -5300,12 +5300,15 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T17:37:07.939Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Rodolfo Heitor Gomes Fernandes Da Silva",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T17:37:07.722Z",
+    "concluida_por": "mathias"
   },
   "f70a3e41-ad80-44f0-8504-e264be62fa9e": {
     "id": "f70a3e41-ad80-44f0-8504-e264be62fa9e",
