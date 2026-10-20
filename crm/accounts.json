@@ -41699,5 +41699,33 @@
     "atualizado_em": "2026-09-22T17:33:44.479Z",
     "atualizado_por": "bling-sync",
     "owner_definido_por_venda": false
+  },
+  "3445fae4-d59e-4e46-b416-48285ac271ff": {
+    "id": "3445fae4-d59e-4e46-b416-48285ac271ff",
+    "tipo": "pf",
+    "cpf_cnpj": null,
+    "razao_social": null,
+    "nome_fantasia": null,
+    "nome": "Rafael Liberato Fuzil 556",
+    "email": null,
+    "telefone": "62 9944-8881",
+    "endereco": null,
+    "status": "ativo",
+    "owner_id": "dickmann",
+    "onboarding_id": null,
+    "primeira_compra_em": null,
+    "ultima_compra_em": null,
+    "pedidos_count": 0,
+    "valor_total_compras": 0,
+    "categorias_compradas": [],
+    "bling_contato_id": null,
+    "tags": [
+      "prospect_vendedor"
+    ],
+    "notas": "Cadastrado manualmente via tarefa manual por dickmann em 2026-10-20",
+    "criado_em": "2026-10-20T17:56:16.952Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T17:56:16.952Z",
+    "atualizado_por": "dickmann"
   }
 }
