@@ -11722,5 +11722,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T18:52:45.338Z",
     "atualizado_por": "mathias"
+  },
+  "d6a1c415-7a71-43ff-8de8-846ad931d6a5": {
+    "id": "d6a1c415-7a71-43ff-8de8-846ad931d6a5",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_f557fdc91ca67d21",
+    "titulo": "📅 Follow-up — Leonardo Rodrigues dos Santos",
+    "descricao": "1 ano da 1a compra (2025-10-02) — retomar contato\n\nCliente: Leonardo Rodrigues dos Santos\nUltima compra: 2025-10-02\nPedidos: 1\nValor historico: R$ 925.20\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_d6a1c415-7a71-43ff-8de8-846ad931d6a5",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_f557fdc91ca67d21",
+    "origem_tarefa_id": "c2f15622-032e-4b34-b6fd-f7f61dcb37ba",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T18:59:04.455Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T18:59:04.455Z",
+    "atualizado_por": "mathias"
   }
 }
