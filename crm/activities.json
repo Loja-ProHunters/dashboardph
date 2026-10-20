@@ -5238,7 +5238,7 @@
   "c0035e6b-fc8d-41a6-aca5-6d41a7cf1f33": {
     "id": "c0035e6b-fc8d-41a6-aca5-6d41a7cf1f33",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_8b6385b8422d08d2",
@@ -5261,12 +5261,18 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T17:35:19.667Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "PAULO ROBERTO SCHUHMACHER",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-20T17:35:19.530Z",
+    "concluida_por": "mathias",
+    "canal_contato": "whatsapp",
+    "motivo_nao_conversao": "numero_errado",
+    "observacao_conclusao": "Não consegui contato com  cliente"
   },
   "873cd98a-3caa-4142-ab93-49c6ff716216": {
     "id": "873cd98a-3caa-4142-ab93-49c6ff716216",
