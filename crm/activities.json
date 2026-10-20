@@ -11784,5 +11784,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T19:00:59.306Z",
     "atualizado_por": "mathias"
+  },
+  "110e4f83-6366-4acf-8309-6d07c3c52d40": {
+    "id": "110e4f83-6366-4acf-8309-6d07c3c52d40",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_e129d3de599718a2",
+    "titulo": "📅 Follow-up — Gustavo de Freitas Baise",
+    "descricao": "1 ano da 1a compra (2025-10-12) — retomar contato\n\nCliente: Gustavo de Freitas Baise\nUltima compra: 2026-08-06\nPedidos: 3\nValor historico: R$ 5218.20\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_110e4f83-6366-4acf-8309-6d07c3c52d40",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_e129d3de599718a2",
+    "origem_tarefa_id": "6116c5e5-e458-4a95-8277-790466c47918",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T19:06:15.745Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T19:06:15.745Z",
+    "atualizado_por": "mathias"
   }
 }
