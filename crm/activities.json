@@ -7255,15 +7255,15 @@
   },
   "e7df7d80-a486-465b-8fe4-10342ab5ce21": {
     "id": "e7df7d80-a486-465b-8fe4-10342ab5ce21",
-    "status": "pendente",
+    "status": "concluida",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.961Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T13:44:52.723Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T17:10:59.234Z",
+    "atualizado_por": "dickmann",
     "tipo": "contrato_assinatura",
     "owner_id": "dickmann",
     "dono": "dickmann",
@@ -7306,7 +7306,19 @@
       "conta": "calibre",
       "origem": "vendedor"
     },
-    "atribuir_vendedor": false
+    "atribuir_vendedor": false,
+    "resultado": "contrato_assinado",
+    "concluida_em": "2026-10-20T17:10:59.234Z",
+    "concluida_por": "dickmann",
+    "declaracao": {
+      "texto": "Declaro que o contrato assinado pelo cliente está salvo na pasta de contratos.",
+      "por": "dickmann",
+      "em": "2026-10-20T17:10:59.234Z"
+    },
+    "verificacao": {
+      "status": "pendente"
+    },
+    "observacao_conclusao": null
   },
   "d1d05aa2-3904-47e8-a397-558aa3033025": {
     "id": "d1d05aa2-3904-47e8-a397-558aa3033025",
