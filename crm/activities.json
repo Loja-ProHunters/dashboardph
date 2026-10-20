@@ -9634,5 +9634,33 @@
     "cliente_telefone": null,
     "dia_origem": "2026-10-20",
     "dias_em_aberto": 0
+  },
+  "d73c8077-3383-48de-afdb-f2622b7dd15c": {
+    "id": "d73c8077-3383-48de-afdb-f2622b7dd15c",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "boschetto",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_062365df34395d8e",
+    "titulo": "📅 Follow-up — andre luiz mereu rodrigues",
+    "descricao": "Sumido ha 129d — ideal p/ D1147 Fenix Floor-standing Showcase\n\nCliente: andre luiz mereu rodrigues\nUltima compra: 2026-06-07\nPedidos: 1\nValor historico: R$ 1547.89\n\nProduto sugerido: D1147 Fenix Floor-standing Showcase (SKU D1147-ID)\nConfianca: 50%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "08:30",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_d73c8077-3383-48de-afdb-f2622b7dd15c",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "boschetto",
+    "account_id": "acc_062365df34395d8e",
+    "origem_tarefa_id": "70799111-0318-4f22-9d2f-f95bec22ec34",
+    "criada_por_vendedor": "boschetto",
+    "criado_em": "2026-10-20T12:20:21.056Z",
+    "criado_por": "boschetto",
+    "atualizado_em": "2026-10-20T12:20:21.056Z",
+    "atualizado_por": "boschetto"
   }
 }
