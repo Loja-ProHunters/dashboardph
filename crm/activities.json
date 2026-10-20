@@ -7765,8 +7765,8 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T13:44:52.723Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T14:45:42.346Z",
+    "atualizado_por": "mathias",
     "tipo": "contrato_envio",
     "owner_id": "mathias",
     "dono": "mathias",
@@ -7811,7 +7811,10 @@
       "conta": "calibre",
       "origem": "vendedor"
     },
-    "atribuir_vendedor": false
+    "atribuir_vendedor": false,
+    "contrato_gerado_em": "2026-10-20T14:45:42.346Z",
+    "contrato_gerado_por": "mathias",
+    "contrato_gerado_fora": true
   },
   "f5eb756f-a8c2-4cf7-92e9-2ce72cf645e8": {
     "id": "f5eb756f-a8c2-4cf7-92e9-2ce72cf645e8",
