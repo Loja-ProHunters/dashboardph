@@ -11428,5 +11428,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T18:31:07.346Z",
     "atualizado_por": "mathias"
+  },
+  "2571dcd3-e8f9-42e6-bda1-8ded5a02771c": {
+    "id": "2571dcd3-e8f9-42e6-bda1-8ded5a02771c",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_2fe49085dddc1670",
+    "titulo": "📅 Follow-up — GILSON BUCKOSKI GONCALVES",
+    "descricao": "Aguardando Retorno",
+    "prazo": "2026-10-21",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_2571dcd3-e8f9-42e6-bda1-8ded5a02771c",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_2fe49085dddc1670",
+    "origem_tarefa_id": "f70a3e41-ad80-44f0-8504-e264be62fa9e",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T18:32:01.361Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T18:32:01.361Z",
+    "atualizado_por": "dickmann"
   }
 }
