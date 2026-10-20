@@ -11204,5 +11204,33 @@
     "criado_por": "boschetto",
     "atualizado_em": "2026-10-20T18:16:00.741Z",
     "atualizado_por": "boschetto"
+  },
+  "4e7e308a-6a5d-4dfd-ac57-3a4b67bf11b8": {
+    "id": "4e7e308a-6a5d-4dfd-ac57-3a4b67bf11b8",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_a4fe067916bb1627",
+    "titulo": "📅 Follow-up — Fagner bordinhao",
+    "descricao": "Sumido ha 105d — ideal p/ Red Dot Frenzy 1x17x24 - Vector Optics\n\nCliente: Fagner bordinhao\nUltima compra: 2026-07-07\nPedidos: 1\nValor historico: R$ 1556.10\n\nProduto sugerido: Red Dot Frenzy 1x17x24 - Vector Optics (SKU VEC-SCRD-19II)\nConfianca: 20%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_4e7e308a-6a5d-4dfd-ac57-3a4b67bf11b8",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_a4fe067916bb1627",
+    "origem_tarefa_id": "966bab9e-2a1d-4f94-a7a1-e02a923e644d",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T18:16:59.092Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T18:16:59.092Z",
+    "atualizado_por": "mathias"
   }
 }
