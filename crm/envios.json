@@ -7137,9 +7137,9 @@
     "gt_numero": "202699218136",
     "gt_por": "auxiliar",
     "gt_em": "2026-10-20T14:40:05.132Z",
-    "assinatura_ok": false,
-    "assinatura_por": null,
-    "assinatura_em": null,
+    "assinatura_ok": true,
+    "assinatura_por": "auxiliar",
+    "assinatura_em": "2026-10-20T14:40:07.960Z",
     "liberacao_ok": false,
     "liberacao_por": null,
     "liberacao_em": null,
@@ -7227,11 +7227,19 @@
         "acao": "campo_alterado",
         "campo": "gt_numero",
         "novo": "202699218136"
+      },
+      {
+        "ts": "2026-10-20T14:40:07.960Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "assinatura_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-19T19:18:08.580Z",
     "criado_por": "gerencia",
-    "atualizado_em": "2026-10-20T14:40:05.250Z",
+    "atualizado_em": "2026-10-20T14:40:08.112Z",
     "atualizado_por": "auxiliar"
   }
 }
