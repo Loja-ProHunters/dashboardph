@@ -11686,5 +11686,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T18:47:24.498Z",
     "atualizado_por": "dickmann"
+  },
+  "e175e8cc-01b1-431f-a918-0777cd8b5537": {
+    "id": "e175e8cc-01b1-431f-a918-0777cd8b5537",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_af67307a388094cb",
+    "titulo": "📅 Follow-up — Valter Jose Poloni",
+    "descricao": "1 ano da 1a compra (2025-10-03) — retomar contato\n\nCliente: Valter Jose Poloni\nUltima compra: 2025-10-17\nPedidos: 2\nValor historico: R$ 1153.77\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_e175e8cc-01b1-431f-a918-0777cd8b5537",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_af67307a388094cb",
+    "origem_tarefa_id": "c130565f-719e-4d9f-aab6-1bd9720570bd",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T18:52:45.338Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T18:52:45.338Z",
+    "atualizado_por": "mathias"
   }
 }
