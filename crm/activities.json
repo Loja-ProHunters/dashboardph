@@ -11080,5 +11080,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T18:02:35.064Z",
     "atualizado_por": "dickmann"
+  },
+  "1bc6fba2-9791-406e-9466-7c84f530d360": {
+    "id": "1bc6fba2-9791-406e-9466-7c84f530d360",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_30a4ccb3a83f91b3",
+    "titulo": "📅 Follow-up — Carlos Alberto Raiza",
+    "descricao": "Aguardando retorno",
+    "prazo": "2026-10-21",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_1bc6fba2-9791-406e-9466-7c84f530d360",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_30a4ccb3a83f91b3",
+    "origem_tarefa_id": "e40e47aa-567d-4577-91b5-d197a0f673bc",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T18:08:43.320Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T18:08:43.320Z",
+    "atualizado_por": "dickmann"
   }
 }
