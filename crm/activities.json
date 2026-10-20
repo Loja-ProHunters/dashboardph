@@ -5881,8 +5881,8 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.959Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.959Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T12:52:16.812Z",
+    "atualizado_por": "mathias",
     "tipo": "contrato_envio",
     "owner_id": "mathias",
     "dono": "mathias",
@@ -5915,7 +5915,10 @@
     },
     "cliente_nome": "André Neves Barros",
     "cliente_telefone": null,
-    "dias_em_aberto": 0
+    "dias_em_aberto": 0,
+    "contrato_gerado_em": "2026-10-20T12:52:16.812Z",
+    "contrato_gerado_por": "mathias",
+    "contrato_gerado_fora": true
   },
   "72b77b22-e11c-46f4-9ea2-a99f7f678928": {
     "id": "72b77b22-e11c-46f4-9ea2-a99f7f678928",
