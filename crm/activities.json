@@ -11841,5 +11841,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T19:23:24.175Z",
     "atualizado_por": "dickmann"
+  },
+  "a629fb92-82c8-4231-95b7-9d8a167443ee": {
+    "id": "a629fb92-82c8-4231-95b7-9d8a167443ee",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_b1d1cd4e0dfe1ff9",
+    "titulo": "📅 Follow-up — Patrícia Vieira Barbosa",
+    "descricao": "1 ano da 1a compra (2025-10-15) — retomar contato\n\nCliente: Patrícia Vieira Barbosa\nUltima compra: 2025-10-15\nPedidos: 1\nValor historico: R$ 1535.00\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_a629fb92-82c8-4231-95b7-9d8a167443ee",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_b1d1cd4e0dfe1ff9",
+    "origem_tarefa_id": "9448c05a-0be3-456f-9fb0-7f049bdffac5",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T20:04:02.698Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T20:04:02.698Z",
+    "atualizado_por": "mathias"
   }
 }
