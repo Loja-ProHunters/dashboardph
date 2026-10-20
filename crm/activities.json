@@ -6399,15 +6399,15 @@
   },
   "bf393fb4-a1bd-4a46-b635-1caacd6a57c2": {
     "id": "bf393fb4-a1bd-4a46-b635-1caacd6a57c2",
-    "status": "pendente",
+    "status": "concluida",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.960Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.960Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T11:51:39.369Z",
+    "atualizado_por": "boschetto",
     "tipo": "contrato_assinatura",
     "owner_id": "boschetto",
     "dono": "boschetto",
@@ -6438,7 +6438,19 @@
       ],
       "vendedor_pedido": "boschetto",
       "account_id": "acc_d63cdae41562bd07"
-    }
+    },
+    "resultado": "contrato_assinado",
+    "concluida_em": "2026-10-20T11:51:39.369Z",
+    "concluida_por": "boschetto",
+    "declaracao": {
+      "texto": "Declaro que o contrato assinado pelo cliente está salvo na pasta de contratos.",
+      "por": "boschetto",
+      "em": "2026-10-20T11:51:39.369Z"
+    },
+    "verificacao": {
+      "status": "pendente"
+    },
+    "observacao_conclusao": "teste"
   },
   "49777cf0-06bc-45f1-acf5-977e2be4d14b": {
     "id": "49777cf0-06bc-45f1-acf5-977e2be4d14b",
