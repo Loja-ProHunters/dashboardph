@@ -11557,5 +11557,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T18:36:30.125Z",
     "atualizado_por": "dickmann"
+  },
+  "9950474a-2764-46c0-b08b-f90c79fdc3a4": {
+    "id": "9950474a-2764-46c0-b08b-f90c79fdc3a4",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_34cbb6673470a0e2",
+    "titulo": "📅 Follow-up — Constructo Construções SA",
+    "descricao": "1 ano da 1a compra (2025-10-14) — retomar contato\n\nCliente: Constructo Construções SA\nUltima compra: 2026-08-11\nPedidos: 6\nValor historico: R$ 5108.90\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_9950474a-2764-46c0-b08b-f90c79fdc3a4",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_34cbb6673470a0e2",
+    "origem_tarefa_id": "70189827-a2bb-44b7-b6cf-08d49bfe9b8b",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T18:36:53.065Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T18:36:53.065Z",
+    "atualizado_por": "mathias"
   }
 }
