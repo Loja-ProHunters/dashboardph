@@ -3502,7 +3502,7 @@
   "b98f05cf-7301-46e2-9851-f5f32418b1ab": {
     "id": "b98f05cf-7301-46e2-9851-f5f32418b1ab",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_f17bf6c970edec30",
@@ -3522,14 +3522,19 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-20T13:44:46.399Z",
-    "atualizado_por": "reatribuicao-v3",
+    "atualizado_em": "2026-10-20T18:27:23.541Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Aguinaldo Miguel Gonçalves",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
     "dias_em_aberto": 6,
     "reatribuido_de": "boschetto",
-    "reatribuido_em": "2026-10-20T13:44:46.399Z"
+    "reatribuido_em": "2026-10-20T13:44:46.399Z",
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-20T18:27:23.399Z",
+    "concluida_por": "mathias",
+    "canal_contato": "whatsapp",
+    "motivo_nao_conversao": "numero_errado"
   },
   "ce97cc7f-2d15-44c0-84e9-12e9b3418765": {
     "id": "ce97cc7f-2d15-44c0-84e9-12e9b3418765",
