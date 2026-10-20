@@ -3931,7 +3931,7 @@
   "9448c05a-0be3-456f-9fb0-7f049bdffac5": {
     "id": "9448c05a-0be3-456f-9fb0-7f049bdffac5",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_b1d1cd4e0dfe1ff9",
@@ -3951,14 +3951,17 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-20T13:44:46.399Z",
-    "atualizado_por": "reatribuicao-v3",
+    "atualizado_em": "2026-10-20T20:04:00.756Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Patrícia Vieira Barbosa",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
     "dias_em_aberto": 6,
     "reatribuido_de": "boschetto",
-    "reatribuido_em": "2026-10-20T13:44:46.399Z"
+    "reatribuido_em": "2026-10-20T13:44:46.399Z",
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T20:04:00.554Z",
+    "concluida_por": "mathias"
   },
   "39f65ff0-37e3-4c51-9918-e2a449a103a8": {
     "id": "39f65ff0-37e3-4c51-9918-e2a449a103a8",
