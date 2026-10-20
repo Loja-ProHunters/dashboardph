@@ -11009,5 +11009,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T17:56:18.540Z",
     "atualizado_por": "dickmann"
+  },
+  "b24a17e9-61a7-4f7c-aacf-024c1ae69859": {
+    "id": "b24a17e9-61a7-4f7c-aacf-024c1ae69859",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_19a3b8a44aaf9afd",
+    "titulo": "📅 Follow-up — Davi José da Silva",
+    "descricao": "Aguardando Retorno",
+    "prazo": "2026-10-21",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_b24a17e9-61a7-4f7c-aacf-024c1ae69859",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_19a3b8a44aaf9afd",
+    "origem_tarefa_id": "35f89dd2-712b-45ac-ba23-8bf24dcce321",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T18:00:41.007Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T18:00:41.007Z",
+    "atualizado_por": "dickmann"
   }
 }
