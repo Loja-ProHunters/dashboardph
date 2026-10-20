@@ -10921,5 +10921,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T17:49:39.646Z",
     "atualizado_por": "mathias"
+  },
+  "4103a1c8-db0d-4c15-9159-4926cb84cb85": {
+    "id": "4103a1c8-db0d-4c15-9159-4926cb84cb85",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_6c98b099c4f112e4",
+    "titulo": "📅 Follow-up — Jeronimo Augusto Fonseca Alencar",
+    "descricao": "Conferir retorno",
+    "prazo": "2026-10-21",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_4103a1c8-db0d-4c15-9159-4926cb84cb85",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_6c98b099c4f112e4",
+    "origem_tarefa_id": "293a67bd-b965-4141-87ae-3ced6f9385ee",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T17:50:11.755Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T17:50:11.755Z",
+    "atualizado_por": "dickmann"
   }
 }
