@@ -11397,5 +11397,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T18:21:30.219Z",
     "atualizado_por": "dickmann"
+  },
+  "75d3a197-5047-4236-a626-e95826d31fcb": {
+    "id": "75d3a197-5047-4236-a626-e95826d31fcb",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_9eba7fbf879e81ef",
+    "titulo": "📅 Follow-up — Fabio R de Oliveira",
+    "descricao": "1 ano da 1a compra (2025-10-15) — retomar contato\n\nCliente: Fabio R de Oliveira\nUltima compra: 2025-10-15\nPedidos: 1\nValor historico: R$ 3535.55\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_75d3a197-5047-4236-a626-e95826d31fcb",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_9eba7fbf879e81ef",
+    "origem_tarefa_id": "ad538dca-4244-4bb0-9362-adfa5e9fabd3",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T18:31:07.346Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T18:31:07.346Z",
+    "atualizado_por": "mathias"
   }
 }
