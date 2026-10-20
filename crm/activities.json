@@ -9384,7 +9384,7 @@
   "f199b128-62f1-4ae5-9b4b-690fcdb73c90": {
     "id": "f199b128-62f1-4ae5-9b4b-690fcdb73c90",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_073f0bde1f4752e1",
@@ -9408,12 +9408,15 @@
     "lote_dia": "2026-10-20",
     "criado_em": "2026-10-20T11:00:19.950Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-20T11:00:19.950Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T18:20:45.842Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "Luicito Medeiros Gastal",
     "cliente_telefone": null,
     "dia_origem": "2026-10-20",
-    "dias_em_aberto": 0
+    "dias_em_aberto": 0,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:20:45.257Z",
+    "concluida_por": "boschetto"
   },
   "e4ce29d0-e7ed-4c8a-8eb7-2364ac7a5ff0": {
     "id": "e4ce29d0-e7ed-4c8a-8eb7-2364ac7a5ff0",
