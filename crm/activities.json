@@ -3840,7 +3840,7 @@
   "f2c7bc2b-d39c-45e4-b706-e21377e2cd22": {
     "id": "f2c7bc2b-d39c-45e4-b706-e21377e2cd22",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_fd9ee11cb51ed6a6",
@@ -3863,12 +3863,15 @@
     "dono": "boschetto",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T12:17:53.486Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "Roberto Shimizu",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T12:17:53.486Z",
+    "concluida_por": "boschetto"
   },
   "70799111-0318-4f22-9d2f-f95bec22ec34": {
     "id": "70799111-0318-4f22-9d2f-f95bec22ec34",
