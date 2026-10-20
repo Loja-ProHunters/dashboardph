@@ -11753,5 +11753,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T18:59:04.455Z",
     "atualizado_por": "mathias"
+  },
+  "3de9d5a0-c49c-437a-881a-a75100deb23d": {
+    "id": "3de9d5a0-c49c-437a-881a-a75100deb23d",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_413b97963171840c",
+    "titulo": "📅 Follow-up — Fabiano Andrade Gomes",
+    "descricao": "1 ano da 1a compra (2025-10-12) — retomar contato\n\nCliente: Fabiano Andrade Gomes\nUltima compra: 2025-10-12\nPedidos: 1\nValor historico: R$ 2190.00\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_3de9d5a0-c49c-437a-881a-a75100deb23d",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_413b97963171840c",
+    "origem_tarefa_id": "19d0f3cc-926b-4feb-9507-1b71c9240bb8",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T19:00:59.306Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T19:00:59.306Z",
+    "atualizado_por": "mathias"
   }
 }
