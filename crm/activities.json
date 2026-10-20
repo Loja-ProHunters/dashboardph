@@ -4766,7 +4766,7 @@
   "ec24edeb-5570-4ade-ad0d-8ec3b4261bb7": {
     "id": "ec24edeb-5570-4ade-ad0d-8ec3b4261bb7",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_15e043273e656430",
@@ -4789,12 +4789,15 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T15:10:30.238Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Claudio zielinski",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T15:10:30.058Z",
+    "concluida_por": "mathias"
   },
   "6116c5e5-e458-4a95-8277-790466c47918": {
     "id": "6116c5e5-e458-4a95-8277-790466c47918",
