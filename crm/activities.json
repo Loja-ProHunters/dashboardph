@@ -5842,15 +5842,15 @@
   },
   "fa21ac6c-dae3-4730-ae93-607f8abbab26": {
     "id": "fa21ac6c-dae3-4730-ae93-607f8abbab26",
-    "status": "pendente",
+    "status": "cancelada",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.958Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T13:44:52.723Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T17:02:22.005Z",
+    "atualizado_por": "dickmann",
     "tipo": "contrato_envio",
     "owner_id": "dickmann",
     "dono": "dickmann",
@@ -5886,19 +5886,30 @@
       "nome": "Pedro Henrique Dickmann",
       "conta": "prohunters",
       "origem": "vendedor"
+    },
+    "resultado": "anulada",
+    "cancelada_em": "2026-10-20T17:02:22.005Z",
+    "cancelada_por": "dickmann",
+    "cancelamento_motivo": "Contrato anulado: Arma já enviada / entregue com contrato resolvido",
+    "anulacao": {
+      "motivo": "arma_ja_enviada",
+      "motivo_label": "Arma já enviada / entregue com contrato resolvido",
+      "descricao": "Arma vendida para Lojista, já foi enviada",
+      "por": "dickmann",
+      "em": "2026-10-20T17:02:22.005Z"
     }
   },
   "f5c5af9e-91fc-40ba-8430-e11ec79f686c": {
     "id": "f5c5af9e-91fc-40ba-8430-e11ec79f686c",
-    "status": "pendente",
+    "status": "cancelada",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.958Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T13:44:52.723Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T17:02:22.005Z",
+    "atualizado_por": "dickmann",
     "tipo": "contrato_assinatura",
     "owner_id": "dickmann",
     "dono": "dickmann",
@@ -5935,6 +5946,17 @@
       "nome": "Pedro Henrique Dickmann",
       "conta": "prohunters",
       "origem": "vendedor"
+    },
+    "resultado": "anulada",
+    "cancelada_em": "2026-10-20T17:02:22.005Z",
+    "cancelada_por": "dickmann",
+    "cancelamento_motivo": "Contrato anulado: Arma já enviada / entregue com contrato resolvido",
+    "anulacao": {
+      "motivo": "arma_ja_enviada",
+      "motivo_label": "Arma já enviada / entregue com contrato resolvido",
+      "descricao": "Arma vendida para Lojista, já foi enviada",
+      "por": "dickmann",
+      "em": "2026-10-20T17:02:22.005Z"
     }
   },
   "cb020332-d3ae-448b-aa67-ac2b7d2d173d": {
