@@ -4553,7 +4553,7 @@
   "74449db8-2373-4c3e-9b4b-148c5c3f766a": {
     "id": "74449db8-2373-4c3e-9b4b-148c5c3f766a",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_f185d13d9007aeb2",
@@ -4576,10 +4576,13 @@
     "dono": "dickmann",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T17:41:19.590Z",
+    "atualizado_por": "dickmann",
     "cliente_nome": "Adailton Alves de Souza",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T17:41:18.942Z",
+    "concluida_por": "dickmann"
   },
   "9d2301ea-86eb-4b20-8c2a-ffec71f9d4fa": {
     "id": "9d2301ea-86eb-4b20-8c2a-ffec71f9d4fa",
