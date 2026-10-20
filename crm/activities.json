@@ -10561,5 +10561,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T15:51:31.136Z",
     "atualizado_por": "mathias"
+  },
+  "a9bde4fe-927c-4bc2-a304-09b3204ed0c8": {
+    "id": "a9bde4fe-927c-4bc2-a304-09b3204ed0c8",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_11f3d7c126bd1c4e",
+    "titulo": "📅 Follow-up — Vitor Diego Lima da Silva",
+    "descricao": "Sumido ha 105d — ideal p/ Trilho para acoplar Luneta/RedDot Vecto…\n\nCliente: Vitor Diego Lima da Silva\nUltima compra: 2026-07-01\nPedidos: 1\nValor historico: R$ 136.85\n\nProduto sugerido: Trilho para acoplar Luneta/RedDot Vector Optics SCRAAM-52P 2\" (SKU VEC-SCRAAM-52)\nConfianca: 50%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_a9bde4fe-927c-4bc2-a304-09b3204ed0c8",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_11f3d7c126bd1c4e",
+    "origem_tarefa_id": "2185c45d-2613-427e-a33e-73ed646ec4c0",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T15:52:47.985Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T15:52:47.985Z",
+    "atualizado_por": "mathias"
   }
 }
