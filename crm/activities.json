@@ -9594,7 +9594,7 @@
   "f967a27d-1aed-4e87-8882-4b22e9265f97": {
     "id": "f967a27d-1aed-4e87-8882-4b22e9265f97",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_5de1626574d1d4f3",
@@ -9618,12 +9618,15 @@
     "lote_dia": "2026-10-20",
     "criado_em": "2026-10-20T11:00:19.950Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-20T11:00:19.950Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T18:21:17.178Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "Guilherme Augusto dos Santos",
     "cliente_telefone": null,
     "dia_origem": "2026-10-20",
-    "dias_em_aberto": 0
+    "dias_em_aberto": 0,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:21:16.192Z",
+    "concluida_por": "boschetto"
   },
   "e12cc890-74e9-45f5-a384-5cdd6c94b104": {
     "id": "e12cc890-74e9-45f5-a384-5cdd6c94b104",
