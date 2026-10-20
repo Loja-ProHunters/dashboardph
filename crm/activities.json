@@ -10378,5 +10378,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T15:10:33.208Z",
     "atualizado_por": "mathias"
+  },
+  "5200bd3b-1505-4e2c-846e-ac207d4c898c": {
+    "id": "5200bd3b-1505-4e2c-846e-ac207d4c898c",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_963c7a22a91fb109",
+    "titulo": "📅 Follow-up — Eduardo Pio Mendes de Carvalho Filho",
+    "descricao": "Sumido ha 127d — ideal p/ Jogo de 2 Matrizes (Die) Redding Master…\n\nCliente: Eduardo Pio Mendes de Carvalho Filho\nUltima compra: 2026-06-09\nPedidos: 1\nValor historico: R$ 6365.40\n\nProduto sugerido: Jogo de 2 Matrizes (Die) Redding Master Hunter(Carbide) cal 308 Win (SKU RED-28155)\nConfianca: 50%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_5200bd3b-1505-4e2c-846e-ac207d4c898c",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_963c7a22a91fb109",
+    "origem_tarefa_id": "14677849-51d1-43b7-b319-53f234d79a75",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T15:18:11.053Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T15:18:11.053Z",
+    "atualizado_por": "mathias"
   }
 }
