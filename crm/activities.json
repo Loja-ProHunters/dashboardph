@@ -5366,7 +5366,7 @@
   "026c87d9-d9d7-408a-8094-c471b4a1f08d": {
     "id": "026c87d9-d9d7-408a-8094-c471b4a1f08d",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "cancelada",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_c5d6be87cebbea30",
@@ -5389,10 +5389,14 @@
     "dono": "dickmann",
     "criado_em": "2026-10-16T11:00:19.246Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-16T11:00:19.246Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T17:13:08.550Z",
+    "atualizado_por": "dickmann",
     "cliente_nome": "MECA – Material Elétrico, Controles e Automação Ltda.",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "cancelada",
+    "cancelada_em": "2026-10-20T17:13:08.170Z",
+    "cancelada_por": "dickmann",
+    "cancelamento_motivo": "Outro — Cliente Lojista, não tem como prospectar"
   },
   "293a67bd-b965-4141-87ae-3ced6f9385ee": {
     "id": "293a67bd-b965-4141-87ae-3ced6f9385ee",
