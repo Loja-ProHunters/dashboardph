@@ -3822,7 +3822,7 @@
   "eead6296-ac95-47e4-965d-560c31a8010c": {
     "id": "eead6296-ac95-47e4-965d-560c31a8010c",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_91ae5cbb886d1bc1",
@@ -3842,14 +3842,19 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-20T13:44:46.399Z",
-    "atualizado_por": "reatribuicao-v3",
+    "atualizado_em": "2026-10-20T18:54:09.032Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Alencar Gentil da Silva",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
     "dias_em_aberto": 6,
     "reatribuido_de": "boschetto",
-    "reatribuido_em": "2026-10-20T13:44:46.399Z"
+    "reatribuido_em": "2026-10-20T13:44:46.399Z",
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-20T18:54:08.840Z",
+    "concluida_por": "mathias",
+    "canal_contato": "whatsapp",
+    "motivo_nao_conversao": "numero_errado"
   },
   "f2c7bc2b-d39c-45e4-b706-e21377e2cd22": {
     "id": "f2c7bc2b-d39c-45e4-b706-e21377e2cd22",
