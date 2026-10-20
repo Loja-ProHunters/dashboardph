@@ -5655,7 +5655,7 @@ function crmBlingRenderCardConta(c){
       '<button class="crm-btn" onclick="crmBlingSyncAgora(' + q + ')">Sync agora (últimos 24h)</button>' +
       '<button class="crm-btn" onclick="crmBlingBackfillIniciar(' + q + ')">📥 Backfill histórico</button>' +
       '<button class="crm-btn" onclick="crmVerificarSaude(' + q + ')">🛡 Verificar saúde</button>' +
-      (cid === 'prohunters' ? '<button class="crm-btn" onclick="crmReatribuirVendedores()">🔄 Reatribuir vendedores</button>' : '') +
+      (cid === 'prohunters' ? '<button class="crm-btn" onclick="crmReatribuirVendedores()">🔄 Corrigir vendedores pelo Bling</button>' : '') +
       '<button class="crm-btn ghost" onclick="crmBlingRefresh(' + q + ')">Renovar token</button>' +
       '<a class="crm-btn ghost" href="/api/bling/authorize?conta=' + encodeURIComponent(cid) + '" target="_blank">Reconectar</a>' +
       '<button class="crm-btn danger" onclick="crmBlingDisconnect(' + q + ')">Desconectar</button>';
@@ -7469,48 +7469,41 @@ async function crmVerificarSaude(conta){
 // Reatribuição de vendedores nos pedidos (roda em lotes com checkpoint)
 // ═══════════════════════════════════════════════════════════════
 async function crmReatribuirVendedores(){
-  // Botão aparece só no card do Bling prohunters (multi-conta)
+  // v3: relê o vendedor de TODOS os pedidos no Bling com a conta certa
+  // (Pro Hunters e Calibre) e corrige pedidos, clientes, tarefas e contratos.
   var out = _blingOut('prohunters');
   if (!out) return;
-  if (!confirm('Reatribuir vendedores em todos os pedidos existentes?\n\nVersão robusta v2: com delay de 400ms entre requests + retry automático em rate limit.\n\nDemora ~4-6 minutos pros 529 pedidos. Deixa a aba aberta até terminar.')) return;
-  out.innerHTML = '<span style="color:var(--gd)">🔄 Iniciando reatribuição v2…</span>';
+  if (!confirm('Corrigir o vendedor de todos os pedidos pelo Bling?\n\nRelê o campo "Vendedor" de cada pedido (Pro Hunters e Calibre) e corrige:\n• vendedor do pedido e dono do cliente\n• tarefas automáticas abertas\n• contratos de arma\n\nVendas de e-commerce (sem vendedor/Tray) continuam no rodízio.\nPode levar ~20-30 min. Deixe a aba aberta.')) return;
+  out.innerHTML = '<span style="color:var(--gd)">🔄 Iniciando…</span>';
   try {
-    var r = await fetch('/api/crm/vendedores/reatribuir-iniciar', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ forcar: true }) });
+    var r = await fetch('/api/crm/vendedores/reatribuir-iniciar', { method:'POST', headers:{'Content-Type':'application/json'}, body: '{}' });
     var d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro ao iniciar');
-    var cp = d.checkpoint;
-    out.innerHTML = '<span style="color:var(--gd)">🔄 Iniciada.</span> ' +
-      cp.total + ' pedidos · estimativa ~' + Math.ceil(cp.total / 15 * 7) + 's.';
+    var total = d.checkpoint.total;
+    var falhas = 0;
     while (true) {
       var rt = await fetch('/api/crm/vendedores/reatribuir-tick', { method:'POST' });
-      var dt = await rt.json();
-      if (!rt.ok) throw new Error(dt.error || 'Erro no tick');
-      var cpAtual = dt.checkpoint;
-      var c = cpAtual.contadores || {};
-      var pct = cpAtual.total ? Math.round((cpAtual.processados / cpAtual.total) * 100) : 100;
-      out.innerHTML = '<span style="color:var(--gd)">🔄 Processando…</span> ' +
-        pct + '% · ' + cpAtual.processados + '/' + cpAtual.total +
-        ' · ✓' + (c.atualizados||0) +
-        ' · rate-limit:' + (c.erro_rate_limit||0);
+      var dt = await rt.json().catch(function(){ return {}; });
+      if (!rt.ok) { if (++falhas > 5) throw new Error(dt.error || 'Erro no lote'); await new Promise(function(r){ setTimeout(r, 3000); }); continue; }
+      falhas = 0;
+      var cp = dt.checkpoint, c = cp.contadores || {};
+      var pct = total ? Math.round(cp.processados / total * 100) : 100;
+      out.innerHTML = '<span style="color:var(--gd)">🔄 Corrigindo vendedores…</span> ' + pct + '% · ' + cp.processados + '/' + total +
+        ' · vendedor ' + (c.vendedor||0) + ' · e-commerce ' + (c.ecommerce||0) + ' · corrigidos ' + (c.mudou_vendedor||0) +
+        ((c.erro_rate_limit||0) + (c.erro_outro||0) ? ' · falhas ' + ((c.erro_rate_limit||0) + (c.erro_outro||0)) : '');
       if (dt.terminou) {
-        var resumo = cpAtual.mudancas_por_login || {};
-        var linhas = Object.entries(resumo).map(function(e){ return e[0]+': '+e[1]; }).join(' · ');
-        out.innerHTML =
-          '<div style="color:var(--gd);font-weight:700;margin-bottom:6px">✓ Reatribuição concluída!</div>' +
-          '<div style="margin-left:8px;font-size:12.5px;line-height:1.6">' +
-            '• <b>' + cpAtual.processados + '</b> pedidos processados<br>' +
-            '• <b>' + (c.atualizados||0) + '</b> pedidos com vendedor corrigido<br>' +
-            '• <b>' + (cpAtual.accounts_atualizadas||0) + '</b> contas com novo owner<br>' +
-            (linhas ? '• Distribuição por vendedor: <b>' + linhas + '</b><br>' : '') +
-            '<div style="margin-top:8px;padding-top:6px;border-top:1px dashed var(--bd);font-size:11.5px;color:var(--gy)">' +
-              '<b>Diagnóstico dos ' + cpAtual.processados + ' pedidos:</b><br>' +
-              '↳ ' + (c.ja_mapeado_correto||0) + ' já estavam com vendedor certo<br>' +
-              '↳ ' + (c.sem_vendedor_no_bling||0) + ' vieram sem vendedor no Bling (id=0)<br>' +
-              '↳ ' + (c.vendedor_nao_mapeado||0) + ' têm vendedor no Bling mas fora do CRM (Tray, Luis, Redin)<br>' +
-              '↳ ' + (c.order_nao_achado||0) + ' order não encontrado localmente<br>' +
-              '↳ <span style="color:' + ((c.erro_rate_limit||0)>0?'var(--r)':'inherit') + '">' + (c.erro_rate_limit||0) + ' falharam por rate limit</span><br>' +
-              '↳ ' + (c.erro_outro||0) + ' falharam por outro erro' +
-            '</div>' +
+        var res = cp.resultado || {};
+        var pv = Object.entries(cp.por_vendedor || {}).map(function(e){ return e[0] + ': ' + e[1]; }).join(' · ');
+        var nm = Object.keys(cp.nomes_nao_mapeados || {});
+        out.innerHTML = '<div style="color:var(--gd);font-weight:700;margin-bottom:6px">✓ Vendedores corrigidos pelo Bling</div>' +
+          '<div style="font-size:12.5px;line-height:1.7">• ' + cp.processados + ' pedidos relidos (' + (c.vendedor||0) + ' de vendedor, ' + (c.ecommerce||0) + ' de e-commerce)<br>' +
+          '• <b>' + (res.pedidos_vendedor_mudou||0) + '</b> pedidos estavam com o vendedor errado<br>' +
+          '• <b>' + (res.clientes_novo_dono||0) + '</b> clientes mudaram de dono · ' + (res.clientes_ecommerce_distribuidos||0) + ' clientes de e-commerce distribuídos<br>' +
+          '• <b>' + (res.tarefas_reatribuidas||0) + '</b> tarefas abertas foram para o vendedor certo<br>' +
+          '• <b>' + (res.contratos_corrigidos||0) + '</b> contratos de arma corrigidos<br>' +
+          (pv ? '• Pedidos por vendedor: ' + pv + '<br>' : '') +
+          (nm.length ? '<span style="color:var(--r)">• Nomes no Bling não reconhecidos: ' + crmEsc(nm.join(', ')) + '</span><br>' : '') +
+          ((c.erro_rate_limit||0) + (c.erro_outro||0) ? '<span style="color:var(--r)">• ' + ((c.erro_rate_limit||0) + (c.erro_outro||0)) + ' pedidos não puderam ser lidos (rode de novo depois)</span>' : '') +
           '</div>';
         break;
       }
@@ -11342,7 +11335,7 @@ window.PROD = (function(){
           '<button class="pg-mini ok" onclick="PROD._conferir(\'' + l.tarefa_assinatura_id + '\',true,this)">✓ Está na pasta</button><button class="pg-mini bad" onclick="PROD._conferir(\'' + l.tarefa_assinatura_id + '\',false,this)">✗ Não está</button>' : '';
         var an = l.anulacao ? '<small><b>' + esc(l.anulacao.motivo_label || l.anulacao.motivo) + '</b> — ' + esc(l.anulacao.descricao) + ' (' + esc(l.anulacao.por) + ', ' + dm(l.anulacao.em) + ')</small>' : '';
         return '<tr><td><span class="pg-chip ' + s.cls + '">' + s.ic + ' ' + s.txt + '</span>' + an + '</td><td>' + esc(l.bling_numero || '—') + '<small>' + dm(l.data_pedido) + '</small></td><td>' + esc(l.cliente_nome || '—') + '<small>' + moeda(l.valor_total) + '</small></td>' +
-          '<td class="pg-arma">' + esc((l.armas || []).join(' + ')) + '</td><td>' + esc(l.vendedor) + '</td><td>' + (l.dias_venda != null ? l.dias_venda : l.dias) + 'd' + (l.avisos_cancelamento ? '<small>' + l.avisos_cancelamento + ' aviso(s)</small>' : '') + '</td><td class="pg-acts">' + acoes + '</td></tr>';
+          '<td class="pg-arma">' + esc((l.armas || []).join(' + ')) + '</td><td>' + (l.atribuir_vendedor ? '<select class="pg-mini" onchange="PROD._atribuir(\'' + esc(l.order_id) + '\', this)"><option value="">Escolher…</option><option value="dickmann">Pedro</option><option value="boschetto">Enzo</option><option value="mathias">Wesley</option></select>' + (l.vendedor_bling_nome ? '<small>Bling: ' + esc(l.vendedor_bling_nome) + '</small>' : '<small>sem vendedor no Bling</small>') : esc(l.vendedor) + (l.vendedor_bling_nome ? '<small>' + esc(l.vendedor_bling_nome) + '</small>' : '')) + '</td><td>' + (l.dias_venda != null ? l.dias_venda : l.dias) + 'd' + (l.avisos_cancelamento ? '<small>' + l.avisos_cancelamento + ' aviso(s)</small>' : '') + '</td><td class="pg-acts">' + acoes + '</td></tr>';
       }).join('') + '</tbody></table></div>';
     return h + '</div>';
   }
@@ -11362,12 +11355,22 @@ window.PROD = (function(){
       recarregar();
     } catch(e){ if (btn) btn.disabled = false; if (typeof crmToast === 'function') crmToast('Erro: ' + e.message, 'erro', 5000); }
   }
+  async function _atribuir(orderId, sel){
+    if (!sel.value) return;
+    sel.disabled = true;
+    try {
+      var r = await fetch('/api/crm/contratos/' + encodeURIComponent(orderId) + '/atribuir', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login: sel.value }) });
+      var d = await r.json(); if (!r.ok) throw new Error(d.error || 'Erro');
+      if (typeof crmToast === 'function') crmToast('Contrato atribuído.', 'ok', 3000);
+      recarregar();
+    } catch(e){ sel.disabled = false; if (typeof crmToast === 'function') crmToast('Erro: ' + e.message, 'erro', 5000); }
+  }
   async function _varrer(btn){
     if (btn) { btn.disabled = true; btn.textContent = 'Verificando…'; }
     try {
       var r = await fetch('/api/crm/contratos/processar', { method: 'POST' });
       var d = await r.json(); if (!r.ok) throw new Error(d.error || 'Erro');
-      if (typeof crmToast === 'function') crmToast(d.pedidos_arma_no_periodo + ' venda(s) de arma nos últimos 90 dias · ' + d.tarefas_criadas + ' tarefa(s) nova(s) criada(s).', 'ok', 5000);
+      if (typeof crmToast === 'function') crmToast(d.pedidos_arma_no_periodo + ' venda(s) de arma nos últimos 90 dias · ' + d.tarefas_criadas + ' tarefa(s) nova(s) · ' + (d.contratos_corrigidos || 0) + ' contrato(s) corrigido(s) pelo vendedor do Bling' + (d.aguardando_leitura_bling ? ' · faltam ' + d.aguardando_leitura_bling + ' para ler (clique de novo)' : '') + '.', 'ok', 8000);
       recarregar();
     } catch(e){ if (typeof crmToast === 'function') crmToast('Erro: ' + e.message, 'erro', 5000); }
     finally { if (btn) { btn.disabled = false; btn.textContent = 'Verificar vendas de arma agora'; } }
@@ -11376,7 +11379,7 @@ window.PROD = (function(){
   var _rz = null;
   window.addEventListener('resize', function(){ clearTimeout(_rz); _rz = setTimeout(function(){ var t = el('tab-produtividade'); if (state.dados && t && t.classList.contains('on')) { chartExec(); chartFila(); chartRes(); chartMot(); } }, 200); });
 
-  return { init: init, recarregar: recarregar, _abrir: _abrir, _tabela: _tabela, _todasAcoes: _todasAcoes, _filtroC: _filtroC, _conferir: _conferir, _varrer: _varrer,
+  return { init: init, recarregar: recarregar, _abrir: _abrir, _tabela: _tabela, _todasAcoes: _todasAcoes, _filtroC: _filtroC, _conferir: _conferir, _varrer: _varrer, _atribuir: _atribuir,
     toggleAtrasadas: function(){} };
 })();
 </script>
