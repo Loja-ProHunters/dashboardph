@@ -11655,5 +11655,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T18:41:36.521Z",
     "atualizado_por": "mathias"
+  },
+  "e42b197a-c395-4f3a-acbd-62f832524759": {
+    "id": "e42b197a-c395-4f3a-acbd-62f832524759",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_10b9cd2fe37c178f",
+    "titulo": "📅 Follow-up — Filipe Rachele Tebaldi",
+    "descricao": "1 ano da 1a compra (2025-10-24) — retomar contato\n\nCliente: Filipe Rachele Tebaldi\nUltima compra: 2025-10-24\nPedidos: 1\nValor historico: R$ 3168.00",
+    "prazo": "2026-10-26",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_e42b197a-c395-4f3a-acbd-62f832524759",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_10b9cd2fe37c178f",
+    "origem_tarefa_id": "1b6d2b94-02b9-4866-b996-ff1ad0ea2c3d",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T18:47:24.498Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T18:47:24.498Z",
+    "atualizado_por": "dickmann"
   }
 }
