@@ -9445,7 +9445,7 @@
   "20acfcd2-bb27-4d85-a8f5-e9a7c471085f": {
     "id": "20acfcd2-bb27-4d85-a8f5-e9a7c471085f",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_8a3828ce9ca255b1",
@@ -9469,12 +9469,15 @@
     "lote_dia": "2026-10-20",
     "criado_em": "2026-10-20T11:00:19.950Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-20T11:00:19.950Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T18:15:59.112Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "alvaro rocha neto",
     "cliente_telefone": null,
     "dia_origem": "2026-10-20",
-    "dias_em_aberto": 0
+    "dias_em_aberto": 0,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:15:58.440Z",
+    "concluida_por": "boschetto"
   },
   "a6b55c79-1325-4bbb-b2a5-00558a706d31": {
     "id": "a6b55c79-1325-4bbb-b2a5-00558a706d31",
