@@ -4,83 +4,8 @@
   "iniciado_em": "2026-10-20T13:09:16.105Z",
   "iniciado_por": "gerencia",
   "total": 2334,
-  "processados": 0,
+  "processados": 15,
   "fila": [
-    [
-      "ord_e899aeaf4193b490",
-      "26923950237",
-      "prohunters"
-    ],
-    [
-      "ord_8a92bb5ac36977a3",
-      "26847964275",
-      "prohunters"
-    ],
-    [
-      "ord_448d5ddfdfc63b1e",
-      "26812482432",
-      "prohunters"
-    ],
-    [
-      "ord_a4e5236d7fadb6c7",
-      "26784542323",
-      "prohunters"
-    ],
-    [
-      "ord_af5f8b1edc17fba1",
-      "26702265175",
-      "prohunters"
-    ],
-    [
-      "ord_ed8dd827fdb96edf",
-      "26686297854",
-      "prohunters"
-    ],
-    [
-      "ord_333ebf895bd17d91",
-      "26420769501",
-      "prohunters"
-    ],
-    [
-      "ord_dd0d35d3301a28d5",
-      "26925599452",
-      "calibre"
-    ],
-    [
-      "ord_03b3e0225fe432d9",
-      "26850023514",
-      "calibre"
-    ],
-    [
-      "ord_e9bbc08159820cee",
-      "26826302284",
-      "calibre"
-    ],
-    [
-      "ord_8b2e253ee426fadf",
-      "26704635672",
-      "calibre"
-    ],
-    [
-      "ord_078f00e11fc3173e",
-      "26704468986",
-      "calibre"
-    ],
-    [
-      "ord_bd0b1d8620eea66e",
-      "26697160722",
-      "calibre"
-    ],
-    [
-      "ord_0ad32535833f55f3",
-      "26594335474",
-      "calibre"
-    ],
-    [
-      "ord_bd70e80facbd6d89",
-      "26508584092",
-      "calibre"
-    ],
     [
       "ord_70a12014b72dd36e",
       "26475673571",
@@ -11758,16 +11683,142 @@
       }
     }
   },
-  "updates": {},
+  "updates": {
+    "ord_e899aeaf4193b490": {
+      "id": "15596916104",
+      "nome": "Wesley Mathias Ciesielsky",
+      "conta": "prohunters",
+      "login": "mathias",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:18.473Z"
+    },
+    "ord_8a92bb5ac36977a3": {
+      "id": "15596572600",
+      "nome": "Pedro Henrique Dickmann",
+      "conta": "prohunters",
+      "login": "dickmann",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:19.207Z"
+    },
+    "ord_448d5ddfdfc63b1e": {
+      "id": "15596916104",
+      "nome": "Wesley Mathias Ciesielsky",
+      "conta": "prohunters",
+      "login": "mathias",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:19.974Z"
+    },
+    "ord_a4e5236d7fadb6c7": {
+      "id": "15596916104",
+      "nome": "Wesley Mathias Ciesielsky",
+      "conta": "prohunters",
+      "login": "mathias",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:20.711Z"
+    },
+    "ord_af5f8b1edc17fba1": {
+      "id": "15596916104",
+      "nome": "Wesley Mathias Ciesielsky",
+      "conta": "prohunters",
+      "login": "mathias",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:21.450Z"
+    },
+    "ord_ed8dd827fdb96edf": {
+      "id": "15596458513",
+      "nome": "Joao Carlos Redin - Vendedor",
+      "conta": "prohunters",
+      "login": "joao",
+      "origem": "interno",
+      "lido_em": "2026-10-20T13:09:22.167Z"
+    },
+    "ord_333ebf895bd17d91": {
+      "id": "15596742630",
+      "nome": "Enzo dos Santos Boschetto",
+      "conta": "prohunters",
+      "login": "boschetto",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:22.931Z"
+    },
+    "ord_dd0d35d3301a28d5": {
+      "id": "15596572601",
+      "nome": "Pedro Henrique Dickmann",
+      "conta": "calibre",
+      "login": "dickmann",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:23.682Z"
+    },
+    "ord_03b3e0225fe432d9": {
+      "id": "15596916109",
+      "nome": "Wesley Mathias Ciesielsky",
+      "conta": "calibre",
+      "login": "mathias",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:24.416Z"
+    },
+    "ord_e9bbc08159820cee": {
+      "id": "15596572601",
+      "nome": "Pedro Henrique Dickmann",
+      "conta": "calibre",
+      "login": "dickmann",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:25.132Z"
+    },
+    "ord_8b2e253ee426fadf": {
+      "id": "15596572601",
+      "nome": "Pedro Henrique Dickmann",
+      "conta": "calibre",
+      "login": "dickmann",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:25.884Z"
+    },
+    "ord_078f00e11fc3173e": {
+      "id": "15596572601",
+      "nome": "Pedro Henrique Dickmann",
+      "conta": "calibre",
+      "login": "dickmann",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:26.621Z"
+    },
+    "ord_bd0b1d8620eea66e": {
+      "id": "15596572601",
+      "nome": "Pedro Henrique Dickmann",
+      "conta": "calibre",
+      "login": "dickmann",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:27.358Z"
+    },
+    "ord_0ad32535833f55f3": {
+      "id": "15596916109",
+      "nome": "Wesley Mathias Ciesielsky",
+      "conta": "calibre",
+      "login": "mathias",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:28.096Z"
+    },
+    "ord_bd70e80facbd6d89": {
+      "id": "15596916109",
+      "nome": "Wesley Mathias Ciesielsky",
+      "conta": "calibre",
+      "login": "mathias",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:09:28.809Z"
+    }
+  },
   "contadores": {
-    "vendedor": 0,
+    "vendedor": 14,
     "ecommerce": 0,
-    "interno": 0,
+    "interno": 1,
     "nao_mapeado": 0,
-    "mudou_vendedor": 0,
+    "mudou_vendedor": 8,
     "erro_rate_limit": 0,
     "erro_outro": 0
   },
-  "por_vendedor": {},
-  "nomes_nao_mapeados": {}
+  "por_vendedor": {
+    "mathias": 7,
+    "dickmann": 6,
+    "boschetto": 1
+  },
+  "nomes_nao_mapeados": {},
+  "ultimo_tick_em": "2026-10-20T13:09:28.809Z"
 }
