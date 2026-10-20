@@ -11464,5 +11464,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T18:32:01.361Z",
     "atualizado_por": "dickmann"
+  },
+  "919444bf-994c-426a-980e-ac3725e42a15": {
+    "id": "919444bf-994c-426a-980e-ac3725e42a15",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "boschetto",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_90d9a363477a07c3",
+    "titulo": "📅 Follow-up — FRIAS E TOMÉ SOLUÇÕES INDUSTRIAIS LTDA",
+    "descricao": "1 ano da 1a compra (2025-10-13) — retomar contato\n\nCliente: FRIAS E TOMÉ SOLUÇÕES INDUSTRIAIS LTDA\nUltima compra: 2025-10-13\nPedidos: 1\nValor historico: R$ 217.20\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "15:45",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_919444bf-994c-426a-980e-ac3725e42a15",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "boschetto",
+    "account_id": "acc_90d9a363477a07c3",
+    "origem_tarefa_id": "e12cc890-74e9-45f5-a384-5cdd6c94b104",
+    "criada_por_vendedor": "boschetto",
+    "criado_em": "2026-10-20T18:33:13.010Z",
+    "criado_por": "boschetto",
+    "atualizado_em": "2026-10-20T18:33:13.010Z",
+    "atualizado_por": "boschetto"
   }
 }
