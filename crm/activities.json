@@ -11619,5 +11619,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T18:38:51.885Z",
     "atualizado_por": "dickmann"
+  },
+  "008de3af-b21f-431e-ae0c-a21273ec4ef4": {
+    "id": "008de3af-b21f-431e-ae0c-a21273ec4ef4",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_3d7a41dff62fa5ed",
+    "titulo": "📅 Follow-up — ALEX CESAR SALES DOS ANJOS",
+    "descricao": "1 ano da 1a compra (2025-10-17) — retomar contato\n\nCliente: ALEX CESAR SALES DOS ANJOS\nUltima compra: 2025-10-17\nPedidos: 1\nValor historico: R$ 3199.50\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_008de3af-b21f-431e-ae0c-a21273ec4ef4",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_3d7a41dff62fa5ed",
+    "origem_tarefa_id": "ce7e6280-abf7-4910-8fa9-6e2cfee523b3",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T18:41:36.521Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T18:41:36.521Z",
+    "atualizado_por": "mathias"
   }
 }
