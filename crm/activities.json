@@ -5136,7 +5136,7 @@
   "2185c45d-2613-427e-a33e-73ed646ec4c0": {
     "id": "2185c45d-2613-427e-a33e-73ed646ec4c0",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_11f3d7c126bd1c4e",
@@ -5159,12 +5159,15 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T15:52:46.180Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Vitor Diego Lima da Silva",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T15:52:46.011Z",
+    "concluida_por": "mathias"
   },
   "9815e145-69dc-4030-9a8c-14e97551f4d4": {
     "id": "9815e145-69dc-4030-9a8c-14e97551f4d4",
