@@ -4,83 +4,8 @@
   "iniciado_em": "2026-10-20T13:09:16.105Z",
   "iniciado_por": "gerencia",
   "total": 2334,
-  "processados": 1875,
+  "processados": 1890,
   "fila": [
-    [
-      "ord_bef792df77fd5cde",
-      "25302484268",
-      "prohunters"
-    ],
-    [
-      "ord_9798bc4cdd2f6caf",
-      "25298194466",
-      "prohunters"
-    ],
-    [
-      "ord_0eab520f3bdcd44d",
-      "25297608262",
-      "prohunters"
-    ],
-    [
-      "ord_038b616d81a8acd8",
-      "25291939127",
-      "prohunters"
-    ],
-    [
-      "ord_f2062fd2b3e10797",
-      "25290765277",
-      "prohunters"
-    ],
-    [
-      "ord_b8348a3c433f59ab",
-      "25283504440",
-      "prohunters"
-    ],
-    [
-      "ord_4cb4e4ba3942f022",
-      "25280013672",
-      "prohunters"
-    ],
-    [
-      "ord_c3ec5f33eb41c37c",
-      "25279663234",
-      "prohunters"
-    ],
-    [
-      "ord_deac9d6fc2ba3c72",
-      "25277998305",
-      "prohunters"
-    ],
-    [
-      "ord_c167f4f351a9149c",
-      "25273966323",
-      "prohunters"
-    ],
-    [
-      "ord_8e9122cd6e5ce619",
-      "25269935170",
-      "prohunters"
-    ],
-    [
-      "ord_faabfde175ac7662",
-      "25269692729",
-      "prohunters"
-    ],
-    [
-      "ord_12168eeee15f467a",
-      "25266550161",
-      "prohunters"
-    ],
-    [
-      "ord_ba340318aa866b93",
-      "25263650091",
-      "prohunters"
-    ],
-    [
-      "ord_52ed7c3b8e8b07ea",
-      "25258439221",
-      "prohunters"
-    ],
     [
       "ord_e9d0d9e55e623509",
       "25257038534",
@@ -17383,24 +17308,144 @@
       "login": null,
       "origem": "ecommerce",
       "lido_em": "2026-10-20T13:37:52.605Z"
+    },
+    "ord_bef792df77fd5cde": {
+      "id": "9744561230",
+      "nome": "Tray",
+      "conta": "prohunters",
+      "login": null,
+      "origem": "ecommerce",
+      "lido_em": "2026-10-20T13:37:55.672Z"
+    },
+    "ord_9798bc4cdd2f6caf": {
+      "id": "15596557870",
+      "nome": "Jonatas Pereira Chegatti",
+      "conta": "prohunters",
+      "login": "mathias",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:37:56.400Z"
+    },
+    "ord_0eab520f3bdcd44d": {
+      "id": "9744561230",
+      "nome": "Tray",
+      "conta": "prohunters",
+      "login": null,
+      "origem": "ecommerce",
+      "lido_em": "2026-10-20T13:37:57.150Z"
+    },
+    "ord_038b616d81a8acd8": {
+      "id": "9744561230",
+      "nome": "Tray",
+      "conta": "prohunters",
+      "login": null,
+      "origem": "ecommerce",
+      "lido_em": "2026-10-20T13:37:57.901Z"
+    },
+    "ord_f2062fd2b3e10797": {
+      "id": "15596557870",
+      "nome": "Jonatas Pereira Chegatti",
+      "conta": "prohunters",
+      "login": "mathias",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:37:58.656Z"
+    },
+    "ord_b8348a3c433f59ab": {
+      "id": "9744561230",
+      "nome": "Tray",
+      "conta": "prohunters",
+      "login": null,
+      "origem": "ecommerce",
+      "lido_em": "2026-10-20T13:37:59.426Z"
+    },
+    "ord_4cb4e4ba3942f022": {
+      "id": "15596572600",
+      "nome": "Pedro Henrique Dickmann",
+      "conta": "prohunters",
+      "login": "dickmann",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:38:00.176Z"
+    },
+    "ord_c3ec5f33eb41c37c": {
+      "id": "9744561230",
+      "nome": "Tray",
+      "conta": "prohunters",
+      "login": null,
+      "origem": "ecommerce",
+      "lido_em": "2026-10-20T13:38:00.935Z"
+    },
+    "ord_deac9d6fc2ba3c72": {
+      "id": "9744561230",
+      "nome": "Tray",
+      "conta": "prohunters",
+      "login": null,
+      "origem": "ecommerce",
+      "lido_em": "2026-10-20T13:38:01.683Z"
+    },
+    "ord_c167f4f351a9149c": {
+      "id": "9744561230",
+      "nome": "Tray",
+      "conta": "prohunters",
+      "login": null,
+      "origem": "ecommerce",
+      "lido_em": "2026-10-20T13:38:02.449Z"
+    },
+    "ord_8e9122cd6e5ce619": {
+      "id": "9744561230",
+      "nome": "Tray",
+      "conta": "prohunters",
+      "login": null,
+      "origem": "ecommerce",
+      "lido_em": "2026-10-20T13:38:03.222Z"
+    },
+    "ord_faabfde175ac7662": {
+      "id": "15596492308",
+      "nome": "Luis Henrique Gonçalves",
+      "conta": "prohunters",
+      "login": "gerencia",
+      "origem": "interno",
+      "lido_em": "2026-10-20T13:38:04.026Z"
+    },
+    "ord_12168eeee15f467a": {
+      "id": "9744561230",
+      "nome": "Tray",
+      "conta": "prohunters",
+      "login": null,
+      "origem": "ecommerce",
+      "lido_em": "2026-10-20T13:38:04.816Z"
+    },
+    "ord_ba340318aa866b93": {
+      "id": "15596572600",
+      "nome": "Pedro Henrique Dickmann",
+      "conta": "prohunters",
+      "login": "dickmann",
+      "origem": "vendedor",
+      "lido_em": "2026-10-20T13:38:05.562Z"
+    },
+    "ord_52ed7c3b8e8b07ea": {
+      "id": "9744561230",
+      "nome": "Tray",
+      "conta": "prohunters",
+      "login": null,
+      "origem": "ecommerce",
+      "lido_em": "2026-10-20T13:38:06.277Z"
     }
   },
   "contadores": {
-    "vendedor": 855,
-    "ecommerce": 906,
-    "interno": 96,
+    "vendedor": 859,
+    "ecommerce": 916,
+    "interno": 97,
     "nao_mapeado": 18,
-    "mudou_vendedor": 218,
+    "mudou_vendedor": 220,
     "erro_rate_limit": 0,
     "erro_outro": 0
   },
   "por_vendedor": {
-    "mathias": 336,
-    "dickmann": 301,
+    "mathias": 338,
+    "dickmann": 303,
     "boschetto": 218
   },
   "nomes_nao_mapeados": {
     "Loja Integrada": 18
   },
-  "ultimo_tick_em": "2026-10-20T13:37:52.605Z"
+  "ultimo_tick_em": "2026-10-20T13:38:06.277Z"
 }
