@@ -10440,5 +10440,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T15:30:58.054Z",
     "atualizado_por": "mathias"
+  },
+  "e4a5486e-9b30-4948-8586-1ef4b2b4566e": {
+    "id": "e4a5486e-9b30-4948-8586-1ef4b2b4566e",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_ed585275ae941b59",
+    "titulo": "📅 Follow-up — Tiago Rodrigues da Costa",
+    "descricao": "Comprou Lubrificante Redding Imp… — completa c/ Jogo de 3 Matrizes (Die) Redd…\n\nCliente: Tiago Rodrigues da Costa\nUltima compra: 2026-09-13\nPedidos: 3\nValor historico: R$ 2675.07\n\nProduto sugerido: Jogo de 3 Matrizes (Die) Redding Deluxe Cal 308/307 Win (SKU RED-84155)\nConfianca: 31%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_e4a5486e-9b30-4948-8586-1ef4b2b4566e",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_ed585275ae941b59",
+    "origem_tarefa_id": "864f9d94-3c84-419f-a267-46ec73b31572",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T15:38:06.109Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T15:38:06.109Z",
+    "atualizado_por": "mathias"
   }
 }
