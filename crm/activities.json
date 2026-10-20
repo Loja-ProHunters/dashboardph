@@ -11235,5 +11235,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T18:16:59.092Z",
     "atualizado_por": "mathias"
+  },
+  "1681936e-6a9b-4069-88b8-7203b5db1fd4": {
+    "id": "1681936e-6a9b-4069-88b8-7203b5db1fd4",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_6ca35dff6ccf6420",
+    "titulo": "📅 Follow-up — Samuel de Oliveira Junior",
+    "descricao": "Aguardando Resposta",
+    "prazo": "2026-10-21",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_1681936e-6a9b-4069-88b8-7203b5db1fd4",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_6ca35dff6ccf6420",
+    "origem_tarefa_id": "5e3a7c2e-82ab-442e-bbb7-c6a3ddb8d46c",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T18:17:45.154Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T18:17:45.154Z",
+    "atualizado_por": "dickmann"
   }
 }
