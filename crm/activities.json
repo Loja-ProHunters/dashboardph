@@ -4832,7 +4832,7 @@
   "14677849-51d1-43b7-b319-53f234d79a75": {
     "id": "14677849-51d1-43b7-b319-53f234d79a75",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_963c7a22a91fb109",
@@ -4855,12 +4855,15 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T15:18:09.455Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Eduardo Pio Mendes de Carvalho Filho",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T15:18:09.290Z",
+    "concluida_por": "mathias"
   },
   "a80ec854-abeb-4538-a534-60bfeb10272b": {
     "id": "a80ec854-abeb-4538-a534-60bfeb10272b",
