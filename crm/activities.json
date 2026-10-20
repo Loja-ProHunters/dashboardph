@@ -10952,5 +10952,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T17:50:11.755Z",
     "atualizado_por": "dickmann"
+  },
+  "bfa5ee3a-ba0c-4f54-b3e1-b3e8d6f47eef": {
+    "id": "bfa5ee3a-ba0c-4f54-b3e1-b3e8d6f47eef",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_ee596514f6d2241b",
+    "titulo": "📅 Follow-up — Renato De Vico",
+    "descricao": "Sumido ha 169d — ideal p/ Munição Fiocchi Cal.380Auto 100GR RNPC\n\nCliente: Renato De Vico\nUltima compra: 2026-05-04\nPedidos: 1\nValor historico: R$ 9700.00\n\nProduto sugerido: Munição Fiocchi Cal.380Auto 100GR RNPC (SKU HUNTER-555)\nConfianca: 30%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_bfa5ee3a-ba0c-4f54-b3e1-b3e8d6f47eef",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_ee596514f6d2241b",
+    "origem_tarefa_id": "751e7055-4f40-452d-8ff8-400d3d3a4cdf",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T17:51:13.663Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T17:51:13.663Z",
+    "atualizado_por": "mathias"
   }
 }
