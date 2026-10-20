@@ -7035,15 +7035,15 @@
   },
   "cb67938d-f25d-4b7f-a863-c895c02e90af": {
     "id": "cb67938d-f25d-4b7f-a863-c895c02e90af",
-    "status": "pendente",
+    "status": "concluida",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.961Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T13:44:52.723Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T14:41:47.176Z",
+    "atualizado_por": "mathias",
     "tipo": "contrato_assinatura",
     "owner_id": "mathias",
     "dono": "mathias",
@@ -7086,7 +7086,19 @@
       "conta": "calibre",
       "origem": "vendedor"
     },
-    "atribuir_vendedor": false
+    "atribuir_vendedor": false,
+    "resultado": "contrato_assinado",
+    "concluida_em": "2026-10-20T14:41:47.176Z",
+    "concluida_por": "mathias",
+    "declaracao": {
+      "texto": "Declaro que o contrato assinado pelo cliente está salvo na pasta de contratos.",
+      "por": "mathias",
+      "em": "2026-10-20T14:41:47.176Z"
+    },
+    "verificacao": {
+      "status": "pendente"
+    },
+    "observacao_conclusao": null
   },
   "90710d88-42f3-4dd8-a502-18ee608fe05d": {
     "id": "90710d88-42f3-4dd8-a502-18ee608fe05d",
