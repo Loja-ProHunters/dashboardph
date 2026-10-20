@@ -10855,5 +10855,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T17:46:05.707Z",
     "atualizado_por": "dickmann"
+  },
+  "4593babb-14ee-4b48-a123-0d35cbe30c57": {
+    "id": "4593babb-14ee-4b48-a123-0d35cbe30c57",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_561db6479d942ed8",
+    "titulo": "📅 Follow-up — Eduardo Cristian Bisson",
+    "descricao": "Sumido ha 90d — ideal p/ D1147 Fenix Floor-standing Showcase\n\nCliente: Eduardo Cristian Bisson\nUltima compra: 2026-07-16\nPedidos: 1\nValor historico: R$ 263.60\n\nProduto sugerido: D1147 Fenix Floor-standing Showcase (SKU D1147-ID)\nConfianca: 50%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_4593babb-14ee-4b48-a123-0d35cbe30c57",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_561db6479d942ed8",
+    "origem_tarefa_id": "f9708b08-381a-42ea-b268-4b02399ccac5",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T17:46:12.495Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T17:46:12.495Z",
+    "atualizado_por": "mathias"
   }
 }
