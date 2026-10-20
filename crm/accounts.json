@@ -41727,5 +41727,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T17:56:16.952Z",
     "atualizado_por": "dickmann"
+  },
+  "66bd4465-7d42-4424-a717-635edca730d7": {
+    "id": "66bd4465-7d42-4424-a717-635edca730d7",
+    "tipo": "pf",
+    "cpf_cnpj": null,
+    "razao_social": null,
+    "nome_fantasia": null,
+    "nome": "Adriano Neves",
+    "email": null,
+    "telefone": "14 99711-7200",
+    "endereco": null,
+    "status": "ativo",
+    "owner_id": "dickmann",
+    "onboarding_id": null,
+    "primeira_compra_em": null,
+    "ultima_compra_em": null,
+    "pedidos_count": 0,
+    "valor_total_compras": 0,
+    "categorias_compradas": [],
+    "bling_contato_id": null,
+    "tags": [
+      "prospect_vendedor"
+    ],
+    "notas": "Cadastrado manualmente via tarefa manual por dickmann em 2026-10-20",
+    "criado_em": "2026-10-20T19:23:22.511Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T19:23:22.511Z",
+    "atualizado_por": "dickmann"
   }
 }
