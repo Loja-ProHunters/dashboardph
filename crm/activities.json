@@ -11111,5 +11111,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T18:08:43.320Z",
     "atualizado_por": "dickmann"
+  },
+  "3a0e4f63-1602-4e44-b83a-180e2d40c7a6": {
+    "id": "3a0e4f63-1602-4e44-b83a-180e2d40c7a6",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_3abc50194848e1c3",
+    "titulo": "📅 Follow-up — Mario Jordão",
+    "descricao": "Aguardando retorno",
+    "prazo": "2026-10-21",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_3a0e4f63-1602-4e44-b83a-180e2d40c7a6",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_3abc50194848e1c3",
+    "origem_tarefa_id": "aa0d4e9d-e4d1-4854-97c9-aa0f152e5c68",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T18:13:39.249Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T18:13:39.249Z",
+    "atualizado_por": "dickmann"
   }
 }
