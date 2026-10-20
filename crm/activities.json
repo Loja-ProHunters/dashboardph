@@ -10980,5 +10980,31 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T17:51:13.663Z",
     "atualizado_por": "mathias"
+  },
+  "121ff676-7a4a-4881-b62b-6b0d526bb370": {
+    "id": "121ff676-7a4a-4881-b62b-6b0d526bb370",
+    "tipo": "manual",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "3445fae4-d59e-4e46-b416-48285ac271ff",
+    "titulo": "📞 Tarefa manual — Rafael Liberato Fuzil 556",
+    "descricao": "Aguardando a colheita da soja passar pra voltar a conversar com o cliente",
+    "prazo": "2026-11-23",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "manual_121ff676-7a4a-4881-b62b-6b0d526bb370",
+    "gerada_automaticamente": false,
+    "dono": "dickmann",
+    "account_id": "3445fae4-d59e-4e46-b416-48285ac271ff",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T17:56:18.540Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T17:56:18.540Z",
+    "atualizado_por": "dickmann"
   }
 }
