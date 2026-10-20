@@ -10377,7 +10377,7 @@
   "966bab9e-2a1d-4f94-a7a1-e02a923e644d": {
     "id": "966bab9e-2a1d-4f94-a7a1-e02a923e644d",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_a4fe067916bb1627",
@@ -10401,12 +10401,15 @@
     "lote_dia": "2026-10-20",
     "criado_em": "2026-10-20T11:00:19.950Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-20T11:00:19.950Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T18:16:57.367Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Fagner bordinhao",
     "cliente_telefone": null,
     "dia_origem": "2026-10-20",
-    "dias_em_aberto": 0
+    "dias_em_aberto": 0,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:16:56.825Z",
+    "concluida_por": "mathias"
   },
   "9848d0fb-ea0e-4171-9c9e-ec792800ce3a": {
     "id": "9848d0fb-ea0e-4171-9c9e-ec792800ce3a",
