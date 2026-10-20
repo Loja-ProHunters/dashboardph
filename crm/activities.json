@@ -8117,14 +8117,14 @@
   },
   "6d3d7aa9-3d8c-4a72-93dc-a4d7b99d97b6": {
     "id": "6d3d7aa9-3d8c-4a72-93dc-a4d7b99d97b6",
-    "status": "pendente",
+    "status": "cancelada",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T16:59:00.486Z",
+    "atualizado_em": "2026-10-20T17:08:19.765Z",
     "atualizado_por": "dickmann",
     "tipo": "contrato_envio",
     "owner_id": "dickmann",
@@ -8167,19 +8167,30 @@
     },
     "contrato_gerado_em": "2026-10-20T16:59:00.486Z",
     "contrato_gerado_por": "dickmann",
-    "contrato_gerado_fora": true
+    "contrato_gerado_fora": true,
+    "resultado": "anulada",
+    "cancelada_em": "2026-10-20T17:08:19.765Z",
+    "cancelada_por": "dickmann",
+    "cancelamento_motivo": "Contrato anulado: Venda cancelada ou devolvida",
+    "anulacao": {
+      "motivo": "venda_cancelada",
+      "motivo_label": "Venda cancelada ou devolvida",
+      "descricao": "Cliente cancelou a arma pra comprar outra",
+      "por": "dickmann",
+      "em": "2026-10-20T17:08:19.765Z"
+    }
   },
   "cf0faa58-0c1a-4e8c-bc0f-8421e488fd27": {
     "id": "cf0faa58-0c1a-4e8c-bc0f-8421e488fd27",
-    "status": "pendente",
+    "status": "cancelada",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T13:44:52.723Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T17:08:19.765Z",
+    "atualizado_por": "dickmann",
     "tipo": "contrato_assinatura",
     "owner_id": "dickmann",
     "dono": "dickmann",
@@ -8219,6 +8230,17 @@
       "nome": "Pedro Henrique Dickmann",
       "conta": "calibre",
       "origem": "vendedor"
+    },
+    "resultado": "anulada",
+    "cancelada_em": "2026-10-20T17:08:19.765Z",
+    "cancelada_por": "dickmann",
+    "cancelamento_motivo": "Contrato anulado: Venda cancelada ou devolvida",
+    "anulacao": {
+      "motivo": "venda_cancelada",
+      "motivo_label": "Venda cancelada ou devolvida",
+      "descricao": "Cliente cancelou a arma pra comprar outra",
+      "por": "dickmann",
+      "em": "2026-10-20T17:08:19.765Z"
     }
   },
   "8dcb0bfb-43b2-40e1-8ac0-0308409c8a54": {
