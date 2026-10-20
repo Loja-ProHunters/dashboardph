@@ -11526,5 +11526,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T18:35:06.774Z",
     "atualizado_por": "dickmann"
+  },
+  "8e9ddae7-cbdf-428c-b30c-7e009ad66400": {
+    "id": "8e9ddae7-cbdf-428c-b30c-7e009ad66400",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_9c49c6833af9c314",
+    "titulo": "📅 Follow-up — Foco Tiro Rústico LTDA",
+    "descricao": "1 ano da 1a compra (2025-10-07) — retomar contato\n\nCliente: Foco Tiro Rústico LTDA\nUltima compra: 2025-10-07\nPedidos: 1\nValor historico: R$ 1550.00",
+    "prazo": "2026-10-21",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_8e9ddae7-cbdf-428c-b30c-7e009ad66400",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_9c49c6833af9c314",
+    "origem_tarefa_id": "46894ee2-0b07-493e-876d-d50f909d6eb6",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T18:36:30.125Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T18:36:30.125Z",
+    "atualizado_por": "dickmann"
   }
 }
