@@ -5696,7 +5696,7 @@
   "eed644e0-ac66-4b1c-8634-f8c2b4848db6": {
     "id": "eed644e0-ac66-4b1c-8634-f8c2b4848db6",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_49cd6c4fed0189f3",
@@ -5719,12 +5719,15 @@
     "dono": "mathias",
     "criado_em": "2026-10-17T11:00:18.511Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-17T11:00:18.511Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T17:49:37.914Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Marcio Jose Boff",
     "cliente_telefone": null,
     "dia_origem": "2026-10-17",
-    "dias_em_aberto": 3
+    "dias_em_aberto": 3,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T17:49:37.360Z",
+    "concluida_por": "mathias"
   },
   "c130565f-719e-4d9f-aab6-1bd9720570bd": {
     "id": "c130565f-719e-4d9f-aab6-1bd9720570bd",
