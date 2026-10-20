@@ -9488,7 +9488,7 @@
   "751e7055-4f40-452d-8ff8-400d3d3a4cdf": {
     "id": "751e7055-4f40-452d-8ff8-400d3d3a4cdf",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_ee596514f6d2241b",
@@ -9512,14 +9512,17 @@
     "lote_dia": "2026-10-20",
     "criado_em": "2026-10-20T11:00:19.950Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-20T13:44:46.399Z",
-    "atualizado_por": "reatribuicao-v3",
+    "atualizado_em": "2026-10-20T17:51:11.858Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Renato De Vico",
     "cliente_telefone": null,
     "dia_origem": "2026-10-20",
     "dias_em_aberto": 0,
     "reatribuido_de": "boschetto",
-    "reatribuido_em": "2026-10-20T13:44:46.399Z"
+    "reatribuido_em": "2026-10-20T13:44:46.399Z",
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T17:51:11.694Z",
+    "concluida_por": "mathias"
   },
   "7aec4a4b-f05d-4268-bee8-ce3f77b7f3bc": {
     "id": "7aec4a4b-f05d-4268-bee8-ce3f77b7f3bc",
