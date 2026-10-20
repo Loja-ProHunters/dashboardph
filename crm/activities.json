@@ -6595,15 +6595,15 @@
   },
   "680d66d9-95b9-421e-bdaf-dedb5e517707": {
     "id": "680d66d9-95b9-421e-bdaf-dedb5e517707",
-    "status": "pendente",
+    "status": "concluida",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.961Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.961Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T12:50:35.149Z",
+    "atualizado_por": "mathias",
     "tipo": "contrato_assinatura",
     "owner_id": "mathias",
     "dono": "mathias",
@@ -6634,7 +6634,19 @@
       ],
       "vendedor_pedido": "mathias",
       "account_id": "acc_6b98c1aa5e1f8fcd"
-    }
+    },
+    "resultado": "contrato_assinado",
+    "concluida_em": "2026-10-20T12:50:35.149Z",
+    "concluida_por": "mathias",
+    "declaracao": {
+      "texto": "Declaro que o contrato assinado pelo cliente está salvo na pasta de contratos.",
+      "por": "mathias",
+      "em": "2026-10-20T12:50:35.149Z"
+    },
+    "verificacao": {
+      "status": "pendente"
+    },
+    "observacao_conclusao": null
   },
   "79d83203-548f-44db-a4a5-0f6d3e22818d": {
     "id": "79d83203-548f-44db-a4a5-0f6d3e22818d",
@@ -7237,15 +7249,15 @@
   },
   "1b325643-9faa-4849-81f4-bfc9c46851bc": {
     "id": "1b325643-9faa-4849-81f4-bfc9c46851bc",
-    "status": "concluida",
+    "status": "pendente",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.962Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T12:50:24.772Z",
-    "atualizado_por": "mathias",
+    "atualizado_em": "2026-10-19T16:29:22.962Z",
+    "atualizado_por": "contratos-arma",
     "tipo": "contrato_assinatura",
     "owner_id": "mathias",
     "dono": "mathias",
@@ -7276,19 +7288,7 @@
       ],
       "vendedor_pedido": "mathias",
       "account_id": "acc_d626221f51b49185"
-    },
-    "resultado": "contrato_assinado",
-    "concluida_em": "2026-10-20T12:50:24.772Z",
-    "concluida_por": "mathias",
-    "declaracao": {
-      "texto": "Declaro que o contrato assinado pelo cliente está salvo na pasta de contratos.",
-      "por": "mathias",
-      "em": "2026-10-20T12:50:24.772Z"
-    },
-    "verificacao": {
-      "status": "pendente"
-    },
-    "observacao_conclusao": null
+    }
   },
   "8cac631b-4781-4109-81cd-682cd236172d": {
     "id": "8cac631b-4781-4109-81cd-682cd236172d",
