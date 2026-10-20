@@ -4244,7 +4244,7 @@
   "b9066d47-51d6-4a61-b940-64180df26721": {
     "id": "b9066d47-51d6-4a61-b940-64180df26721",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_8f0f36ec3443b59b",
@@ -4267,10 +4267,13 @@
     "dono": "dickmann",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T18:21:28.492Z",
+    "atualizado_por": "dickmann",
     "cliente_nome": "Alex Vicintin",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:21:27.878Z",
+    "concluida_por": "dickmann"
   },
   "0dbb686a-6a88-441b-8a9d-d24cb23dae3a": {
     "id": "0dbb686a-6a88-441b-8a9d-d24cb23dae3a",
