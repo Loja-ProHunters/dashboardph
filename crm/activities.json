@@ -6950,14 +6950,14 @@
   },
   "fb0be7b4-f028-476a-ac84-c1d41a9ba9f1": {
     "id": "fb0be7b4-f028-476a-ac84-c1d41a9ba9f1",
-    "status": "pendente",
+    "status": "concluida",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.961Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T17:07:08.282Z",
+    "atualizado_em": "2026-10-20T17:07:53.629Z",
     "atualizado_por": "dickmann",
     "tipo": "contrato_envio",
     "owner_id": "dickmann",
@@ -7000,7 +7000,12 @@
     },
     "contrato_gerado_em": "2026-10-20T17:07:08.282Z",
     "contrato_gerado_por": "dickmann",
-    "contrato_gerado_fora": false
+    "contrato_gerado_fora": false,
+    "resultado": "contrato_enviado",
+    "concluida_em": "2026-10-20T17:07:53.629Z",
+    "concluida_por": "dickmann",
+    "canal_envio": "whatsapp",
+    "observacao_conclusao": null
   },
   "008fcfc4-6362-494b-9ec8-a36334c7f6ed": {
     "id": "008fcfc4-6362-494b-9ec8-a36334c7f6ed",
