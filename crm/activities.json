@@ -9665,5 +9665,33 @@
     "criado_por": "boschetto",
     "atualizado_em": "2026-10-20T12:20:21.056Z",
     "atualizado_por": "boschetto"
+  },
+  "94e84836-9547-4210-b221-92372dd43dbf": {
+    "id": "94e84836-9547-4210-b221-92372dd43dbf",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "boschetto",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_5e90e42c839f26ad",
+    "titulo": "📅 Follow-up — STRIKE TACTICAL SOLUTIONS LTDA",
+    "descricao": "Sumido ha 89d — ideal p/ D1147 Fenix Floor-standing Showcase\n\nCliente: STRIKE TACTICAL SOLUTIONS LTDA\nUltima compra: 2026-07-17\nPedidos: 1\nValor historico: R$ 450.00\n\nProduto sugerido: D1147 Fenix Floor-standing Showcase (SKU D1147-ID)\nConfianca: 43%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-30",
+    "hora": "10:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_94e84836-9547-4210-b221-92372dd43dbf",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "boschetto",
+    "account_id": "acc_5e90e42c839f26ad",
+    "origem_tarefa_id": "1f27ab7f-0b48-4bef-91a8-2b038e3697a1",
+    "criada_por_vendedor": "boschetto",
+    "criado_em": "2026-10-20T12:21:10.813Z",
+    "criado_por": "boschetto",
+    "atualizado_em": "2026-10-20T12:21:10.813Z",
+    "atualizado_por": "boschetto"
   }
 }
