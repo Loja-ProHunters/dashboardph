@@ -10725,5 +10725,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T17:33:05.889Z",
     "atualizado_por": "mathias"
+  },
+  "463f0350-35df-4caf-a0b8-ae901ff39820": {
+    "id": "463f0350-35df-4caf-a0b8-ae901ff39820",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_ae1e50cd3972c5f3",
+    "titulo": "📅 Follow-up — João Paulo Ghesti",
+    "descricao": "Comprou Lanterna Fenix E18R 750 … — completa c/ Lanterna Camping Fenix CL09 C…\n\nCliente: João Paulo Ghesti\nUltima compra: 2026-09-14\nPedidos: 3\nValor historico: R$ 722.04\n\nProduto sugerido: Lanterna Camping Fenix CL09 Cinza 200 Lúmens (SKU 6942870304816)\nConfianca: 22%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_463f0350-35df-4caf-a0b8-ae901ff39820",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_ae1e50cd3972c5f3",
+    "origem_tarefa_id": "9815e145-69dc-4030-9a8c-14e97551f4d4",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T17:33:22.676Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T17:33:22.676Z",
+    "atualizado_por": "mathias"
   }
 }
