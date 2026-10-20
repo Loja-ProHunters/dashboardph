@@ -5172,7 +5172,7 @@
   "9815e145-69dc-4030-9a8c-14e97551f4d4": {
     "id": "9815e145-69dc-4030-9a8c-14e97551f4d4",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_ae1e50cd3972c5f3",
@@ -5195,12 +5195,15 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T17:33:03.681Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "João Paulo Ghesti",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T17:33:03.525Z",
+    "concluida_por": "mathias"
   },
   "19d0f3cc-926b-4feb-9507-1b71c9240bb8": {
     "id": "19d0f3cc-926b-4feb-9507-1b71c9240bb8",
