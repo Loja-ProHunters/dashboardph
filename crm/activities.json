@@ -5348,7 +5348,7 @@
   "f9708b08-381a-42ea-b268-4b02399ccac5": {
     "id": "f9708b08-381a-42ea-b268-4b02399ccac5",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_561db6479d942ed8",
@@ -5371,12 +5371,15 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T17:46:10.743Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Eduardo Cristian Bisson",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T17:46:10.503Z",
+    "concluida_por": "mathias"
   },
   "026c87d9-d9d7-408a-8094-c471b4a1f08d": {
     "id": "026c87d9-d9d7-408a-8094-c471b4a1f08d",
