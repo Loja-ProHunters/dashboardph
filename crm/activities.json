@@ -10793,5 +10793,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T17:37:09.413Z",
     "atualizado_por": "mathias"
+  },
+  "846f1461-2f6a-4590-a929-0078d5ca5da4": {
+    "id": "846f1461-2f6a-4590-a929-0078d5ca5da4",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_f185d13d9007aeb2",
+    "titulo": "📅 Follow-up — Adailton Alves de Souza",
+    "descricao": "Continuar conversa",
+    "prazo": "2026-10-21",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_846f1461-2f6a-4590-a929-0078d5ca5da4",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_f185d13d9007aeb2",
+    "origem_tarefa_id": "74449db8-2373-4c3e-9b4b-148c5c3f766a",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T17:41:21.628Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T17:41:21.628Z",
+    "atualizado_por": "dickmann"
   }
 }
