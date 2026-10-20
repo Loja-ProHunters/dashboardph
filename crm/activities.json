@@ -5278,7 +5278,7 @@
   "19d0f3cc-926b-4feb-9507-1b71c9240bb8": {
     "id": "19d0f3cc-926b-4feb-9507-1b71c9240bb8",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_413b97963171840c",
@@ -5298,12 +5298,15 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T19:00:57.176Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Fabiano Andrade Gomes",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T19:00:57.038Z",
+    "concluida_por": "mathias"
   },
   "c0035e6b-fc8d-41a6-aca5-6d41a7cf1f33": {
     "id": "c0035e6b-fc8d-41a6-aca5-6d41a7cf1f33",
