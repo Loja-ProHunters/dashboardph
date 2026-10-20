@@ -3876,7 +3876,7 @@
   "70799111-0318-4f22-9d2f-f95bec22ec34": {
     "id": "70799111-0318-4f22-9d2f-f95bec22ec34",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_062365df34395d8e",
@@ -3899,12 +3899,15 @@
     "dono": "boschetto",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T12:20:19.097Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "andre luiz mereu rodrigues",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T12:20:19.097Z",
+    "concluida_por": "boschetto"
   },
   "9448c05a-0be3-456f-9fb0-7f049bdffac5": {
     "id": "9448c05a-0be3-456f-9fb0-7f049bdffac5",
@@ -9626,6 +9629,10 @@
     "criado_em": "2026-10-20T12:17:55.154Z",
     "criado_por": "boschetto",
     "atualizado_em": "2026-10-20T12:17:55.154Z",
-    "atualizado_por": "boschetto"
+    "atualizado_por": "boschetto",
+    "cliente_nome": "Roberto Shimizu",
+    "cliente_telefone": null,
+    "dia_origem": "2026-10-20",
+    "dias_em_aberto": 0
   }
 }
