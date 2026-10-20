@@ -8058,15 +8058,15 @@
   },
   "8dcb0bfb-43b2-40e1-8ac0-0308409c8a54": {
     "id": "8dcb0bfb-43b2-40e1-8ac0-0308409c8a54",
-    "status": "pendente",
+    "status": "cancelada",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.963Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T13:44:52.723Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T14:41:39.633Z",
+    "atualizado_por": "mathias",
     "tipo": "contrato_envio",
     "owner_id": "mathias",
     "dono": "mathias",
@@ -8108,19 +8108,30 @@
       "conta": "calibre",
       "origem": "vendedor"
     },
-    "atribuir_vendedor": false
+    "atribuir_vendedor": false,
+    "resultado": "anulada",
+    "cancelada_em": "2026-10-20T14:41:39.633Z",
+    "cancelada_por": "mathias",
+    "cancelamento_motivo": "Contrato anulado: Venda cancelada ou devolvida",
+    "anulacao": {
+      "motivo": "venda_cancelada",
+      "motivo_label": "Venda cancelada ou devolvida",
+      "descricao": "não chegou a fechar a compra",
+      "por": "mathias",
+      "em": "2026-10-20T14:41:39.633Z"
+    }
   },
   "72b7f6a2-5de6-4ab7-894a-cb78fb646921": {
     "id": "72b7f6a2-5de6-4ab7-894a-cb78fb646921",
-    "status": "pendente",
+    "status": "cancelada",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.963Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T13:44:52.723Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T14:41:39.633Z",
+    "atualizado_por": "mathias",
     "tipo": "contrato_assinatura",
     "owner_id": "mathias",
     "dono": "mathias",
@@ -8163,7 +8174,18 @@
       "conta": "calibre",
       "origem": "vendedor"
     },
-    "atribuir_vendedor": false
+    "atribuir_vendedor": false,
+    "resultado": "anulada",
+    "cancelada_em": "2026-10-20T14:41:39.633Z",
+    "cancelada_por": "mathias",
+    "cancelamento_motivo": "Contrato anulado: Venda cancelada ou devolvida",
+    "anulacao": {
+      "motivo": "venda_cancelada",
+      "motivo_label": "Venda cancelada ou devolvida",
+      "descricao": "não chegou a fechar a compra",
+      "por": "mathias",
+      "em": "2026-10-20T14:41:39.633Z"
+    }
   },
   "6aad1404-1af0-4b72-b3f4-2e69bf27dd39": {
     "id": "6aad1404-1af0-4b72-b3f4-2e69bf27dd39",
