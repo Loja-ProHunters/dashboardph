@@ -11328,5 +11328,33 @@
     "criado_por": "boschetto",
     "atualizado_em": "2026-10-20T18:20:49.482Z",
     "atualizado_por": "boschetto"
+  },
+  "f983fa8b-a71c-4bdc-9a6a-646a273ad740": {
+    "id": "f983fa8b-a71c-4bdc-9a6a-646a273ad740",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "boschetto",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_5de1626574d1d4f3",
+    "titulo": "📅 Follow-up — Guilherme Augusto dos Santos",
+    "descricao": "Sumido ha 113d — ideal p/ Canivete Dobrável Ruike Modelo P843-W\n\nCliente: Guilherme Augusto dos Santos\nUltima compra: 2026-06-29\nPedidos: 1\nValor historico: R$ 473.55\n\nProduto sugerido: Canivete Dobrável Ruike Modelo P843-W (SKU RUIKE-P843-W)\nConfianca: 33%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-28",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_f983fa8b-a71c-4bdc-9a6a-646a273ad740",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "boschetto",
+    "account_id": "acc_5de1626574d1d4f3",
+    "origem_tarefa_id": "f967a27d-1aed-4e87-8882-4b22e9265f97",
+    "criada_por_vendedor": "boschetto",
+    "criado_em": "2026-10-20T18:21:18.905Z",
+    "criado_por": "boschetto",
+    "atualizado_em": "2026-10-20T18:21:18.905Z",
+    "atualizado_por": "boschetto"
   }
 }
