@@ -5160,7 +5160,7 @@
   "ce7e6280-abf7-4910-8fa9-6e2cfee523b3": {
     "id": "ce7e6280-abf7-4910-8fa9-6e2cfee523b3",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_3d7a41dff62fa5ed",
@@ -5180,12 +5180,15 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T18:41:34.771Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "ALEX CESAR SALES DOS ANJOS",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:41:34.155Z",
+    "concluida_por": "mathias"
   },
   "2185c45d-2613-427e-a33e-73ed646ec4c0": {
     "id": "2185c45d-2613-427e-a33e-73ed646ec4c0",
