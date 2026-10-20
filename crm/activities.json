@@ -10762,5 +10762,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T17:33:22.676Z",
     "atualizado_por": "mathias"
+  },
+  "801bf0ea-1191-439a-801d-09a40d4ee721": {
+    "id": "801bf0ea-1191-439a-801d-09a40d4ee721",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_dc845d2988173221",
+    "titulo": "📅 Follow-up — Rodolfo Heitor Gomes Fernandes Da Silva",
+    "descricao": "Comprou Luneta Forester 1-5x24SF… — completa c/ Trilho com anéis para acoplar…\n\nCliente: Rodolfo Heitor Gomes Fernandes Da Silva\nUltima compra: 2026-09-07\nPedidos: 2\nValor historico: R$ 2927.45\n\nProduto sugerido: Trilho com anéis para acoplar Luneta/RedDot Vector Optics XASR-3035 30mm Bronze (SKU VEC-XASR-3035)\nConfianca: 22%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_801bf0ea-1191-439a-801d-09a40d4ee721",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_dc845d2988173221",
+    "origem_tarefa_id": "873cd98a-3caa-4142-ab93-49c6ff716216",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T17:37:09.413Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T17:37:09.413Z",
+    "atualizado_por": "mathias"
   }
 }
