@@ -9652,7 +9652,7 @@
   "e12cc890-74e9-45f5-a384-5cdd6c94b104": {
     "id": "e12cc890-74e9-45f5-a384-5cdd6c94b104",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "boschetto",
     "entidade_tipo": "account",
     "entidade_id": "acc_90d9a363477a07c3",
@@ -9673,12 +9673,15 @@
     "lote_dia": "2026-10-20",
     "criado_em": "2026-10-20T11:00:19.950Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-20T11:00:19.950Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T18:33:11.221Z",
+    "atualizado_por": "boschetto",
     "cliente_nome": "FRIAS E TOMÉ SOLUÇÕES INDUSTRIAIS LTDA",
     "cliente_telefone": null,
     "dia_origem": "2026-10-20",
-    "dias_em_aberto": 0
+    "dias_em_aberto": 0,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:33:10.947Z",
+    "concluida_por": "boschetto"
   },
   "cb918aa9-2848-40f6-8a24-85015c2129b8": {
     "id": "cb918aa9-2848-40f6-8a24-85015c2129b8",
