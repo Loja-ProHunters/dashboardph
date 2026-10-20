@@ -4742,7 +4742,7 @@
   "95a857ac-a5db-4832-b915-89f75fc8eed5": {
     "id": "95a857ac-a5db-4832-b915-89f75fc8eed5",
     "tipo": "trigger",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "mathias",
     "entidade_tipo": "account",
     "entidade_id": "acc_432c7e5627c958c2",
@@ -4762,12 +4762,17 @@
     "dono": "mathias",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T18:32:12.057Z",
+    "atualizado_por": "mathias",
     "cliente_nome": "Pro Hunters Comércio de Imp. e Exp. Ltda ME",
     "cliente_telefone": null,
     "dia_origem": "2026-10-14",
-    "dias_em_aberto": 6
+    "dias_em_aberto": 6,
+    "resultado": "nao_convertida",
+    "concluida_em": "2026-10-20T18:32:11.895Z",
+    "concluida_por": "mathias",
+    "canal_contato": "whatsapp",
+    "motivo_nao_conversao": "numero_errado"
   },
   "8fcb9003-29dd-497e-a483-d93bbe5f5983": {
     "id": "8fcb9003-29dd-497e-a483-d93bbe5f5983",
