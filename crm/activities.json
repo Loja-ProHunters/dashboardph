@@ -11297,5 +11297,33 @@
     "criado_por": "boschetto",
     "atualizado_em": "2026-10-20T18:19:47.940Z",
     "atualizado_por": "boschetto"
+  },
+  "b1d02bd8-c277-416e-bb12-761e86476f86": {
+    "id": "b1d02bd8-c277-416e-bb12-761e86476f86",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "boschetto",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_073f0bde1f4752e1",
+    "titulo": "📅 Follow-up — Luicito Medeiros Gastal",
+    "descricao": "Sumido ha 84d — ideal p/ Lanterna Fenix HT18R V2.0 3700 lumens (…\n\nCliente: Luicito Medeiros Gastal\nUltima compra: 2026-07-28\nPedidos: 1\nValor historico: R$ 299.45\n\nProduto sugerido: Lanterna Fenix HT18R V2.0 3700 lumens (ID) (SKU 6942870312620-ID)\nConfianca: 36%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-11-28",
+    "hora": "11:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_b1d02bd8-c277-416e-bb12-761e86476f86",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "boschetto",
+    "account_id": "acc_073f0bde1f4752e1",
+    "origem_tarefa_id": "f199b128-62f1-4ae5-9b4b-690fcdb73c90",
+    "criada_por_vendedor": "boschetto",
+    "criado_em": "2026-10-20T18:20:49.482Z",
+    "criado_por": "boschetto",
+    "atualizado_em": "2026-10-20T18:20:49.482Z",
+    "atualizado_por": "boschetto"
   }
 }
