@@ -11173,5 +11173,33 @@
     "criado_por": "mathias",
     "atualizado_em": "2026-10-20T18:15:02.032Z",
     "atualizado_por": "mathias"
+  },
+  "250b0450-93d9-44ed-b107-ce6fb57a22ce": {
+    "id": "250b0450-93d9-44ed-b107-ce6fb57a22ce",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "boschetto",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_8a3828ce9ca255b1",
+    "titulo": "📅 Follow-up — alvaro rocha neto",
+    "descricao": "Sumido ha 96d — ideal p/ D1147 Fenix Floor-standing Showcase\n\nCliente: alvaro rocha neto\nUltima compra: 2026-07-16\nPedidos: 1\nValor historico: R$ 1335.70\n\nProduto sugerido: D1147 Fenix Floor-standing Showcase (SKU D1147-ID)\nConfianca: 25%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "15:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_250b0450-93d9-44ed-b107-ce6fb57a22ce",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "boschetto",
+    "account_id": "acc_8a3828ce9ca255b1",
+    "origem_tarefa_id": "20acfcd2-bb27-4d85-a8f5-e9a7c471085f",
+    "criada_por_vendedor": "boschetto",
+    "criado_em": "2026-10-20T18:16:00.741Z",
+    "criado_por": "boschetto",
+    "atualizado_em": "2026-10-20T18:16:00.741Z",
+    "atualizado_por": "boschetto"
   }
 }
