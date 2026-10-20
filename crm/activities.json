@@ -6081,8 +6081,8 @@
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.959Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-19T16:29:22.959Z",
-    "atualizado_por": "contratos-arma",
+    "atualizado_em": "2026-10-20T12:48:58.654Z",
+    "atualizado_por": "mathias",
     "tipo": "contrato_envio",
     "owner_id": "mathias",
     "dono": "mathias",
@@ -6112,7 +6112,10 @@
       ],
       "vendedor_pedido": "mathias",
       "account_id": "acc_d626221f51b49185"
-    }
+    },
+    "contrato_gerado_em": "2026-10-20T12:48:58.654Z",
+    "contrato_gerado_por": "mathias",
+    "contrato_gerado_fora": true
   },
   "0f3e8a08-5374-4792-a84a-e7d3111abc87": {
     "id": "0f3e8a08-5374-4792-a84a-e7d3111abc87",
