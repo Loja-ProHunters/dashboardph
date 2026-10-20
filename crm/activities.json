@@ -6973,14 +6973,14 @@
   },
   "223f207e-02d8-4165-859a-ccc0c64debb7": {
     "id": "223f207e-02d8-4165-859a-ccc0c64debb7",
-    "status": "pendente",
+    "status": "concluida",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.961Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T14:39:16.515Z",
+    "atualizado_em": "2026-10-20T14:39:25.270Z",
     "atualizado_por": "mathias",
     "tipo": "contrato_envio",
     "owner_id": "mathias",
@@ -7026,7 +7026,12 @@
     "atribuir_vendedor": false,
     "contrato_gerado_em": "2026-10-20T14:39:16.515Z",
     "contrato_gerado_por": "mathias",
-    "contrato_gerado_fora": true
+    "contrato_gerado_fora": true,
+    "resultado": "contrato_enviado",
+    "concluida_em": "2026-10-20T14:39:25.270Z",
+    "concluida_por": "mathias",
+    "canal_envio": "whatsapp",
+    "observacao_conclusao": null
   },
   "cb67938d-f25d-4b7f-a863-c895c02e90af": {
     "id": "cb67938d-f25d-4b7f-a863-c895c02e90af",
