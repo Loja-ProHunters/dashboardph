@@ -6248,14 +6248,14 @@
   },
   "681b393c-4124-47d2-8041-75abf1eca451": {
     "id": "681b393c-4124-47d2-8041-75abf1eca451",
-    "status": "pendente",
+    "status": "concluida",
     "entidade_tipo": "account",
     "gerada_automaticamente": true,
     "fonte": "contrato_arma",
     "obrigatoria": true,
     "criado_em": "2026-10-19T16:29:22.959Z",
     "criado_por": "contratos-arma",
-    "atualizado_em": "2026-10-20T13:44:52.723Z",
+    "atualizado_em": "2026-10-20T14:51:03.288Z",
     "atualizado_por": "mathias",
     "tipo": "contrato_envio",
     "owner_id": "mathias",
@@ -6298,7 +6298,12 @@
       "nome": "Wesley Mathias Ciesielsky",
       "conta": "prohunters",
       "origem": "vendedor"
-    }
+    },
+    "resultado": "contrato_enviado",
+    "concluida_em": "2026-10-20T14:51:03.288Z",
+    "concluida_por": "mathias",
+    "canal_envio": "whatsapp",
+    "observacao_conclusao": null
   },
   "0f3e8a08-5374-4792-a84a-e7d3111abc87": {
     "id": "0f3e8a08-5374-4792-a84a-e7d3111abc87",
