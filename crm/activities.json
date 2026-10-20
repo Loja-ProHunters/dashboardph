@@ -4373,7 +4373,7 @@
   "5e3a7c2e-82ab-442e-bbb7-c6a3ddb8d46c": {
     "id": "5e3a7c2e-82ab-442e-bbb7-c6a3ddb8d46c",
     "tipo": "reativacao",
-    "status": "pendente",
+    "status": "concluida",
     "owner_id": "dickmann",
     "entidade_tipo": "account",
     "entidade_id": "acc_6ca35dff6ccf6420",
@@ -4396,10 +4396,13 @@
     "dono": "dickmann",
     "criado_em": "2026-10-14T14:37:48.520Z",
     "criado_por": "cron-oportunidades",
-    "atualizado_em": "2026-10-14T14:37:48.520Z",
-    "atualizado_por": "cron-oportunidades",
+    "atualizado_em": "2026-10-20T18:17:43.409Z",
+    "atualizado_por": "dickmann",
     "cliente_nome": "Samuel de Oliveira Junior",
-    "cliente_telefone": null
+    "cliente_telefone": null,
+    "resultado": "follow_up_agendado",
+    "concluida_em": "2026-10-20T18:17:42.782Z",
+    "concluida_por": "dickmann"
   },
   "44c72108-2270-475f-8332-81a9944d4b56": {
     "id": "44c72108-2270-475f-8332-81a9944d4b56",
