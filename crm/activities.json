@@ -11042,5 +11042,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T18:00:41.007Z",
     "atualizado_por": "dickmann"
+  },
+  "810d209b-2d35-49fc-89ac-54eb615a8225": {
+    "id": "810d209b-2d35-49fc-89ac-54eb615a8225",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_43d624cac8182c6b",
+    "titulo": "📅 Follow-up — Felipe Diesel Piovesan",
+    "descricao": "aguardando respostas",
+    "prazo": "2026-10-21",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_810d209b-2d35-49fc-89ac-54eb615a8225",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_43d624cac8182c6b",
+    "origem_tarefa_id": "d68f44f7-7f3a-4c1e-8eac-7dbd2750b3b1",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T18:02:35.064Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T18:02:35.064Z",
+    "atualizado_por": "dickmann"
   }
 }
