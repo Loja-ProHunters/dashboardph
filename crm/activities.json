@@ -11495,5 +11495,33 @@
     "criado_por": "boschetto",
     "atualizado_em": "2026-10-20T18:33:13.010Z",
     "atualizado_por": "boschetto"
+  },
+  "25ba41ce-faf1-4580-aaed-4d0a6915d030": {
+    "id": "25ba41ce-faf1-4580-aaed-4d0a6915d030",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_003690c09d05f85b",
+    "titulo": "📅 Follow-up — leandro szatkowski",
+    "descricao": "Aguardando resposta",
+    "prazo": "2026-10-21",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_25ba41ce-faf1-4580-aaed-4d0a6915d030",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_003690c09d05f85b",
+    "origem_tarefa_id": "27dc60db-5ab4-40e3-bd98-258f91fc800c",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T18:35:06.774Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T18:35:06.774Z",
+    "atualizado_por": "dickmann"
   }
 }
