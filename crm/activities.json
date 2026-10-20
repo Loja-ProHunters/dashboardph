@@ -10347,5 +10347,33 @@
     "criado_por": "boschetto",
     "atualizado_em": "2026-10-20T12:21:10.813Z",
     "atualizado_por": "boschetto"
+  },
+  "4523debc-2772-49a7-8697-067114f9bf0b": {
+    "id": "4523debc-2772-49a7-8697-067114f9bf0b",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "mathias",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_15e043273e656430",
+    "titulo": "📅 Follow-up — Claudio zielinski",
+    "descricao": "Comprou Lanterna de bicicleta Fe… — completa c/ D1147 Fenix Floor-standing Sh…\n\nCliente: Claudio zielinski\nUltima compra: 2026-09-13\nPedidos: 3\nValor historico: R$ 1904.70\n\nProduto sugerido: D1147 Fenix Floor-standing Showcase (SKU D1147-ID)\nConfianca: 50%\n\n💡 Clique em \"Gerar pitch com IA\" na tarefa pra receber mensagem pronta pra WhatsApp com base no historico completo do cliente.",
+    "prazo": "2026-10-21",
+    "hora": "17:00",
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_4523debc-2772-49a7-8697-067114f9bf0b",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "mathias",
+    "account_id": "acc_15e043273e656430",
+    "origem_tarefa_id": "ec24edeb-5570-4ade-ad0d-8ec3b4261bb7",
+    "criada_por_vendedor": "mathias",
+    "criado_em": "2026-10-20T15:10:33.208Z",
+    "criado_por": "mathias",
+    "atualizado_em": "2026-10-20T15:10:33.208Z",
+    "atualizado_por": "mathias"
   }
 }
