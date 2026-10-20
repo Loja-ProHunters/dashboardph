@@ -11359,5 +11359,33 @@
     "criado_por": "boschetto",
     "atualizado_em": "2026-10-20T18:21:18.905Z",
     "atualizado_por": "boschetto"
+  },
+  "730bb4be-0130-42b1-8da2-66aed3baeb88": {
+    "id": "730bb4be-0130-42b1-8da2-66aed3baeb88",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_8f0f36ec3443b59b",
+    "titulo": "📅 Follow-up — Alex Vicintin",
+    "descricao": "Aguardando retorno",
+    "prazo": "2026-10-21",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_730bb4be-0130-42b1-8da2-66aed3baeb88",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_8f0f36ec3443b59b",
+    "origem_tarefa_id": "b9066d47-51d6-4a61-b940-64180df26721",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-20T18:21:30.219Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-20T18:21:30.219Z",
+    "atualizado_por": "dickmann"
   }
 }
