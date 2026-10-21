@@ -367,6 +367,7 @@ tbody tr:hover td{background:var(--gl)}
     <button class="ni" onclick="goTab('ia',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M12 3.2l1.8 4.6 4.6 1.8-4.6 1.8L12 16l-1.8-4.6L5.6 9.6l4.6-1.8z"/><path d="M18.2 15.4l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7z"/></svg></span><span class="ni-tx">IA Pro Hunters</span><span class="badge">NOVO</span></button>
     <button class="ni" onclick="goTab('gerador',this)"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M16.6 3.4a2.1 2.1 0 0 1 3 3L7.4 18.6 3.2 20l1.4-4.2z"/><path d="M14.5 5.5l3 3"/></svg></span><span class="ni-tx">Gerador de Conteúdo</span></button>
     <button class="ni" id="ni-linhaeditorial" onclick="goTab('linhaeditorial',this)" style="display:none"><span class="ni-ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.2"/><path d="M3 10.2h18M8 3v4M16 3v4"/></svg></span><span class="ni-tx">Linha Editorial</span><span class="badge-admin">ADMIN</span></button>
+    <button class="ni" id="ni-wa-inteligencia" onclick="goTab('wa-inteligencia',this)" style="display:none"><span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5-1.3c1.5.8 3.2 1.3 5 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2z"/><path d="M9 12l2 2 4-4"/></svg></span><span class="ni-tx">WhatsApp Intel</span><span class="badge-admin">ADMIN</span></button>
   </div>
   <div class="sb-grp" id="grp-admin" style="display:none">
     <div class="sb-lbl">Administração</div>
@@ -3706,6 +3707,135 @@ window.chpwdSubmit = function(){
       <div id="pg-root"><div class="pg-vazio">Carregando painel…</div></div>
     </div>
 
+    <!-- ═══ WHATSAPP INTELIGÊNCIA (admin + diretor + gerência) ═══ -->
+    <div class="tab" id="tab-wa-inteligencia">
+<style>
+.wai-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.wai-header h2{font-size:20px;font-weight:700;display:flex;align-items:center;gap:10px}
+.wai-header h2 .wai-ico{width:32px;height:32px;background:linear-gradient(135deg,#25d366,#128c7e);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wai-header h2 .wai-ico svg{width:18px;height:18px;fill:#fff}
+.wai-sel{display:flex;gap:8px;align-items:center}
+.wai-sel select{padding:8px 14px;border-radius:8px;border:1px solid var(--bd);font-size:13px;background:var(--wh);cursor:pointer}
+.wai-sel select:focus{border-color:var(--g);box-shadow:var(--ring)}
+.wai-periodo{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.wai-periodo input[type="date"]{padding:7px 12px;border-radius:8px;border:1px solid var(--bd);font-size:13px;background:var(--wh)}
+.wai-periodo input[type="date"]:focus{border-color:var(--g);box-shadow:var(--ring)}
+.wai-btn{padding:8px 18px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s,transform .1s}
+.wai-btn-pri{background:var(--g);color:#fff}.wai-btn-pri:hover{background:var(--gd)}
+.wai-btn-sec{background:var(--bg);color:var(--dk);border:1px solid var(--bd)}.wai-btn-sec:hover{background:var(--bd)}
+.wai-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.wai-card{background:var(--wh);border-radius:var(--r-md);padding:18px 20px;box-shadow:var(--sh-1);border:1px solid var(--bd);transition:box-shadow .2s}
+.wai-card:hover{box-shadow:var(--sh-2)}
+.wai-card-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gy);margin-bottom:6px}
+.wai-card-value{font-size:28px;font-weight:800;font-family:var(--fc);color:var(--k);line-height:1.1}
+.wai-card-sub{font-size:12px;color:var(--gy);margin-top:4px}
+.wai-card-value.wai-green{color:var(--g)}
+.wai-card-value.wai-red{color:var(--r)}
+.wai-card-value.wai-yellow{color:#d49b1a}
+.wai-section{background:var(--wh);border-radius:var(--r-md);padding:22px 24px;box-shadow:var(--sh-1);border:1px solid var(--bd);margin-bottom:18px}
+.wai-section h3{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.wai-score-ring{display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;position:relative}
+.wai-score-ring svg{width:80px;height:80px;transform:rotate(-90deg)}
+.wai-score-ring circle{fill:none;stroke-width:6;stroke-linecap:round}
+.wai-score-ring .bg-ring{stroke:var(--bg)}
+.wai-score-ring .fg-ring{stroke:var(--g);transition:stroke-dashoffset .8s ease}
+.wai-score-num{position:absolute;font-size:22px;font-weight:800;font-family:var(--fc);color:var(--k)}
+.wai-ai-top{display:flex;align-items:center;gap:20px;margin-bottom:16px;flex-wrap:wrap}
+.wai-ai-resumo{flex:1;min-width:250px;font-size:14px;line-height:1.6;color:var(--dk)}
+.wai-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.wai-pill{padding:6px 14px;border-radius:var(--r-full);font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.wai-pill-green{background:var(--gl);color:var(--gd)}
+.wai-pill-red{background:var(--rl);color:#b83333}
+.wai-pill-yellow{background:#fef9ec;color:#9a7517}
+.wai-pill-blue{background:#eef4ff;color:#2563ab}
+.wai-sugestao{padding:12px 16px;border-radius:var(--r-sm);background:var(--bg);margin-bottom:8px;font-size:13.5px;line-height:1.5;color:var(--dk);border-left:3px solid var(--g)}
+.wai-alerta{padding:12px 16px;border-radius:var(--r-sm);background:var(--rl);margin-bottom:8px;font-size:13.5px;line-height:1.5;color:#8b2020;border-left:3px solid var(--r)}
+.wai-conv{padding:12px 16px;border-radius:var(--r-sm);background:var(--bg);margin-bottom:8px;font-size:13px;line-height:1.5}
+.wai-conv-bom{border-left:3px solid var(--g)}
+.wai-conv-ruim{border-left:3px solid var(--r)}
+.wai-conv-title{font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.wai-hist-item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--r-sm);background:var(--bg);margin-bottom:8px;cursor:pointer;transition:background .15s}
+.wai-hist-item:hover{background:var(--bd)}
+.wai-hist-data{font-size:12px;font-weight:600;color:var(--gy);min-width:90px}
+.wai-hist-score{font-size:18px;font-weight:800;font-family:var(--fc);min-width:36px;text-align:center}
+.wai-hist-resumo{flex:1;font-size:13px;color:var(--dk);line-height:1.4}
+.wai-vazio{text-align:center;padding:40px 20px;color:var(--gy);font-size:14px}
+.wai-vazio svg{width:48px;height:48px;stroke:var(--gl2);margin-bottom:12px}
+.wai-loading{text-align:center;padding:40px;color:var(--gy)}
+.wai-loading::after{content:'';display:inline-block;width:18px;height:18px;border:2px solid var(--bd);border-top-color:var(--g);border-radius:50%;animation:wai-spin .7s linear infinite;margin-left:8px;vertical-align:middle}
+@keyframes wai-spin{to{transform:rotate(360deg)}}
+.wai-tempo-bar{display:flex;height:22px;border-radius:var(--r-full);overflow:hidden;background:var(--bg);margin-top:8px}
+.wai-tempo-bar div{height:100%;transition:width .5s ease}
+.wai-tempo-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:11.5px;color:var(--gy)}
+.wai-tempo-legend span{display:inline-flex;align-items:center;gap:4px}
+.wai-tempo-legend span::before{content:'';width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.wai-cron-info{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:var(--r-sm);background:var(--gl);font-size:12.5px;color:var(--gd);margin-bottom:16px}
+.wai-tabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.wai-tab-btn{padding:8px 16px;border-radius:var(--r-full);border:1px solid var(--bd);background:var(--wh);font-size:13px;font-weight:600;cursor:pointer;color:var(--dk);transition:all .18s}
+.wai-tab-btn:hover{background:var(--bg)}
+.wai-tab-btn.on{background:var(--g);color:#fff;border-color:var(--g)}
+@media(max-width:768px){
+  .wai-cards{grid-template-columns:1fr 1fr}
+  .wai-ai-top{flex-direction:column}
+  .wai-header{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:480px){
+  .wai-cards{grid-template-columns:1fr}
+}
+</style>
+
+      <!-- Header -->
+      <div class="wai-header">
+        <h2>
+          <span class="wai-ico"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5-1.3c1.5.8 3.2 1.3 5 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2z"/><path d="M17 15.2c-.3.9-1.5 1.6-2.5 1.8-.7.2-1.5.3-4.5-1.5-3.5-2.1-5.7-5.8-5.9-6.1-.2-.3-1.4-1.9-1.4-3.6 0-1.7.9-2.5 1.2-2.9.3-.3.7-.4.9-.4h.7c.2 0 .5-.1.8.6l1 2.5c.1.2.2.5 0 .8l-.5.7c-.1.2-.3.4-.1.7.2.4.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.7-.1l.8-1c.2-.3.4-.2.7-.1l2.1 1c.3.2.5.2.6.3.1.3.1.9-.2 1.7z" fill="#fff"/></svg></span>
+          WhatsApp Inteligência
+        </h2>
+        <div class="wai-sel">
+          <select id="wai-vendedor" onchange="WAI.trocarVendedor()">
+            <option value="">Carregando...</option>
+          </select>
+          <div class="wai-periodo">
+            <input type="date" id="wai-de" />
+            <span style="color:var(--gy)">a</span>
+            <input type="date" id="wai-ate" />
+            <button class="wai-btn wai-btn-pri" onclick="WAI.carregar()">Atualizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-tabs -->
+      <div class="wai-tabs">
+        <button class="wai-tab-btn on" onclick="WAI.mudarAba('metricas',this)">Métricas</button>
+        <button class="wai-tab-btn" onclick="WAI.mudarAba('analise',this)">Análise IA</button>
+        <button class="wai-tab-btn" onclick="WAI.mudarAba('historico',this)">Histórico</button>
+      </div>
+
+      <!-- Aba Métricas -->
+      <div id="wai-aba-metricas">
+        <div class="wai-cards" id="wai-metricas-cards">
+          <div class="wai-loading">Carregando métricas...</div>
+        </div>
+        <div class="wai-section" id="wai-tempo-section" style="display:none">
+          <h3>Distribuição de Tempo de Resposta</h3>
+          <div id="wai-tempo-bar-wrap"></div>
+        </div>
+      </div>
+
+      <!-- Aba Análise IA -->
+      <div id="wai-aba-analise" style="display:none">
+        <div id="wai-analise-content">
+          <div class="wai-loading">Carregando análise...</div>
+        </div>
+      </div>
+
+      <!-- Aba Histórico -->
+      <div id="wai-aba-historico" style="display:none">
+        <div id="wai-hist-content">
+          <div class="wai-loading">Carregando histórico...</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal de nova solicitacao -->
     <div id="solic-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;padding:20px;overflow:auto" onclick="if(event.target===this)solicFecharModal()">
       <div style="max-width:520px;margin:5vh auto;background:#fff;border-radius:12px;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,.3)">
@@ -3765,7 +3895,8 @@ var tabMeta = {
   crm:       ['CRM','Contas, leads, oportunidades, atividades e pedidos'],
   solicitacoes: ['Solicitações','Hub de tarefas entre colaboradores'],
   garantias: ['Garantias, Trocas e Devoluções','Triagem CDC, estoque e envio ao fabricante'],
-  produtividade: ['Produtividade da Equipe','Execução das tarefas, alertas e contratos de arma']
+  produtividade: ['Produtividade da Equipe','Execução das tarefas, alertas e contratos de arma'],
+  'wa-inteligencia': ['WhatsApp Intel','Análise de conversas com IA']
 };
 
 // Mapa de permissoes por role — quais abas cada perfil ve.
@@ -3831,6 +3962,11 @@ window.onload = function() {
   if (_niProd && typeof CAN_VER_PRODUTIVIDADE !== 'undefined' && CAN_VER_PRODUTIVIDADE) {
     _niProd.style.display = '';
     document.getElementById('grp-comercial').style.display = 'block';
+  }
+  // Revela WhatsApp Intel (admin, diretor, gerência)
+  var _niWAI = document.getElementById('ni-wa-inteligencia');
+  if (_niWAI && typeof CAN_VER_WA_INTELIGENCIA !== 'undefined' && CAN_VER_WA_INTELIGENCIA) {
+    _niWAI.style.display = '';
   }
 
   // Auxiliar: entra no CRM so pra Op. Controlado. Renomeia o botao "CRM" pra
@@ -3918,6 +4054,7 @@ function goTab(id, el) {
   if (id === 'solicitacoes') solicInit();
   if (id === 'garantias' && typeof GAR !== 'undefined') GAR.init();
   if (id === 'produtividade' && typeof PROD !== 'undefined') PROD.init();
+  if (id === 'wa-inteligencia' && typeof WAI !== 'undefined') WAI.init();
 }
 
 // Atalho dedicado pra Op. Controlado — abre a aba do CRM mas forca a sub-aba
@@ -6495,6 +6632,8 @@ function tqFiltrar(){
   var linhas = [];
   if (f === 'todas' || f === 'contratos') D.contratos.forEach(function(c){ linhas.push({ k: 'ct:' + c.order_id, ct: c }); });
   if (f !== 'contratos') D.tarefas.forEach(function(t){
+    // Tarefas agendadas pro futuro (follow-up) não aparecem na fila do vendedor
+    if (t.agendada_futura) return;
     var l = tqLimite(t), venc = !!(l && l < agora), antiga = (t.dias_em_aberto || 0) > 0;
     if (f === 'vencidas' && !venc) return;
     if (f === 'antigas' && !antiga) return;
@@ -6507,11 +6646,12 @@ function tqFiltrar(){
 function tqDesenhar(){
   var view = document.getElementById('crm-view'); if (!view || !TQ.dados) return;
   var D = TQ.dados, agora = tqAgoraBRT(), rs = D.resumo || {};
-  var nVenc = D.tarefas.filter(function(t){ var l = tqLimite(t); return l && l < agora; }).length;
-  var nAnt = D.tarefas.filter(function(t){ return (t.dias_em_aberto || 0) > 0; }).length;
-  var nHoje = D.tarefas.length - nAnt;
+  var tarefasVisiveis = D.tarefas.filter(function(t){ return !t.agendada_futura; });
+  var nVenc = tarefasVisiveis.filter(function(t){ var l = tqLimite(t); return l && l < agora; }).length;
+  var nAnt = tarefasVisiveis.filter(function(t){ return (t.dias_em_aberto || 0) > 0; }).length;
+  var nHoje = tarefasVisiveis.length - nAnt;
   var feitas = rs.executadas_hoje || 0, meta = rs.cota_dia || 0;
-  var total = D.tarefas.length + D.contratos.length;
+  var total = tarefasVisiveis.length + D.contratos.length;
   var h = '<div class="tq-head"><div class="tq-head-l"><h3>' + (total ? total + ' para fazer' : 'Fila em dia') + '</h3>' +
     (meta ? '<div class="tq-prog"><span>Feitas hoje <b>' + feitas + '</b> de ' + meta + '</span><i><b style="width:' + Math.min(100, Math.round(feitas / meta * 100)) + '%"></b></i></div>' : '') + '</div>' +
     '<button class="tq-btn-sec" onclick="crmAbrirModalNovaTarefa()">+ Nova tarefa</button></div>';
@@ -11159,10 +11299,13 @@ window.PROD = (function(){
     var e = d.equipe, c = e.contratos || {};
     var pct = e.meta_hoje ? Math.min(100, Math.round(e.finalizadas_hoje / e.meta_hoje * 100)) : 0;
     var contrAtr = (c.sem_assinatura_atrasado || 0) + (c.nao_encontrado || 0);
+    var totFin14 = e.convertidas_14d + e.nao_convertidas_14d + (e.follow_ups_14d || 0);
+    var pctFU = totFin14 ? Math.round((e.follow_ups_14d || 0) / totFin14 * 100) : 0;
     return '<div class="pg-kpis">' +
       tile('Finalizadas hoje', e.finalizadas_hoje + '<small> / ' + e.meta_hoje + '</small>', '<div class="pg-meter"><i style="width:' + pct + '%"></i></div>meta: ' + d.cota_dia + ' por vendedor') +
       tile('Fila em aberto', e.abertas, (e.acumuladas ? '<b class="pg-tx-warn">' + e.acumuladas + ' de dias anteriores</b>' : 'nenhuma de dias anteriores') + (e.vencidas ? ' · ' + e.vencidas + ' vencidas' : '')) +
       tile('Conversão (14 dias)', e.conversao_14d == null ? '—' : e.conversao_14d + '%', e.convertidas_14d + ' vendas em ' + (e.convertidas_14d + e.nao_convertidas_14d) + ' contatos com resultado') +
+      tile('📅 Reagendamentos (14d)', (e.follow_ups_14d || 0), pctFU + '% das finalizações · ' + (pctFU >= 40 ? '<b class="pg-tx-warn">acima de 40%</b>' : 'dentro do esperado')) +
       tile('Contratos de arma pendentes', (c.aguardando_envio || 0) + (c.aguardando_assinatura || 0) + (c.sem_assinatura_atrasado || 0),
         contrAtr ? '<b class="pg-tx-bad">⛔ ' + contrAtr + ' em situação irregular</b>' : (c.total ? c.assinados + ' de ' + c.total + ' assinados' : 'nenhuma venda de arma no período')) +
     '</div>';
@@ -11366,6 +11509,10 @@ window.PROD = (function(){
   // ─── Cards de vendedor (enxutos, detalhe sob demanda) ──────────
   function cardVendedor(v){
     var st = STATUS[v.status] || STATUS.ok, x = v.execucao, f = v.fila, aberto = state.abertos[v.login];
+    var nFollow = x.finalizacoes.follow_up_agendado || 0;
+    var totalFin = (x.finalizacoes.convertida||0) + (x.finalizacoes.nao_convertida||0) + nFollow + (x.finalizacoes.cancelada||0);
+    var pctFollow = totalFin ? Math.round(nFollow / totalFin * 100) : 0;
+    var followCls = pctFollow >= 40 ? 'warn' : '';
     var h = '<div class="pg-vend"><div class="pg-vend-top"><span class="pg-dot" style="background:' + v._cor + '"></span><b>' + esc(v.nome) + '</b>' +
       '<span class="pg-chip ' + st.cls + '">' + st.ic + ' ' + st.txt + '</span></div>' +
       '<div class="pg-vend-motivo">' + esc(v.motivo_status) + '</div>' +
@@ -11373,6 +11520,7 @@ window.PROD = (function(){
         num(f.abertas, 'na fila', f.acumuladas ? f.acumuladas + ' antigas · ' + f.mais_antiga_dias + 'd' : 'nenhuma antiga', f.acumuladas >= 40 ? 'warn' : '') +
         num(x.executadas_hoje + '<small>/' + state.dados.cota_dia + '</small>', 'feitas hoje', x.ultima_finalizacao_em ? 'última: ' + new Date(x.ultima_finalizacao_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : 'nenhuma ainda', '') +
         num(x.taxa_conversao == null ? '—' : x.taxa_conversao + '%', 'conversão 14d', (x.finalizacoes.convertida || 0) + ' venda(s)', '') +
+        num(nFollow, '📅 reagendou', pctFollow + '% das finalizações', followCls) +
       '</div>' +
       '<button class="pg-link" onclick="PROD._abrir(\'' + v.login + '\')">' + (aberto ? 'ocultar detalhes ▴' : 'ver detalhes ▾') + '</button>';
     if (aberto) h += detalhe(v);
@@ -12755,6 +12903,345 @@ async function crmContratoGeradoHook(filename){
     crmToast('Etapa 1 concluída: contrato gerado. Agora envie ao cliente.', 'ok', 5000);
   } catch(e){ crmToast('Contrato gerado, mas não consegui registrar a etapa: ' + e.message, 'erro', 6000); }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// WhatsApp Inteligência — módulo de análise de vendedores
+// ═══════════════════════════════════════════════════════════════
+window.WAI = (function(){
+  var _vendedores = [];
+  var _vendedorAtual = '';
+  var _abaAtual = 'metricas';
+  var _metricas = null;
+  var _analise = null;
+  var _historico = [];
+  var _iniciado = false;
+
+  function _esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function _fmtData(iso){ if(!iso) return '-'; var d = new Date(iso); return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+  function _fmtDataCurta(iso){ if(!iso) return '-'; var d = new Date(iso); return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}); }
+
+  function _corScore(s){
+    if(s===null||s===undefined) return 'var(--gy)';
+    if(s >= 7) return 'var(--g)';
+    if(s >= 5) return '#d49b1a';
+    return 'var(--r)';
+  }
+  function _classScore(s){
+    if(s===null||s===undefined) return '';
+    if(s >= 7) return 'wai-green';
+    if(s >= 5) return 'wai-yellow';
+    return 'wai-red';
+  }
+
+  async function _fetch(url){
+    try {
+      var r = await fetch(url, { credentials: 'include' });
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      return await r.json();
+    } catch(e){
+      console.error('[WAI] Erro fetch:', url, e);
+      return null;
+    }
+  }
+
+  // ── Inicializar ──
+  async function init(){
+    if(_iniciado) return;
+    _iniciado = true;
+    // Carregar vendedores
+    var data = await _fetch('/api/whatsapp/inteligencia/vendedores');
+    if(data && data.vendedores){
+      _vendedores = data.vendedores;
+      var sel = document.getElementById('wai-vendedor');
+      if(sel){
+        sel.innerHTML = '';
+        if(_vendedores.length === 0){
+          sel.innerHTML = '<option value="">Nenhum vendedor configurado</option>';
+          return;
+        }
+        _vendedores.forEach(function(v){
+          var opt = document.createElement('option');
+          opt.value = v.instancia;
+          opt.textContent = v.nome;
+          sel.appendChild(opt);
+        });
+        _vendedorAtual = _vendedores[0].instancia;
+      }
+    }
+    // Datas padrão: últimos 7 dias
+    var hoje = new Date();
+    var semanaAtras = new Date(hoje); semanaAtras.setDate(hoje.getDate() - 7);
+    document.getElementById('wai-de').value = semanaAtras.toISOString().slice(0,10);
+    document.getElementById('wai-ate').value = hoje.toISOString().slice(0,10);
+    carregar();
+  }
+
+  function trocarVendedor(){
+    _vendedorAtual = document.getElementById('wai-vendedor').value;
+    carregar();
+  }
+
+  async function carregar(){
+    if(!_vendedorAtual) return;
+    var de = document.getElementById('wai-de').value;
+    var ate = document.getElementById('wai-ate').value;
+    // Carregar tudo em paralelo
+    await Promise.all([
+      _carregarMetricas(de, ate),
+      _carregarAnalise(),
+      _carregarHistorico()
+    ]);
+  }
+
+  // ── Métricas ──
+  async function _carregarMetricas(de, ate){
+    var container = document.getElementById('wai-metricas-cards');
+    container.innerHTML = '<div class="wai-loading">Carregando métricas...</div>';
+    var qs = '?instancia=' + encodeURIComponent(_vendedorAtual);
+    if(de) qs += '&de=' + de + 'T00:00:00Z';
+    if(ate) qs += '&ate=' + ate + 'T23:59:59Z';
+    var data = await _fetch('/api/whatsapp/inteligencia/metricas' + qs);
+    if(!data || data.error){
+      container.innerHTML = '<div class="wai-vazio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><br>Erro ao carregar métricas</div>';
+      return;
+    }
+    _metricas = data;
+    _renderMetricas();
+  }
+
+  function _renderMetricas(){
+    var m = _metricas;
+    if(!m){ return; }
+    var container = document.getElementById('wai-metricas-cards');
+    var tempoMedio = m.tempo_resposta && m.tempo_resposta.medio_minutos !== null
+      ? m.tempo_resposta.medio_minutos : null;
+    var tempoFmt = tempoMedio !== null
+      ? (tempoMedio < 60 ? tempoMedio.toFixed(1) + ' min' : (tempoMedio/60).toFixed(1) + ' h')
+      : 'N/A';
+    var tempoClass = tempoMedio !== null
+      ? (tempoMedio <= 15 ? 'wai-green' : (tempoMedio <= 60 ? 'wai-yellow' : 'wai-red'))
+      : '';
+
+    container.innerHTML =
+      '<div class="wai-card">' +
+        '<div class="wai-card-label">Total de Mensagens</div>' +
+        '<div class="wai-card-value">' + (m.total_mensagens||0).toLocaleString('pt-BR') + '</div>' +
+        '<div class="wai-card-sub">' + (m.recebidas||0) + ' recebidas · ' + (m.enviadas||0) + ' enviadas</div>' +
+      '</div>' +
+      '<div class="wai-card">' +
+        '<div class="wai-card-label">Conversas</div>' +
+        '<div class="wai-card-value">' + (m.conversas_total||0) + '</div>' +
+        '<div class="wai-card-sub">' + (m.conversas_iniciadas||0) + ' iniciadas pelo vendedor</div>' +
+      '</div>' +
+      '<div class="wai-card">' +
+        '<div class="wai-card-label">Tempo Médio de Resposta</div>' +
+        '<div class="wai-card-value ' + tempoClass + '">' + tempoFmt + '</div>' +
+        '<div class="wai-card-sub">' + (m.tempo_resposta?m.tempo_resposta.amostras:0) + ' amostras medidas</div>' +
+      '</div>' +
+      '<div class="wai-card">' +
+        '<div class="wai-card-label">Msgs / Dia</div>' +
+        '<div class="wai-card-value">' + (m.msgs_por_dia||0) + '</div>' +
+        '<div class="wai-card-sub">' + (m.dias_ativos||0) + ' dias ativos</div>' +
+      '</div>';
+
+    // Barra de distribuição de tempo de resposta
+    var secTempo = document.getElementById('wai-tempo-section');
+    var wrap = document.getElementById('wai-tempo-bar-wrap');
+    if(m.tempo_resposta && m.tempo_resposta.amostras > 0){
+      secTempo.style.display = '';
+      var d = m.tempo_resposta.distribuicao;
+      var total = m.tempo_resposta.amostras;
+      var cores = ['#22c55e','#84cc16','#eab308','#f59e0b','#ef4444','#991b1b'];
+      var labels = ['Até 5min','5-15min','15-30min','30min-1h','1h-4h','+4h'];
+      var vals = [d.ate_5min||0, d.ate_15min||0, d.ate_30min||0, d.ate_1h||0, d.ate_4h||0, d.mais_4h||0];
+      var barHtml = '<div class="wai-tempo-bar">';
+      var legHtml = '<div class="wai-tempo-legend">';
+      for(var i=0;i<vals.length;i++){
+        var pct = total > 0 ? (vals[i]/total*100) : 0;
+        if(pct > 0){
+          barHtml += '<div style="width:'+pct.toFixed(1)+'%;background:'+cores[i]+'" title="'+labels[i]+': '+vals[i]+' ('+pct.toFixed(0)+'%)"></div>';
+        }
+        if(vals[i] > 0){
+          legHtml += '<span><span style="background:'+cores[i]+';display:inline-block;width:10px;height:10px;border-radius:3px"></span> '+labels[i]+': '+vals[i]+'</span>';
+        }
+      }
+      barHtml += '</div>';
+      legHtml += '</div>';
+      wrap.innerHTML = barHtml + legHtml;
+    } else {
+      secTempo.style.display = 'none';
+    }
+  }
+
+  // ── Análise IA ──
+  async function _carregarAnalise(){
+    var container = document.getElementById('wai-analise-content');
+    container.innerHTML = '<div class="wai-loading">Carregando análise...</div>';
+    var vend = _vendedores.find(function(v){ return v.instancia === _vendedorAtual; });
+    if(!vend){ container.innerHTML = '<div class="wai-vazio">Selecione um vendedor</div>'; return; }
+    var data = await _fetch('/api/whatsapp/inteligencia/ultima-analise?vendedor=' + encodeURIComponent(vend.id));
+    if(!data || data.error || !data.analise){
+      container.innerHTML =
+        '<div class="wai-vazio">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l.146.146A3 3 0 0118.5 21H5.5a3 3 0 01-2.121-5.879l.146-.146z"/></svg>' +
+          '<br>Nenhuma análise disponível ainda.' +
+          '<br><span style="font-size:12px;color:var(--gl2)">A análise roda automaticamente toda segunda-feira</span>' +
+        '</div>';
+      return;
+    }
+    _analise = data.analise;
+    _renderAnalise();
+  }
+
+  function _renderAnalise(){
+    var a = _analise;
+    if(!a) return;
+    var container = document.getElementById('wai-analise-content');
+    var html = '';
+
+    // Cron info
+    html += '<div class="wai-cron-info">Análise automática toda segunda-feira · Última: ' + _fmtData(a.criado_em) + ' · Período: ' + _fmtData(a.periodo_de) + ' a ' + _fmtData(a.periodo_ate) + '</div>';
+
+    // Score + Resumo
+    var score = a.score_geral;
+    var circumference = 2 * Math.PI * 34;
+    var dashOffset = score !== null ? circumference - (score / 10) * circumference : circumference;
+    html += '<div class="wai-section">';
+    html += '<div class="wai-ai-top">';
+    html += '<div class="wai-score-ring">';
+    html += '<svg viewBox="0 0 80 80"><circle class="bg-ring" cx="40" cy="40" r="34"/>';
+    html += '<circle class="fg-ring" cx="40" cy="40" r="34" stroke="' + _corScore(score) + '" stroke-dasharray="' + circumference.toFixed(1) + '" stroke-dashoffset="' + dashOffset.toFixed(1) + '"/>';
+    html += '</svg><span class="wai-score-num" style="color:' + _corScore(score) + '">' + (score !== null ? score.toFixed(1) : '-') + '</span></div>';
+    html += '<div class="wai-ai-resumo">';
+    html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gy);margin-bottom:4px">SCORE GERAL · ' + (a.conversas_analisadas || 0) + ' conversas analisadas</div>';
+    html += '<div>' + _esc(a.resumo || 'Sem resumo disponível.') + '</div>';
+    html += '</div></div></div>';
+
+    // Pontos Fortes
+    var fortes = a.pontos_fortes || [];
+    if(fortes.length > 0){
+      html += '<div class="wai-section"><h3>Pontos Fortes</h3><div class="wai-pills">';
+      fortes.forEach(function(p){ html += '<span class="wai-pill wai-pill-green">' + _esc(typeof p === 'string' ? p : p.descricao || p.titulo || JSON.stringify(p)) + '</span>'; });
+      html += '</div></div>';
+    }
+
+    // Pontos Fracos
+    var fracos = a.pontos_fracos || [];
+    if(fracos.length > 0){
+      html += '<div class="wai-section"><h3>Pontos a Melhorar</h3><div class="wai-pills">';
+      fracos.forEach(function(p){ html += '<span class="wai-pill wai-pill-red">' + _esc(typeof p === 'string' ? p : p.descricao || p.titulo || JSON.stringify(p)) + '</span>'; });
+      html += '</div></div>';
+    }
+
+    // Sugestões
+    var sug = a.sugestoes || [];
+    if(sug.length > 0){
+      html += '<div class="wai-section"><h3>Sugestões de Melhoria</h3>';
+      sug.forEach(function(s){
+        var texto = typeof s === 'string' ? s : (s.descricao || s.sugestao || s.titulo || JSON.stringify(s));
+        html += '<div class="wai-sugestao">' + _esc(texto) + '</div>';
+      });
+      html += '</div>';
+    }
+
+    // Alertas
+    var alertas = a.alertas || [];
+    if(alertas.length > 0){
+      html += '<div class="wai-section"><h3>Alertas</h3>';
+      alertas.forEach(function(al){
+        var texto = typeof al === 'string' ? al : (al.descricao || al.alerta || al.titulo || JSON.stringify(al));
+        html += '<div class="wai-alerta">' + _esc(texto) + '</div>';
+      });
+      html += '</div>';
+    }
+
+    // Conversas Destaque
+    var destaques = a.conversas_destaque || [];
+    if(destaques.length > 0){
+      html += '<div class="wai-section"><h3>Conversas em Destaque</h3>';
+      destaques.forEach(function(c){
+        var tipo = c.tipo || c.avaliacao || 'neutro';
+        var cls = tipo === 'positiva' || tipo === 'boa' || tipo === 'bom' ? 'wai-conv-bom' : 'wai-conv-ruim';
+        var badge = tipo === 'positiva' || tipo === 'boa' || tipo === 'bom'
+          ? '<span class="wai-pill wai-pill-green" style="font-size:11px;padding:2px 8px">Positiva</span>'
+          : '<span class="wai-pill wai-pill-red" style="font-size:11px;padding:2px 8px">Atenção</span>';
+        html += '<div class="wai-conv ' + cls + '">';
+        html += '<div class="wai-conv-title">' + _esc(c.cliente || c.telefone || 'Conversa') + ' ' + badge + '</div>';
+        html += '<div>' + _esc(c.motivo || c.descricao || c.resumo || '') + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  // ── Histórico ──
+  async function _carregarHistorico(){
+    var container = document.getElementById('wai-hist-content');
+    container.innerHTML = '<div class="wai-loading">Carregando histórico...</div>';
+    var vend = _vendedores.find(function(v){ return v.instancia === _vendedorAtual; });
+    if(!vend){ container.innerHTML = '<div class="wai-vazio">Selecione um vendedor</div>'; return; }
+    var data = await _fetch('/api/whatsapp/inteligencia/historico?vendedor=' + encodeURIComponent(vend.id) + '&limite=20');
+    if(!data || data.error){
+      container.innerHTML = '<div class="wai-vazio">Erro ao carregar histórico</div>';
+      return;
+    }
+    _historico = data.analises || [];
+    _renderHistorico();
+  }
+
+  function _renderHistorico(){
+    var container = document.getElementById('wai-hist-content');
+    if(_historico.length === 0){
+      container.innerHTML =
+        '<div class="wai-vazio">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>' +
+          '<br>Nenhuma análise no histórico ainda.' +
+        '</div>';
+      return;
+    }
+    var html = '';
+    _historico.forEach(function(an){
+      var scoreColor = _corScore(an.score_geral);
+      html +=
+        '<div class="wai-hist-item" onclick="WAI.verAnalise('+an.id+')">' +
+          '<div class="wai-hist-data">' + _fmtData(an.periodo_de) + '<br><span style="color:var(--gl2);font-size:11px">a ' + _fmtDataCurta(an.periodo_ate) + '</span></div>' +
+          '<div class="wai-hist-score" style="color:'+scoreColor+'">' + (an.score_geral !== null ? an.score_geral.toFixed(1) : '-') + '</div>' +
+          '<div class="wai-hist-resumo">' + _esc(an.resumo || 'Sem resumo') + '</div>' +
+        '</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  async function verAnalise(id){
+    mudarAba('analise', document.querySelector('.wai-tab-btn:nth-child(2)'));
+    var container = document.getElementById('wai-analise-content');
+    container.innerHTML = '<div class="wai-loading">Carregando análise #' + id + '...</div>';
+    var data = await _fetch('/api/whatsapp/inteligencia/analise/' + id);
+    if(!data || data.error || !data.analise){
+      container.innerHTML = '<div class="wai-vazio">Erro ao carregar análise</div>';
+      return;
+    }
+    _analise = data.analise;
+    _renderAnalise();
+  }
+
+  // ── Sub-abas ──
+  function mudarAba(aba, btn){
+    _abaAtual = aba;
+    document.querySelectorAll('.wai-tab-btn').forEach(function(b){ b.classList.remove('on'); });
+    if(btn) btn.classList.add('on');
+    ['metricas','analise','historico'].forEach(function(a){
+      var el = document.getElementById('wai-aba-' + a);
+      if(el) el.style.display = a === aba ? '' : 'none';
+    });
+  }
+
+  return { init:init, trocarVendedor:trocarVendedor, carregar:carregar, mudarAba:mudarAba, verAnalise:verAnalise };
+})();
+
 </script>
 
 </body>
