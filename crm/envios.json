@@ -5876,7 +5876,7 @@
       "id": 15596742630,
       "nome": null
     },
-    "status": "aberto",
+    "status": "pronto_coleta",
     "confirmado_bling": true,
     "volumes_qtd": 1,
     "volumes_por": "boschetto",
@@ -5898,9 +5898,9 @@
     "assinatura_ok": true,
     "assinatura_por": "auxiliar",
     "assinatura_em": "2026-10-21T14:16:30.214Z",
-    "liberacao_ok": false,
-    "liberacao_por": null,
-    "liberacao_em": null,
+    "liberacao_ok": true,
+    "liberacao_por": "auxiliar",
+    "liberacao_em": "2026-10-21T14:16:42.522Z",
     "anexo_p_ok": false,
     "anexo_p_por": null,
     "anexo_p_em": null,
@@ -5993,11 +5993,19 @@
         "acao": "campo_alterado",
         "campo": "assinatura_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-21T14:16:42.522Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "liberacao_ok",
+        "novo": true
       }
     ],
     "criado_em": "2026-10-16T13:58:42.032Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-21T14:16:30.356Z",
+    "atualizado_em": "2026-10-21T14:16:42.641Z",
     "atualizado_por": "auxiliar"
   },
   "env_prohunters_26813": {
