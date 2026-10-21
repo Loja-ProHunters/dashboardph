@@ -249,7 +249,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:00.208Z",
-    "atualizado_em": "2026-10-13T12:37:40.612Z",
+    "atualizado_em": "2026-10-21T11:37:44.264Z",
     "tally_meta": {
       "eventId": "sync_rD1q9Y2",
       "responseId": "rD1q9Y2",
@@ -307,6 +307,13 @@
         "de": "em_analise",
         "para": "aguardando_cliente",
         "nota": null
+      },
+      {
+        "ts": "2026-10-21T11:37:44.264Z",
+        "acao": "observacao_atualizada",
+        "por": "auxiliar",
+        "nota": "Esperando cliente postar nos correios",
+        "anterior": null
       }
     ],
     "procedimento_interno": {
@@ -323,6 +330,12 @@
       "atualizado_por": null,
       "concluido_em": null,
       "concluido_por": null
+    },
+    "observacao": {
+      "texto": "Esperando cliente postar nos correios",
+      "por": "auxiliar",
+      "em": "2026-10-21T11:37:44.264Z",
+      "versao": 1
     }
   },
   "4fe8a8c1-d89d-4f2d-931d-9646c580ca83": {
