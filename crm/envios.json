@@ -5889,9 +5889,9 @@
     "transporte_valor": 250,
     "transporte_por": "boschetto",
     "transporte_em": "2026-10-16T14:00:51.076Z",
-    "nf_numero": null,
-    "nf_por": null,
-    "nf_em": null,
+    "nf_numero": "031246",
+    "nf_por": "auxiliar",
+    "nf_em": "2026-10-21T13:52:36.002Z",
     "gt_numero": null,
     "gt_por": null,
     "gt_em": null,
@@ -5969,12 +5969,20 @@
         "acao": "campo_alterado",
         "campo": "conferencia_ok",
         "novo": true
+      },
+      {
+        "ts": "2026-10-21T13:52:36.002Z",
+        "por": "auxiliar",
+        "ip": "170.231.25.101",
+        "acao": "campo_alterado",
+        "campo": "nf_numero",
+        "novo": "031246"
       }
     ],
     "criado_em": "2026-10-16T13:58:42.032Z",
     "criado_por": "boschetto",
-    "atualizado_em": "2026-10-16T14:00:56.488Z",
-    "atualizado_por": "boschetto"
+    "atualizado_em": "2026-10-21T13:52:36.111Z",
+    "atualizado_por": "auxiliar"
   },
   "env_prohunters_26813": {
     "id": "env_prohunters_26813",
