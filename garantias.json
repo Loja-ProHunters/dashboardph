@@ -1727,7 +1727,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:09.009Z",
-    "atualizado_em": "2026-10-09T12:10:09.701Z",
+    "atualizado_em": "2026-10-21T11:39:14.643Z",
     "tally_meta": {
       "eventId": "sync_lazBVMX",
       "responseId": "lazBVMX",
@@ -1765,6 +1765,13 @@
         "de": "em_analise",
         "para": "aguardando_cliente",
         "nota": null
+      },
+      {
+        "ts": "2026-10-21T11:39:14.643Z",
+        "acao": "observacao_atualizada",
+        "por": "auxiliar",
+        "nota": "Esperando cliente encaminhar lanterna",
+        "anterior": null
       }
     ],
     "procedimento_interno": {
@@ -1781,6 +1788,12 @@
       "atualizado_por": null,
       "concluido_em": null,
       "concluido_por": null
+    },
+    "observacao": {
+      "texto": "Esperando cliente encaminhar lanterna",
+      "por": "auxiliar",
+      "em": "2026-10-21T11:39:14.643Z",
+      "versao": 1
     }
   },
   "e4633cb8-b87e-4198-8f71-509e6c5d2d80": {
