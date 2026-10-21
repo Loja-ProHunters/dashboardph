@@ -41761,5 +41761,33 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-20T19:23:22.511Z",
     "atualizado_por": "dickmann"
+  },
+  "eedd207b-9501-49f0-9cf6-9bc259747882": {
+    "id": "eedd207b-9501-49f0-9cf6-9bc259747882",
+    "tipo": "pf",
+    "cpf_cnpj": null,
+    "razao_social": null,
+    "nome_fantasia": null,
+    "nome": "Florentino Projéteis",
+    "email": null,
+    "telefone": "11 98920-2721",
+    "endereco": null,
+    "status": "ativo",
+    "owner_id": "dickmann",
+    "onboarding_id": null,
+    "primeira_compra_em": null,
+    "ultima_compra_em": null,
+    "pedidos_count": 0,
+    "valor_total_compras": 0,
+    "categorias_compradas": [],
+    "bling_contato_id": null,
+    "tags": [
+      "prospect_vendedor"
+    ],
+    "notas": "Cadastrado manualmente via tarefa manual por dickmann em 2026-10-21",
+    "criado_em": "2026-10-21T13:15:48.988Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-21T13:15:48.988Z",
+    "atualizado_por": "dickmann"
   }
 }
