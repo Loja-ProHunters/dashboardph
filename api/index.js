@@ -55,6 +55,7 @@ const { getFile: _ghGet, saveFile: _ghSave } = require('../lib/githubStore');
 
 // WhatsApp — Evolution API (piloto)
 const waMensagens = require('../lib/whatsapp/mensagens');
+const waInteligencia = require('../lib/whatsapp/inteligencia');
 
 // Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
 // Fallback pro esquema antigo (baseado no nome do usuário) fica só como safety-net.
@@ -93,6 +94,12 @@ function canUseIA(sess) {
   if (!sess) return false;
   const r = getRole(sess.usuario, sess);
   return r !== 'auxiliar';
+}
+// WhatsApp Inteligência: admin, diretor, gerência. Vendedor/auxiliar NÃO vê.
+function canVerWAInteligencia(sess) {
+  if (!sess) return false;
+  const r = getRole(sess.usuario, sess);
+  return r === 'admin' || r === 'diretor' || r === 'gerencia';
 }
 // Base de Conhecimento (edita e ve): so admin/diretor.
 function canManageKB(sess) { return isAdminOrDiretor(sess); }
@@ -1399,6 +1406,166 @@ module.exports = async (req, res) => {
   }
 
   // ═══════════════════════════════════════════════════════════════
+  // WhatsApp Inteligência — Métricas + Análise com IA
+  // Visível somente para admin/diretor/gerência
+  // ═══════════════════════════════════════════════════════════════
+
+  // GET /api/whatsapp/inteligencia/metricas — métricas detalhadas por vendedor
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/inteligencia/metricas')) {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const params = new URL(req.url, 'http://x').searchParams;
+      const instancia = params.get('instancia') || null;
+      const de = params.get('de') || null;
+      const ate = params.get('ate') || null;
+      const metricas = await waInteligencia.calcularMetricas(instancia, de, ate);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(metricas));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/inteligencia/vendedores — lista instâncias/vendedores configurados
+  if (req.method === 'GET' && url === '/api/whatsapp/inteligencia/vendedores') {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    const lista = Object.entries(waInteligencia.INSTANCIAS_VENDEDORES).map(([inst, v]) => ({
+      instancia: inst, nome: v.nome, id: v.id,
+    }));
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(lista));
+    return;
+  }
+
+  // GET /api/whatsapp/inteligencia/ultima-analise?vendedor=Pedro+Dickmann
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/inteligencia/ultima-analise')) {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const params = new URL(req.url, 'http://x').searchParams;
+      const vendedor = params.get('vendedor') || '';
+      if (!vendedor) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Parâmetro vendedor obrigatório.' }));
+        return;
+      }
+      const analise = await waInteligencia.obterUltimaAnalise(vendedor);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(analise || { nenhuma: true }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/inteligencia/analise/:id — detalhe de uma análise
+  if (req.method === 'GET' && url.match(/^\/api\/whatsapp\/inteligencia\/analise\/\d+/)) {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const id = parseInt(url.split('/').pop(), 10);
+      const analise = await waInteligencia.obterAnalise(id);
+      if (!analise) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Análise não encontrada.' }));
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(analise));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/inteligencia/historico — lista análises passadas
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/inteligencia/historico')) {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const params = new URL(req.url, 'http://x').searchParams;
+      const vendedor = params.get('vendedor') || undefined;
+      const limite = parseInt(params.get('limite') || '20', 10);
+      const analises = await waInteligencia.listarAnalises({ vendedor, limite });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(analises));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/crm/cron/whatsapp-analise — cron semanal (toda segunda)
+  // Chamado pelo cron-job.org. Protegido por CRON_SECRET no header.
+  // Roda análise pra TODOS os vendedores configurados.
+  if (req.method === 'GET' && url === '/api/crm/cron/whatsapp-analise') {
+    const secret = config.cronSecret;
+    const headerSecret = req.headers['x-cron-secret'] || '';
+    if (secret && headerSecret !== secret) {
+      // Também aceita via sessão admin
+      const sess = getSession(req);
+      if (!sess || !canVerWAInteligencia(sess)) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Não autorizado.' }));
+        return;
+      }
+    }
+    try {
+      const agora = new Date();
+      const ate = agora.toISOString();
+      const de = new Date(agora.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+      const resultados = {};
+      for (const [instancia, vendedor] of Object.entries(waInteligencia.INSTANCIAS_VENDEDORES)) {
+        try {
+          const analise = await waInteligencia.analisarVendedor(instancia, vendedor.nome, de, ate);
+          resultados[vendedor.nome] = {
+            ok: true,
+            score: analise.score_geral,
+            conversas: analise.conversas_analisadas,
+          };
+        } catch (e) {
+          resultados[vendedor.nome] = { ok: false, error: e.message };
+        }
+      }
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, periodo: { de, ate }, resultados }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
   // Migração CRM GitHub → Supabase (roda UMA vez)
   // ═══════════════════════════════════════════════════════════════
 
@@ -2409,7 +2576,11 @@ module.exports = async (req, res) => {
         if (disciplina.ehContrato(t)) { contratosAbertos++; t.dias_em_aberto = 0; if (t.prazo && t.prazo < hojeBRT) vencidas++; continue; }
         const origem = t.lote_dia || disciplina.dataBRT(t.criado_em);
         t.dia_origem = origem || null;
-        t.dias_em_aberto = origem ? Math.max(0, Math.round((Date.parse(hojeBRT) - Date.parse(origem)) / 86400000)) : 0;
+        // Se a tarefa tem prazo no futuro (follow-up agendado), dias_em_aberto = 0
+        // Ela ainda não "começou" — só entra na fila quando o prazo chegar
+        const prazoFuturo = t.prazo && t.prazo > hojeBRT;
+        t.dias_em_aberto = prazoFuturo ? 0 : (origem ? Math.max(0, Math.round((Date.parse(hojeBRT) - Date.parse(origem)) / 86400000)) : 0);
+        t.agendada_futura = !!prazoFuturo;  // flag para o front esconder da fila do vendedor
         if (t.dias_em_aberto > 0) acumuladas++; else deHoje++;
         if (t.prazo && t.prazo < hojeBRT) vencidas++;
       }
@@ -2745,6 +2916,7 @@ module.exports = async (req, res) => {
       }, sess.usuario);
       // 2) Cria a tarefa de follow-up
       const novoId = crmUtils.uuid();
+      const prazoStr = String(prazo).slice(0, 10);
       const followDoc = {
         id: novoId,
         tipo: 'follow_up',
@@ -2754,7 +2926,8 @@ module.exports = async (req, res) => {
         entidade_id: accId,
         titulo: '📅 Follow-up — ' + (nomeCliente || 'cliente'),
         descricao: String(descricao).trim().slice(0, 2000),
-        prazo: String(prazo).slice(0, 10),
+        prazo: prazoStr,
+        lote_dia: prazoStr,   // garante que dias_em_aberto conta a partir do prazo, não de hoje
         hora: hora ? String(hora).slice(0, 5) : null,
         concluido_em: null,
         concluido_com_order_id: null,
@@ -5453,6 +5626,7 @@ module.exports = async (req, res) => {
     const canManageKBFlag = canManageKB(sess) ? 'true' : 'false';
     const canGerGar = canGerenciarGarantias(sess) ? 'true' : 'false';
     const canVerProd = isAdminOrDiretor(sess) ? 'true' : 'false';
+    const canVerWAInt = canVerWAInteligencia(sess) ? 'true' : 'false';
     const usuarioEsc = String(sess.usuario || '').replace(/"/g, '\\"');
     const nomeEsc = String(sess.nome || '').replace(/"/g, '\\"');
     const roleEsc = String(userRole || '').replace(/"/g, '\\"');
@@ -5466,6 +5640,7 @@ module.exports = async (req, res) => {
       'var CAN_USE_IA=' + canUseIaFlag + '; var CAN_MANAGE_KB=' + canManageKBFlag + '; ' +
       'var CAN_GERENCIAR_GARANTIAS=' + canGerGar + '; ' +
       'var CAN_VER_PRODUTIVIDADE=' + canVerProd + '; ' +
+      'var CAN_VER_WA_INTELIGENCIA=' + canVerWAInt + '; ' +
       'var MUST_CHANGE_PASSWORD=' + mustChange + ';'
     );
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
