@@ -23498,7 +23498,7 @@
     "account_id": "acc_e56c8aabbb9865b5",
     "opportunity_id": null,
     "referral_id": null,
-    "vendedor_id": "tray",
+    "vendedor_id": "boschetto",
     "status": "rascunho",
     "valor_total": 1062,
     "itens": [
@@ -23519,8 +23519,8 @@
     "sincronizado_bling_em": "2026-09-21T18:37:15.818Z",
     "criado_em": "2026-09-21T18:37:15.818Z",
     "criado_por": "bling-sync",
-    "atualizado_em": "2026-10-20T13:44:46.399Z",
-    "atualizado_por": "reatribuicao-v3",
+    "atualizado_em": "2026-10-21T11:00:18.078Z",
+    "atualizado_por": "automacao-cron-diario",
     "vendedor_bling": {
       "id": "9744561230",
       "nome": "Tray",
