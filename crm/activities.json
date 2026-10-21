@@ -13624,5 +13624,33 @@
     "criado_por": "cron-oportunidades",
     "atualizado_em": "2026-10-21T11:00:20.028Z",
     "atualizado_por": "cron-oportunidades"
+  },
+  "b6030a07-b597-4171-963c-efac940d76a8": {
+    "id": "b6030a07-b597-4171-963c-efac940d76a8",
+    "tipo": "follow_up",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "acc_296f2c4169f2d90c",
+    "titulo": "📅 Follow-up — Luis Henrique Reuter",
+    "descricao": "Comprou Protetivo Anticorrosivo … — completa c/ Canivete Ruike M41-B\n\nCliente: Luis Henrique Reuter\nUltima compra: 2026-09-01\nPedidos: 1\nValor historico: R$ 561.36",
+    "prazo": "2026-10-22",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "followup_b6030a07-b597-4171-963c-efac940d76a8",
+    "gerada_automaticamente": false,
+    "fonte": "follow_up",
+    "dono": "dickmann",
+    "account_id": "acc_296f2c4169f2d90c",
+    "origem_tarefa_id": "79a79506-ac25-48e7-a574-ce3bb543150b",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-21T12:52:37.267Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-21T12:52:37.267Z",
+    "atualizado_por": "dickmann"
   }
 }
