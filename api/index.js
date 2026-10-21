@@ -53,6 +53,9 @@ const envios        = require('../lib/crm/envios');
 const romaneios     = require('../lib/crm/romaneios');
 const { getFile: _ghGet, saveFile: _ghSave } = require('../lib/githubStore');
 
+// WhatsApp — Evolution API (piloto)
+const waMensagens = require('../lib/whatsapp/mensagens');
+
 // Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
 // Fallback pro esquema antigo (baseado no nome do usuário) fica só como safety-net.
 //
@@ -1237,6 +1240,253 @@ module.exports = async (req, res) => {
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
     } catch (e) {
       res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // WhatsApp — Evolution API (piloto Enzo/boschetto)
+  // ═══════════════════════════════════════════════════════════════
+
+  // POST /api/whatsapp/webhook — recebe eventos da Evolution API
+  // Protegido por apikey no header ou no body (a Evolution manda no payload).
+  // Sem sessão — a Evolution chama de fora.
+  if (req.method === 'POST' && url === '/api/whatsapp/webhook') {
+    try {
+      const body = await readBody(req);
+      const payload = JSON.parse(body || '{}');
+
+      // Autenticação: apikey no header OU config.evolutionWebhookSecret
+      const headerKey = req.headers['apikey'] || req.headers['x-evolution-key'] || '';
+      const payloadKey = payload.apikey || '';
+      const segredo = config.evolutionWebhookSecret;
+      if (segredo && headerKey !== segredo && payloadKey !== segredo) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Webhook não autorizado.' }));
+        return;
+      }
+
+      const evento = payload.event || '';
+
+      // CONNECTION_UPDATE — só loga
+      if (evento === 'CONNECTION_UPDATE' || evento === 'connection.update') {
+        const state = payload.data && payload.data.state;
+        console.log('[WA] connection.update:', payload.instance, state);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, evento, state }));
+        return;
+      }
+
+      // MESSAGES_UPSERT — grava mensagem
+      if (evento === 'MESSAGES_UPSERT' || evento === 'messages.upsert') {
+        const resultado = await waMensagens.processarMensagem(payload);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, ...resultado }));
+        return;
+      }
+
+      // SEND_MESSAGE — mensagem enviada pelo vendedor
+      if (evento === 'SEND_MESSAGE' || evento === 'send.message') {
+        const resultado = await waMensagens.processarMensagem(payload);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, ...resultado }));
+        return;
+      }
+
+      // Outros eventos — aceita silenciosamente
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, evento, ignorado: true }));
+    } catch (e) {
+      console.error('[WA] Erro no webhook:', e.message);
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/conversas — lista conversas agrupadas por contato
+  // Requer sessão admin/diretor
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/conversas')) {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      // /api/whatsapp/conversas?instancia=enzo&limite=50
+      const params = new URL(url, 'http://x').searchParams;
+      const conversas = await waMensagens.listarConversas({
+        instancia: params.get('instancia') || undefined,
+        limite: parseInt(params.get('limite') || '50', 10),
+        offset: parseInt(params.get('offset') || '0', 10),
+      });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, conversas }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/mensagens/:telefone — mensagens de uma conversa
+  if (req.method === 'GET' && url.match(/^\/api\/whatsapp\/mensagens\/\d+/)) {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const telefone = url.split('/')[4];
+      const params = new URL(url, 'http://x').searchParams;
+      const mensagens = await waMensagens.mensagensPorTelefone(telefone, {
+        limite: parseInt(params.get('limite') || '100', 10),
+        antes_de: params.get('antes_de') || null,
+      });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, mensagens }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/metricas — métricas de conversas
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/metricas')) {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const params = new URL(url, 'http://x').searchParams;
+      const m = await waMensagens.metricas({
+        instancia: params.get('instancia') || undefined,
+        de: params.get('de') || undefined,
+        ate: params.get('ate') || undefined,
+      });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, metricas: m }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/health — verifica conexão com Supabase
+  if (req.method === 'GET' && url === '/api/whatsapp/health') {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const { ping } = require('../lib/supabaseClient');
+      await ping();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, supabase: 'connected' }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: e.message }));
+    }
+    return;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // Migração CRM GitHub → Supabase (roda UMA vez)
+  // ═══════════════════════════════════════════════════════════════
+
+  // GET /api/migrate-to-supabase — lê 14 coleções do GitHub JSON e popula Supabase
+  // Protegido: só gerência/admin (via sessão).
+  // Idempotente: usa upsert — pode rodar várias vezes sem duplicar.
+  if (req.method === 'GET' && url === '/api/migrate-to-supabase') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao. Só gerência.' }));
+      return;
+    }
+    try {
+      const { getClient } = require('../lib/supabaseClient');
+      const sb = getClient();
+      const colecoes = [
+        'accounts', 'contacts', 'leads', 'referrals',
+        'opportunities', 'activities', 'orders', 'onboardings',
+        'documentos', 'armas', 'envios', 'romaneios',
+        'tarefas', 'contratos'
+      ];
+
+      const resultado = {};
+      let totalDocs = 0;
+
+      for (const col of colecoes) {
+        try {
+          // Lê do GitHub (branch de dados)
+          let raw;
+          try {
+            raw = await _ghGet('crm/' + col + '.json');
+          } catch (e) {
+            if (e && e.statusCode === 404) {
+              resultado[col] = { status: 'vazio', docs: 0, motivo: 'arquivo não existe no GitHub' };
+              continue;
+            }
+            throw e;
+          }
+
+          let data;
+          try { data = JSON.parse(raw); } catch (_) { data = {}; }
+          if (!data || typeof data !== 'object' || Array.isArray(data)) data = {};
+
+          const entries = Object.entries(data);
+          if (entries.length === 0) {
+            resultado[col] = { status: 'vazio', docs: 0 };
+            continue;
+          }
+
+          // Monta linhas para upsert
+          const rows = entries.map(([id, doc]) => ({
+            colecao: col,
+            id,
+            data: doc,
+            owner_id:       doc.vendedor_id || doc.owner_id || null,
+            criado_em:      doc.criado_em      || new Date().toISOString(),
+            atualizado_em:  doc.atualizado_em  || new Date().toISOString(),
+            criado_por:     doc.criado_por     || null,
+            atualizado_por: doc.atualizado_por || null,
+          }));
+
+          // Upsert em batches de 500
+          for (let i = 0; i < rows.length; i += 500) {
+            const batch = rows.slice(i, i + 500);
+            const { error: errUp } = await sb
+              .from('crm_docs')
+              .upsert(batch, { onConflict: 'colecao,id' });
+            if (errUp) throw errUp;
+          }
+
+          resultado[col] = { status: 'ok', docs: entries.length };
+          totalDocs += entries.length;
+        } catch (e) {
+          resultado[col] = { status: 'erro', error: e.message };
+        }
+      }
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        ok: true,
+        total_docs: totalDocs,
+        colecoes: resultado,
+        mensagem: 'Migração concluída. Verifique os status acima.'
+      }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: e.message }));
     }
     return;
   }
