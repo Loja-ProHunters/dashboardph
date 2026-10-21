@@ -13657,5 +13657,31 @@
     "criado_por": "dickmann",
     "atualizado_em": "2026-10-21T12:52:37.267Z",
     "atualizado_por": "dickmann"
+  },
+  "baf36fe7-9315-4657-b7b4-ba70f7e57839": {
+    "id": "baf36fe7-9315-4657-b7b4-ba70f7e57839",
+    "tipo": "manual",
+    "status": "pendente",
+    "owner_id": "dickmann",
+    "entidade_tipo": "account",
+    "entidade_id": "eedd207b-9501-49f0-9cf6-9bc259747882",
+    "titulo": "📞 Tarefa manual — Florentino Projéteis",
+    "descricao": "Retomar contato para venda de projéteis",
+    "prazo": "2026-10-23",
+    "hora": null,
+    "concluido_em": null,
+    "concluido_com_order_id": null,
+    "pontos_base": 10,
+    "pontos_bonus": 0,
+    "pontos_ganhos": 0,
+    "trigger_id": "manual_baf36fe7-9315-4657-b7b4-ba70f7e57839",
+    "gerada_automaticamente": false,
+    "dono": "dickmann",
+    "account_id": "eedd207b-9501-49f0-9cf6-9bc259747882",
+    "criada_por_vendedor": "dickmann",
+    "criado_em": "2026-10-21T13:15:51.023Z",
+    "criado_por": "dickmann",
+    "atualizado_em": "2026-10-21T13:15:51.023Z",
+    "atualizado_por": "dickmann"
   }
 }
