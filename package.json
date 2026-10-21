@@ -6,6 +6,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
     "bcryptjs": "^3.0.3",
     "bwip-js": "^4.11.2",
     "docxtemplater": "^3.50.0",
