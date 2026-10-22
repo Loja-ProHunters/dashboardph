@@ -4175,14 +4175,14 @@ module.exports = async (req, res) => {
           const cfg = (config.blingContas || {})[conta];
           if (!cfg || !cfg.ativa) continue;
 
-          // Busca pedidos recentes (últimos 90 dias) paginando
+          // Busca pedidos recentes (últimos 4 dias) paginando
           const dataLimite = new Date();
-          dataLimite.setDate(dataLimite.getDate() - 90);
+          dataLimite.setDate(dataLimite.getDate() - 4);
           const dataInicial = dataLimite.toISOString().slice(0, 10);
           const dataFinal = new Date().toISOString().slice(0, 10);
 
           let pagina = 1;
-          const maxPaginas = 10; // segurança: máximo 10 páginas (1000 pedidos)
+          const maxPaginas = 3; // segurança: máximo 3 páginas (300 pedidos, 4 dias)
 
           while (pagina <= maxPaginas && !resultado) {
             const listaResp = await blingApi.get('/pedidos/vendas', {
