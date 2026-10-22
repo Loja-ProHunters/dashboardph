@@ -9092,7 +9092,7 @@ function ctrlRenderCorreios(){
     acoes = '<div class="correios-acoes"><div class="crm-loading">Gerando romaneio…</div></div>';
   }
 
-  // ── Scanner + entrada manual (só aparece antes da busca) ──
+  // ── Scanner (só aparece antes da busca) ──
   var scannerHtml = '';
   if (!cor.buscaFeita && !cor.buscando) {
     scannerHtml =
@@ -9108,10 +9108,21 @@ function ctrlRenderCorreios(){
           '</button>' +
         '</div>' +
         '<div id="correios-feedback" class="correios-feedback"></div>' +
-      '</div>' +
-      '<div class="correios-manual-divider"><span>ou</span></div>' +
+      '</div>';
+  }
+
+  // ── Entrada manual (sempre visível, exceto durante busca) ──
+  var manualHtml = '';
+  if (!cor.buscando) {
+    var manualLabel = cor.buscaFeita
+      ? '✏️ Adicionar manualmente — preencha os dados dos códigos não encontrados'
+      : 'Entrada manual — preencha os dados';
+    var divider = !cor.buscaFeita
+      ? '<div class="correios-manual-divider"><span>ou</span></div>'
+      : '';
+    manualHtml = divider +
       '<div class="correios-manual-wrap">' +
-        '<label class="correios-scanner-label">Entrada manual — preencha os dados</label>' +
+        '<label class="correios-scanner-label">'+manualLabel+'</label>' +
         '<div class="correios-manual-grid">' +
           '<div class="correios-manual-fld">' +
             '<label>Código de rastreio</label>' +
@@ -9148,9 +9159,11 @@ function ctrlRenderCorreios(){
         '</div>' +
       '</div>' +
       scannerHtml +
+      (!cor.buscaFeita ? manualHtml : '') +
       codigosHtml +
       buscarBtn +
       resultHtml +
+      (cor.buscaFeita ? manualHtml : '') +
       acoes +
     '</div>';
 
@@ -9197,12 +9210,31 @@ function correiosAdicionarManual(){
   if (!pedido)   { if (fb) fb.innerHTML = '<span style="color:var(--r)">Preencha o número do pedido</span>'; return; }
   if (!nome)     { if (fb) fb.innerHTML = '<span style="color:var(--r)">Preencha o destinatário</span>'; return; }
 
-  // Verifica duplicata no código
+  // Verifica duplicata no código (permite substituir itens com erro)
   var jaExisteCod = window.CORREIOS.codigos.indexOf(rastreio) !== -1;
-  var jaExisteItem = window.CORREIOS.itens.some(function(x){ return x.codigo_rastreio === rastreio; });
-  if (jaExisteCod || jaExisteItem) {
-    if (fb) fb.innerHTML = '<span style="color:#a06210">⚠ Código <b>'+crmEsc(rastreio)+'</b> já está na lista</span>';
+  var idxErro = -1;
+  var jaExisteOk = false;
+  for (var _mi = 0; _mi < window.CORREIOS.itens.length; _mi++) {
+    if (window.CORREIOS.itens[_mi].codigo_rastreio === rastreio) {
+      if (window.CORREIOS.itens[_mi].status === 'erro') { idxErro = _mi; }
+      else { jaExisteOk = true; }
+    }
+  }
+  if (jaExisteCod && idxErro === -1) {
+    if (fb) fb.innerHTML = '<span style="color:#a06210">⚠ Código <b>'+crmEsc(rastreio)+'</b> já está na lista de bipagem</span>';
     return;
+  }
+  if (jaExisteOk) {
+    if (fb) fb.innerHTML = '<span style="color:#a06210">⚠ Código <b>'+crmEsc(rastreio)+'</b> já está na lista como encontrado</span>';
+    return;
+  }
+
+  // Remove item de erro se estiver substituindo
+  if (idxErro !== -1) {
+    window.CORREIOS.itens.splice(idxErro, 1);
+    // Remove também da lista de códigos bipados
+    var idxCod = window.CORREIOS.codigos.indexOf(rastreio);
+    if (idxCod !== -1) window.CORREIOS.codigos.splice(idxCod, 1);
   }
 
   // Adiciona direto nos itens resolvidos (status ok)
