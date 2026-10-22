@@ -4412,6 +4412,78 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // GET /api/crm/correios/romaneios — lista romaneios emitidos
+  if (req.method === 'GET' && url === '/api/crm/correios/romaneios') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,jh); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const all = await crmStore.getCollection('romaneios_correios');
+      const lista = Object.values(all || {}).sort(function(a, b) {
+        return (b.criado_em || '').localeCompare(a.criado_em || '');
+      });
+      res.writeHead(200, jh);
+      res.end(JSON.stringify({ romaneios: lista }));
+    } catch (e) {
+      res.writeHead(500, jh);
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/crm/correios/enviados — lista todos os envios individuais de todos os romaneios
+  if (req.method === 'GET' && url === '/api/crm/correios/enviados') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,jh); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const all = await crmStore.getCollection('romaneios_correios');
+      const enviados = [];
+      for (const rom of Object.values(all || {})) {
+        if (!Array.isArray(rom.itens)) continue;
+        for (const it of rom.itens) {
+          enviados.push({
+            codigo_rastreio: it.codigo_rastreio,
+            pedido_numero: it.pedido_numero,
+            cliente_nome: it.cliente_nome,
+            empresa: it.empresa,
+            empresa_label: it.empresa_label,
+            romaneio_numero: rom.numero,
+            romaneio_id: rom.id,
+            romaneio_data: rom.data,
+            gerado_por: rom.gerado_por,
+          });
+        }
+      }
+      // Ordena por data mais recente
+      enviados.sort(function(a, b) {
+        return (b.romaneio_data || '').localeCompare(a.romaneio_data || '');
+      });
+      res.writeHead(200, jh);
+      res.end(JSON.stringify({ enviados: enviados }));
+    } catch (e) {
+      res.writeHead(500, jh);
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/crm/correios/romaneio/:id — detalhe de um romaneio
+  if (req.method === 'GET' && url.startsWith('/api/crm/correios/romaneio/')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,jh); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const romId = url.split('/api/crm/correios/romaneio/')[1];
+      if (!romId) { res.writeHead(400, jh); res.end(JSON.stringify({error:'ID obrigatório'})); return; }
+      const doc = await crmStore.getDoc('romaneios_correios', romId);
+      if (!doc) { res.writeHead(404, jh); res.end(JSON.stringify({error:'Romaneio não encontrado'})); return; }
+      res.writeHead(200, jh);
+      res.end(JSON.stringify({ romaneio: doc }));
+    } catch (e) {
+      res.writeHead(500, jh);
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
   // ═════════════════════════════════════════════════════════════
   // Bling — OAuth 2.0 (integração com API v3)
   // ═════════════════════════════════════════════════════════════
