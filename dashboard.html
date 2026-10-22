@@ -8977,18 +8977,60 @@ function crmFmtDateTime(s){
 
 /* ═══════════════════════════════════════════════════════════════
    CORREIOS — Scanner de rastreio + Romaneio de envio Correios
-   Fluxo: bipar acumula na lista → "Buscar no Bling" resolve tudo
+   Sub-abas: Bipagem | Romaneios | Enviados
    ═══════════════════════════════════════════════════════════════ */
 window.CORREIOS = window.CORREIOS || {
-  codigos: [],     // strings de códigos bipados (ainda não buscados)
-  itens: [],       // resultado pós-busca: { codigo_rastreio, pedido_numero, pedido_id, cliente_nome, empresa, empresa_label, status:'ok'|'erro'|'buscando', erro:'' }
+  subaba: 'bipagem',  // 'bipagem' | 'romaneios' | 'enviados'
+  codigos: [],
+  itens: [],
   buscando: false,
-  buscaFeita: false,  // true depois que clicou "Buscar"
+  buscaFeita: false,
   gerandoRom: false,
+  // Dados carregados das sub-abas
+  romaneiosList: null,   // cache da lista de romaneios
+  enviadosList: null,     // cache da lista de enviados
+  romaneioDetalhe: null,  // romaneio aberto para ver detalhes
 };
 
 function ctrlRenderCorreios(){
   var p = document.getElementById('ctrl-panel');
+  var cor = window.CORREIOS;
+
+  // Sub-abas internas do Correios
+  var subTabs =
+    '<div class="correios-subtabs">' +
+      '<button class="correios-stab '+(cor.subaba==='bipagem'?'on':'')+'" onclick="correiosGoSub(\'bipagem\')">Bipagem</button>' +
+      '<button class="correios-stab '+(cor.subaba==='romaneios'?'on':'')+'" onclick="correiosGoSub(\'romaneios\')">Romaneios</button>' +
+      '<button class="correios-stab '+(cor.subaba==='enviados'?'on':'')+'" onclick="correiosGoSub(\'enviados\')">Enviados</button>' +
+    '</div>';
+
+  p.innerHTML =
+    '<div class="ctrl-card correios-card">' +
+      '<div class="correios-header">' +
+        '<div class="correios-header-ic">📮</div>' +
+        '<div>' +
+          '<h3 class="correios-title">Correios</h3>' +
+          '<div class="correios-subtitle">Bipagem, romaneios e consulta de envios via Correios.</div>' +
+        '</div>' +
+      '</div>' +
+      subTabs +
+      '<div id="correios-subpanel"></div>' +
+    '</div>';
+
+  if (cor.subaba === 'bipagem') return correiosRenderBipagem();
+  if (cor.subaba === 'romaneios') return correiosRenderRomaneios();
+  if (cor.subaba === 'enviados') return correiosRenderEnviados();
+}
+
+function correiosGoSub(sub){
+  window.CORREIOS.subaba = sub;
+  ctrlRenderCorreios();
+}
+
+// ── SUB-ABA: BIPAGEM ──────────────────────────────────────────
+function correiosRenderBipagem(){
+  var sp = document.getElementById('correios-subpanel');
+  if (!sp) return;
   var cor = window.CORREIOS;
   var totalCodigos = cor.codigos.length;
   var totalOk = cor.itens.filter(function(x){ return x.status === 'ok'; }).length;
@@ -9092,48 +9134,37 @@ function ctrlRenderCorreios(){
     acoes = '<div class="correios-acoes"><div class="crm-loading">Gerando romaneio…</div></div>';
   }
 
-  // ── Scanner (só aparece antes da busca) ──
-  var scannerHtml = '';
+  // ── Bloco de entrada: scanner + manual (ANTES da busca) ──
+  var entradaAntes = '';
   if (!cor.buscaFeita && !cor.buscando) {
-    scannerHtml =
+    entradaAntes =
       '<div class="correios-scanner-wrap">' +
-        '<label class="correios-scanner-label">Bipagem automática — leitor de código de barras</label>' +
+        '<label class="correios-scanner-label">Bipagem automatica - leitor de codigo de barras</label>' +
         '<div class="correios-scanner-row">' +
           '<input type="text" id="correios-input" class="correios-scanner-input" ' +
-            'placeholder="Bipe ou digite o código (ex: AP640299478BR)" ' +
+            'placeholder="Bipe ou digite o codigo (ex: AP640299478BR)" ' +
             'onkeydown="if(event.key===\'Enter\'){event.preventDefault();correiosAdicionarCodigo();}" ' +
             'autocomplete="off" spellcheck="false" />' +
           '<button class="ctrl-btn-primary correios-btn-bipar" onclick="correiosAdicionarCodigo()">' +
-            '➕ Adicionar' +
+            '+ Adicionar' +
           '</button>' +
         '</div>' +
         '<div id="correios-feedback" class="correios-feedback"></div>' +
-      '</div>';
-  }
-
-  // ── Entrada manual (sempre visível, exceto durante busca) ──
-  var manualHtml = '';
-  if (!cor.buscando) {
-    var manualLabel = cor.buscaFeita
-      ? '✏️ Adicionar manualmente — preencha os dados dos códigos não encontrados'
-      : 'Entrada manual — preencha os dados';
-    var divider = !cor.buscaFeita
-      ? '<div class="correios-manual-divider"><span>ou</span></div>'
-      : '';
-    manualHtml = divider +
+      '</div>' +
+      '<div class="correios-manual-divider"><span>ou</span></div>' +
       '<div class="correios-manual-wrap">' +
-        '<label class="correios-scanner-label">'+manualLabel+'</label>' +
+        '<label class="correios-scanner-label">Entrada manual - preencha os dados</label>' +
         '<div class="correios-manual-grid">' +
           '<div class="correios-manual-fld">' +
-            '<label>Código de rastreio</label>' +
+            '<label>Codigo de rastreio</label>' +
             '<input type="text" id="correios-m-rastreio" placeholder="Ex: AP640299478BR" autocomplete="off" spellcheck="false" />' +
           '</div>' +
           '<div class="correios-manual-fld">' +
-            '<label>Nº do pedido</label>' +
+            '<label>No do pedido</label>' +
             '<input type="text" id="correios-m-pedido" placeholder="Ex: 27269" autocomplete="off" />' +
           '</div>' +
           '<div class="correios-manual-fld">' +
-            '<label>Destinatário</label>' +
+            '<label>Destinatario</label>' +
             '<input type="text" id="correios-m-nome" placeholder="Nome do cliente" autocomplete="off" />' +
           '</div>' +
           '<div class="correios-manual-fld">' +
@@ -9144,28 +9175,50 @@ function ctrlRenderCorreios(){
             '</select>' +
           '</div>' +
         '</div>' +
-        '<button class="ctrl-btn-primary correios-btn-manual" onclick="correiosAdicionarManual()">➕ Adicionar manual</button>' +
+        '<button class="ctrl-btn-primary correios-btn-manual" onclick="correiosAdicionarManual()">+ Adicionar manual</button>' +
         '<div id="correios-feedback-manual" class="correios-feedback"></div>' +
       '</div>';
   }
 
-  p.innerHTML =
-    '<div class="ctrl-card correios-card">' +
-      '<div class="correios-header">' +
-        '<div class="correios-header-ic">📮</div>' +
-        '<div>' +
-          '<h3 class="correios-title">Romaneio Correios</h3>' +
-          '<div class="correios-subtitle">Bipe os códigos de rastreio e depois clique em "Buscar no Bling" para identificar os pedidos.</div>' +
+  // ── Formulario manual (DEPOIS da busca — para corrigir os erros) ──
+  var entradaDepois = '';
+  if (cor.buscaFeita && !cor.buscando) {
+    entradaDepois =
+      '<div class="correios-manual-wrap" style="margin-top:16px;border-top:1px solid var(--brd);padding-top:16px">' +
+        '<label class="correios-scanner-label" style="color:var(--r);font-weight:600">Adicionar manualmente - preencha os dados dos codigos nao encontrados</label>' +
+        '<div class="correios-manual-grid">' +
+          '<div class="correios-manual-fld">' +
+            '<label>Codigo de rastreio</label>' +
+            '<input type="text" id="correios-m-rastreio" placeholder="Ex: AP640299478BR" autocomplete="off" spellcheck="false" />' +
+          '</div>' +
+          '<div class="correios-manual-fld">' +
+            '<label>No do pedido</label>' +
+            '<input type="text" id="correios-m-pedido" placeholder="Ex: 27269" autocomplete="off" />' +
+          '</div>' +
+          '<div class="correios-manual-fld">' +
+            '<label>Destinatario</label>' +
+            '<input type="text" id="correios-m-nome" placeholder="Nome do cliente" autocomplete="off" />' +
+          '</div>' +
+          '<div class="correios-manual-fld">' +
+            '<label>Empresa</label>' +
+            '<select id="correios-m-empresa">' +
+              '<option value="prohunters">Pro Hunters</option>' +
+              '<option value="calibre">Calibre Restrito</option>' +
+            '</select>' +
+          '</div>' +
         '</div>' +
-      '</div>' +
-      scannerHtml +
-      (!cor.buscaFeita ? manualHtml : '') +
-      codigosHtml +
-      buscarBtn +
-      resultHtml +
-      (cor.buscaFeita ? manualHtml : '') +
-      acoes +
-    '</div>';
+        '<button class="ctrl-btn-primary correios-btn-manual" onclick="correiosAdicionarManual()">+ Adicionar manual</button>' +
+        '<div id="correios-feedback-manual" class="correios-feedback"></div>' +
+      '</div>';
+  }
+
+  sp.innerHTML =
+    entradaAntes +
+    codigosHtml +
+    buscarBtn +
+    resultHtml +
+    entradaDepois +
+    acoes;
 
   // Auto-focus no input do scanner
   if (!cor.buscaFeita && !cor.buscando) {
@@ -9350,7 +9403,7 @@ function correiosNovaBipagem(){
 
 async function correiosGerarRomaneio(){
   var okItens = window.CORREIOS.itens.filter(function(x){ return x.status === 'ok'; });
-  if (okItens.length === 0) { alert('Nenhum envio válido para gerar romaneio'); return; }
+  if (okItens.length === 0) { alert('Nenhum envio valido para gerar romaneio'); return; }
 
   window.CORREIOS.gerandoRom = true;
   ctrlRenderCorreios();
@@ -9375,29 +9428,223 @@ async function correiosGerarRomaneio(){
     var d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro ao gerar romaneio');
 
-    // Abre o HTML do romaneio numa nova aba pra imprimir
-    var w = window.open('', '_blank');
-    if (w) {
-      w.document.write(d.html);
-      w.document.close();
-    } else {
-      alert('Pop-up bloqueado. Permita pop-ups para imprimir o romaneio.');
-    }
-
-    // Volta pra nova bipagem
+    // Limpa bipagem e navega para Enviados
     window.CORREIOS.itens = [];
     window.CORREIOS.codigos = [];
     window.CORREIOS.buscaFeita = false;
     window.CORREIOS.gerandoRom = false;
+    window.CORREIOS.enviadosList = null; // força recarregar
+    window.CORREIOS.romaneiosList = null;
+    window.CORREIOS.subaba = 'enviados';
     ctrlRenderCorreios();
 
-    // Feedback
-    var fb = document.getElementById('correios-feedback');
-    if (fb) fb.innerHTML = '<span style="color:var(--gd)">✓ Romaneio <b>'+crmEsc(d.numero || '')+'</b> gerado com sucesso! Aberto em nova aba para impressão.</span>';
+    // Toast de sucesso
+    crmToast('Romaneio ' + (d.numero || '') + ' gerado com sucesso!', 'ok');
   } catch (e) {
     window.CORREIOS.gerandoRom = false;
     ctrlRenderCorreios();
     alert('Erro ao gerar romaneio: ' + e.message);
+  }
+}
+
+// ── SUB-ABA: ROMANEIOS ────────────────────────────────────────
+function correiosRenderRomaneios(){
+  var sp = document.getElementById('correios-subpanel');
+  if (!sp) return;
+  var cor = window.CORREIOS;
+
+  // Se tem detalhe aberto, mostra ele
+  if (cor.romaneioDetalhe) {
+    return correiosRenderRomaneioDetalhe(cor.romaneioDetalhe);
+  }
+
+  // Carrega lista se necessario
+  if (!cor.romaneiosList) {
+    sp.innerHTML = '<div class="crm-loading">Carregando romaneios...</div>';
+    fetch('/api/crm/correios/romaneios').then(function(r){ return r.json(); }).then(function(d){
+      if (d.error) { sp.innerHTML = '<div class="crm-vazio">Erro: '+crmEsc(d.error)+'</div>'; return; }
+      cor.romaneiosList = d.romaneios || [];
+      correiosRenderRomaneios();
+    }).catch(function(e){ sp.innerHTML = '<div class="crm-vazio">Erro de conexao</div>'; });
+    return;
+  }
+
+  if (cor.romaneiosList.length === 0) {
+    sp.innerHTML = '<div class="crm-vazio" style="padding:32px;text-align:center;color:var(--gy)">Nenhum romaneio emitido ainda.</div>';
+    return;
+  }
+
+  var linhas = cor.romaneiosList.map(function(rom){
+    var dataFmt = (rom.data || '').split('-').reverse().join('/');
+    return '<tr class="correios-rom-row" onclick="correiosAbrirRomaneio(\''+crmEsc(rom.id)+'\')" style="cursor:pointer">' +
+      '<td class="c" style="font-weight:700;color:#1565c0">' + crmEsc(rom.numero) + '</td>' +
+      '<td>' + dataFmt + '</td>' +
+      '<td class="c">' + (rom.total_itens || (rom.itens ? rom.itens.length : 0)) + '</td>' +
+      '<td>' + crmEsc(rom.gerado_por || '') + '</td>' +
+      '<td class="c"><button class="correios-btn-ver" onclick="event.stopPropagation();correiosAbrirRomaneio(\''+crmEsc(rom.id)+'\')">Ver</button></td>' +
+    '</tr>';
+  }).join('');
+
+  sp.innerHTML =
+    '<div class="correios-lista-wrap">' +
+      '<div class="correios-lista-head">' +
+        '<span>Total: ' + cor.romaneiosList.length + ' romaneio' + (cor.romaneiosList.length > 1 ? 's' : '') + '</span>' +
+        '<button class="correios-link-btn" onclick="window.CORREIOS.romaneiosList=null;correiosRenderRomaneios()">Atualizar</button>' +
+      '</div>' +
+      '<div style="overflow-x:auto">' +
+      '<table class="correios-table">' +
+        '<thead><tr>' +
+          '<th style="width:80px">Numero</th>' +
+          '<th style="width:100px">Data</th>' +
+          '<th style="width:60px">Itens</th>' +
+          '<th>Gerado por</th>' +
+          '<th style="width:60px"></th>' +
+        '</tr></thead>' +
+        '<tbody>' + linhas + '</tbody>' +
+      '</table></div>' +
+    '</div>';
+}
+
+function correiosAbrirRomaneio(id){
+  var sp = document.getElementById('correios-subpanel');
+  if (!sp) return;
+  sp.innerHTML = '<div class="crm-loading">Carregando romaneio...</div>';
+
+  fetch('/api/crm/correios/romaneio/' + encodeURIComponent(id)).then(function(r){ return r.json(); }).then(function(d){
+    if (d.error) { sp.innerHTML = '<div class="crm-vazio">Erro: '+crmEsc(d.error)+'</div>'; return; }
+    window.CORREIOS.romaneioDetalhe = d.romaneio;
+    correiosRenderRomaneioDetalhe(d.romaneio);
+  }).catch(function(e){ sp.innerHTML = '<div class="crm-vazio">Erro de conexao</div>'; });
+}
+
+function correiosRenderRomaneioDetalhe(rom){
+  var sp = document.getElementById('correios-subpanel');
+  if (!sp) return;
+  var dataFmt = (rom.data || '').split('-').reverse().join('/');
+  var itens = rom.itens || [];
+
+  var linhas = itens.map(function(it, i){
+    var empTag = it.empresa === 'calibre'
+      ? '<span class="correios-emp cr">CR</span>'
+      : '<span class="correios-emp ph">PH</span>';
+    return '<tr>' +
+      '<td class="c">' + (i+1) + '</td>' +
+      '<td style="font-weight:600">' + crmEsc(it.pedido_numero) + '</td>' +
+      '<td class="c">' + empTag + '</td>' +
+      '<td>' + crmEsc(it.cliente_nome) + '</td>' +
+      '<td><code style="font-size:11px">' + crmEsc(it.codigo_rastreio) + '</code></td>' +
+    '</tr>';
+  }).join('');
+
+  sp.innerHTML =
+    '<div>' +
+      '<button class="correios-link-btn" onclick="window.CORREIOS.romaneioDetalhe=null;correiosRenderRomaneios()" style="margin-bottom:12px;font-size:13px">&larr; Voltar para lista</button>' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #1565c0">' +
+        '<div>' +
+          '<div style="font-size:17px;font-weight:700;color:#1565c0">Romaneio Correios N. ' + crmEsc(rom.numero) + '</div>' +
+          '<div style="font-size:12px;color:var(--gy);margin-top:2px">Emitido em ' + dataFmt + ' por ' + crmEsc(rom.gerado_por || '') + '</div>' +
+        '</div>' +
+        '<div style="font-size:13px;font-weight:600;color:#1565c0">' + itens.length + ' envio' + (itens.length > 1 ? 's' : '') + '</div>' +
+      '</div>' +
+      '<div style="overflow-x:auto">' +
+      '<table class="correios-table">' +
+        '<thead><tr>' +
+          '<th style="width:36px">#</th>' +
+          '<th style="width:80px">Pedido</th>' +
+          '<th style="width:56px">Empr.</th>' +
+          '<th>Destinatario</th>' +
+          '<th style="width:180px">Codigo de Rastreio</th>' +
+        '</tr></thead>' +
+        '<tbody>' + linhas + '</tbody>' +
+      '</table></div>' +
+    '</div>';
+}
+
+// ── SUB-ABA: ENVIADOS ─────────────────────────────────────────
+function correiosRenderEnviados(){
+  var sp = document.getElementById('correios-subpanel');
+  if (!sp) return;
+  var cor = window.CORREIOS;
+
+  if (!cor.enviadosList) {
+    sp.innerHTML = '<div class="crm-loading">Carregando enviados...</div>';
+    fetch('/api/crm/correios/enviados').then(function(r){ return r.json(); }).then(function(d){
+      if (d.error) { sp.innerHTML = '<div class="crm-vazio">Erro: '+crmEsc(d.error)+'</div>'; return; }
+      cor.enviadosList = d.enviados || [];
+      correiosRenderEnviados();
+    }).catch(function(e){ sp.innerHTML = '<div class="crm-vazio">Erro de conexao</div>'; });
+    return;
+  }
+
+  if (cor.enviadosList.length === 0) {
+    sp.innerHTML = '<div class="crm-vazio" style="padding:32px;text-align:center;color:var(--gy)">Nenhum envio registrado ainda.</div>';
+    return;
+  }
+
+  // Filtro de busca
+  var filtroId = 'correios-env-filtro';
+  var filtroVal = '';
+  var el = document.getElementById(filtroId);
+  if (el) filtroVal = el.value;
+
+  var enviados = cor.enviadosList;
+  if (filtroVal) {
+    var f = filtroVal.toLowerCase();
+    enviados = enviados.filter(function(e){
+      return (e.codigo_rastreio || '').toLowerCase().indexOf(f) !== -1 ||
+             (e.pedido_numero || '').toLowerCase().indexOf(f) !== -1 ||
+             (e.cliente_nome || '').toLowerCase().indexOf(f) !== -1 ||
+             (e.romaneio_numero || '').toLowerCase().indexOf(f) !== -1;
+    });
+  }
+
+  var linhas = enviados.map(function(env){
+    var dataFmt = (env.romaneio_data || '').split('-').reverse().join('/');
+    var empTag = env.empresa === 'calibre'
+      ? '<span class="correios-emp cr">CR</span>'
+      : '<span class="correios-emp ph">PH</span>';
+    return '<tr>' +
+      '<td><code style="font-size:11px">' + crmEsc(env.codigo_rastreio) + '</code></td>' +
+      '<td style="font-weight:600">' + crmEsc(env.pedido_numero) + '</td>' +
+      '<td>' + crmEsc(env.cliente_nome) + '</td>' +
+      '<td class="c">' + empTag + '</td>' +
+      '<td class="c" style="color:#1565c0;font-weight:600;cursor:pointer" onclick="correiosGoSub(\'romaneios\');setTimeout(function(){correiosAbrirRomaneio(\''+crmEsc(env.romaneio_id)+'\')},100)">' + crmEsc(env.romaneio_numero) + '</td>' +
+      '<td>' + dataFmt + '</td>' +
+    '</tr>';
+  }).join('');
+
+  sp.innerHTML =
+    '<div class="correios-lista-wrap">' +
+      '<div class="correios-lista-head">' +
+        '<span>Total: ' + cor.enviadosList.length + ' envio' + (cor.enviadosList.length > 1 ? 's' : '') +
+          (filtroVal ? ' (' + enviados.length + ' filtrado' + (enviados.length > 1 ? 's' : '') + ')' : '') +
+        '</span>' +
+        '<button class="correios-link-btn" onclick="window.CORREIOS.enviadosList=null;correiosRenderEnviados()">Atualizar</button>' +
+      '</div>' +
+      '<div style="margin-bottom:10px">' +
+        '<input type="text" id="'+filtroId+'" placeholder="Buscar por rastreio, pedido, nome ou romaneio..." ' +
+          'value="'+crmEsc(filtroVal)+'" ' +
+          'oninput="correiosRenderEnviados()" ' +
+          'style="width:100%;padding:8px 12px;border:1px solid var(--brd);border-radius:6px;font-size:13px;background:var(--bg)" />' +
+      '</div>' +
+      '<div style="overflow-x:auto">' +
+      '<table class="correios-table">' +
+        '<thead><tr>' +
+          '<th style="width:170px">Codigo Rastreio</th>' +
+          '<th style="width:80px">Pedido</th>' +
+          '<th>Destinatario</th>' +
+          '<th style="width:56px">Empr.</th>' +
+          '<th style="width:70px">Romaneio</th>' +
+          '<th style="width:90px">Data</th>' +
+        '</tr></thead>' +
+        '<tbody>' + linhas + '</tbody>' +
+      '</table></div>' +
+    '</div>';
+
+  // Preserva posicao do cursor no filtro
+  if (filtroVal) {
+    var inp = document.getElementById(filtroId);
+    if (inp) { inp.focus(); inp.setSelectionRange(filtroVal.length, filtroVal.length); }
   }
 }
 
@@ -10476,6 +10723,29 @@ window.addEventListener('load', function(){
   background: #1565c0 !important; box-shadow: 0 4px 12px #1565c033;
 }
 .correios-btn-gerar:hover { background: #0d47a1 !important; }
+
+/* ── Correios sub-abas ── */
+.correios-subtabs {
+  display: flex; gap: 4px; margin-bottom: 18px;
+  border-bottom: 2px solid var(--bd); padding-bottom: 0;
+}
+.correios-stab {
+  background: none; border: none; border-bottom: 3px solid transparent;
+  padding: 9px 18px; font-size: 13.5px; font-weight: 600;
+  color: var(--gy); cursor: pointer; transition: all .18s;
+  margin-bottom: -2px;
+}
+.correios-stab:hover { color: #1565c0; }
+.correios-stab.on {
+  color: #1565c0; border-bottom-color: #1565c0;
+}
+.correios-btn-ver {
+  background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb;
+  border-radius: 6px; padding: 4px 12px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.correios-btn-ver:hover { background: #bbdefb; }
+.correios-rom-row:hover td { background: #f0f7ff !important; }
 
 /* ═════ SOLICITAÇÕES — hub de tarefas + barra vermelha ═════ */
 @keyframes solicBarraPulso {
