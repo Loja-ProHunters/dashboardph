@@ -9027,9 +9027,9 @@ function ctrlRenderCorreios(){
     '</div></div>';
   }
 
-  // ── Tabela de resultados (depois da busca) ──
+  // ── Tabela de resultados (depois da busca OU itens manuais) ──
   var resultHtml = '';
-  if (cor.buscaFeita && cor.itens.length > 0) {
+  if (cor.itens.length > 0) {
     var linhas = cor.itens.map(function(item, i){
       var empChip = item.empresa === 'prohunters'
         ? '<span class="correios-emp ph">PH</span>'
@@ -9076,29 +9076,28 @@ function ctrlRenderCorreios(){
       '</div>';
   }
 
-  // ── Ações pós-busca ──
+  // ── Ações (gerar romaneio / nova bipagem) ──
   var acoes = '';
-  if (cor.buscaFeita && !cor.gerandoRom && !cor.buscando) {
-    var btns = '';
-    if (totalOk > 0) {
-      btns += '<button class="ctrl-btn-primary correios-btn-gerar" onclick="correiosGerarRomaneio()">' +
+  if (totalOk > 0 && !cor.gerandoRom && !cor.buscando) {
+    var btns = '<button class="ctrl-btn-primary correios-btn-gerar" onclick="correiosGerarRomaneio()">' +
         '📄 Gerar Romaneio ('+totalOk+' envio'+(totalOk>1?'s':'')+')' +
       '</button>';
+    if (cor.buscaFeita || cor.itens.length > 0) {
+      btns += '<button class="ctrl-btn-outline" onclick="correiosNovaBipagem()" style="margin-left:8px">' +
+        '🔄 Nova bipagem' +
+      '</button>';
     }
-    btns += '<button class="ctrl-btn-outline" onclick="correiosNovaBipagem()" style="margin-left:8px">' +
-      '🔄 Nova bipagem' +
-    '</button>';
     acoes = '<div class="correios-acoes">'+btns+'</div>';
   } else if (cor.gerandoRom) {
     acoes = '<div class="correios-acoes"><div class="crm-loading">Gerando romaneio…</div></div>';
   }
 
-  // ── Scanner (só aparece antes da busca ou durante nova bipagem) ──
+  // ── Scanner + entrada manual (só aparece antes da busca) ──
   var scannerHtml = '';
   if (!cor.buscaFeita && !cor.buscando) {
     scannerHtml =
       '<div class="correios-scanner-wrap">' +
-        '<label class="correios-scanner-label">Código de rastreio</label>' +
+        '<label class="correios-scanner-label">Bipagem automática — leitor de código de barras</label>' +
         '<div class="correios-scanner-row">' +
           '<input type="text" id="correios-input" class="correios-scanner-input" ' +
             'placeholder="Bipe ou digite o código (ex: AP640299478BR)" ' +
@@ -9109,6 +9108,33 @@ function ctrlRenderCorreios(){
           '</button>' +
         '</div>' +
         '<div id="correios-feedback" class="correios-feedback"></div>' +
+      '</div>' +
+      '<div class="correios-manual-divider"><span>ou</span></div>' +
+      '<div class="correios-manual-wrap">' +
+        '<label class="correios-scanner-label">Entrada manual — preencha os dados</label>' +
+        '<div class="correios-manual-grid">' +
+          '<div class="correios-manual-fld">' +
+            '<label>Código de rastreio</label>' +
+            '<input type="text" id="correios-m-rastreio" placeholder="Ex: AP640299478BR" autocomplete="off" spellcheck="false" />' +
+          '</div>' +
+          '<div class="correios-manual-fld">' +
+            '<label>Nº do pedido</label>' +
+            '<input type="text" id="correios-m-pedido" placeholder="Ex: 27269" autocomplete="off" />' +
+          '</div>' +
+          '<div class="correios-manual-fld">' +
+            '<label>Destinatário</label>' +
+            '<input type="text" id="correios-m-nome" placeholder="Nome do cliente" autocomplete="off" />' +
+          '</div>' +
+          '<div class="correios-manual-fld">' +
+            '<label>Empresa</label>' +
+            '<select id="correios-m-empresa">' +
+              '<option value="prohunters">Pro Hunters</option>' +
+              '<option value="calibre">Calibre Restrito</option>' +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+        '<button class="ctrl-btn-primary correios-btn-manual" onclick="correiosAdicionarManual()">➕ Adicionar manual</button>' +
+        '<div id="correios-feedback-manual" class="correios-feedback"></div>' +
       '</div>';
   }
 
@@ -9159,6 +9185,47 @@ function correiosAdicionarCodigo(){
   ctrlRenderCorreios();
 }
 
+// Adiciona item manual (já resolvido, pula a busca no Bling)
+function correiosAdicionarManual(){
+  var rastreio = (document.getElementById('correios-m-rastreio').value || '').trim().toUpperCase();
+  var pedido   = (document.getElementById('correios-m-pedido').value || '').trim();
+  var nome     = (document.getElementById('correios-m-nome').value || '').trim();
+  var empresa  = document.getElementById('correios-m-empresa').value;
+  var fb = document.getElementById('correios-feedback-manual');
+
+  if (!rastreio) { if (fb) fb.innerHTML = '<span style="color:var(--r)">Preencha o código de rastreio</span>'; return; }
+  if (!pedido)   { if (fb) fb.innerHTML = '<span style="color:var(--r)">Preencha o número do pedido</span>'; return; }
+  if (!nome)     { if (fb) fb.innerHTML = '<span style="color:var(--r)">Preencha o destinatário</span>'; return; }
+
+  // Verifica duplicata no código
+  var jaExisteCod = window.CORREIOS.codigos.indexOf(rastreio) !== -1;
+  var jaExisteItem = window.CORREIOS.itens.some(function(x){ return x.codigo_rastreio === rastreio; });
+  if (jaExisteCod || jaExisteItem) {
+    if (fb) fb.innerHTML = '<span style="color:#a06210">⚠ Código <b>'+crmEsc(rastreio)+'</b> já está na lista</span>';
+    return;
+  }
+
+  // Adiciona direto nos itens resolvidos (status ok)
+  window.CORREIOS.itens.push({
+    codigo_rastreio: rastreio,
+    pedido_numero: pedido,
+    pedido_id: '',
+    cliente_nome: nome,
+    empresa: empresa,
+    empresa_label: empresa === 'calibre' ? 'Calibre' : 'Pro Hunters',
+    status: 'ok',
+    erro: '',
+    manual: true
+  });
+
+  // Limpa campos
+  document.getElementById('correios-m-rastreio').value = '';
+  document.getElementById('correios-m-pedido').value = '';
+  document.getElementById('correios-m-nome').value = '';
+  if (fb) fb.innerHTML = '<span style="color:var(--gd)">✓ <b>'+crmEsc(rastreio)+'</b> — pedido '+crmEsc(pedido)+' adicionado manualmente</span>';
+  ctrlRenderCorreios();
+}
+
 function correiosRemoverCodigo(idx){
   window.CORREIOS.codigos.splice(idx, 1);
   ctrlRenderCorreios();
@@ -9176,7 +9243,9 @@ async function correiosBuscarTodos(){
   if (!codigos.length) return;
 
   window.CORREIOS.buscando = true;
-  window.CORREIOS.itens = [];
+  // Preserva itens manuais já adicionados
+  var manuaisExistentes = window.CORREIOS.itens.filter(function(x){ return x.manual; });
+  window.CORREIOS.itens = manuaisExistentes;
   ctrlRenderCorreios();
 
   var total = codigos.length;
@@ -10336,6 +10405,39 @@ window.addEventListener('load', function(){
   background: #1565c0 !important; box-shadow: 0 4px 12px #1565c033;
 }
 .correios-btn-buscar:hover { background: #0d47a1 !important; }
+.correios-manual-divider {
+  display: flex; align-items: center; gap: 14px;
+  margin: 14px 0; color: var(--gy); font-size: 12px; font-weight: 600;
+}
+.correios-manual-divider::before,
+.correios-manual-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--bd);
+}
+.correios-manual-wrap {
+  padding: 16px; background: #fafbfc; border: 1px dashed var(--bd);
+  border-radius: var(--r-sm); margin-bottom: 16px;
+}
+.correios-manual-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;
+}
+@media (max-width: 640px) { .correios-manual-grid { grid-template-columns: 1fr; } }
+.correios-manual-fld label {
+  display: block; font-size: 11px; font-weight: 600; color: var(--gy);
+  margin-bottom: 4px; text-transform: uppercase; letter-spacing: .3px;
+}
+.correios-manual-fld input,
+.correios-manual-fld select {
+  width: 100%; padding: 9px 12px; font-size: 13px; border: 1px solid var(--bd);
+  border-radius: var(--r-sm); background: var(--wh); color: var(--dk);
+  transition: border-color .2s;
+}
+.correios-manual-fld input:focus,
+.correios-manual-fld select:focus { border-color: #1565c0; outline: none; box-shadow: 0 0 0 3px #1565c020; }
+.correios-btn-manual {
+  background: #1565c0 !important; font-size: 13px !important;
+  padding: 9px 18px !important;
+}
+.correios-btn-manual:hover { background: #0d47a1 !important; }
 .correios-acoes { margin-top: 16px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .correios-btn-gerar {
   font-size: 14px !important; padding: 12px 24px !important;
