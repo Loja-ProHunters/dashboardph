@@ -4146,6 +4146,273 @@ module.exports = async (req, res) => {
   }
 
   // ═════════════════════════════════════════════════════════════
+  // ROMANEIO CORREIOS — bipa rastreio, busca pedido no Bling, gera romaneio
+  // ═════════════════════════════════════════════════════════════
+
+  // POST /api/crm/correios/buscar-rastreio
+  // Body: { codigo: "AP640299478BR" }
+  // Busca o pedido no Bling (ambas contas) que contenha esse código de rastreio.
+  if (req.method === 'POST' && url === '/api/crm/correios/buscar-rastreio') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      const { codigo } = JSON.parse(body || '{}');
+      if (!codigo || String(codigo).trim().length < 5) {
+        res.writeHead(400,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Código de rastreio inválido'}));
+        return;
+      }
+      const cod = String(codigo).trim().toUpperCase();
+
+      // Busca nas 2 contas Bling (prohunters + calibre)
+      const contas = ['prohunters', 'calibre'];
+      let resultado = null;
+
+      for (const conta of contas) {
+        try {
+          // Verifica se a conta está ativa
+          const cfg = (config.blingContas || {})[conta];
+          if (!cfg || !cfg.ativa) continue;
+
+          // Busca pedidos recentes (últimos 90 dias) paginando
+          const dataLimite = new Date();
+          dataLimite.setDate(dataLimite.getDate() - 90);
+          const dataInicial = dataLimite.toISOString().slice(0, 10);
+          const dataFinal = new Date().toISOString().slice(0, 10);
+
+          let pagina = 1;
+          const maxPaginas = 10; // segurança: máximo 10 páginas (1000 pedidos)
+
+          while (pagina <= maxPaginas && !resultado) {
+            const listaResp = await blingApi.get('/pedidos/vendas', {
+              dataInicial, dataFinal, limite: 100, pagina,
+            }, conta);
+            const lista = (listaResp && listaResp.data) || [];
+            if (!lista.length) break;
+
+            // Para cada pedido da página, busca detalhe e verifica tracking
+            for (const p of lista) {
+              try {
+                const det = await blingApi.get('/pedidos/vendas/' + p.id, null, conta);
+                const pedido = det.data || det;
+                const transporte = pedido.transporte || {};
+                const volumes = transporte.volumes || [];
+
+                // Verifica tracking em cada volume
+                for (const vol of volumes) {
+                  const tracking = String(vol.codigoRastreamento || vol.etiqueta || vol.codigo || '').trim().toUpperCase();
+                  if (tracking === cod) {
+                    const contato = pedido.contato || {};
+                    resultado = {
+                      encontrado: true,
+                      codigo_rastreio: cod,
+                      pedido_numero: String(pedido.numero || p.numero || ''),
+                      pedido_id: String(pedido.id || p.id || ''),
+                      cliente_nome: contato.nome || contato.razao || 'Sem nome',
+                      empresa: conta,
+                      empresa_label: conta === 'calibre' ? 'Calibre' : 'Pro Hunters',
+                    };
+                    break;
+                  }
+                }
+                if (resultado) break;
+
+                // Verifica também na etiqueta do transporte (campo legado)
+                if (!resultado) {
+                  const etiquetaGeral = String(transporte.etiqueta || '').trim().toUpperCase();
+                  if (etiquetaGeral === cod) {
+                    const contato = pedido.contato || {};
+                    resultado = {
+                      encontrado: true,
+                      codigo_rastreio: cod,
+                      pedido_numero: String(pedido.numero || p.numero || ''),
+                      pedido_id: String(pedido.id || p.id || ''),
+                      cliente_nome: contato.nome || contato.razao || 'Sem nome',
+                      empresa: conta,
+                      empresa_label: conta === 'calibre' ? 'Calibre' : 'Pro Hunters',
+                    };
+                  }
+                }
+                if (resultado) break;
+
+                // Verifica no JSON inteiro (fallback — caso o campo tenha nome diferente)
+                if (!resultado) {
+                  const json = JSON.stringify(pedido);
+                  if (json.includes(cod)) {
+                    const contato = pedido.contato || {};
+                    resultado = {
+                      encontrado: true,
+                      codigo_rastreio: cod,
+                      pedido_numero: String(pedido.numero || p.numero || ''),
+                      pedido_id: String(pedido.id || p.id || ''),
+                      cliente_nome: contato.nome || contato.razao || 'Sem nome',
+                      empresa: conta,
+                      empresa_label: conta === 'calibre' ? 'Calibre' : 'Pro Hunters',
+                    };
+                  }
+                }
+                if (resultado) break;
+              } catch (detErr) {
+                // Ignora erro no detalhe de um pedido específico
+                continue;
+              }
+            }
+            pagina++;
+          }
+          if (resultado) break;
+        } catch (contaErr) {
+          // Conta pode não ter token válido — segue pra próxima
+          console.warn('[Correios] Erro buscando na conta ' + conta + ':', contaErr.message);
+          continue;
+        }
+      }
+
+      if (resultado) {
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify(resultado));
+      } else {
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ encontrado: false, codigo_rastreio: cod, erro: 'Código não encontrado nos pedidos dos últimos 90 dias' }));
+      }
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error: e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/correios/romaneio-pdf?data=<JSON>
+  // Gera HTML print-ready do romaneio de Correios.
+  // Query param data: JSON array de itens [{codigo_rastreio, pedido_numero, cliente_nome, empresa, empresa_label}]
+  if (req.method === 'POST' && url === '/api/crm/correios/gerar-romaneio-pdf') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'text/html'}); res.end('<h2>Sem acesso</h2>'); return; }
+    try {
+      const body = await readBody(req);
+      const { itens } = JSON.parse(body || '{}');
+      if (!Array.isArray(itens) || !itens.length) {
+        res.writeHead(400,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Nenhum item para o romaneio'}));
+        return;
+      }
+
+      // Número sequencial do romaneio Correios (separado dos romaneios de transportadora)
+      const ano = new Date().getFullYear();
+      const allCorreios = await crmStore.getCollection('romaneios_correios');
+      const doAno = Object.values(allCorreios || {}).filter(r => String(r.data || '').startsWith(String(ano)));
+      const numero = String(doAno.length + 1).padStart(4, '0');
+      const data = new Date().toISOString().slice(0, 10);
+      const id = 'rcor_' + data.replace(/-/g, '') + '_' + numero;
+
+      // Salva o romaneio no CRM
+      const romDoc = {
+        id,
+        numero,
+        data,
+        tipo: 'correios',
+        itens: itens.map(function(it) {
+          return {
+            codigo_rastreio: it.codigo_rastreio,
+            pedido_numero: it.pedido_numero,
+            cliente_nome: it.cliente_nome,
+            empresa: it.empresa,
+            empresa_label: it.empresa_label,
+          };
+        }),
+        total_itens: itens.length,
+        gerado_por: sess.usuario,
+        criado_em: new Date().toISOString(),
+      };
+      await crmStore.createDoc('romaneios_correios', romDoc, sess.usuario);
+
+      // Gera HTML PDF
+      const _esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      const dataFmt = data.split('-').reverse().join('/');
+
+      const linhas = itens.map(function(it, i) {
+        const empTag = it.empresa === 'calibre' ? 'CR' : 'PH';
+        return '<tr>' +
+          '<td class="c">' + (i + 1) + '</td>' +
+          '<td>' + _esc(it.pedido_numero) + '</td>' +
+          '<td>' + _esc(empTag) + '</td>' +
+          '<td>' + _esc(it.cliente_nome) + '</td>' +
+          '<td style="font-family:monospace;font-size:11px">' + _esc(it.codigo_rastreio) + '</td>' +
+          '</tr>';
+      }).join('');
+
+      const html = '<!doctype html>' +
+      '<html><head><meta charset="utf-8">' +
+      '<title>Romaneio Correios ' + _esc(numero) + '/' + ano + '</title>' +
+      '<style>' +
+        '* { box-sizing: border-box; }' +
+        'body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #111; padding: 20px 26px; margin: 0; }' +
+        '.hd { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 2px solid #1565c0; padding-bottom: 10px; }' +
+        '.hd .l { max-width: 65%; }' +
+        '.hd .r { text-align: right; }' +
+        'h1 { margin: 0 0 4px; font-size: 18px; color: #1565c0; font-weight: 700; }' +
+        '.sub { font-size: 12px; color: #444; }' +
+        '.meta { font-size: 11.5px; color: #555; margin-top: 4px; }' +
+        '.meta b { color: #111; }' +
+        'table { width: 100%; border-collapse: collapse; margin-top: 8px; }' +
+        'th { background: #1565c0; color: #fff; padding: 7px 6px; text-align: left; font-size: 11px; font-weight: 700; border: 1px solid #1565c0; }' +
+        'td { padding: 6px 6px; border: 1px solid #d0d0d0; font-size: 11.5px; vertical-align: top; }' +
+        '.c { text-align: center; }' +
+        'tr:nth-child(even) td { background: #fafafa; }' +
+        '.total-row td { background: #e3f2fd; font-weight: 700; border-top: 2px solid #1565c0; }' +
+        '.foot { margin-top: 22px; padding-top: 10px; border-top: 1px dashed #999; font-size: 10px; color: #777; display: flex; justify-content: space-between; }' +
+        '@media print { body { padding: 12mm; } .no-print { display: none !important; } }' +
+        '.no-print { position: fixed; top: 10px; right: 10px; }' +
+        '.btn-print { background: #1565c0; color: #fff; border: 0; border-radius: 6px; padding: 10px 16px; cursor: pointer; font-size: 13px; font-weight: 700; box-shadow: 0 4px 10px rgba(0,0,0,.15); }' +
+      '</style></head><body>' +
+        '<div class="no-print"><button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button></div>' +
+        '<div class="hd">' +
+          '<div class="l">' +
+            '<h1>📮 Romaneio Correios</h1>' +
+            '<div class="sub">Pro Hunters + Calibre Restrito</div>' +
+            '<div class="meta">Transportadora: <b>Correios — Empresa Brasileira de Correios e Telégrafos</b></div>' +
+          '</div>' +
+          '<div class="r">' +
+            '<div style="font-size:20px;font-weight:700;color:#1565c0">Nº ' + _esc(numero) + '</div>' +
+            '<div class="meta">Emitido em <b>' + dataFmt + '</b></div>' +
+            '<div class="meta">Gerado por: ' + _esc(sess.usuario) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<table>' +
+          '<thead><tr>' +
+            '<th style="width:32px">#</th>' +
+            '<th style="width:80px">Pedido</th>' +
+            '<th style="width:50px">Empr.</th>' +
+            '<th>Destinatário</th>' +
+            '<th style="width:180px">Código de Rastreio</th>' +
+          '</tr></thead>' +
+          '<tbody>' + linhas +
+            '<tr class="total-row">' +
+              '<td class="c" colspan="4" style="text-align:right">TOTAL DE OBJETOS</td>' +
+              '<td class="c">' + itens.length + '</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
+        '<div style="margin-top:30px;padding:14px 18px;border:1px solid #999;border-radius:6px;background:#f9f9f9;font-size:12.5px;line-height:1.9">' +
+          '<div style="line-height:2.4;letter-spacing:.3px">Conferido por: __________________________________________________________</div>' +
+          '<div style="line-height:2.4;letter-spacing:.3px">Data: ____/____/______ · Assinatura: ________________________________________________</div>' +
+        '</div>' +
+        '<div class="foot">' +
+          '<div>Sistema Pro Hunters CRM · Documento gerado eletronicamente</div>' +
+          '<div>Romaneio Correios ' + _esc(id) + '</div>' +
+        '</div>' +
+      '</body></html>';
+
+      res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});
+      res.end(html);
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'text/html'});
+      res.end('<h2>Erro: ' + String(e.message).replace(/</g,'&lt;') + '</h2>');
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
   // Bling — OAuth 2.0 (integração com API v3)
   // ═════════════════════════════════════════════════════════════
 
