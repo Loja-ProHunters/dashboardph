@@ -2568,6 +2568,24 @@ module.exports = async (req, res) => {
           }
         }
       }
+      // Conta follow-ups por account_id pra mostrar "Tentativa X de 3" no front
+      const MAX_FOLLOWUPS_CLIENTE = 3;
+      const followCountPorAcc = {};
+      if (tarefas.length) {
+        const allActs = await crmStore.listDocs('activities', a =>
+          a.fonte === 'follow_up' && (a.status === 'pendente' || a.resultado === 'follow_up_agendado'));
+        for (const a of allActs) {
+          const aid = a.account_id || a.entidade_id;
+          if (aid) followCountPorAcc[aid] = (followCountPorAcc[aid] || 0) + 1;
+        }
+      }
+      for (const t of tarefas) {
+        const aid = t.account_id || t.entidade_id;
+        if (aid && followCountPorAcc[aid]) {
+          t.followups_cliente = followCountPorAcc[aid];
+          t.followups_max = MAX_FOLLOWUPS_CLIENTE;
+        }
+      }
       // Acumulo: ha quantos dias cada tarefa esta aberta (dia BRT). Tarefa de
       // dia anterior NAO some — fica na fila marcada como "acumulada".
       const hojeBRT = disciplina.hojeBRT();
@@ -2906,6 +2924,25 @@ module.exports = async (req, res) => {
       const now = new Date().toISOString();
       const dono = donoTarefa || meuLogin;
       const accId = t.account_id || t.entidade_id || null;
+      // ── Limite de 3 follow-ups por cliente ──
+      // Conta quantos follow-ups (pendentes + concluídos com resultado follow_up_agendado)
+      // já existem para o mesmo account_id. Na 4ª tentativa, bloqueia.
+      const MAX_FOLLOWUPS = 3;
+      if (accId) {
+        const followsPrevios = await crmStore.listDocs('activities', a =>
+          a.fonte === 'follow_up' &&
+          (a.account_id || a.entidade_id) === accId &&
+          (a.status === 'pendente' || a.resultado === 'follow_up_agendado'));
+        if (followsPrevios.length >= MAX_FOLLOWUPS) {
+          res.writeHead(400,{'Content-Type':'application/json'});
+          res.end(JSON.stringify({
+            error: 'Limite de ' + MAX_FOLLOWUPS + ' follow-ups atingido para este cliente. Finalize como "Não convertido" — o cliente voltará automaticamente pelo motor de reativação em 30-60 dias.',
+            limite_atingido: true,
+            total_followups: followsPrevios.length
+          }));
+          return;
+        }
+      }
       // Nome do cliente pro titulo (busca o account; se nao achar usa o titulo antigo)
       let nomeCliente = null;
       if (accId) { try { const acc = await crmStore.getDoc('accounts', accId); if (acc) nomeCliente = acc.nome || acc.razao_social; } catch(_){} }
