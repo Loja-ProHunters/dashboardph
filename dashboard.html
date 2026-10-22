@@ -6575,9 +6575,12 @@ async function crmAtualizaContadorTarefas(){
     if (!r.ok) return;
     var d = await r.json();
     var hoje = new Date().toISOString().slice(0,10);
-    var overdue = (d.tarefas||[]).filter(function(t){ return t.prazo && t.prazo < hoje; }).length;
-    window.CRM.tarefasCount = d.total || 0;
+    // Badge mostra só tarefas VISÍVEIS (exclui follow-ups futuros)
+    var visiveis = (d.tarefas||[]).filter(function(t){ return !t.agendada_futura; });
+    var overdue = visiveis.filter(function(t){ return t.prazo && t.prazo < hoje; }).length;
+    window.CRM.tarefasCount = visiveis.length;
     window.CRM.tarefasOverdue = overdue;
+    window.CRM.tarefasAgendadas = (d.tarefas||[]).filter(function(t){ return !!t.agendada_futura; }).length;
     crmRenderSubTabs();
   } catch(e){}
 }
@@ -6613,7 +6616,10 @@ async function crmRenderTarefas(){
     var resumo = (await pR) || {};
     window.CRM.tarefasCache = tarefas;
     window.CRM.contratosCards = contratos;
-    window.CRM.tarefasCount = tarefas.length + contratos.length;
+    // Badge mostra só tarefas VISÍVEIS (exclui follow-ups futuros)
+    var visiveisCount = tarefas.filter(function(t){ return !t.agendada_futura; }).length;
+    window.CRM.tarefasCount = visiveisCount + contratos.length;
+    window.CRM.tarefasAgendadas = tarefas.filter(function(t){ return !!t.agendada_futura; }).length;
     var agora = tqAgoraBRT();
     window.CRM.tarefasOverdue = tarefas.filter(function(t){ var l = tqLimite(t); return l && l < agora; }).length + contratos.filter(function(c){ return c.atrasado; }).length;
     TQ.dados = { tarefas: tarefas, contratos: contratos, resumo: resumo };
@@ -6652,7 +6658,9 @@ function tqDesenhar(){
   var nHoje = tarefasVisiveis.length - nAnt;
   var feitas = rs.executadas_hoje || 0, meta = rs.cota_dia || 0;
   var total = tarefasVisiveis.length + D.contratos.length;
-  var h = '<div class="tq-head"><div class="tq-head-l"><h3>' + (total ? total + ' para fazer' : 'Fila em dia') + '</h3>' +
+  var nAgendadas = D.tarefas.filter(function(t){ return !!t.agendada_futura; }).length;
+  var agendadasTag = nAgendadas > 0 ? '<span class="tq-agendadas">📅 ' + nAgendadas + ' agendada' + (nAgendadas > 1 ? 's' : '') + '</span>' : '';
+  var h = '<div class="tq-head"><div class="tq-head-l"><h3>' + (total ? total + ' para fazer' : 'Fila em dia') + agendadasTag + '</h3>' +
     (meta ? '<div class="tq-prog"><span>Feitas hoje <b>' + feitas + '</b> de ' + meta + '</span><i><b style="width:' + Math.min(100, Math.round(feitas / meta * 100)) + '%"></b></i></div>' : '') + '</div>' +
     '<button class="tq-btn-sec" onclick="crmAbrirModalNovaTarefa()">+ Nova tarefa</button></div>';
   var fs = [['todas', 'Tudo', total], ['contratos', '📝 Contratos', D.contratos.length], ['vencidas', 'Vencidas', nVenc], ['antigas', 'Antigas', nAnt], ['hoje', 'De hoje', nHoje]];
@@ -7025,12 +7033,32 @@ function crmAbrirFollowUp(id){
   var t = cache.find(function(x){ return x.id === id; }) || {};
   var nome = t.cliente_nome || 'cliente';
   var descAtual = t.descricao || t.titulo || '';
+  var fuCount = t.followups_cliente || 0;
+  var fuMax = t.followups_max || 3;
+  var fuAtual = fuCount + 1; // esta seria a próxima tentativa
+  // Se já atingiu o limite, mostra aviso e bloqueia
+  if (fuCount >= fuMax) {
+    var htmlBlock = '<div id="crm-mdl-followup" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10055;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)crmFecharFollowUp()">' +
+      '<div style="background:#fff;border-radius:12px;max-width:460px;width:100%;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,.3);text-align:center">' +
+        '<div style="font-size:36px;margin-bottom:8px">🔄</div>' +
+        '<h3 style="margin:0 0 8px;color:#c62828">Limite de follow-ups atingido</h3>' +
+        '<p style="font-size:13px;color:#555;margin:0 0 16px">Você já reagendou <b>' + fuCount + ' vez' + (fuCount > 1 ? 'es' : '') + '</b> para <b>' + crmEsc(nome) + '</b>.<br><br>' +
+          'Finalize como <b>"Não convertido"</b> com o motivo adequado. O cliente voltará automaticamente pelo motor de reativação em 30-60 dias.</p>' +
+        '<button onclick="crmFecharFollowUp()" style="background:#0e6bd4;color:#fff;border:none;border-radius:6px;padding:10px 22px;font-weight:700;cursor:pointer">Entendi</button>' +
+      '</div></div>';
+    document.body.insertAdjacentHTML('beforeend', htmlBlock);
+    return;
+  }
   // Default: amanhã
   var amanha = new Date(Date.now() + 86400000).toISOString().slice(0,10);
   var hojeStr = new Date().toISOString().slice(0,10);
+  var fuTag = fuCount > 0
+    ? '<span style="display:inline-block;margin-left:8px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;' +
+        (fuAtual >= fuMax ? 'background:#fff3e0;color:#e65100' : 'background:#e3f2fd;color:#1565c0') + '">Tentativa ' + fuAtual + ' de ' + fuMax + '</span>'
+    : '';
   var html = '<div id="crm-mdl-followup" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10055;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)crmFecharFollowUp()">' +
     '<div style="background:#fff;border-radius:12px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,.3)">' +
-      '<h3 style="margin:0 0 4px;color:#0e6bd4">📅 Agendar follow-up</h3>' +
+      '<h3 style="margin:0 0 4px;color:#0e6bd4">📅 Agendar follow-up' + fuTag + '</h3>' +
       '<p style="margin:0 0 16px;font-size:12.5px;color:#7b8285">Cliente: <b>' + crmEsc(nome) + '</b><br>Isso conclui a tarefa atual e cria uma nova pra data escolhida.</p>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">' +
         '<div>' +
@@ -13446,7 +13474,8 @@ async function cartSalvarNotas(id){
 <style>
 /* ── Minhas Tarefas v4 (lista enxuta) ─────────────────── */
 #tab-crm .tq-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:2px 0 12px;flex-wrap:wrap}
-#tab-crm .tq-head h3{margin:0;font-size:18px;color:#111412}
+#tab-crm .tq-head h3{margin:0;font-size:18px;color:#111412;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#tab-crm .tq-agendadas{font-size:12px;font-weight:600;color:#6d6b66;background:#f5f3ee;border:1px solid #e7e5e0;border-radius:20px;padding:3px 10px;white-space:nowrap}
 #tab-crm .tq-prog{display:flex;align-items:center;gap:10px;margin-top:4px;font-size:12.5px;color:#52514e}
 #tab-crm .tq-prog i{display:block;width:140px;height:6px;background:#e7ebe7;border-radius:4px;overflow:hidden}
 #tab-crm .tq-prog i b{display:block;height:100%;background:#3d8a49;border-radius:4px}
