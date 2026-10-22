@@ -1737,7 +1737,7 @@ module.exports = async (req, res) => {
       && crmMatch[1] !== 'coocorrencia' && crmMatch[1] !== 'sugerir' && crmMatch[1] !== 'tarefas' && crmMatch[1] !== 'ficha'
       && crmMatch[1] !== 'catalogo' && crmMatch[1] !== 'prospeccao' && crmMatch[1] !== 'vendedores' && crmMatch[1] !== 'bling'
       && crmMatch[1] !== 'frete' && crmMatch[1] !== 'envios' && crmMatch[1] !== 'controlado' && crmMatch[1] !== 'romaneios'
-      && crmMatch[1] !== 'carteira' && crmMatch[1] !== 'contratos') {
+      && crmMatch[1] !== 'carteira' && crmMatch[1] !== 'contratos' && crmMatch[1] !== 'correios') {
     const colName = crmMatch[1];
     const docId = crmMatch[2] || null;
     const reg = crmColl.REGISTRY[colName];
