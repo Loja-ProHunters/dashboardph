@@ -8205,6 +8205,11 @@ async function ctrlAbrirDetalhe(id){
     window.CTRL.envioAberto = d.envio;
     window.CTRL.envioChecklist = d.checklist;
     ctrlRenderFilaLista();
+    // Re-render enviados list too (highlights selected row)
+    if (window.CTRL.subtab === 'enviados') {
+      var qInput = document.getElementById('ctrl-env-q');
+      ctrlEnviadosCarregar(qInput ? qInput.value : '');
+    }
     ctrlRenderDetalhe();
   } catch (e) {
     det.innerHTML = '<div style="color:var(--r);font-size:12px">Erro: '+crmEsc(e.message)+'</div>';
@@ -8618,11 +8623,14 @@ async function ctrlRenderEnviados(){
   var p = document.getElementById('ctrl-panel');
   p.innerHTML =
     '<div class="ctrl-card">' +
-      '<div class="ctrl-card-head"><span class="ctrl-card-ic">✅</span><div><h3>Controlados enviados</h3><div class="ctrl-card-sub">Envios coletados pelo motorista. Use aqui pra atualizar o cliente sobre a coleta.</div></div></div>' +
+      '<div class="ctrl-card-head"><span class="ctrl-card-ic">✅</span><div><h3>Controlados enviados</h3><div class="ctrl-card-sub">Envios coletados pelo motorista. Clique num envio pra ver os detalhes completos.</div></div></div>' +
       '<div class="ctrl-fld" style="max-width:420px"><label>🔎 Buscar (cliente, CPF, nº pedido, cidade, NF)</label>' +
         '<input id="ctrl-env-q" type="text" placeholder="Digite pra filtrar…" oninput="ctrlEnviadosCarregar(this.value)"/></div>' +
     '</div>' +
-    '<div id="ctrl-enviados-list"><div class="crm-loading" style="padding:20px">Carregando…</div></div>' +
+    '<div class="ctrl-fila-layout ctrl-env-layout">' +
+      '<div id="ctrl-enviados-list"><div class="crm-loading" style="padding:20px">Carregando…</div></div>' +
+      '<div id="ctrl-fila-detail" class="ctrl-card" style="color:var(--gy);font-size:13px">Clique num envio à esquerda pra ver o checklist e detalhes.</div>' +
+    '</div>' +
     '<div id="ctrl-romaneios-lista"></div>';
   await ctrlEnviadosCarregar('');
   ctrlRomaneiosCarregar();
@@ -8637,6 +8645,7 @@ async function ctrlEnviadosCarregar(q){
       box.innerHTML = '<div class="ctrl-card" style="text-align:center;padding:34px;color:var(--gy);font-size:13px">Nenhum envio coletado ainda.</div>';
       return;
     }
+    var aberto = window.CTRL.envioAberto && window.CTRL.envioAberto.id;
     box.innerHTML = '<div class="ctrl-card"><h3 style="margin-bottom:10px">✅ '+lista.length+' envio'+(lista.length>1?'s':'')+' coletado'+(lista.length>1?'s':'')+'</h3>' +
       lista.map(function(e){
         var empCorCls = e.empresa === 'calibre' ? 'b-cr' : 'b-ph';
@@ -8647,7 +8656,8 @@ async function ctrlEnviadosCarregar(q){
           : '';
         var romaneio = e.romaneio_numero ? ' · Romaneio nº <b>'+crmEsc(e.romaneio_numero)+'</b>' : '';
         var cidUf = (e.cliente_cidade||'—') + '/' + (e.cliente_uf||'');
-        return '<div class="ctrl-enviado-row">' +
+        var isOpen = aberto === e.id;
+        return '<div class="ctrl-enviado-row'+(isOpen?' on':'')+'" onclick="ctrlAbrirDetalhe(\''+e.id+'\')">' +
           '<div class="ctrl-enviado-ic">✅</div>' +
           '<div class="ctrl-enviado-body">' +
             '<div style="font-weight:700;font-size:13.5px">'+crmEsc(e.cliente_nome||'—')+
@@ -9857,13 +9867,16 @@ window.addEventListener('load', function(){
 .ctrl-opt { color: var(--gl2); font-weight: 500; font-size: 10.5px; text-transform: none; letter-spacing: 0; }
 
 /* ═════ Enviados ═════ */
+.ctrl-env-layout{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+@media (max-width: 960px){.ctrl-env-layout{grid-template-columns:1fr}}
 .ctrl-enviado-row {
   display: grid; grid-template-columns: 40px 1fr; gap: 12px;
   padding: 12px; border-top: 1px solid var(--bd);
-  transition: background .18s var(--ez);
+  transition: background .18s var(--ez); cursor: pointer; border-radius: 6px;
 }
 .ctrl-enviado-row:first-child { border-top: 0; padding-top: 0; }
 .ctrl-enviado-row:hover { background: var(--bg); }
+.ctrl-enviado-row.on { background: var(--gl); border-left: 3px solid var(--gd); }
 .ctrl-enviado-ic {
   width: 36px; height: 36px; border-radius: 50%; background: var(--gl); color: var(--gd);
   display: flex; align-items: center; justify-content: center; font-size: 16px; margin-top: 2px;
