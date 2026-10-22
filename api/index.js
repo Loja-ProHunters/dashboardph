@@ -4403,11 +4403,11 @@ module.exports = async (req, res) => {
         '</div>' +
       '</body></html>';
 
-      res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});
-      res.end(html);
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ html: html, numero: numero }));
     } catch (e) {
-      res.writeHead(500,{'Content-Type':'text/html'});
-      res.end('<h2>Erro: ' + String(e.message).replace(/</g,'&lt;') + '</h2>');
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ error: e.message || 'Erro ao gerar romaneio' }));
     }
     return;
   }
