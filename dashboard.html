@@ -8977,30 +8977,69 @@ function crmFmtDateTime(s){
 
 /* ═══════════════════════════════════════════════════════════════
    CORREIOS — Scanner de rastreio + Romaneio de envio Correios
+   Fluxo: bipar acumula na lista → "Buscar no Bling" resolve tudo
    ═══════════════════════════════════════════════════════════════ */
 window.CORREIOS = window.CORREIOS || {
-  itens: [],       // { codigo_rastreio, pedido_numero, pedido_id, cliente_nome, empresa, empresa_label, status:'ok'|'erro', erro:'' }
+  codigos: [],     // strings de códigos bipados (ainda não buscados)
+  itens: [],       // resultado pós-busca: { codigo_rastreio, pedido_numero, pedido_id, cliente_nome, empresa, empresa_label, status:'ok'|'erro'|'buscando', erro:'' }
   buscando: false,
+  buscaFeita: false,  // true depois que clicou "Buscar"
   gerandoRom: false,
 };
 
 function ctrlRenderCorreios(){
   var p = document.getElementById('ctrl-panel');
   var cor = window.CORREIOS;
+  var totalCodigos = cor.codigos.length;
   var totalOk = cor.itens.filter(function(x){ return x.status === 'ok'; }).length;
+  var totalErro = cor.itens.filter(function(x){ return x.status === 'erro'; }).length;
 
-  var itensHtml = '';
-  if (cor.itens.length) {
+  // ── Lista de códigos bipados (antes da busca) ──
+  var codigosHtml = '';
+  if (totalCodigos > 0 && !cor.buscaFeita) {
+    var chips = cor.codigos.map(function(cod, i){
+      return '<div class="correios-chip">' +
+        '<code>'+crmEsc(cod)+'</code>' +
+        '<button class="correios-chip-rm" onclick="correiosRemoverCodigo('+i+')" title="Remover">✕</button>' +
+      '</div>';
+    }).join('');
+    codigosHtml =
+      '<div class="correios-codigos-wrap">' +
+        '<div class="correios-lista-head">' +
+          '<span>📋 '+totalCodigos+' código'+(totalCodigos>1?'s':'')+' bipado'+(totalCodigos>1?'s':'')+'</span>' +
+          '<button class="correios-link-btn" onclick="correiosLimparCodigos()">Limpar todos</button>' +
+        '</div>' +
+        '<div class="correios-chips">'+chips+'</div>' +
+      '</div>';
+  }
+
+  // ── Botão "Buscar no Bling" (aparece quando tem códigos e não buscou ainda) ──
+  var buscarBtn = '';
+  if (totalCodigos > 0 && !cor.buscaFeita && !cor.buscando) {
+    buscarBtn = '<div class="correios-acoes">' +
+      '<button class="ctrl-btn-primary correios-btn-buscar" onclick="correiosBuscarTodos()">' +
+        '🔍 Buscar no Bling ('+totalCodigos+' código'+(totalCodigos>1?'s':'')+')' +
+      '</button>' +
+    '</div>';
+  } else if (cor.buscando) {
+    buscarBtn = '<div class="correios-acoes"><div class="correios-progress" id="correios-progress">' +
+      '<span class="ctrl-spinner"></span> Buscando códigos no Bling… <span id="correios-progress-txt"></span>' +
+    '</div></div>';
+  }
+
+  // ── Tabela de resultados (depois da busca) ──
+  var resultHtml = '';
+  if (cor.buscaFeita && cor.itens.length > 0) {
     var linhas = cor.itens.map(function(item, i){
       var empChip = item.empresa === 'prohunters'
         ? '<span class="correios-emp ph">PH</span>'
-        : '<span class="correios-emp cr">CR</span>';
+        : (item.empresa === 'calibre' ? '<span class="correios-emp cr">CR</span>' : '—');
       if (item.status === 'erro') {
         return '<tr class="correios-row-erro">' +
           '<td class="c">'+(i+1)+'</td>' +
           '<td><code>'+crmEsc(item.codigo_rastreio)+'</code></td>' +
           '<td colspan="3" style="color:var(--r);font-size:12px">⚠ '+crmEsc(item.erro)+'</td>' +
-          '<td class="c"><button class="correios-btn-rm" onclick="correiosRemover('+i+')" title="Remover">✕</button></td>' +
+          '<td class="c"><button class="correios-btn-rm" onclick="correiosRemoverItem('+i+')" title="Remover">✕</button></td>' +
         '</tr>';
       }
       return '<tr>' +
@@ -9009,15 +9048,18 @@ function ctrlRenderCorreios(){
         '<td style="font-weight:600">'+crmEsc(item.pedido_numero)+'</td>' +
         '<td>'+crmEsc(item.cliente_nome)+'</td>' +
         '<td class="c">'+empChip+'</td>' +
-        '<td class="c"><button class="correios-btn-rm" onclick="correiosRemover('+i+')" title="Remover">✕</button></td>' +
+        '<td class="c"><button class="correios-btn-rm" onclick="correiosRemoverItem('+i+')" title="Remover">✕</button></td>' +
       '</tr>';
     }).join('');
 
-    itensHtml =
+    resultHtml =
       '<div class="correios-lista-wrap">' +
         '<div class="correios-lista-head">' +
-          '<span>📋 '+cor.itens.length+' bipado'+(cor.itens.length>1?'s':'')+'</span>' +
-          '<span style="color:var(--gd);font-weight:700">'+totalOk+' encontrado'+(totalOk>1?'s':'')+'</span>' +
+          '<span>📋 Resultado: '+cor.itens.length+' código'+(cor.itens.length>1?'s':'')+'</span>' +
+          '<span>' +
+            '<span style="color:var(--gd);font-weight:700">'+totalOk+' encontrado'+(totalOk>1?'s':'')+'</span>' +
+            (totalErro > 0 ? ' · <span style="color:var(--r);font-weight:600">'+totalErro+' não encontrado'+(totalErro>1?'s':'')+'</span>' : '') +
+          '</span>' +
         '</div>' +
         '<div style="overflow-x:auto">' +
         '<table class="correios-table">' +
@@ -9034,18 +9076,40 @@ function ctrlRenderCorreios(){
       '</div>';
   }
 
+  // ── Ações pós-busca ──
   var acoes = '';
-  if (totalOk > 0 && !cor.gerandoRom) {
-    acoes = '<div class="correios-acoes">' +
-      '<button class="ctrl-btn-primary correios-btn-gerar" onclick="correiosGerarRomaneio()">' +
+  if (cor.buscaFeita && !cor.gerandoRom && !cor.buscando) {
+    var btns = '';
+    if (totalOk > 0) {
+      btns += '<button class="ctrl-btn-primary correios-btn-gerar" onclick="correiosGerarRomaneio()">' +
         '📄 Gerar Romaneio ('+totalOk+' envio'+(totalOk>1?'s':'')+')' +
-      '</button>' +
-      '<button class="ctrl-btn-outline" onclick="correiosLimpar()" style="margin-left:8px">' +
-        '🗑️ Limpar lista' +
-      '</button>' +
-    '</div>';
+      '</button>';
+    }
+    btns += '<button class="ctrl-btn-outline" onclick="correiosNovaBipagem()" style="margin-left:8px">' +
+      '🔄 Nova bipagem' +
+    '</button>';
+    acoes = '<div class="correios-acoes">'+btns+'</div>';
   } else if (cor.gerandoRom) {
     acoes = '<div class="correios-acoes"><div class="crm-loading">Gerando romaneio…</div></div>';
+  }
+
+  // ── Scanner (só aparece antes da busca ou durante nova bipagem) ──
+  var scannerHtml = '';
+  if (!cor.buscaFeita && !cor.buscando) {
+    scannerHtml =
+      '<div class="correios-scanner-wrap">' +
+        '<label class="correios-scanner-label">Código de rastreio</label>' +
+        '<div class="correios-scanner-row">' +
+          '<input type="text" id="correios-input" class="correios-scanner-input" ' +
+            'placeholder="Bipe ou digite o código (ex: AP640299478BR)" ' +
+            'onkeydown="if(event.key===\'Enter\'){event.preventDefault();correiosAdicionarCodigo();}" ' +
+            'autocomplete="off" spellcheck="false" />' +
+          '<button class="ctrl-btn-primary correios-btn-bipar" onclick="correiosAdicionarCodigo()">' +
+            '➕ Adicionar' +
+          '</button>' +
+        '</div>' +
+        '<div id="correios-feedback" class="correios-feedback"></div>' +
+      '</div>';
   }
 
   p.innerHTML =
@@ -9054,116 +9118,132 @@ function ctrlRenderCorreios(){
         '<div class="correios-header-ic">📮</div>' +
         '<div>' +
           '<h3 class="correios-title">Romaneio Correios</h3>' +
-          '<div class="correios-subtitle">Bipe os códigos de rastreio. O sistema busca o pedido no Bling automaticamente.</div>' +
+          '<div class="correios-subtitle">Bipe os códigos de rastreio e depois clique em "Buscar no Bling" para identificar os pedidos.</div>' +
         '</div>' +
       '</div>' +
-      '<div class="correios-scanner-wrap">' +
-        '<label class="correios-scanner-label">Código de rastreio</label>' +
-        '<div class="correios-scanner-row">' +
-          '<input type="text" id="correios-input" class="correios-scanner-input" ' +
-            'placeholder="Bipe ou digite o código (ex: AP640299478BR)" ' +
-            'onkeydown="if(event.key===\'Enter\'){event.preventDefault();correiosBipar();}" ' +
-            'autocomplete="off" spellcheck="false" />' +
-          '<button class="ctrl-btn-primary correios-btn-bipar" onclick="correiosBipar()" id="correios-btn-bipar">' +
-            (cor.buscando ? '<span class="ctrl-spinner" style="border-color:#fff;border-top-color:transparent"></span> Buscando…' : '🔍 Buscar') +
-          '</button>' +
-        '</div>' +
-        '<div id="correios-feedback" class="correios-feedback"></div>' +
-      '</div>' +
-      itensHtml +
+      scannerHtml +
+      codigosHtml +
+      buscarBtn +
+      resultHtml +
       acoes +
     '</div>';
 
   // Auto-focus no input do scanner
-  setTimeout(function(){
-    var inp = document.getElementById('correios-input');
-    if (inp && !cor.buscando) inp.focus();
-  }, 100);
+  if (!cor.buscaFeita && !cor.buscando) {
+    setTimeout(function(){
+      var inp = document.getElementById('correios-input');
+      if (inp) inp.focus();
+    }, 100);
+  }
 }
 
-async function correiosBipar(){
+// Adiciona código na lista (sem buscar no Bling)
+function correiosAdicionarCodigo(){
   var inp = document.getElementById('correios-input');
   var fb = document.getElementById('correios-feedback');
   if (!inp) return;
   var codigo = (inp.value || '').trim().toUpperCase();
   if (!codigo) { if (fb) fb.innerHTML = '<span style="color:var(--r)">Digite ou bipe um código</span>'; inp.focus(); return; }
 
-  // Verifica se já foi bipado
-  var jaExiste = window.CORREIOS.itens.some(function(x){ return x.codigo_rastreio === codigo; });
-  if (jaExiste) {
-    if (fb) fb.innerHTML = '<span style="color:#a06210">⚠ Código <b>'+crmEsc(codigo)+'</b> já foi bipado</span>';
+  // Verifica duplicata
+  if (window.CORREIOS.codigos.indexOf(codigo) !== -1) {
+    if (fb) fb.innerHTML = '<span style="color:#a06210">⚠ Código <b>'+crmEsc(codigo)+'</b> já está na lista</span>';
     inp.value = '';
     inp.focus();
     return;
   }
 
+  window.CORREIOS.codigos.push(codigo);
+  inp.value = '';
+  if (fb) fb.innerHTML = '<span style="color:var(--gd)">✓ <b>'+crmEsc(codigo)+'</b> adicionado ('+window.CORREIOS.codigos.length+' na lista)</span>';
+  ctrlRenderCorreios();
+}
+
+function correiosRemoverCodigo(idx){
+  window.CORREIOS.codigos.splice(idx, 1);
+  ctrlRenderCorreios();
+}
+
+function correiosLimparCodigos(){
+  if (!confirm('Limpar todos os códigos bipados?')) return;
+  window.CORREIOS.codigos = [];
+  ctrlRenderCorreios();
+}
+
+// Busca TODOS os códigos no Bling de uma vez
+async function correiosBuscarTodos(){
+  var codigos = window.CORREIOS.codigos.slice(); // cópia
+  if (!codigos.length) return;
+
   window.CORREIOS.buscando = true;
-  var btn = document.getElementById('correios-btn-bipar');
-  if (btn) btn.innerHTML = '<span class="ctrl-spinner" style="border-color:#fff;border-top-color:transparent"></span> Buscando…';
-  if (btn) btn.disabled = true;
-  if (fb) fb.innerHTML = '<span class="ctrl-spinner"></span> Buscando pedido para <b>'+crmEsc(codigo)+'</b> no Bling…';
+  window.CORREIOS.itens = [];
+  ctrlRenderCorreios();
 
-  try {
-    var r = await fetch('/api/crm/correios/buscar-rastreio', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ codigo: codigo })
-    });
-    var d = await r.json();
-    if (!r.ok) throw new Error(d.error || 'Erro na busca');
+  var total = codigos.length;
+  var feitos = 0;
 
-    if (d.encontrado) {
-      window.CORREIOS.itens.push({
-        codigo_rastreio: d.codigo_rastreio,
-        pedido_numero: d.pedido_numero,
-        pedido_id: d.pedido_id,
-        cliente_nome: d.cliente_nome,
-        empresa: d.empresa,
-        empresa_label: d.empresa_label,
-        status: 'ok',
-        erro: ''
+  for (var i = 0; i < codigos.length; i++) {
+    var codigo = codigos[i];
+    var progTxt = document.getElementById('correios-progress-txt');
+    if (progTxt) progTxt.textContent = (feitos+1) + ' de ' + total + ' — ' + codigo;
+
+    try {
+      var r = await fetch('/api/crm/correios/buscar-rastreio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigo: codigo })
       });
-      if (fb) fb.innerHTML = '<span style="color:var(--gd)">✓ Encontrado: pedido <b>'+crmEsc(d.pedido_numero)+'</b> — '+crmEsc(d.cliente_nome)+' ('+crmEsc(d.empresa_label)+')</span>';
-    } else {
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.error || 'Erro na busca');
+
+      if (d.encontrado) {
+        window.CORREIOS.itens.push({
+          codigo_rastreio: d.codigo_rastreio,
+          pedido_numero: d.pedido_numero,
+          pedido_id: d.pedido_id,
+          cliente_nome: d.cliente_nome,
+          empresa: d.empresa,
+          empresa_label: d.empresa_label,
+          status: 'ok',
+          erro: ''
+        });
+      } else {
+        window.CORREIOS.itens.push({
+          codigo_rastreio: codigo,
+          pedido_numero: '', pedido_id: '', cliente_nome: '', empresa: '', empresa_label: '',
+          status: 'erro',
+          erro: 'Pedido não encontrado no Bling (últimos 4 dias)'
+        });
+      }
+    } catch (e) {
       window.CORREIOS.itens.push({
         codigo_rastreio: codigo,
-        pedido_numero: '',
-        pedido_id: '',
-        cliente_nome: '',
-        empresa: '',
-        empresa_label: '',
+        pedido_numero: '', pedido_id: '', cliente_nome: '', empresa: '', empresa_label: '',
         status: 'erro',
-        erro: 'Pedido não encontrado no Bling'
+        erro: e.message || 'Erro de conexão'
       });
-      if (fb) fb.innerHTML = '<span style="color:var(--r)">⚠ Nenhum pedido encontrado para <b>'+crmEsc(codigo)+'</b></span>';
     }
-  } catch (e) {
-    window.CORREIOS.itens.push({
-      codigo_rastreio: codigo,
-      pedido_numero: '',
-      pedido_id: '',
-      cliente_nome: '',
-      empresa: '',
-      empresa_label: '',
-      status: 'erro',
-      erro: e.message || 'Erro desconhecido'
-    });
-    if (fb) fb.innerHTML = '<span style="color:var(--r)">Erro ao buscar: '+crmEsc(e.message)+'</span>';
+    feitos++;
   }
 
   window.CORREIOS.buscando = false;
-  inp.value = '';
+  window.CORREIOS.buscaFeita = true;
+  window.CORREIOS.codigos = []; // limpa códigos pendentes
   ctrlRenderCorreios();
 }
 
-function correiosRemover(idx){
+function correiosRemoverItem(idx){
   window.CORREIOS.itens.splice(idx, 1);
+  if (window.CORREIOS.itens.length === 0) {
+    window.CORREIOS.buscaFeita = false;
+  }
   ctrlRenderCorreios();
 }
 
-function correiosLimpar(){
-  if (!confirm('Limpar toda a lista de códigos bipados?')) return;
+function correiosNovaBipagem(){
+  window.CORREIOS.codigos = [];
   window.CORREIOS.itens = [];
+  window.CORREIOS.buscaFeita = false;
   ctrlRenderCorreios();
 }
 
@@ -9203,8 +9283,10 @@ async function correiosGerarRomaneio(){
       alert('Pop-up bloqueado. Permita pop-ups para imprimir o romaneio.');
     }
 
-    // Limpa a lista após gerar
+    // Volta pra nova bipagem
     window.CORREIOS.itens = [];
+    window.CORREIOS.codigos = [];
+    window.CORREIOS.buscaFeita = false;
     window.CORREIOS.gerandoRom = false;
     ctrlRenderCorreios();
 
@@ -10220,6 +10302,40 @@ window.addEventListener('load', function(){
 }
 .correios-btn-rm:hover { background: #fee; color: var(--r); }
 
+.correios-codigos-wrap { margin-bottom: 16px; }
+.correios-chips {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+}
+.correios-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px; background: #e3f2fd; border: 1px solid #bbdefb;
+  border-radius: 20px; font-size: 12.5px;
+}
+.correios-chip code {
+  font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px;
+  color: #1565c0; letter-spacing: .5px; background: none; padding: 0;
+}
+.correios-chip-rm {
+  background: none; border: none; color: #90a4ae; cursor: pointer;
+  font-size: 13px; padding: 0 2px; border-radius: 50%; line-height: 1;
+  transition: all .15s;
+}
+.correios-chip-rm:hover { color: var(--r); background: #ffebee; }
+.correios-link-btn {
+  background: none; border: none; color: var(--r); cursor: pointer;
+  font-size: 12px; text-decoration: underline; padding: 0;
+}
+.correios-link-btn:hover { color: #b71c1c; }
+.correios-progress {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px; background: #e3f2fd; border-radius: var(--r-sm);
+  font-size: 13px; color: #1565c0; font-weight: 600;
+}
+.correios-btn-buscar {
+  font-size: 14px !important; padding: 12px 24px !important;
+  background: #1565c0 !important; box-shadow: 0 4px 12px #1565c033;
+}
+.correios-btn-buscar:hover { background: #0d47a1 !important; }
 .correios-acoes { margin-top: 16px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .correios-btn-gerar {
   font-size: 14px !important; padding: 12px 24px !important;
