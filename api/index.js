@@ -1445,7 +1445,7 @@ module.exports = async (req, res) => {
       instancia: inst, nome: v.nome, id: v.id,
     }));
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(lista));
+    res.end(JSON.stringify({ vendedores: lista }));
     return;
   }
 
