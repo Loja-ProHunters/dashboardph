@@ -781,6 +781,55 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // GET /api/crm/diag/reagendamentos?vendedor=dickmann — DIAGNOSTICO (read-only).
+  // Mostra de onde vem o numero de "reagendou" (follow_up_agendado) no painel:
+  // quantos foram concluidos pelo PROPRIO vendedor, quantos sem autor (registros
+  // antigos) e quantos passaram por reatribuicao. Admin/diretor. Nao altera nada.
+  if (req.method === 'GET' && url.startsWith('/api/crm/diag/reagendamentos')) {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
+    try {
+      const q = new URL(url, 'http://x');
+      const vend = String(q.searchParams.get('vendedor') || 'dickmann').trim().toLowerCase();
+      const acts = await crmStore.listDocs('activities');
+      const norm = (v) => String(v || '').trim().toLowerCase();
+      const dono = (a) => norm(a.owner_id || a.dono);
+      const JAN = 14;
+      const limite = new Date(Date.now() - JAN * 86400000).toISOString();
+      const finEm = (a) => a.status === 'concluida' ? (a.concluida_em || a.concluido_em || a.atualizado_em || null)
+        : (a.status === 'cancelada' ? (a.cancelada_em || a.atualizado_em || null) : null);
+      const doVend = acts.filter(a => a && dono(a) === vend && a.resultado === 'follow_up_agendado' && a.status === 'concluida');
+      const janela = doVend.filter(a => { const e = finEm(a); return e && e >= limite; });
+      const dist = { total_all_time: doVend.length, na_janela_14d: janela.length,
+        concluida_por_vazio: 0, concluida_por_ele: 0, concluida_por_outro: 0, com_reatribuicao: 0 };
+      const porConcluidaPor = {}, porCriadoPor = {};
+      for (const a of janela) {
+        const cp = norm(a.concluida_por);
+        if (!cp) dist.concluida_por_vazio++;
+        else if (cp === vend) dist.concluida_por_ele++;
+        else dist.concluida_por_outro++;
+        porConcluidaPor[cp || '(vazio)'] = (porConcluidaPor[cp || '(vazio)'] || 0) + 1;
+        const crp = norm(a.criado_por);
+        porCriadoPor[crp || '(vazio)'] = (porCriadoPor[crp || '(vazio)'] || 0) + 1;
+        if (a.reatribuido_de || a.reatribuido_em) dist.com_reatribuicao++;
+      }
+      const amostra = janela.slice(0, 20).map(a => ({
+        id: a.id, titulo: String(a.titulo || '').slice(0, 45),
+        owner_id: a.owner_id || null, dono: a.dono || null,
+        concluida_por: a.concluida_por || null, criado_por: a.criado_por || null,
+        concluida_em: a.concluida_em || a.concluido_em || null, criado_em: a.criado_em || null,
+        fonte: a.fonte || null, lote_dia: a.lote_dia || null,
+        reatribuido_de: a.reatribuido_de || null, origem_tarefa_id: a.origem_tarefa_id || null,
+      }));
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ vendedor: vend, janela_dias: JAN, distribuicao: dist,
+        por_concluida_por: porConcluidaPor, por_criado_por: porCriadoPor, amostra }, null, 2));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // POST /api/garantias/limpar-tally — DESTRUTIVO: apaga TODAS as garantias com
   // fonte='tally_webhook'. Preserva as manuais. Usado quando acumulou lixo e
   // queremos re-importar do zero. Admin/diretor/auxiliar.
