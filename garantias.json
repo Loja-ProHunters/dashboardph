@@ -6112,7 +6112,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-19T16:13:27.559Z",
-    "atualizado_em": "2026-10-21T11:50:00.027Z",
+    "atualizado_em": "2026-10-23T12:15:00.725Z",
     "tally_meta": {
       "eventId": "sync_DqoW7pp",
       "responseId": "DqoW7pp",
@@ -6142,13 +6142,20 @@
         "por": "auxiliar",
         "nota": "Postado nos correios dia 20/10. Previsão de Entrega: 22/10/2026",
         "anterior": null
+      },
+      {
+        "ts": "2026-10-23T12:15:00.725Z",
+        "acao": "observacao_atualizada",
+        "por": "auxiliar",
+        "nota": "Chegou dia 23/10/2026",
+        "anterior": "Postado nos correios dia 20/10. Previsão de Entrega: 22/10/2026"
       }
     ],
     "observacao": {
-      "texto": "Postado nos correios dia 20/10. Previsão de Entrega: 22/10/2026",
+      "texto": "Chegou dia 23/10/2026",
       "por": "auxiliar",
-      "em": "2026-10-21T11:50:00.027Z",
-      "versao": 1
+      "em": "2026-10-23T12:15:00.725Z",
+      "versao": 2
     }
   }
 }
