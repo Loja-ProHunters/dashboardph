@@ -6687,8 +6687,12 @@ function tqLinhaTarefa(t, venc){
     (t.hora ? '<span class="tq-tag">' + crmEsc(t.hora) + '</span>' : ''));
   var tel = t.cliente_telefone ? crmNormalizaTelBR(t.cliente_telefone) : null;
   var pitch = t.pitch_pronto || '';
-  var cta = tel ? '<a class="tq-cta wa" href="https://wa.me/' + tel + '?text=' + encodeURIComponent(pitch || ('Olá! Aqui é da Pro Hunters.')) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();crmRegistraContato(\'' + id + '\',\'whatsapp\')" title="Abrir WhatsApp com a mensagem pronta">💬 WhatsApp</a>'
-    : '<button class="tq-cta" onclick="tqToggle(\'' + k + '\')">Abrir</button>';
+  var accIdCta = t.entidade_id || t.account_id || '';
+  // WhatsApp em TODA tarefa: com telefone abre a conversa direto; sem telefone,
+  // o botão pede o número, salva na ficha do cliente e abre o WhatsApp.
+  var cta = tel
+    ? '<a class="tq-cta wa" href="https://wa.me/' + tel + '?text=' + encodeURIComponent(pitch || ('Olá! Aqui é da Pro Hunters.')) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();crmRegistraContato(\'' + id + '\',\'whatsapp\')" title="Abrir WhatsApp com a mensagem pronta">💬 WhatsApp</a>'
+    : '<button class="tq-cta wa" onclick="event.stopPropagation();crmWhatsSemTel(\'' + crmEsc(accIdCta) + '\',\'' + id + '\')" title="Cliente sem telefone — clique para adicionar o número e abrir o WhatsApp">💬 WhatsApp</button>';
   var h = '<div class="tq-row' + (aberto ? ' aberto' : '') + (venc ? ' venc' : '') + '" id="tar-' + id + '" data-k="' + k + '">' +
     '<button class="tq-main" onclick="tqToggle(\'' + k + '\')" aria-expanded="' + aberto + '">' +
       '<span class="tq-ic">' + tqIcone(t) + '</span>' +
@@ -12948,6 +12952,80 @@ function crmRegistraContato(tarefaId, canal){
   if (card && !card.querySelector('.tar-contato-ok')) {
     var hd = card.querySelector('.tar-tit');
     if (hd) hd.insertAdjacentHTML('beforeend', '<span class="tar-contato-ok">✓ contato registrado</span>');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WhatsApp quando o cliente NÃO tem telefone cadastrado.
+// Pede o número, salva na ficha (POST /accounts/:id/telefone) e abre o
+// WhatsApp. O número fica salvo pro cliente — na próxima vez o botão já
+// abre direto. Assim o botão de WhatsApp existe em TODA tarefa.
+// ═══════════════════════════════════════════════════════════════
+function crmWhatsSemTel(accId, tarefaId){
+  if (document.getElementById('crm-mdl-wa')) return;
+  var cache = (window.CRM && window.CRM.tarefasCache) || [];
+  var t = cache.find(function(x){ return x.id === tarefaId; }) || {};
+  var nome = t.cliente_nome || 'cliente';
+  var html = '<div id="crm-mdl-wa" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10062;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)crmFecharWa()">' +
+    '<div style="background:#fff;border-radius:12px;max-width:420px;width:100%;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,.3)">' +
+      '<h3 style="margin:0 0 4px;color:#1f9d55">💬 Abrir WhatsApp</h3>' +
+      '<p style="margin:0 0 14px;font-size:12.5px;color:#7b8285">Cliente: <b>' + crmEsc(nome) + '</b><br>Esse cliente ainda não tem telefone cadastrado. Informe o número pra abrir a conversa — ele fica salvo na ficha.</p>' +
+      '<label style="font-size:12px;font-weight:700;color:#4a5057;display:block;margin-bottom:4px">WhatsApp do cliente *</label>' +
+      '<input id="crm-wa-tel" type="tel" inputmode="tel" placeholder="(47) 99999-9999" style="width:100%;padding:10px 12px;border:1px solid #ccd0d3;border-radius:6px;font-size:14px" oninput="crmWaErro(\'\')"/>' +
+      '<div id="crm-wa-erro" style="color:#c62828;font-size:12.5px;margin-top:8px;display:none"></div>' +
+      '<div id="crm-wa-acoes" style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">' +
+        '<button onclick="crmFecharWa()" style="background:#e5e7eb;color:#374151;border:none;border-radius:6px;padding:10px 18px;font-weight:600;cursor:pointer">Cancelar</button>' +
+        '<button id="crm-wa-salvar" onclick="crmWaSalvar(\'' + crmEsc(accId) + '\',\'' + crmEsc(tarefaId) + '\')" style="background:#1f9d55;color:#fff;border:none;border-radius:6px;padding:10px 18px;font-weight:700;cursor:pointer">Salvar e abrir</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+  setTimeout(function(){ var i = document.getElementById('crm-wa-tel'); if (i) i.focus(); }, 50);
+}
+function crmFecharWa(){ var m = document.getElementById('crm-mdl-wa'); if (m) m.remove(); }
+function crmWaErro(msg){ var e = document.getElementById('crm-wa-erro'); if (!e) return; if (msg){ e.textContent = msg; e.style.display = 'block'; } else { e.style.display = 'none'; } }
+async function crmWaSalvar(accId, tarefaId){
+  var inp = document.getElementById('crm-wa-tel');
+  var raw = inp ? inp.value : '';
+  var tel = crmNormalizaTelBR(raw);
+  if (!tel) { crmWaErro('Número inválido. Use DDD + número, ex: (47) 99999-9999.'); return; }
+  var btn = document.getElementById('crm-wa-salvar');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
+  var cache = (window.CRM && window.CRM.tarefasCache) || [];
+  var t = cache.find(function(x){ return x.id === tarefaId; }) || {};
+  var pitch = t.pitch_pronto || 'Olá! Aqui é da Pro Hunters.';
+  var waUrl = 'https://wa.me/' + tel + '?text=' + encodeURIComponent(pitch);
+  // Salva o telefone na ficha (se a tarefa tem account). Se não tiver account,
+  // segue abrindo o WhatsApp mesmo assim (sem persistir).
+  if (accId) {
+    try {
+      var r = await fetch('/api/crm/accounts/' + encodeURIComponent(accId) + '/telefone', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ telefone: tel })
+      });
+      var d = await r.json().catch(function(){ return {}; });
+      if (!r.ok) { crmWaErro(d.error || 'Não foi possível salvar o telefone.'); if (btn){ btn.disabled = false; btn.textContent = 'Salvar e abrir'; } return; }
+    } catch (e) {
+      crmWaErro('Erro de conexão ao salvar. Tente de novo.'); if (btn){ btn.disabled = false; btn.textContent = 'Salvar e abrir'; } return;
+    }
+    // Atualiza o cache pra o botão já abrir direto depois
+    if (t) t.cliente_telefone = tel;
+  }
+  // Registra o contato e abre o WhatsApp
+  crmRegistraContato(tarefaId, 'whatsapp');
+  var novaAba = window.open(waUrl, '_blank', 'noopener');
+  var m = document.getElementById('crm-mdl-wa');
+  if (m) {
+    if (novaAba) {
+      // Popup abriu: fecha o modal e recarrega a fila
+      crmFecharWa();
+      if (typeof crmRenderTarefas === 'function') crmRenderTarefas();
+    } else {
+      // Popup bloqueado: mostra link pro usuário clicar
+      var acoes = document.getElementById('crm-wa-acoes');
+      crmWaErro('');
+      if (acoes) acoes.innerHTML = '<a href="' + waUrl + '" target="_blank" rel="noopener noreferrer" onclick="crmFecharWa();if(typeof crmRenderTarefas===\'function\')crmRenderTarefas();" style="background:#1f9d55;color:#fff;border:none;border-radius:6px;padding:10px 18px;font-weight:700;cursor:pointer;text-decoration:none">✓ Número salvo — abrir WhatsApp</a>';
+    }
   }
 }
 
