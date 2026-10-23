@@ -56,6 +56,7 @@ const { getFile: _ghGet, saveFile: _ghSave } = require('../lib/githubStore');
 // WhatsApp — Evolution API (piloto)
 const waMensagens = require('../lib/whatsapp/mensagens');
 const waInteligencia = require('../lib/whatsapp/inteligencia');
+const waSync = require('../lib/whatsapp/sync');
 
 // Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
 // Fallback pro esquema antigo (baseado no nome do usuário) fica só como safety-net.
@@ -1516,6 +1517,33 @@ module.exports = async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(analises));
     } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/crm/cron/whatsapp-sync — cron a cada 5-10 min
+  // Puxa mensagens recentes da Evolution API e grava no Supabase.
+  // Alternativa ao webhook (que depende de rede do EasyPanel).
+  // Protegido por CRON_SECRET ou sessão admin.
+  if (req.method === 'GET' && url === '/api/crm/cron/whatsapp-sync') {
+    const secret = config.cronSecret;
+    const headerSecret = req.headers['x-cron-secret'] || '';
+    if (secret && headerSecret !== secret) {
+      const sess = getSession(req);
+      if (!sess || !isAdminOrDiretor(sess)) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Não autorizado.' }));
+        return;
+      }
+    }
+    try {
+      const resultados = await waSync.sincronizarTodas();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, resultados }));
+    } catch (e) {
+      console.error('[WA-SYNC] Erro no cron:', e.message);
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: e.message }));
     }
