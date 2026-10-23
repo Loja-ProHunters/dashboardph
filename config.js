@@ -71,6 +71,10 @@ module.exports = {
   // Evolution API — webhook secret pra validar requests
   evolutionWebhookSecret: process.env.EVOLUTION_WEBHOOK_SECRET || '',
 
+  // Evolution API — conexão direta (pull de mensagens via cron)
+  evolutionApiUrl: process.env.EVOLUTION_API_URL || '',
+  evolutionApiKey: process.env.EVOLUTION_API_KEY || '',
+
   // Bling API v3 — LEGADO (compat com código antigo que não passa contaId)
   // Sempre aponta pra conta padrão "prohunters".
   blingClientId:     process.env.BLING_CLIENT_ID     || '',
