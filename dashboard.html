@@ -14102,8 +14102,10 @@ window.WAI = (function(){
     container.innerHTML = '<div class="wai-loading">Carregando análise...</div>';
     var vend = _vendedores.find(function(v){ return v.instancia === _vendedorAtual; });
     if(!vend){ container.innerHTML = '<div class="wai-vazio">Selecione um vendedor</div>'; return; }
-    var data = await _fetch('/api/whatsapp/inteligencia/ultima-analise?vendedor=' + encodeURIComponent(vend.id));
-    if(!data || data.error || !data.analise){
+    // A análise é salva com vendedor = NOME ("Pedro Dickmann"), então consulta
+    // pelo nome. A API devolve o registro achatado (não dentro de {analise}).
+    var data = await _fetch('/api/whatsapp/inteligencia/ultima-analise?vendedor=' + encodeURIComponent(vend.nome));
+    if(!data || data.error || !data.id){
       container.innerHTML =
         '<div class="wai-vazio">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l.146.146A3 3 0 0118.5 21H5.5a3 3 0 01-2.121-5.879l.146-.146z"/></svg>' +
@@ -14112,7 +14114,7 @@ window.WAI = (function(){
         '</div>';
       return;
     }
-    _analise = data.analise;
+    _analise = data;
     _renderAnalise();
   }
 
@@ -14205,12 +14207,13 @@ window.WAI = (function(){
     container.innerHTML = '<div class="wai-loading">Carregando histórico...</div>';
     var vend = _vendedores.find(function(v){ return v.instancia === _vendedorAtual; });
     if(!vend){ container.innerHTML = '<div class="wai-vazio">Selecione um vendedor</div>'; return; }
-    var data = await _fetch('/api/whatsapp/inteligencia/historico?vendedor=' + encodeURIComponent(vend.id) + '&limite=20');
+    var data = await _fetch('/api/whatsapp/inteligencia/historico?vendedor=' + encodeURIComponent(vend.nome) + '&limite=20');
     if(!data || data.error){
       container.innerHTML = '<div class="wai-vazio">Erro ao carregar histórico</div>';
       return;
     }
-    _historico = data.analises || [];
+    // A API devolve um array direto (não dentro de {analises}).
+    _historico = Array.isArray(data) ? data : (data.analises || []);
     _renderHistorico();
   }
 
@@ -14242,11 +14245,11 @@ window.WAI = (function(){
     var container = document.getElementById('wai-analise-content');
     container.innerHTML = '<div class="wai-loading">Carregando análise #' + id + '...</div>';
     var data = await _fetch('/api/whatsapp/inteligencia/analise/' + id);
-    if(!data || data.error || !data.analise){
+    if(!data || data.error || !data.id){
       container.innerHTML = '<div class="wai-vazio">Erro ao carregar análise</div>';
       return;
     }
-    _analise = data.analise;
+    _analise = data;
     _renderAnalise();
   }
 
