@@ -6299,5 +6299,133 @@
         "por": "tally-webhook"
       }
     ]
+  },
+  "cc6fdcb0-febd-4a32-97b5-00eb56a35de4": {
+    "id": "cc6fdcb0-febd-4a32-97b5-00eb56a35de4",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Caio Augusto de Toledo Gomes",
+      "cpf_cnpj": "35499944865",
+      "whatsapp": "+5547999199516",
+      "email": "caio_anubis@hotmail.com",
+      "cidade": "joinville",
+      "uf": "SC",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031621",
+      "data_compra": "2026-10-23",
+      "data_recebimento": "2026-10-23",
+      "nome_produto": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+      "marca": "Vector Optics",
+      "modelo": "Red Dot Vector Optics Frenzy SCRD-43 1x17x24 MIC",
+      "numero_serie": "n/a",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Lente trincou na base, com apenas poucos disparos",
+      "data_percebido_problema": "2026-10-23",
+      "chegou_defeito_ou_depois": "Apareceu após o uso",
+      "motivo_troca_devolucao": "Trinca da base da lente após pouco uso",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "WhatsApp Image 2026-10-26 at 09.58.0.jpeg",
+          "url": "https://storage.tally.so/private/WhatsApp-Image-2026-10-26-at-09.58.0.jpeg?id=JEZWdo&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkpFWldkbyIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MzAyMjIzN30.dnbzLoEWowdBq-T9s8DmsNFqXtG9L0GVs5TKLBuMgto&signature=6b55a15f9e2fbe5256aa1440003cb4efacd1fcf7317f34697242b00a45d84bc1",
+          "mimeType": "image/jpeg",
+          "size": 359099
+        },
+        {
+          "tipo": "foto",
+          "nome": "WhatsApp Image 2026-10-26 at 09.58.56.jpeg",
+          "url": "https://storage.tally.so/private/WhatsApp-Image-2026-10-26-at-09.58.56.jpeg?id=0qgD7y&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBxZ0Q3eSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MzAyMjIzN30.JHfthcoVjOk-XyUFtDKklMTtLhcKHAHADGDiX0LIgEY&signature=97b67a9f084bccfa8a7e3db4c9e82e16680a2db6bf093ef3c56c2d8e62814a2c",
+          "mimeType": "image/jpeg",
+          "size": 124968
+        },
+        {
+          "tipo": "video",
+          "nome": "WhatsApp Video 2026-10-26 at 09.58.56.mp4",
+          "url": "https://storage.tally.so/private/WhatsApp-Video-2026-10-26-at-09.58.56.mp4?id=x8LlMr&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ing4TGxNciIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MzAyMjIzN30.njs0rBF0g-blgJefosZQAxfGQqo9-MAfUsSaib2aLHs&signature=32392abd207a8997f5c674fd647127235731e0a40818a359c97c031653ee619d",
+          "mimeType": "video/mp4",
+          "size": 4968599
+        }
+      ]
+    },
+    "preferencia_cliente": "operador_decide",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-10-23",
+      "data_percebido_problema": "2026-10-23",
+      "tipo_vicio": "oculto",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "operador_decide",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Dentro do prazo legal, com evidência, sem indício de mau uso. Cliente deixou a resolução a critério da Pro Hunters — operador escolhe entre troca ou devolução conforme disponibilidade de estoque e política interna.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-26T13:43:58.160Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-26T13:43:58.160Z",
+    "atualizado_em": "2026-10-26T13:43:58.160Z",
+    "tally_meta": {
+      "eventId": "sync_J1jbgyo",
+      "responseId": "J1jbgyo",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-10-26T13:00:42.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Garantia (produto com defeito)",
+      "raw_momento": "Apareceu após o uso"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-26T13:43:58.160Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
