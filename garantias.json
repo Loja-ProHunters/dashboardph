@@ -6171,5 +6171,119 @@
       "em": "2026-10-23T12:15:00.725Z",
       "versao": 2
     }
+  },
+  "1d4096ca-d7ab-4a3a-a153-3804d2f0f85d": {
+    "id": "1d4096ca-d7ab-4a3a-a153-3804d2f0f85d",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Abimael Cezar Dantas de Carvalho",
+      "cpf_cnpj": "083.797.681-24",
+      "whatsapp": "+5561994001960",
+      "email": "abimaelcezard.c@gmail.com",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031563",
+      "data_compra": "2026-10-16",
+      "data_recebimento": "2026-10-21",
+      "nome_produto": "Ruike p662-B",
+      "marca": "Ruike",
+      "modelo": "P662-B",
+      "numero_serie": "E4PEKX00099",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "O canivete possui um travamento muito forte quando fechado, dificultando muito a abertura e facilidade do dia a dia",
+      "data_percebido_problema": "2026-10-21",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Não gostei do produto, quero a devolução",
+      "uploads": [
+        {
+          "tipo": "video",
+          "nome": "346815.mp4",
+          "url": "https://storage.tally.so/private/346815.mp4?id=EoaqAA&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkVvYXFBQSIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MzAxNTQyN30.UHS4YHfo-orx_kR-ef3GTF1H3u8zqx_K7bJV7WpFzTE&signature=58bf4f4711723652ac9eef9b4aac60e010b03a6d704836b837bd0b4b64c6ee12",
+          "mimeType": "video/mp4",
+          "size": 9088761
+        }
+      ]
+    },
+    "preferencia_cliente": "restituicao",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-10-21",
+      "data_percebido_problema": "2026-10-21",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": true,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "restituicao",
+      "sugestao_sistema": "procedente_restituicao",
+      "justificativa_sistema": "Pedido de arrependimento em compra à distância, dentro do prazo de 7 dias (CDC Art. 49). Devolução integral do valor pago, incluindo frete.",
+      "score_confianca": "alta",
+      "calculado_em": "2026-10-26T11:50:27.675Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-26T11:50:27.675Z",
+    "atualizado_em": "2026-10-26T11:50:27.675Z",
+    "tally_meta": {
+      "eventId": "sync_je4xOkJ",
+      "responseId": "je4xOkJ",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-10-23T18:39:33.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Devolução (arrependimento de compra)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-26T11:50:27.675Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
