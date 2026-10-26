@@ -14258,24 +14258,62 @@ window.WAI = (function(){
     _renderHistorico();
   }
 
+  // Limpa resumo que veio como JSON cru (análises antigas de teste)
+  function _resumoLimpo(r){
+    r = String(r||'');
+    if(r.indexOf('```') === 0 || r.trim().indexOf('{') === 0){
+      var m = r.match(/"resumo"\s*:\s*"([^"]+)"/);
+      return m ? m[1] : 'Análise registrada';
+    }
+    return r;
+  }
+
+  // Gráfico de evolução da nota (uma série, pro vendedor selecionado)
+  function _chartHistScore(analises){
+    var pts0 = analises.slice().sort(function(a,b){ return String(a.periodo_ate).localeCompare(String(b.periodo_ate)); })
+      .map(function(a){ return { d:String(a.periodo_ate).slice(0,10), s:Number(a.score_geral) }; });
+    var n = pts0.length;
+    if(n < 2){
+      return '<div class="wai-chart-empty">O gráfico de evolução aparece a partir de 2 análises concluídas.<br>Hoje há '+n+' análise concluída.</div>';
+    }
+    var W=640,H=210,pl=34,pr=16,pt=22,pb=38;
+    var X=function(i){ return pl+(W-pl-pr)*(n<=1?0:i/(n-1)); };
+    var Y=function(s){ return pt+(H-pt-pb)*(1-(s/10)); };
+    var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto" role="img" aria-label="Evolução da nota">';
+    [0,5,10].forEach(function(g){ var y=Y(g); s+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="#eee"/><text x="'+(pl-6)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="10" fill="#999">'+g+'</text>'; });
+    var pts = pts0.map(function(p,i){ return { x:X(i), y:Y(p.s), s:p.s, d:p.d }; });
+    var step = n<=8?1:Math.ceil(n/8);
+    pts.forEach(function(p,i){ if(i%step===0 || i===n-1){ var lbl=p.d.slice(8,10)+'/'+p.d.slice(5,7); s+='<text x="'+p.x.toFixed(1)+'" y="'+(H-pb+16)+'" text-anchor="middle" font-size="10" fill="#999">'+lbl+'</text>'; } });
+    s+='<polyline points="'+pts.map(function(p){ return p.x.toFixed(1)+','+p.y.toFixed(1); }).join(' ')+'" fill="none" stroke="#0e6bd4" stroke-width="2.5" stroke-linejoin="round"/>';
+    pts.forEach(function(p){ s+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="4" fill="#0e6bd4" stroke="#fff" stroke-width="1.5"/>'; s+='<text x="'+p.x.toFixed(1)+'" y="'+(p.y-9).toFixed(1)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#0e6bd4">'+p.s.toFixed(1)+'</text>'; });
+    s+='</svg>';
+    return s;
+  }
+
   function _renderHistorico(){
     var container = document.getElementById('wai-hist-content');
-    if(_historico.length === 0){
+    // Só análises concluídas (com nota) — descarta as incompletas/de teste
+    var validas = (_historico||[]).filter(function(an){ return an.score_geral !== null && an.score_geral !== undefined; });
+    if(validas.length === 0){
       container.innerHTML =
         '<div class="wai-vazio">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>' +
-          '<br>Nenhuma análise no histórico ainda.' +
+          '<br>Nenhuma análise concluída ainda.' +
         '</div>';
       return;
     }
-    var html = '';
-    _historico.forEach(function(an){
+    var html = _GERAL_CSS;
+    // Gráfico de evolução da nota
+    html += '<div class="wai-chart-card"><div class="wai-chart-tit">📈 Evolução da nota</div>' + _chartHistScore(validas) + '</div>';
+    // Lista clicável (abre a análise completa)
+    html += '<div class="wai-chart-tit" style="margin:14px 0 8px">Análises anteriores</div>';
+    validas.slice().sort(function(a,b){ return String(b.periodo_ate).localeCompare(String(a.periodo_ate)); }).forEach(function(an){
       var scoreColor = _corScore(an.score_geral);
       html +=
         '<div class="wai-hist-item" onclick="WAI.verAnalise('+an.id+')">' +
           '<div class="wai-hist-data">' + _fmtData(an.periodo_de) + '<br><span style="color:var(--gl2);font-size:11px">a ' + _fmtDataCurta(an.periodo_ate) + '</span></div>' +
-          '<div class="wai-hist-score" style="color:'+scoreColor+'">' + (an.score_geral !== null ? an.score_geral.toFixed(1) : '-') + '</div>' +
-          '<div class="wai-hist-resumo">' + _esc(an.resumo || 'Sem resumo') + '</div>' +
+          '<div class="wai-hist-score" style="color:'+scoreColor+'">' + Number(an.score_geral).toFixed(1) + '</div>' +
+          '<div class="wai-hist-resumo">' + _esc(_resumoLimpo(an.resumo)) + '</div>' +
         '</div>';
     });
     container.innerHTML = html;
