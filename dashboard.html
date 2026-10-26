@@ -8778,6 +8778,16 @@ function ctrlLabelFamilia(k){
   return ctrlLabelRota(k);
 }
 
+// Conta volumes considerando caixas unidas: cada grupo conta UMA vez (pela
+// quantidade da caixa combinada), não a soma dos volumes de cada pedido.
+function ctrlContarVolumes(envs){
+  var t = 0, g = {};
+  (envs || []).forEach(function(e){
+    if (e.grupo_volume_id) { if (g[e.grupo_volume_id]) return; g[e.grupo_volume_id] = 1; t += Number(e.grupo_volume_qtd) || 0; }
+    else t += Number(e.volumes_qtd) || 0;
+  });
+  return t;
+}
 function ctrlProntosDesenhar(){
   var box = document.getElementById('ctrl-prontos-list'); if (!box) return;
   var g = ctrlProntosGrupos(), chaves = Object.keys(g);
@@ -8790,19 +8800,36 @@ function ctrlProntosDesenhar(){
   var sel = window.CTRL.prontoTransp;
   if (!sel || !g[sel]) sel = window.CTRL.prontoTransp = chaves[0];
   if (!window.CTRL.prontoDesmarcados) window.CTRL.prontoDesmarcados = {};
+  if (!window.CTRL.unirSel) window.CTRL.unirSel = {};
   var des = window.CTRL.prontoDesmarcados;
+  var unir = window.CTRL.unirSel;
   var h = '<div class="ctrl-pr-q">Qual transportadora chegou?</div><div class="ctrl-pr-trans">' + chaves.map(function(k){
-    var vol = g[k].reduce(function(s, e){ return s + (e.volumes_qtd || 0); }, 0);
+    var vol = ctrlContarVolumes(g[k]);
     return '<button class="ctrl-pr-t' + (k === sel ? ' on' : '') + '" onclick="window.CTRL.prontoTransp=\'' + k + '\';ctrlProntosDesenhar()"><b>' + crmEsc(ctrlLabelFamilia(k)) + '</b><span>' + g[k].length + ' envio(s)' + (k === 'retirada' ? '' : ' · ' + vol + ' vol.') + '</span></button>';
   }).join('') + '</div>';
   var lista = g[sel];
   var marcados = lista.filter(function(e){ return !des[e.id]; });
-  var volMarc = marcados.reduce(function(s, e){ return s + (e.volumes_qtd || 0); }, 0);
+  var volMarc = ctrlContarVolumes(marcados);
   var aberto = window.CTRL.envioAberto && window.CTRL.envioAberto.id;
   h += '<div class="ctrl-card ctrl-pr-box">';
   if (sel !== 'retirada') {
     h += '<button class="ctrl-pr-gerar" ' + (marcados.length ? '' : 'disabled') + ' onclick="ctrlGerarRomaneioProntos(\'' + sel + '\', this)">📋 Gerar romaneio · ' + crmEsc(ctrlLabelFamilia(sel).replace(/ \(.*\)$/, '')) + '<small>' + marcados.length + ' envio(s) · ' + volMarc + ' volume(s)</small></button>' +
       '<div class="ctrl-pr-hint">Gere só com a transportadora aqui. Os envios marcados vão para <b>Enviados</b> e a folha do romaneio abre para impressão e assinatura do motorista.</div>';
+    // Barra de unificar volumes — aparece quando 2+ envios estão marcados com "unir"
+    var unirIds = Object.keys(unir).filter(function(id){ return lista.some(function(e){ return e.id === id; }); });
+    if (unirIds.length >= 2) {
+      var docsClientes = {};
+      unirIds.forEach(function(id){ var e = lista.find(function(x){ return x.id === id; }); if (e) docsClientes[(e.cliente_cpf_cnpj || e.cliente_nome || id)] = true; });
+      var clientesDif = Object.keys(docsClientes).length > 1;
+      h += '<div style="margin-top:10px;padding:10px 12px;background:#eafaf0;border:1px solid #bfe6cd;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+        '<span>📦 Unir <b>' + unirIds.length + '</b> envios na <b>mesma caixa</b>' + (clientesDif ? ' <span style="color:#b26a00">(clientes diferentes — confira)</span>' : '') + '</span>' +
+        '<span style="margin-left:auto">Volumes da caixa: <input id="ctrl-unir-vol" type="number" min="1" value="1" style="width:56px;padding:5px 7px;border:1px solid #ccc;border-radius:6px"></span>' +
+        '<button class="crm-btn small" onclick="ctrlUnificarVolumes()">Unificar</button>' +
+        '<button class="crm-btn ghost small" onclick="window.CTRL.unirSel={};ctrlProntosDesenhar()">limpar</button>' +
+      '</div>';
+    } else {
+      h += '<div class="ctrl-pr-hint" style="margin-top:6px">💡 Dois pedidos do mesmo cliente na mesma caixa? Marque <b>"unir"</b> em cada um e clique em Unificar — eles contam como um volume só no romaneio.</div>';
+    }
   } else {
     h += '<div class="ctrl-pr-hint">Retirada na loja não tem romaneio: quando o cliente buscar, abra o envio e clique em <b>Cliente retirou</b>.</div>';
   }
@@ -8810,9 +8837,20 @@ function ctrlProntosDesenhar(){
     var empLbl = e.empresa === 'calibre' ? 'CR' : 'PH';
     var chk = sel !== 'retirada' ? '<input type="checkbox" ' + (des[e.id] ? '' : 'checked') + ' onclick="event.stopPropagation();ctrlProntoToggle(\'' + e.id + '\', this.checked)" title="Incluir no romaneio">' : '';
     var desde = e.liberacao_em ? 'pronto desde ' + new Date(e.liberacao_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
-    return '<div class="ctrl-pr-row' + (aberto === e.id ? ' on' : '') + (des[e.id] ? ' off' : '') + '" onclick="ctrlAbrirDetalhe(\'' + e.id + '\')">' + chk +
+    // Volume / caixa unida + controle à direita (unir / desfazer)
+    var volTxt, grpCtrl = '';
+    if (e.grupo_volume_id) {
+      var membros = lista.filter(function(x){ return x.grupo_volume_id === e.grupo_volume_id; }).length;
+      volTxt = '📦 caixa unida · ' + (e.grupo_volume_qtd || 0) + ' vol' + (membros > 1 ? ' (' + membros + ' pedidos)' : '');
+      grpCtrl = '<button onclick="event.stopPropagation();ctrlDesunificar(\'' + e.grupo_volume_id + '\')" title="Desfazer caixa unida" style="margin-left:auto;background:none;border:none;color:#b26a00;font-size:12px;cursor:pointer;text-decoration:underline">desfazer</button>';
+    } else {
+      volTxt = (e.volumes_qtd || 0) + ' vol.';
+      if (sel !== 'retirada') grpCtrl = '<label onclick="event.stopPropagation()" title="Marcar para unir na mesma caixa" style="margin-left:auto;font-size:12px;color:#0a6e2e;display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap"><input type="checkbox" ' + (unir[e.id] ? 'checked' : '') + ' onclick="event.stopPropagation();ctrlUnirToggle(\'' + e.id + '\',this.checked)"> unir</label>';
+    }
+    return '<div class="ctrl-pr-row' + (aberto === e.id ? ' on' : '') + (des[e.id] ? ' off' : '') + '" style="' + (e.grupo_volume_id ? 'border-left:3px solid #0a6e2e;' : '') + 'display:flex;align-items:center;gap:8px" onclick="ctrlAbrirDetalhe(\'' + e.id + '\')">' + chk +
       '<div class="ctrl-pr-txt"><b>' + empLbl + ' #' + crmEsc(e.numero) + ' — ' + crmEsc(e.cliente_nome || '—') + '</b>' +
-      '<span>' + crmEsc((e.cliente_cidade || '—') + '/' + (e.cliente_uf || '')) + ' · ' + (e.volumes_qtd || 0) + ' vol. · NF ' + crmEsc(e.nf_numero || '—') + (e.transportadora === 'ezequiel_gollog' ? ' · ✈️ Gollog' : '') + (desde ? ' · ' + desde : '') + '</span></div></div>';
+      '<span>' + crmEsc((e.cliente_cidade || '—') + '/' + (e.cliente_uf || '')) + ' · ' + volTxt + ' · NF ' + crmEsc(e.nf_numero || '—') + (e.transportadora === 'ezequiel_gollog' ? ' · ✈️ Gollog' : '') + (desde ? ' · ' + desde : '') + '</span></div>' +
+      grpCtrl + '</div>';
   }).join('') + '</div></div>';
   box.innerHTML = h;
 }
@@ -8821,12 +8859,44 @@ function ctrlProntoToggle(id, marcado){
   if (marcado) delete window.CTRL.prontoDesmarcados[id]; else window.CTRL.prontoDesmarcados[id] = true;
   ctrlProntosDesenhar();
 }
+function ctrlUnirToggle(id, on){
+  window.CTRL.unirSel = window.CTRL.unirSel || {};
+  if (on) window.CTRL.unirSel[id] = true; else delete window.CTRL.unirSel[id];
+  ctrlProntosDesenhar();
+}
+async function ctrlUnificarVolumes(){
+  var unir = window.CTRL.unirSel || {};
+  var ids = Object.keys(unir);
+  if (ids.length < 2) { alert('Marque "unir" em pelo menos 2 envios.'); return; }
+  var volEl = document.getElementById('ctrl-unir-vol');
+  var vol = Math.max(1, parseInt(volEl && volEl.value, 10) || 1);
+  try {
+    var r = await fetch('/api/crm/envios/unificar-volumes', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ envio_ids: ids, volumes: vol }) });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    window.CTRL.unirSel = {};
+    if (typeof crmToast === 'function') crmToast('📦 ' + ids.length + ' envios unificados em ' + vol + ' volume(s).', 'ok', 5000);
+    await ctrlCarregarProntos();
+  } catch (e) { alert('Erro: ' + e.message); }
+}
+async function ctrlDesunificar(gid){
+  if (!confirm('Desfazer a caixa unida? Cada pedido volta a contar os próprios volumes.')) return;
+  try {
+    var r = await fetch('/api/crm/envios/desunificar-volumes', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ grupo_volume_id: gid }) });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erro');
+    if (typeof crmToast === 'function') crmToast('Caixa unida desfeita.', 'ok', 3000);
+    await ctrlCarregarProntos();
+  } catch (e) { alert('Erro: ' + e.message); }
+}
 
 async function ctrlGerarRomaneioProntos(familia, btn){
   var g = ctrlProntosGrupos(), des = window.CTRL.prontoDesmarcados || {};
   var envs = (g[familia] || []).filter(function(e){ return !des[e.id]; });
   if (!envs.length) return;
-  var vol = envs.reduce(function(s, e){ return s + (e.volumes_qtd || 0); }, 0);
+  var vol = ctrlContarVolumes(envs);
   if (!confirm('Gerar romaneio ' + ctrlLabelFamilia(familia).replace(/ \(.*\)$/, '') + ' com ' + envs.length + ' envio(s) e ' + vol + ' volume(s)?\n\nConfirme que o motorista está aqui: os envios vão para "Enviados".')) return;
   if (btn) { btn.disabled = true; btn.firstChild.textContent = 'Gerando…'; }
   try {
