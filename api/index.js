@@ -102,6 +102,115 @@ function canVerWAInteligencia(sess) {
   const r = getRole(sess.usuario, sess);
   return r === 'admin' || r === 'diretor' || r === 'gerencia';
 }
+
+// ── Dossiê de feedback (HTML print-ready) ───────────────────────────
+// Recebe o nome do vendedor e o registro da última análise. Gera uma folha
+// pronta pra imprimir (ou salvar em PDF pelo navegador) pra reunião de feedback.
+function _dossieHtml(nome, a) {
+  const esc = (s) => String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const item = (x) => typeof x === 'string' ? x : (x && (x.descricao || x.sugestao || x.titulo || x.alerta || x.motivo) || JSON.stringify(x));
+  const fmt = (iso) => { if (!iso) return '—'; const d = new Date(iso); return isNaN(d) ? '—' : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }); };
+  const hoje = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  const semAnalise = !a || a.score_geral == null;
+  const score = (a && a.score_geral != null) ? Number(a.score_geral) : null;
+  const corScore = score == null ? '#888' : (score >= 7 ? '#0a6e2e' : score >= 5 ? '#b26a00' : '#b01515');
+  const fortes = (a && a.pontos_fortes) || [];
+  const fracos = (a && a.pontos_fracos) || [];
+  const sugestoes = (a && a.sugestoes) || [];
+  const alertas = (a && a.alertas) || [];
+  const destaques = (a && a.conversas_destaque) || [];
+  const negativas = destaques.filter(d => { const t = String(d && d.tipo || '').toLowerCase(); return t.indexOf('neg') === 0 || t === 'ruim' || t === 'atencao' || t === 'negativa'; });
+  const m = (a && a.metricas) || {};
+  const tr = m.tempo_resposta || {};
+
+  const prBadge = (p) => {
+    const x = String(p || '').toLowerCase();
+    const cor = x.indexOf('alta') === 0 ? '#b01515' : x.indexOf('med') === 0 ? '#b26a00' : '#555';
+    const txt = x.indexOf('alta') === 0 ? 'Alta' : x.indexOf('med') === 0 ? 'Média' : (p ? 'Baixa' : '');
+    return txt ? `<span style="font-size:10px;font-weight:700;color:#fff;background:${cor};border-radius:10px;padding:1px 8px;margin-left:6px">${txt}</span>` : '';
+  };
+  const linhasAnotacao = Array(7).fill('<div class="an-line"></div>').join('');
+
+  const corpo = semAnalise
+    ? `<div class="vazio">Ainda não há análise de IA concluída para este vendedor no período. A análise roda automaticamente toda segunda-feira.</div>`
+    : `
+    <div class="score-row">
+      <div class="score-box" style="border-color:${corScore}">
+        <div class="score-num" style="color:${corScore}">${score.toFixed(1)}</div>
+        <div class="score-lbl">nota da semana</div>
+      </div>
+      <div class="resumo">
+        <div class="sec-tit">Resumo do desempenho</div>
+        <p>${esc(a.resumo || '—')}</p>
+        <div class="metinline">${esc(a.conversas_analisadas || 0)} conversas analisadas · tempo médio de resposta ${tr.medio_minutos != null ? esc(tr.medio_minutos) + ' min' : '—'} · ${esc(m.total_mensagens || 0)} mensagens (${esc(m.conversas_iniciadas || 0)} conversas iniciadas pelo vendedor)</div>
+      </div>
+    </div>
+
+    ${fortes.length ? `<div class="sec"><div class="sec-tit verde">✓ Pontos fortes</div><ul>${fortes.map(p => `<li>${esc(item(p))}</li>`).join('')}</ul></div>` : ''}
+
+    <div class="sec"><div class="sec-tit vermelho">⚠ Pontos a melhorar / erros</div>
+      ${fracos.length ? `<ul>${fracos.map(p => `<li>${esc(item(p))}</li>`).join('')}</ul>` : '<p class="muted">Nenhum ponto fraco crítico registrado.</p>'}
+      ${alertas.length ? `<div class="alertas"><b>Alertas:</b><ul>${alertas.map(al => `<li>${esc(item(al))}</li>`).join('')}</ul></div>` : ''}
+      ${negativas.length ? `<div class="exemplos"><b>Exemplos de conversas pra revisar:</b>${negativas.map(c => `<div class="ex"><span class="ex-cli">${esc(c.cliente || c.telefone || 'Conversa')}</span> — ${esc(c.motivo || c.descricao || '')}</div>`).join('')}</div>` : ''}
+    </div>
+
+    ${sugestoes.length ? `<div class="sec"><div class="sec-tit azul">→ Plano de ação (próxima semana)</div><ol>${sugestoes.map(s => `<li>${esc(item(s))}${prBadge(s && s.prioridade)}</li>`).join('')}</ol></div>` : ''}
+    `;
+
+  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dossiê — ${esc(nome)}</title>
+<style>
+  *{box-sizing:border-box}
+  body{font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;font-size:13px;line-height:1.5;margin:0;padding:26px 30px;max-width:820px;margin:0 auto}
+  .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #0a6e2e;padding-bottom:12px;margin-bottom:18px}
+  .hd h1{margin:0;font-size:20px;color:#0a6e2e}
+  .hd .sub{font-size:12px;color:#555;margin-top:3px}
+  .hd .r{text-align:right;font-size:11.5px;color:#555}
+  .score-row{display:flex;gap:18px;align-items:stretch;margin-bottom:16px}
+  .score-box{border:3px solid #0a6e2e;border-radius:12px;padding:12px 18px;text-align:center;min-width:120px;display:flex;flex-direction:column;justify-content:center}
+  .score-num{font-size:44px;font-weight:800;line-height:1}
+  .score-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:#666;margin-top:4px}
+  .resumo{flex:1}
+  .metinline{font-size:11px;color:#555;margin-top:8px;border-top:1px dashed #ccc;padding-top:6px}
+  .sec{margin:16px 0;page-break-inside:avoid}
+  .sec-tit{font-size:14px;font-weight:700;margin-bottom:7px;padding-bottom:3px;border-bottom:1px solid #e0e0e0}
+  .sec-tit.verde{color:#0a6e2e}.sec-tit.vermelho{color:#b01515}.sec-tit.azul{color:#0e6bd4}
+  ul,ol{margin:6px 0;padding-left:22px}
+  li{margin:4px 0}
+  .muted{color:#888;font-size:12px}
+  .alertas{background:#fff6f6;border:1px solid #f0c9c9;border-radius:6px;padding:8px 12px;margin-top:8px}
+  .alertas ul{margin:4px 0}
+  .exemplos{margin-top:10px}
+  .ex{background:#fafafa;border-left:3px solid #d49b1a;padding:6px 10px;margin:5px 0;font-size:12px}
+  .ex-cli{font-weight:700}
+  .anot{margin-top:20px;page-break-inside:avoid}
+  .an-line{border-bottom:1px solid #bbb;height:26px}
+  .assin{display:flex;justify-content:space-between;margin-top:34px;gap:30px}
+  .assin div{flex:1;border-top:1px solid #333;padding-top:5px;font-size:11px;text-align:center;color:#555}
+  .vazio{background:#f7f7f7;border-radius:8px;padding:30px;text-align:center;color:#777}
+  .no-print{position:fixed;top:12px;right:14px}
+  .btn-print{background:#0a6e2e;color:#fff;border:0;border-radius:6px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+  @media print{body{padding:0}.no-print{display:none!important}}
+</style></head><body>
+  <div class="no-print"><button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button></div>
+  <div class="hd">
+    <div><h1>Dossiê de Feedback</h1><div class="sub">WhatsApp · <b>${esc(nome)}</b></div></div>
+    <div class="r">Período analisado: <b>${fmt(a && a.periodo_de)}</b> a <b>${fmt(a && a.periodo_ate)}</b><br>Gerado em ${hoje}</div>
+  </div>
+  ${corpo}
+  <div class="sec anot">
+    <div class="sec-tit">Anotações da reunião</div>
+    ${linhasAnotacao}
+  </div>
+  <div class="assin">
+    <div>Gestor responsável</div>
+    <div>${esc(nome)}</div>
+  </div>
+</body></html>`;
+}
 // Base de Conhecimento (edita e ve): so admin/diretor.
 function canManageKB(sess) { return isAdminOrDiretor(sess); }
 // Garantias: admin, diretor e auxiliar (Maria). Nenhum outro perfil ve a aba.
@@ -1568,6 +1677,78 @@ module.exports = async (req, res) => {
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/inteligencia/equipe — diagnóstico geral da equipe.
+  // Para cada vendedor configurado: última análise (nota + métricas) + evolução
+  // semanal das notas. Alimenta os gráficos comparativos da visão geral.
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/inteligencia/equipe')) {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const cfg = waInteligencia.INSTANCIAS_VENDEDORES || {};
+      const vendedores = [];
+      for (const [instancia, info] of Object.entries(cfg)) {
+        let ultima = null, hist = [];
+        try { ultima = await waInteligencia.obterUltimaAnalise(info.nome); } catch (_) {}
+        try { hist = await waInteligencia.listarAnalises({ vendedor: info.nome, limite: 12 }); } catch (_) {}
+        const evolucao = (hist || [])
+          .filter(h => h.score_geral !== null && h.score_geral !== undefined)
+          .map(h => ({ periodo_ate: h.periodo_ate, score: h.score_geral }))
+          .sort((a, b) => String(a.periodo_ate).localeCompare(String(b.periodo_ate)));
+        vendedores.push({
+          id: info.id,
+          nome: info.nome,
+          instancia,
+          tem_analise: !!(ultima && ultima.score_geral !== null && ultima.score_geral !== undefined),
+          score: ultima ? ultima.score_geral : null,
+          resumo: ultima ? ultima.resumo : null,
+          criado_em: ultima ? ultima.criado_em : null,
+          periodo_de: ultima ? ultima.periodo_de : null,
+          periodo_ate: ultima ? ultima.periodo_ate : null,
+          conversas_analisadas: ultima ? ultima.conversas_analisadas : null,
+          metricas: ultima ? ultima.metricas : null,
+          evolucao,
+        });
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ vendedores, gerado_em: new Date().toISOString() }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/inteligencia/dossie?vendedor=<nome>  (ou &id=<n>)
+  // Página HTML pronta pra impressão: dossiê de feedback do vendedor.
+  // Nota + resumo + pontos fortes · erros com exemplos · plano de ação · anotações.
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/inteligencia/dossie')) {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end('<h2>Sem permissão</h2>');
+      return;
+    }
+    try {
+      const params = new URL(req.url, 'http://x').searchParams;
+      const idParam = params.get('id');
+      const vendedor = params.get('vendedor') || '';
+      let a = null;
+      if (idParam) a = await waInteligencia.obterAnalise(parseInt(idParam, 10));
+      else if (vendedor) a = await waInteligencia.obterUltimaAnalise(vendedor);
+      const html = _dossieHtml(vendedor || (a && a.vendedor) || 'Vendedor', a);
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(html);
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end('<h2>Erro: ' + String(e.message).replace(/</g, '&lt;') + '</h2>');
     }
     return;
   }
