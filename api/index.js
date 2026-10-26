@@ -2671,11 +2671,16 @@ module.exports = async (req, res) => {
         if (disciplina.ehContrato(t)) { contratosAbertos++; t.dias_em_aberto = 0; if (t.prazo && t.prazo < hojeBRT) vencidas++; continue; }
         const origem = t.lote_dia || disciplina.dataBRT(t.criado_em);
         t.dia_origem = origem || null;
-        // Se a tarefa tem prazo no futuro (follow-up agendado), dias_em_aberto = 0
-        // Ela ainda não "começou" — só entra na fila quando o prazo chegar
-        const prazoFuturo = t.prazo && t.prazo > hojeBRT;
-        t.dias_em_aberto = prazoFuturo ? 0 : (origem ? Math.max(0, Math.round((Date.parse(hojeBRT) - Date.parse(origem)) / 86400000)) : 0);
-        t.agendada_futura = !!prazoFuturo;  // flag para o front esconder da fila do vendedor
+        // "Agendada pro futuro" = tarefa cujo DIA DE INÍCIO (lote_dia) ainda não
+        // chegou. Vale só pra follow-up e tarefa manual que o vendedor agendou
+        // pra uma data futura (o lote_dia dessas é a data escolhida). As tarefas
+        // automáticas do dia têm lote_dia = hoje, então aparecem na fila HOJE.
+        // ANTES: escondia pelo PRAZO (deadline +5 dias), o que ocultava o lote
+        // inteiro do dia e inchava o contador "agendadas".
+        const inicioFuturo = !!(origem && origem > hojeBRT);
+        t.dias_em_aberto = inicioFuturo ? 0 : (origem ? Math.max(0, Math.round((Date.parse(hojeBRT) - Date.parse(origem)) / 86400000)) : 0);
+        t.agendada_futura = inicioFuturo;  // flag para o front esconder da fila do vendedor
+        if (inicioFuturo) continue;        // não conta no resumo da fila de hoje
         if (t.dias_em_aberto > 0) acumuladas++; else deHoje++;
         if (t.prazo && t.prazo < hojeBRT) vencidas++;
       }
@@ -2753,6 +2758,7 @@ module.exports = async (req, res) => {
         titulo: tituloFinal,
         descricao: String(descricao).trim().slice(0, 2000),
         prazo: prazoLimpo,
+        lote_dia: prazoLimpo, // "início" = data escolhida: se futura, fica agendada até lá; se hoje, aparece hoje
         hora: horaLimpa, // novo campo opcional — alertas usam
         concluido_em: null,
         concluido_com_order_id: null,
@@ -3875,6 +3881,9 @@ module.exports = async (req, res) => {
           nf_numero: e.nf_numero,
           gt_numero: e.gt_numero,
           volumes_qtd: e.volumes_qtd,
+          grupo_volume_id: e.grupo_volume_id || null,
+          grupo_volume_qtd: e.grupo_volume_qtd || null,
+          grupo_volume_lider: e.grupo_volume_lider || false,
           liberacao_em: e.liberacao_em || null,
           liberacao_por: e.liberacao_por || null,
           romaneio_id: e.romaneio_id,
@@ -4109,6 +4118,84 @@ module.exports = async (req, res) => {
 
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ ok: true, envio: salvo }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/envios/unificar-volumes — agrupa 2+ envios na MESMA caixa.
+  //   Body: { envio_ids: [...], volumes: N }  (N = volumes da caixa combinada, padrão 1)
+  // No romaneio o grupo conta como `volumes` no total (não a soma de cada pedido).
+  // Usado quando dois pedidos (geralmente do mesmo cliente) vão juntos numa caixa só.
+  if (req.method === 'POST' && url === '/api/crm/envios/unificar-volumes') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      const { envio_ids, volumes } = JSON.parse(body || '{}');
+      if (!Array.isArray(envio_ids) || envio_ids.length < 2) throw new Error('Selecione pelo menos 2 envios para unificar.');
+      const vol = Math.max(1, parseInt(volumes, 10) || 1);
+      // Carrega e valida
+      const docs = [];
+      let familia = null;
+      for (const eid of envio_ids) {
+        const e = await crmStore.getDoc('envios', eid);
+        if (!e) throw new Error('Envio não encontrado: ' + eid);
+        if (e.status === 'enviado' || e.status === 'cancelado' || e.status === 'retirado') {
+          throw new Error('Envio #' + e.numero + ' não pode ser unificado (' + e.status + ').');
+        }
+        const fam = romaneios.familiaTransportadora(e.transportadora);
+        if (familia === null) familia = fam;
+        else if (fam !== familia) throw new Error('Só dá pra unificar envios da mesma transportadora. Envio #' + e.numero + ' está em outra rota.');
+        docs.push(e);
+      }
+      const grupoId = 'vg_' + crmUtils.uuid();
+      const now = new Date().toISOString();
+      const atualizados = [];
+      for (let i = 0; i < docs.length; i++) {
+        const salvo = await crmStore.updateDoc('envios', docs[i].id, {
+          grupo_volume_id: grupoId,
+          grupo_volume_qtd: vol,
+          grupo_volume_lider: i === 0,
+          grupo_volume_por: sess.usuario,
+          grupo_volume_em: now,
+        }, sess.usuario);
+        atualizados.push(salvo);
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, grupo_volume_id: grupoId, volumes: vol, envios: atualizados }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/envios/desunificar-volumes — desfaz a caixa unida.
+  //   Body: { grupo_volume_id }  ou  { envio_id }  (desfaz o grupo inteiro)
+  if (req.method === 'POST' && url === '/api/crm/envios/desunificar-volumes') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      let { grupo_volume_id, envio_id } = JSON.parse(body || '{}');
+      if (!grupo_volume_id && envio_id) {
+        const e = await crmStore.getDoc('envios', envio_id);
+        if (e) grupo_volume_id = e.grupo_volume_id;
+      }
+      if (!grupo_volume_id) throw new Error('Grupo de volume não informado.');
+      const todos = await crmStore.listDocs('envios', e => e.grupo_volume_id === grupo_volume_id);
+      let desfeitos = 0;
+      for (const e of todos) {
+        if (e.status === 'enviado') continue; // já saiu no romaneio — não mexe
+        await crmStore.updateDoc('envios', e.id, {
+          grupo_volume_id: null, grupo_volume_qtd: null, grupo_volume_lider: null,
+          grupo_volume_por: null, grupo_volume_em: null,
+        }, sess.usuario);
+        desfeitos++;
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, desfeitos }));
     } catch (e) {
       res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
