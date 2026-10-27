@@ -103,6 +103,88 @@ function canVerWAInteligencia(sess) {
   return r === 'admin' || r === 'diretor' || r === 'gerencia';
 }
 
+// ── Romaneio Correios (HTML print-ready) ────────────────────────────
+// Recebe o doc salvo do romaneio (romaneios_correios) e devolve a folha pronta
+// pra impressão. Usado na geração E na reimpressão a partir da lista.
+function _correiosRomaneioHtml(rom) {
+  const _esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const numero = rom.numero || '';
+  const ano = String(rom.data || '').slice(0, 4) || String(new Date().getFullYear());
+  const dataFmt = String(rom.data || '').split('-').reverse().join('/');
+  const itens = Array.isArray(rom.itens) ? rom.itens : [];
+  const linhas = itens.map(function(it, i) {
+    const empTag = it.empresa === 'calibre' ? 'CR' : 'PH';
+    return '<tr>' +
+      '<td class="c">' + (i + 1) + '</td>' +
+      '<td>' + _esc(it.pedido_numero) + '</td>' +
+      '<td>' + _esc(empTag) + '</td>' +
+      '<td>' + _esc(it.cliente_nome) + '</td>' +
+      '<td style="font-family:monospace;font-size:11px">' + _esc(it.codigo_rastreio) + '</td>' +
+      '</tr>';
+  }).join('');
+  return '<!doctype html>' +
+  '<html><head><meta charset="utf-8">' +
+  '<title>Romaneio Correios ' + _esc(numero) + '/' + ano + '</title>' +
+  '<style>' +
+    '* { box-sizing: border-box; }' +
+    'body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #111; padding: 20px 26px; margin: 0; }' +
+    '.hd { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 2px solid #1565c0; padding-bottom: 10px; }' +
+    '.hd .l { max-width: 65%; }' +
+    '.hd .r { text-align: right; }' +
+    'h1 { margin: 0 0 4px; font-size: 18px; color: #1565c0; font-weight: 700; }' +
+    '.sub { font-size: 12px; color: #444; }' +
+    '.meta { font-size: 11.5px; color: #555; margin-top: 4px; }' +
+    '.meta b { color: #111; }' +
+    'table { width: 100%; border-collapse: collapse; margin-top: 8px; }' +
+    'th { background: #1565c0; color: #fff; padding: 7px 6px; text-align: left; font-size: 11px; font-weight: 700; border: 1px solid #1565c0; }' +
+    'td { padding: 6px 6px; border: 1px solid #d0d0d0; font-size: 11.5px; vertical-align: top; }' +
+    '.c { text-align: center; }' +
+    'tr:nth-child(even) td { background: #fafafa; }' +
+    '.total-row td { background: #e3f2fd; font-weight: 700; border-top: 2px solid #1565c0; }' +
+    '.foot { margin-top: 22px; padding-top: 10px; border-top: 1px dashed #999; font-size: 10px; color: #777; display: flex; justify-content: space-between; }' +
+    '@media print { body { padding: 12mm; } .no-print { display: none !important; } }' +
+    '.no-print { position: fixed; top: 10px; right: 10px; }' +
+    '.btn-print { background: #1565c0; color: #fff; border: 0; border-radius: 6px; padding: 10px 16px; cursor: pointer; font-size: 13px; font-weight: 700; box-shadow: 0 4px 10px rgba(0,0,0,.15); }' +
+  '</style></head><body>' +
+    '<div class="no-print"><button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button></div>' +
+    '<div class="hd">' +
+      '<div class="l">' +
+        '<h1>📮 Romaneio Correios</h1>' +
+        '<div class="sub">Pro Hunters + Calibre Restrito</div>' +
+        '<div class="meta">Transportadora: <b>Correios — Empresa Brasileira de Correios e Telégrafos</b></div>' +
+      '</div>' +
+      '<div class="r">' +
+        '<div style="font-size:20px;font-weight:700;color:#1565c0">Nº ' + _esc(numero) + '</div>' +
+        '<div class="meta">Emitido em <b>' + dataFmt + '</b></div>' +
+        '<div class="meta">Gerado por: ' + _esc(rom.gerado_por || '') + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<table>' +
+      '<thead><tr>' +
+        '<th style="width:32px">#</th>' +
+        '<th style="width:80px">Pedido</th>' +
+        '<th style="width:50px">Empr.</th>' +
+        '<th>Destinatário</th>' +
+        '<th style="width:180px">Código de Rastreio</th>' +
+      '</tr></thead>' +
+      '<tbody>' + linhas +
+        '<tr class="total-row">' +
+          '<td class="c" colspan="4" style="text-align:right">TOTAL DE OBJETOS</td>' +
+          '<td class="c">' + itens.length + '</td>' +
+        '</tr>' +
+      '</tbody>' +
+    '</table>' +
+    '<div style="margin-top:30px;padding:14px 18px;border:1px solid #999;border-radius:6px;background:#f9f9f9;font-size:12.5px;line-height:1.9">' +
+      '<div style="line-height:2.4;letter-spacing:.3px">Conferido por: __________________________________________________________</div>' +
+      '<div style="line-height:2.4;letter-spacing:.3px">Data: ____/____/______ · Assinatura: ________________________________________________</div>' +
+    '</div>' +
+    '<div class="foot">' +
+      '<div>Sistema Pro Hunters CRM · Documento gerado eletronicamente</div>' +
+      '<div>Romaneio Correios ' + _esc(rom.id) + '</div>' +
+    '</div>' +
+  '</body></html>';
+}
+
 // ── Dossiê de feedback (HTML print-ready) ───────────────────────────
 // Recebe o nome do vendedor e o registro da última análise. Gera uma folha
 // pronta pra imprimir (ou salvar em PDF pelo navegador) pra reunião de feedback.
@@ -4816,7 +4898,7 @@ module.exports = async (req, res) => {
       '</body></html>';
 
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ html: html, numero: numero }));
+      res.end(JSON.stringify({ id: id, numero: numero, html: html }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ error: e.message || 'Erro ao gerar romaneio' }));
@@ -4824,7 +4906,26 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // GET /api/crm/correios/romaneio/:id/pdf — HTML print-ready pra (re)impressão
+  // Carrega o romaneio salvo e renderiza a folha. Precisa vir ANTES da rota de
+  // detalhe (/romaneio/:id), senão o regex de detalhe captura o ".../pdf".
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/correios\/romaneio\/[A-Za-z0-9_\-]+\/pdf$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'text/html'}); res.end('<h2>Sem acesso</h2>'); return; }
+    try {
+      const romId = url.split('/')[5];
+      const rom = await crmStore.getDoc('romaneios_correios', romId);
+      if (!rom) { res.writeHead(404,{'Content-Type':'text/html'}); res.end('<h2>Romaneio não encontrado</h2>'); return; }
+      res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});
+      res.end(_correiosRomaneioHtml(rom));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'text/html'}); res.end('<h2>Erro: ' + String(e.message).replace(/</g,'&lt;') + '</h2>');
+    }
+    return;
+  }
+
   // GET /api/crm/correios/romaneios — lista romaneios emitidos
+  const jh = { 'Content-Type': 'application/json' };
   if (req.method === 'GET' && url === '/api/crm/correios/romaneios') {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,jh); res.end(JSON.stringify({error:'Sem acesso'})); return; }
