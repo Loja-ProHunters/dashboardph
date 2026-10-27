@@ -9541,18 +9541,22 @@ async function correiosGerarRomaneio(){
     var d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro ao gerar romaneio');
 
-    // Limpa bipagem e navega para Enviados
+    // Abre a folha do romaneio pronta pra impressão (nova aba)
+    if (d.id) window.open('/api/crm/correios/romaneio/' + encodeURIComponent(d.id) + '/pdf', '_blank');
+
+    // Limpa bipagem e navega para Romaneios (pra ver o que foi emitido)
     window.CORREIOS.itens = [];
     window.CORREIOS.codigos = [];
     window.CORREIOS.buscaFeita = false;
     window.CORREIOS.gerandoRom = false;
     window.CORREIOS.enviadosList = null; // força recarregar
     window.CORREIOS.romaneiosList = null;
-    window.CORREIOS.subaba = 'enviados';
+    window.CORREIOS.romaneioDetalhe = null;
+    window.CORREIOS.subaba = 'romaneios';
     ctrlRenderCorreios();
 
     // Toast de sucesso
-    crmToast('Romaneio ' + (d.numero || '') + ' gerado com sucesso!', 'ok');
+    crmToast('Romaneio ' + (d.numero || '') + ' gerado! A folha abriu em nova aba para impressão.', 'ok');
   } catch (e) {
     window.CORREIOS.gerandoRom = false;
     ctrlRenderCorreios();
@@ -9594,7 +9598,10 @@ function correiosRenderRomaneios(){
       '<td>' + dataFmt + '</td>' +
       '<td class="c">' + (rom.total_itens || (rom.itens ? rom.itens.length : 0)) + '</td>' +
       '<td>' + crmEsc(rom.gerado_por || '') + '</td>' +
-      '<td class="c"><button class="correios-btn-ver" onclick="event.stopPropagation();correiosAbrirRomaneio(\''+crmEsc(rom.id)+'\')">Ver</button></td>' +
+      '<td class="c" style="white-space:nowrap">' +
+        '<button onclick="event.stopPropagation();window.open(\'/api/crm/correios/romaneio/'+crmEsc(rom.id)+'/pdf\',\'_blank\')" title="Imprimir" style="background:none;border:1px solid #1565c0;color:#1565c0;border-radius:5px;padding:3px 7px;cursor:pointer;margin-right:4px">🖨️</button>' +
+        '<button class="correios-btn-ver" onclick="event.stopPropagation();correiosAbrirRomaneio(\''+crmEsc(rom.id)+'\')">Ver</button>' +
+      '</td>' +
     '</tr>';
   }).join('');
 
@@ -9657,7 +9664,10 @@ function correiosRenderRomaneioDetalhe(rom){
           '<div style="font-size:17px;font-weight:700;color:#1565c0">Romaneio Correios N. ' + crmEsc(rom.numero) + '</div>' +
           '<div style="font-size:12px;color:var(--gy);margin-top:2px">Emitido em ' + dataFmt + ' por ' + crmEsc(rom.gerado_por || '') + '</div>' +
         '</div>' +
-        '<div style="font-size:13px;font-weight:600;color:#1565c0">' + itens.length + ' envio' + (itens.length > 1 ? 's' : '') + '</div>' +
+        '<div style="text-align:right">' +
+          '<button onclick="window.open(\'/api/crm/correios/romaneio/' + crmEsc(rom.id) + '/pdf\',\'_blank\')" style="background:#1565c0;color:#fff;border:0;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer">🖨️ Imprimir</button>' +
+          '<div style="font-size:13px;font-weight:600;color:#1565c0;margin-top:6px">' + itens.length + ' envio' + (itens.length > 1 ? 's' : '') + '</div>' +
+        '</div>' +
       '</div>' +
       '<div style="overflow-x:auto">' +
       '<table class="correios-table">' +
