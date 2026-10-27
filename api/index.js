@@ -1780,6 +1780,36 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // GET /api/crm/cron/whatsapp-backfill?instancia=X&paginas=N — puxa o histórico
+  // profundo de UMA instância (usado quando um vendedor acabou de conectar).
+  // Protegido por CRON_SECRET ou sessão admin/diretor.
+  if (req.method === 'GET' && url.startsWith('/api/crm/cron/whatsapp-backfill')) {
+    const secret = config.cronSecret;
+    const headerSecret = req.headers['x-cron-secret'] || '';
+    if (secret && headerSecret !== secret) {
+      const sess = getSession(req);
+      if (!sess || !isAdminOrDiretor(sess)) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Não autorizado.' }));
+        return;
+      }
+    }
+    try {
+      const q = new URL(req.url, 'http://x').searchParams;
+      const instancia = q.get('instancia');
+      const paginas = parseInt(q.get('paginas') || '15', 10);
+      if (!instancia) throw new Error('Parâmetro instancia obrigatório.');
+      const resultado = await waSync.backfillInstancia(instancia, paginas);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, resultado }));
+    } catch (e) {
+      console.error('[WA-BACKFILL] Erro:', e.message);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
   // GET /api/crm/cron/whatsapp-analise — cron semanal (toda segunda)
   // Chamado pelo cron-job.org. Protegido por CRON_SECRET no header.
   // Roda análise pra TODOS os vendedores configurados.
