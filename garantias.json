@@ -6258,7 +6258,7 @@
       "divergiu_do_sistema": false,
       "sugestao_original": "procedente_restituicao"
     },
-    "status": "aberto",
+    "status": "em_analise",
     "resultado": null,
     "produto_fisico": {
       "status": "aguardando_chegada",
@@ -6289,7 +6289,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-26T11:50:27.675Z",
-    "atualizado_em": "2026-10-27T13:30:28.716Z",
+    "atualizado_em": "2026-10-27T13:30:51.201Z",
     "tally_meta": {
       "eventId": "sync_je4xOkJ",
       "responseId": "je4xOkJ",
@@ -6317,6 +6317,14 @@
         "acao": "produto_solicitado",
         "por": "auxiliar",
         "rastreio": "AP664145145BR"
+      },
+      {
+        "ts": "2026-10-27T13:30:51.201Z",
+        "acao": "status_mudou",
+        "por": "auxiliar",
+        "de": "aberto",
+        "para": "em_analise",
+        "nota": null
       }
     ]
   },
