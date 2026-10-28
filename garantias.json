@@ -5967,9 +5967,9 @@
     "status": "aguardando_cliente",
     "resultado": null,
     "produto_fisico": {
-      "status": "nao_solicitado",
+      "status": "aguardando_chegada",
       "rastreio_entrada": null,
-      "aguardando_desde": null,
+      "aguardando_desde": "2026-10-28T12:08:03.819Z",
       "recebido_em": null,
       "recebido_por": null,
       "localizacao_loja": null,
@@ -5995,7 +5995,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-19T11:18:32.240Z",
-    "atualizado_em": "2026-10-21T11:48:17.788Z",
+    "atualizado_em": "2026-10-28T12:08:03.819Z",
     "tally_meta": {
       "eventId": "sync_q5qVBXg",
       "responseId": "q5qVBXg",
@@ -6040,6 +6040,12 @@
         "por": "auxiliar",
         "nota": "Luis repassou a um consultor",
         "anterior": null
+      },
+      {
+        "ts": "2026-10-28T12:08:03.819Z",
+        "acao": "produto_solicitado",
+        "por": "auxiliar",
+        "rastreio": null
       }
     ],
     "observacao": {
