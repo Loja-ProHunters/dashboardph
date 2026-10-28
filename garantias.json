@@ -6463,7 +6463,14 @@
       "score_confianca": "baixa",
       "calculado_em": "2026-10-26T13:43:58.160Z"
     },
-    "decisao_operador": null,
+    "decisao_operador": {
+      "valor": "procedente_troca",
+      "justificativa": "Provavel dfeito de fabricação",
+      "por": "auxiliar",
+      "em": "2026-10-28T12:12:42.758Z",
+      "divergiu_do_sistema": true,
+      "sugestao_original": "analise_manual"
+    },
     "status": "aberto",
     "resultado": null,
     "produto_fisico": {
@@ -6495,7 +6502,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-26T13:43:58.160Z",
-    "atualizado_em": "2026-10-26T13:43:58.160Z",
+    "atualizado_em": "2026-10-28T12:12:42.758Z",
     "tally_meta": {
       "eventId": "sync_J1jbgyo",
       "responseId": "J1jbgyo",
@@ -6510,6 +6517,13 @@
         "ts": "2026-10-26T13:43:58.160Z",
         "acao": "criada",
         "por": "tally-webhook"
+      },
+      {
+        "ts": "2026-10-28T12:12:42.758Z",
+        "acao": "decisao_registrada",
+        "por": "auxiliar",
+        "valor": "procedente_troca",
+        "divergiu": true
       }
     ]
   }
