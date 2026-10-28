@@ -1892,6 +1892,57 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // GET /api/crm/cron/telefones-backfill?max=N[&forcar=1] — preenche o telefone
+  // dos clientes buscando a ficha completa no Bling (/contatos/{id}). O detalhe
+  // do pedido nao traz numero, entao os accounts ficavam sem telefone e a tarefa
+  // pedia pra cadastrar na mao. Roda em lotes (max chamadas de API) e faz
+  // auto-chain ate zerar. Protegido por CRON_SECRET, sessao admin, Vercel Cron
+  // ou token de self-invocation.
+  if (req.method === 'GET' && url.startsWith('/api/crm/cron/telefones-backfill')) {
+    const secret = config.cronSecret;
+    const headerSecret = req.headers['x-cron-secret'] || '';
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const chainToken = req.headers['x-bling-chain'] === config.sessionSecret;
+    if (!(vercelCron || chainToken || (secret && headerSecret === secret))) {
+      const sess = getSession(req);
+      if (!sess || !isAdminOrDiretor(sess)) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Não autorizado.' }));
+        return;
+      }
+    }
+    try {
+      const q = new URL(req.url, 'http://x').searchParams;
+      const max = Math.max(1, Math.min(200, parseInt(q.get('max') || '60', 10)));
+      const forcar = q.get('forcar') === '1' || q.get('forcar') === 'true';
+      const resultado = await blingSync.enriquecerTelefones({ maxLookups: max, forcar });
+      // AUTO-CHAIN: se ainda faltam clientes pra buscar, dispara o proximo lote.
+      if (resultado && resultado.faltam > 0 && resultado.lookups > 0) {
+        const host = req.headers['x-forwarded-host'] || req.headers.host || 'dashboardph.vercel.app';
+        const nextUrl = 'https://' + host + '/api/crm/cron/telefones-backfill?max=' + max + (forcar ? '&forcar=1' : '');
+        try {
+          const https = require('https');
+          const u2 = new URL(nextUrl);
+          const chainReq = https.request({
+            hostname: u2.hostname, path: u2.pathname + u2.search, method: 'GET',
+            headers: { 'x-bling-chain': config.sessionSecret, 'User-Agent': 'tel-backfill-chain' },
+            timeout: 3000,
+          }, () => {});
+          chainReq.on('error', () => {});
+          chainReq.on('timeout', () => chainReq.destroy());
+          chainReq.end();
+        } catch (e) { /* silencia */ }
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, ...resultado, chained: !!(resultado && resultado.faltam > 0 && resultado.lookups > 0) }));
+    } catch (e) {
+      console.error('[TEL-BACKFILL] Erro:', e.message);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
   // GET /api/crm/cron/whatsapp-analise — cron semanal (toda segunda)
   // Chamado pelo cron-job.org. Protegido por CRON_SECRET no header.
   // Roda análise pra TODOS os vendedores configurados.
@@ -5387,6 +5438,9 @@ module.exports = async (req, res) => {
       const usersJson = await _loadUsersMap();
       const r = await blingBackfill.syncIncrementalTodas({ dias: 1, usersJson });
       try { r.contratos_arma = await contratosArma.processar(); } catch (e) { r.contratos_arma = { ok: false, erro: e.message }; }
+      // Enriquece telefones dos clientes novos/sem numero (lote pequeno por dia —
+      // o backfill dedicado faz o grosso; aqui so mantem em dia o que entra novo).
+      try { r.telefones = await blingSync.enriquecerTelefones({ maxLookups: 40 }); } catch (e) { r.telefones = { ok: false, erro: e.message }; }
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
