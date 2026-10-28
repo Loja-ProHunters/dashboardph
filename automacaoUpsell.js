@@ -8,11 +8,15 @@
 //      pro vendedor original abordar o cliente enquanto ele ainda esta quente.
 //
 //   2) gerarTarefasDiarias() — cron diaria. Analisa TODA a base de clientes e
-//      gera ate 10 tarefas/dia por vendedor, distribuidas por 3 fontes:
+//      gera 20 tarefas NOVAS/dia por vendedor (cota diaria pelo lote_dia; as
+//      pendentes de dias anteriores NAO somem nem reduzem a cota — acumulam).
+//      Fontes (rodizio pra variedade; reserva so completa):
 //
 //        a) Reativacao com match (60-180 dias sumido + coocorrencia forte)
 //        b) Cross-sell (comprou algo ha >=30 dias e nao levou complemento obvio)
 //        c) Aniversario (355-380 dias da primeira compra)
+//        d) Carteira parada (cliente com temperatura sem contato ha N dias)
+//        e) RESERVA: reativacao longa (181-720 dias sem comprar)
 //
 //      Se sobrar folga, completa com candidatos de menor score (nao deixa dia
 //      vazio pro vendedor). Dono da tarefa = vendedor da ultima venda do
@@ -42,6 +46,30 @@ const ANIVERSARIO_MIN_DIAS   = 355;
 const ANIVERSARIO_MAX_DIAS   = 380;
 const PRAZO_TAREFA_DIAS      = 5;
 const PRAZO_ANIVERSARIO_DIAS = 14;
+
+// INTERVALO MINIMO POR CLIENTE (cross-fonte, por CPF) ─────────────
+// Trava global por cliente: nao importa a fonte (reativacao, cross-sell,
+// aniversario, carteira, reserva), o mesmo cliente NAO recebe uma nova tarefa
+// automatica se ja tem uma tarefa automatica PENDENTE ou se recebeu qualquer
+// tarefa automatica nos ultimos INTERVALO_MIN_CLIENTE_DIAS dias. Agrupa por
+// CPF/CNPJ (nao por account_id), entao clientes duplicados — varias fichas com
+// o mesmo documento — contam como UM so. Isso evita empilhar 2 tarefas do mesmo
+// cliente em janela curta e inflar as metricas negativas (atrasadas) dos
+// vendedores. O _estaBloqueado por-fonte continua valendo por cima (ex.: nao
+// repetir a MESMA fonte dentro do COOLDOWN pos-conclusao).
+const INTERVALO_MIN_CLIENTE_DIAS = 21;
+
+// Fonte de RESERVA: cliente sumido ha muito tempo (6 meses a 2 anos). So
+// completa a cota do dia DEPOIS que as fontes principais esgotam — garante que
+// o vendedor receba as 20 do dia mesmo quando a base "quente" ja foi trabalhada.
+const REATIVACAO_LONGA_MIN_DIAS = 181;
+const REATIVACAO_LONGA_MAX_DIAS = 720;
+const FONTES_RESERVA = ['reativacao_longa'];
+
+// Minha Carteira: cliente que o vendedor marcou com temperatura e ficou sem
+// contato ha N dias volta como tarefa ("esfriando, retoma").
+const CARTEIRA_PARADO_DIAS = { quente: 7, morno: 15, frio: 45 };
+const PRAZO_CARTEIRA_DIAS  = 2;
 
 // Pos-venda (processarOrderNovo)
 const POSVENDA_PRAZO_DIAS    = 5;
@@ -124,6 +152,15 @@ async function processarOrderNovo(orderId, ownerVendedor) {
 // FRENTE 2 — Motor diario de oportunidades
 // ═══════════════════════════════════════════════════════════════
 
+// Chave de "cliente" pro intervalo minimo. Prioriza CPF/CNPJ (so digitos) pra
+// tratar fichas duplicadas do mesmo documento como um unico cliente; cai pro
+// account_id so quando a ficha nao tem documento valido.
+function _clienteKey(acc) {
+  const cpf = String((acc && acc.cpf_cnpj) || '').replace(/\D+/g, '');
+  if (cpf.length >= 11) return 'cpf:' + cpf;
+  return 'acc:' + ((acc && acc.id) || '');
+}
+
 async function gerarTarefasDiarias() {
   const inicio = Date.now();
   const hoje = _hojeISO();
@@ -144,7 +181,60 @@ async function gerarTarefasDiarias() {
   //      a cota com clientes diferentes a cada dia.
   const COOLDOWN_DIAS = 14; // cooldown pos-conclusao (14 dias = nao ligar 2x no mes)
   const cutoffISO = _hojeMenos(COOLDOWN_DIAS);
-  const activitiesRelevantes = await crmStore.listDocs('activities', a => {
+  const cutoffClienteISO = _hojeMenos(INTERVALO_MIN_CLIENTE_DIAS); // trava cross-fonte por CPF
+  const hojeBRT = _hojeBRT();
+  const todasActs = await crmStore.listDocs('activities');
+
+  // Mapa accountId -> clienteKey (CPF quando houver). Usado tanto pra montar a
+  // trava de intervalo por cliente quanto pra deduplicar candidatos de fichas
+  // diferentes que compartilham o mesmo documento.
+  const clienteKeyPorAccount = {};
+  for (const acc of accounts) clienteKeyPorAccount[acc.id] = _clienteKey(acc);
+  // Clientes (por CPF) bloqueados pra NOVAS tarefas automaticas: tem tarefa
+  // automatica pendente OU receberam uma tarefa automatica ha menos de
+  // INTERVALO_MIN_CLIENTE_DIAS dias. Cross-fonte: vale pra qualquer fonte.
+  const clientesBloqueadosIntervalo = new Set();
+
+  // ── COTA DIARIA (regra nova) ─────────────────────────────────────
+  // Cada vendedor recebe TAREFAS_POR_VENDEDOR tarefas NOVAS por dia, sempre.
+  // A cota NAO olha as pendentes: o que nao foi executado continua na fila e
+  // ACUMULA — e isso que mostra pra gestao quem esta (ou nao) trabalhando.
+  // Idempotente no dia: se o cron rodar 2x, a segunda rodada so completa o que
+  // faltou das 20 de HOJE (conta pelo lote_dia gravado em cada tarefa).
+  const criadasHojePorVendedor = {};
+  // Ultimo contato por cliente (tarefa finalizada ou WhatsApp registrado) —
+  // usado pela fonte "carteira_parado".
+  const ultimoContatoPorAccount = {};
+  // Clientes que JA tem qualquer tarefa aberta — a carteira nao empilha outra.
+  const accountsComTarefaAberta = new Set();
+  for (const a of todasActs) {
+    const owner = _normLogin(a.owner_id || a.dono);
+    const ehDoGerador = a.gerada_automaticamente &&
+      (a.lote_dia === hojeBRT || (a.criado_por === 'cron-oportunidades' && _dataBRT(a.criado_em) === hojeBRT));
+    if (ehDoGerador && owner) criadasHojePorVendedor[owner] = (criadasHojePorVendedor[owner] || 0) + 1;
+    const accId = a.account_id || a.entidade_id;
+    if (!accId) continue;
+    // Trava de intervalo por cliente (cross-fonte, por CPF). So tarefas
+    // automaticas nao-canceladas contam. Bloqueia se: pendente (ja tem tarefa
+    // em aberto) OU criada ha menos de INTERVALO_MIN_CLIENTE_DIAS dias.
+    if (a.gerada_automaticamente && a.status !== 'cancelada') {
+      const criadaEm = String(a.criado_em || a.lote_dia || '').slice(0, 10);
+      if (a.status === 'pendente' || (criadaEm && criadaEm >= cutoffClienteISO)) {
+        const ck = clienteKeyPorAccount[accId] || ('acc:' + accId);
+        clientesBloqueadosIntervalo.add(ck);
+      }
+    }
+    if (a.status === 'pendente') accountsComTarefaAberta.add(accId);
+    const toques = [];
+    if (a.status === 'concluida') toques.push(a.concluida_em || a.concluido_em || a.atualizado_em);
+    if (a.primeiro_contato_em) toques.push(a.primeiro_contato_em);
+    for (const t of toques) {
+      const d = String(t || '').slice(0, 10);
+      if (d && (!ultimoContatoPorAccount[accId] || d > ultimoContatoPorAccount[accId])) ultimoContatoPorAccount[accId] = d;
+    }
+  }
+
+  const activitiesRelevantes = todasActs.filter(a => {
     if (!a.gerada_automaticamente) return false;
     // Cancelada NAO bloqueia nem conta: se o vendedor julgou a tarefa invalida,
     // o cliente deve poder voltar ao pool numa proxima rodada.
@@ -196,7 +286,36 @@ async function gerarTarefasDiarias() {
   // Coleta candidatos das 3 fontes
   const candidatos = [];
   for (const acc of accounts) {
+    // Trava de intervalo por cliente (CPF): se este cliente ja tem tarefa
+    // automatica em aberto ou recebeu uma ha menos de INTERVALO_MIN_CLIENTE_DIAS
+    // dias, pula TODAS as fontes dele agora. Evita 2 tarefas do mesmo cliente
+    // numa janela curta (que so inflaria as metricas de atraso dos vendedores).
+    if (clientesBloqueadosIntervalo.has(clienteKeyPorAccount[acc.id] || ('acc:' + acc.id))) continue;
+
     const meusPeds = ordersPorAccount[acc.id] || [];
+
+    // Fonte 0 — Minha Carteira: cliente com temperatura definida pelo vendedor
+    // (ou prospect cadastrado por ele) que ficou sem contato alem do limite.
+    // Vem ANTES do "sem compra -> pula" porque prospect ainda nao comprou.
+    const temp = acc.carteira_temperatura || (Array.isArray(acc.tags) && acc.tags.indexOf('prospect_vendedor') !== -1 ? 'morno' : null);
+    if (temp && CARTEIRA_PARADO_DIAS[temp] && !accountsComTarefaAberta.has(acc.id)
+        && !_estaBloqueado(acc.id, 'carteira_parado')) {
+      const refContato = ultimoContatoPorAccount[acc.id] || String(acc.carteira_atualizado_em || acc.criado_em || '').slice(0, 10);
+      const diasSemContato = refContato ? _diasEntre(refContato, hoje) : 999;
+      if (diasSemContato >= CARTEIRA_PARADO_DIAS[temp]) {
+        candidatos.push({
+          accountId: acc.id, account: acc,
+          fonte: 'carteira_parado',
+          motivoCurto: 'Cliente ' + temp + ' da sua carteira sem contato ha ' + (diasSemContato >= 999 ? 'muito tempo' : diasSemContato + 'd'),
+          sku_sugerido: null, sku_desc: null, sug_confianca: null,
+          score: _scoreCarteira(acc, temp, diasSemContato),
+          triggerId: 'cart_' + acc.id + '_' + hojeBRT,
+          pedRef: meusPeds[0] || null,
+          temperatura: temp,
+        });
+      }
+    }
+
     if (!meusPeds.length && !acc.ultima_compra_em) continue;
 
     const ultimaData = acc.ultima_compra_em || (meusPeds[0] && meusPeds[0].data_pedido);
@@ -261,18 +380,37 @@ async function gerarTarefasDiarias() {
         pedRef,
       });
     }
+
+    // Fonte 4 (RESERVA) — Reativacao longa: sumido de 6 meses a 2 anos. So
+    // entra na cota depois das fontes principais. A sugestao de produto e
+    // calculada DEPOIS da selecao, so pras escolhidas (evita custo a toa).
+    if (diasUltima >= REATIVACAO_LONGA_MIN_DIAS && diasUltima <= REATIVACAO_LONGA_MAX_DIAS
+        && !_estaBloqueado(acc.id, 'reativacao_longa')) {
+      candidatos.push({
+        accountId: acc.id, account: acc,
+        fonte: 'reativacao_longa',
+        motivoCurto: 'Sem comprar ha ' + Math.round(diasUltima / 30) + ' meses — retomar relacionamento',
+        sku_sugerido: null, sku_desc: null, sug_confianca: null,
+        score: _scoreReativacaoLonga(acc, diasUltima),
+        triggerId: 'reativl_' + acc.id,
+        pedRef, skusJa, diasUltima,
+      });
+    }
   }
 
   // Nao filtra mais por triggerId — dedupe ja aconteceu no _estaBloqueado acima
   const novos = candidatos;
 
-  // Dedupe por account: se um cliente aparece em 2 fontes, fica com a de maior score
-  const melhorPorAccount = {};
+  // Dedupe por CLIENTE (CPF, com fallback account_id): se o mesmo cliente
+  // aparece em 2 fontes — ou em 2 fichas diferentes com o mesmo documento —
+  // fica so a de maior score. Garante no maximo 1 tarefa nova por cliente/rodada.
+  const melhorPorCliente = {};
   for (const c of novos) {
-    const atual = melhorPorAccount[c.accountId];
-    if (!atual || atual.score < c.score) melhorPorAccount[c.accountId] = c;
+    const ck = clienteKeyPorAccount[c.accountId] || _clienteKey(c.account);
+    const atual = melhorPorCliente[ck];
+    if (!atual || atual.score < c.score) melhorPorCliente[ck] = c;
   }
-  const dedupados = Object.values(melhorPorAccount);
+  const dedupados = Object.values(melhorPorCliente);
 
   // Agrupa por vendedor (dono da tarefa). Realoca account/orders órfãos
   // pro vendedor do rodizio — mas AGORA EM BATCH, nao mais 1 write por doc.
@@ -284,26 +422,68 @@ async function gerarTarefasDiarias() {
   // AGORA: coletamos todas as realocacoes em 2 Maps (uma pra accounts, outra
   // pra orders) enquanto montamos o porOwner. No final chamamos _flushRealoc*
   // uma unica vez pra cada collection — 1 write ao inves de 20-40, zero 409.
+  // Candidato "flexivel" = cliente SEM dono real (orfao: gerencia/tray/vazio).
+  // So esses podem ser redistribuidos — carteira de vendedor nunca e tocada.
   const porOwner = {};
-  const realocAccounts = new Map(); // accountId -> novoDono
-  const realocOrders = new Map();   // orderId -> novoDono
+  for (const v of VENDEDORES_ATIVOS) porOwner[v] = [];
   for (const c of dedupados) {
     const owner = _resolverVendedor(c.account, ordersPorAccount[c.accountId]);
-    // Se account tava órfão (gerencia/tray/vendedor fora da lista), marca pra realocar
     const ownerOriginal = _normLogin(c.account && c.account.owner_id);
-    if (!_isVendedorReal(ownerOriginal)) {
-      realocAccounts.set(c.accountId, owner);
-      // Também marca orders dessa conta que estavam órfãos
-      const peds = ordersPorAccount[c.accountId] || [];
-      for (const p of peds) {
-        if (!_isVendedorReal(_normLogin(p.vendedor_id))) {
-          realocOrders.set(p.id, owner);
-        }
+    const flexivel = !_isVendedorReal(ownerOriginal);
+    (porOwner[owner] = porOwner[owner] || []).push({ ...c, owner_id: owner, flexivel });
+  }
+
+  // COTA DO DIA = TAREFAS_POR_VENDEDOR - (ja criadas HOJE pra ele).
+  // Pendentes de dias anteriores NAO reduzem a cota — elas ficam e acumulam.
+  const finais = [];
+  const cotaPorVendedor = {};
+  const sobras = []; // flexiveis que o "dono do rodizio" nao precisou usar
+  for (const owner of Object.keys(porOwner)) {
+    porOwner[owner].sort((a, b) => b.score - a.score);
+    const jaCriadasHoje = criadasHojePorVendedor[owner] || 0;
+    const cota = Math.max(0, TAREFAS_POR_VENDEDOR - jaCriadasHoje);
+    cotaPorVendedor[owner] = cota;
+    // Rodizio entre fontes (variedade garantida); fontes de RESERVA so completam.
+    const escolhidos = cota > 0 ? _selecionarBalanceado(porOwner[owner], cota) : [];
+    finais.push(...escolhidos);
+    const usados = new Set(escolhidos.map(c => c.accountId));
+    for (const c of porOwner[owner]) if (c.flexivel && !usados.has(c.accountId)) sobras.push(c);
+  }
+
+  // Redistribuicao: quem nao chegou nas 20 de hoje recebe orfaos que sobraram
+  // da lista de outro vendedor. Garante "20 por dia" mesmo com base desigual.
+  const deficit = {};
+  for (const owner of VENDEDORES_ATIVOS) {
+    const recebidas = finais.filter(c => c.owner_id === owner).length;
+    const falta = (cotaPorVendedor[owner] || 0) - recebidas;
+    if (falta > 0) deficit[owner] = falta;
+  }
+  let redistribuidas = 0;
+  if (Object.keys(deficit).length && sobras.length) {
+    const jaUsados = new Set(finais.map(c => c.accountId));
+    const pool = sobras.filter(c => !jaUsados.has(c.accountId)).sort((a, b) => b.score - a.score);
+    for (const owner of Object.keys(deficit)) {
+      if (!pool.length) break;
+      const extra = _selecionarBalanceado(pool, deficit[owner]);
+      for (const c of extra) {
+        finais.push({ ...c, owner_id: owner, redistribuida: true });
+        const idx = pool.indexOf(c); if (idx >= 0) pool.splice(idx, 1);
+        redistribuidas++;
       }
     }
-    (porOwner[owner] = porOwner[owner] || []).push({ ...c, owner_id: owner });
   }
-  // Faz os flushes em batch — com retry 409 interno (igual na parte de activities)
+
+  // Realoca SO os clientes orfaos que de fato viraram tarefa (antes realocava
+  // todo candidato, mesmo sem tarefa). Batch: 1 write por colecao, sem 409.
+  const realocAccounts = new Map(); // accountId -> novoDono
+  const realocOrders = new Map();   // orderId -> novoDono
+  for (const c of finais) {
+    if (!c.flexivel) continue;
+    realocAccounts.set(c.accountId, c.owner_id);
+    for (const p of (ordersPorAccount[c.accountId] || [])) {
+      if (!_isVendedorReal(_normLogin(p.vendedor_id))) realocOrders.set(p.id, c.owner_id);
+    }
+  }
   if (realocAccounts.size > 0) {
     try { await _flushRealocAccountsBatch(realocAccounts, 'automacao-cron-diario'); }
     catch (e) { console.warn('[automacaoUpsell] batch accounts falhou: ' + (e.message || e)); }
@@ -313,18 +493,16 @@ async function gerarTarefasDiarias() {
     catch (e) { console.warn('[automacaoUpsell] batch orders falhou: ' + (e.message || e)); }
   }
 
-  // Pega top da cota por vendedor. A cota NAO e fixa em TAREFAS_POR_VENDEDOR —
-  // e o quanto FALTA pra cada vendedor chegar em TAREFAS_POR_VENDEDOR pendentes.
-  // Ex: vendedor ja tem 15 pendentes -> cota = 20-15 = 5 novas. Ja tem 20 -> 0.
-  // Assim a fila fica estavel em ~20 e rodar o cron varias vezes nao infla.
-  const finais = [];
-  const cotaPorVendedor = {};
-  for (const owner of Object.keys(porOwner)) {
-    porOwner[owner].sort((a, b) => b.score - a.score);
-    const jaTem = pendentesPorVendedor[owner] || 0;
-    const cota = Math.max(0, TAREFAS_POR_VENDEDOR - jaTem);
-    cotaPorVendedor[owner] = cota;
-    if (cota > 0) finais.push(...porOwner[owner].slice(0, cota));
+  // Sugestao de produto pra fonte de reserva — so pras escolhidas.
+  for (const c of finais) {
+    if (c.fonte !== 'reativacao_longa' || !c.pedRef) continue;
+    try {
+      const sug = await _melhorSugestaoCooc(c.pedRef, c.skusJa || new Set(), REATIVACAO_CONF_MIN);
+      if (sug) {
+        c.sku_sugerido = sug.sku; c.sku_desc = sug.descricao; c.sug_confianca = sug.confianca;
+        c.motivoCurto = 'Sem comprar ha ' + Math.round((c.diasUltima || 0) / 30) + ' meses — ideal p/ ' + _corta(sug.descricao, 35);
+      }
+    } catch (_) {}
   }
 
   // Cria as activities em BULK — carrega a colecao uma vez, adiciona todas
@@ -351,9 +529,11 @@ async function gerarTarefasDiarias() {
     try {
       const prazo = c.fonte === 'aniversario'
         ? _hojeMais(PRAZO_ANIVERSARIO_DIAS)
-        : _hojeMais(PRAZO_TAREFA_DIAS);
+        : (c.fonte === 'carteira_parado' ? _hojeMais(PRAZO_CARTEIRA_DIAS) : _hojeMais(PRAZO_TAREFA_DIAS));
+      const tipoAct = (c.fonte === 'reativacao_match' || c.fonte === 'reativacao_longa') ? 'reativacao'
+        : (c.fonte === 'carteira_parado' ? 'contato' : 'trigger');
       const doc = _buildAct({
-        tipo: c.fonte === 'reativacao_match' ? 'reativacao' : 'trigger',
+        tipo: tipoAct,
         owner_id: c.owner_id,
         entidade_id: c.accountId,
         titulo: _titulo(c),
@@ -369,6 +549,10 @@ async function gerarTarefasDiarias() {
         sug_confianca: c.sug_confianca,
         dono: c.owner_id, // retrocompat filtro
       });
+      // Lote do dia (data BRT) — base da cota diaria idempotente e das
+      // metricas de acumulo ("tarefa de qual dia ainda esta aberta").
+      doc.lote_dia = hojeBRT;
+      if (c.redistribuida) doc.redistribuida = true;
       // Meta que o createDoc normalmente injeta
       doc.criado_em = nowIso;
       doc.criado_por = 'cron-oportunidades';
@@ -419,9 +603,8 @@ async function gerarTarefasDiarias() {
 
   // Contagem do que FOI criado por vendedor nesta rodada (respeitando a cota)
   const porVendedorContagem = {};
-  for (const owner of Object.keys(porOwner)) {
-    porVendedorContagem[owner] = Math.min(porOwner[owner].length, cotaPorVendedor[owner] || 0);
-  }
+  for (const owner of Object.keys(porOwner)) porVendedorContagem[owner] = 0;
+  if (criadas > 0) for (const c of finais) porVendedorContagem[c.owner_id] = (porVendedorContagem[c.owner_id] || 0) + 1;
 
   return {
     ok: true,
@@ -433,10 +616,13 @@ async function gerarTarefasDiarias() {
     erros,
     erros_detalhe: errosDetalhe,
     vendedores_atingidos: Object.keys(porOwner).length,
-    // Quantas cada vendedor JA tinha pendentes antes desta rodada (pra entender a cota)
+    lote_dia: hojeBRT,
+    // Pendentes ACUMULADAS antes desta rodada (nao reduzem mais a cota — so informativo)
     pendentes_antes: pendentesPorVendedor,
+    criadas_hoje_antes: criadasHojePorVendedor,
     cota_por_vendedor: cotaPorVendedor,
     por_vendedor: porVendedorContagem,
+    redistribuidas,
     por_fonte: _contaPorFonte(finais),
   };
 }
@@ -470,6 +656,23 @@ function _scoreCrossSell(acc, conf) {
 }
 
 // Aniversario: valor historico + bonus fixo (volume baixo, boa desculpa).
+// Carteira: o vendedor marcou a temperatura — cliente quente esfriando e o
+// mais urgente. Score alto pra entrar sempre na rodada (e lead DELE).
+function _scoreCarteira(acc, temp, diasSemContato) {
+  const base = temp === 'quente' ? 60 : (temp === 'morno' ? 45 : 30);
+  const valorPeso = Math.min(20, (Number(acc.valor_total_compras) || 0) / 1000);
+  const atrasoPeso = Math.min(15, Math.max(0, (diasSemContato || 0) - (CARTEIRA_PARADO_DIAS[temp] || 0)) * 0.5);
+  return base + valorPeso + atrasoPeso;
+}
+
+// Reserva: quanto mais valioso e frequente o cliente era, maior a prioridade.
+function _scoreReativacaoLonga(acc, diasSumido) {
+  const valorPeso = Math.min(25, (Number(acc.valor_total_compras) || 0) / 1000);
+  const freqPeso = Math.min(10, (Number(acc.pedidos_count) || 0) * 2);
+  const recencia = Math.max(0, 10 - (diasSumido - REATIVACAO_LONGA_MIN_DIAS) / 60);
+  return valorPeso + freqPeso + recencia;
+}
+
 function _scoreAniversario(acc) {
   const valorPeso = Math.min(35, (Number(acc.valor_total_compras) || 0) / 500);
   return valorPeso + 15;
@@ -748,6 +951,8 @@ function _titulo(c) {
   if (c.fonte === 'reativacao_match') return '🔥 Reativar — ' + nome;
   if (c.fonte === 'cross_sell')       return '➕ Cross-sell — ' + nome;
   if (c.fonte === 'aniversario')      return '🎉 1 ano de cliente — ' + nome;
+  if (c.fonte === 'reativacao_longa') return '♻️ Retomar contato — ' + nome;
+  if (c.fonte === 'carteira_parado')  return (c.temperatura === 'quente' ? '🔥' : '💼') + ' Carteira esfriando — ' + nome;
   return 'Oportunidade — ' + nome;
 }
 
@@ -824,12 +1029,59 @@ function _contaPorFonte(tarefas) {
   return c;
 }
 
+// Seleciona ate `cota` candidatos GARANTINDO variedade de fontes. Faz rodizio
+// entre as fontes (reativacao_match / cross_sell / aniversario), pegando o de
+// maior score de cada fonte por vez. Assim nenhuma fonte inunda a fila (ex: so
+// aniversario), mas dentro de cada fonte o score ainda decide a ordem. Se uma
+// fonte acaba, as outras preenchem o restante da cota.
+// Fontes de RESERVA (FONTES_RESERVA) nao entram no rodizio: so completam a
+// cota depois que todas as principais esgotaram. 'carteira_parado' abre o
+// rodizio (e lead do proprio vendedor esfriando — prioridade maxima).
+function _selecionarBalanceado(cands, cota) {
+  const porFonte = {};
+  for (const c of cands) (porFonte[c.fonte] = porFonte[c.fonte] || []).push(c);
+  for (const f of Object.keys(porFonte)) porFonte[f].sort((a, b) => b.score - a.score);
+  const principais = Object.keys(porFonte)
+    .filter(f => FONTES_RESERVA.indexOf(f) === -1)
+    .sort((a, b) => (a === 'carteira_parado' ? -1 : 0) - (b === 'carteira_parado' ? -1 : 0));
+  const out = [];
+  while (out.length < cota) {
+    let adicionou = false;
+    for (const f of principais) {
+      if (porFonte[f].length) {
+        out.push(porFonte[f].shift());
+        adicionou = true;
+        if (out.length >= cota) break;
+      }
+    }
+    if (!adicionou) break; // principais esgotaram
+  }
+  // Completa com a reserva (maior score primeiro)
+  if (out.length < cota) {
+    const reserva = [];
+    for (const f of FONTES_RESERVA) if (porFonte[f]) reserva.push(...porFonte[f]);
+    reserva.sort((a, b) => b.score - a.score);
+    while (out.length < cota && reserva.length) out.push(reserva.shift());
+  }
+  return out;
+}
+
 function _corta(s, n) {
   s = String(s || '');
   return s.length <= n ? s : s.slice(0, n - 1) + '…';
 }
 
 function _hojeISO() { return new Date().toISOString().slice(0, 10); }
+
+// Data no fuso de Brasilia (UTC-3, sem horario de verao desde 2019). A cota
+// diaria usa o "dia" do vendedor, nao o dia UTC (que vira as 21h de Brasilia).
+function _dataBRT(iso) {
+  if (!iso) return '';
+  const t = new Date(iso).getTime();
+  if (isNaN(t)) return '';
+  return new Date(t - 3 * 3600 * 1000).toISOString().slice(0, 10);
+}
+function _hojeBRT() { return _dataBRT(new Date().toISOString()); }
 // Data de hoje menos N dias, em ISO YYYY-MM-DD (UTC). Usado pra cooldown.
 function _hojeMenos(dias) {
   const d = new Date(); d.setUTCDate(d.getUTCDate() - Number(dias || 0));
@@ -842,6 +1094,7 @@ function _fonteDoTipo(tipo) {
   if (!tipo) return null;
   if (tipo === 'reativacao') return 'reativacao_match';
   if (tipo === 'trigger') return 'cross_sell'; // melhor palpite
+  if (tipo === 'contato') return 'carteira_parado';
   return tipo;
 }
 
@@ -970,4 +1223,6 @@ module.exports = {
   gerarTarefasDiarias,
   disparaReativacao, // alias — mantido pra cron atual
   repararAccountsOrfaosDeTarefas,
+  // helpers reaproveitados por disciplina/carteira
+  _dataBRT, _hojeBRT, VENDEDORES_ATIVOS, TAREFAS_POR_VENDEDOR, CARTEIRA_PARADO_DIAS,
 };
