@@ -6548,5 +6548,124 @@
         "nota": null
       }
     ]
+  },
+  "64cac6dc-320b-4cd4-939a-40d16fe97f91": {
+    "id": "64cac6dc-320b-4cd4-939a-40d16fe97f91",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Marcelo Vianna",
+      "cpf_cnpj": "03260481117",
+      "whatsapp": "+5561981192600",
+      "email": "marcelo_pantel@hotmail.com",
+      "cidade": "brasilia",
+      "uf": "DF",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "Nº 031599",
+      "data_compra": "2026-10-23",
+      "data_recebimento": "2026-10-28",
+      "nome_produto": "trilho picatine",
+      "marca": "whaterby",
+      "modelo": "short",
+      "numero_serie": "nao tem",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "trilho nao serve no equipamento",
+      "data_percebido_problema": "2026-10-26",
+      "chegou_defeito_ou_depois": "Funcionamento Normal",
+      "motivo_troca_devolucao": "nao serviu no equipamento",
+      "uploads": [
+        {
+          "tipo": "video",
+          "nome": "WhatsApp Video 2026-10-26 at 16.10.40.mp4",
+          "url": "https://storage.tally.so/private/WhatsApp-Video-2026-10-26-at-16.10.40.mp4?id=dJMbkV&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRKTWJrViIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MzI3NjIxNH0.YQUvOUsGa-OH7NQ799ydczpMRWDqaMe9bkHIjB5PTdM&signature=7f8f42e3cf9a3cb59f4e750ab53dc3aff82de7bc7e3c47d6bd346bba8c7bf9b5",
+          "mimeType": "video/mp4",
+          "size": 5652826
+        }
+      ]
+    },
+    "preferencia_cliente": "troca",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-10-28",
+      "data_percebido_problema": "2026-10-26",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": false,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": true
+      },
+      "_override": {
+        "sugestao": "analise_manual",
+        "justificativa": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+        "score_confianca": "baixa"
+      },
+      "preferencia_cliente": "troca",
+      "sugestao_sistema": "analise_manual",
+      "justificativa_sistema": "Cliente marcou \"Funcionamento Normal\" na pergunta de defeito. Sem vício aparente ou oculto reportado — operador deve esclarecer com o cliente qual é a reclamação específica antes de decidir.",
+      "score_confianca": "baixa",
+      "calculado_em": "2026-10-29T12:16:55.270Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-10-29T12:16:55.270Z",
+    "atualizado_em": "2026-10-29T12:16:55.270Z",
+    "tally_meta": {
+      "eventId": "sync_QoN5W0p",
+      "responseId": "QoN5W0p",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-10-28T19:45:49.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Troca (produto errado ou insatisfação)",
+      "raw_momento": "Funcionamento Normal"
+    },
+    "historico": [
+      {
+        "ts": "2026-10-29T12:16:55.270Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
