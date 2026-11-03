@@ -6703,5 +6703,133 @@
         "nota": null
       }
     ]
+  },
+  "818a6c25-f618-405a-80bd-94cd8857dfc4": {
+    "id": "818a6c25-f618-405a-80bd-94cd8857dfc4",
+    "fonte": "tally_webhook",
+    "cliente": {
+      "nome": "Charles Adriano Meneses",
+      "cpf_cnpj": "82773440659",
+      "whatsapp": "+5534992089103",
+      "email": "charlesameneses@hotmail.com",
+      "cidade": "Ibiá",
+      "uf": "MG",
+      "endereco": null,
+      "cep": null
+    },
+    "pedido": {
+      "nf": "031278",
+      "data_compra": "2026-09-08",
+      "data_recebimento": "2026-11-14",
+      "nome_produto": "RED DOT",
+      "marca": "Vector optics",
+      "modelo": "FRENZY SCRD-19ll",
+      "numero_serie": "N/A",
+      "bling_pedido_id": null,
+      "vendedor_bling": null,
+      "valor_pedido": null
+    },
+    "problema": {
+      "descricao_cliente": "Produto apresenta defeito no ajuste do laser vertical e horizontalmente.",
+      "data_percebido_problema": "2026-10-10",
+      "chegou_defeito_ou_depois": "Chegou com defeito",
+      "motivo_troca_devolucao": "Produto ja foi para garantia e continua com defeito.",
+      "uploads": [
+        {
+          "tipo": "foto",
+          "nome": "IMG_6069.jpeg",
+          "url": "https://storage.tally.so/private/IMG_6069.jpeg?id=rMOgB2&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJNT2dCMiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MzcxNzI3M30.dz-n6EHE4VHZHilIlHxQdQv6AvKlem_78ANhpaR0U0Y&signature=57e6c80988df700341c0919c4ddc719e3107dcbc0305bc228d30f96564ac8a8f",
+          "mimeType": "image/jpeg",
+          "size": 3948251
+        },
+        {
+          "tipo": "foto",
+          "nome": "IMG_6068.jpeg",
+          "url": "https://storage.tally.so/private/IMG_6068.jpeg?id=WVRQrv&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IldWUlFydiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MzcxNzI3M30.vcE6egM84huvzIZsjWdC5m_3joQK1F0qOCpUG8JPYTI&signature=de48715405e241c7919b3701bb4d46c0cc9bf01da994c5979dc278dbbd3a1f7d",
+          "mimeType": "image/jpeg",
+          "size": 2965391
+        },
+        {
+          "tipo": "foto",
+          "nome": "IMG_6066.jpeg",
+          "url": "https://storage.tally.so/private/IMG_6066.jpeg?id=lkOgev&accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImxrT2dldiIsImZvcm1JZCI6InJqWTdXbCIsImlhdCI6MTc5MzcxNzI3M30.7LK9GAwo_65pRpsYqOEgOu0REB1p665RrR8BZYtnHUs&signature=0134c938fa5049638c058b2240604b7b9d434176a81b98ff41e5c8efae18afd8",
+          "mimeType": "image/jpeg",
+          "size": 3530863
+        }
+      ]
+    },
+    "preferencia_cliente": "restituicao",
+    "avaliacao_cdc": {
+      "tipo_produto": "durável",
+      "data_recebimento": "2026-11-14",
+      "data_percebido_problema": "2026-10-10",
+      "tipo_vicio": "aparente",
+      "forma_compra": "online",
+      "eh_arrependimento": true,
+      "teve_queda_impacto_agua": "nao",
+      "teve_modificacao": "nao",
+      "tem_evidencia": true,
+      "_flags_brutas": {
+        "queda_impacto": false,
+        "agua_umidade": false,
+        "aberto_por_terceiros": false,
+        "usado_conforme_manual": true,
+        "funcionamento_normal": false
+      },
+      "preferencia_cliente": "restituicao",
+      "sugestao_sistema": "procedente_restituicao",
+      "justificativa_sistema": "Pedido de arrependimento em compra à distância, dentro do prazo de 7 dias (CDC Art. 49). Devolução integral do valor pago, incluindo frete.",
+      "score_confianca": "alta",
+      "calculado_em": "2026-11-03T14:47:54.004Z"
+    },
+    "decisao_operador": null,
+    "status": "aberto",
+    "resultado": null,
+    "produto_fisico": {
+      "status": "nao_solicitado",
+      "rastreio_entrada": null,
+      "aguardando_desde": null,
+      "recebido_em": null,
+      "recebido_por": null,
+      "localizacao_loja": null,
+      "etiqueta_impressa_em": null,
+      "etiqueta_impressa_por": null,
+      "envio_fabricante": null,
+      "resolucao_fabricante": null
+    },
+    "procedimento_interno": {
+      "status": "nao_aplicavel",
+      "pedido_substituto": null,
+      "pedido_substituto_data": null,
+      "baixa_estoque_feita": false,
+      "baixa_estoque_sku": null,
+      "baixa_estoque_qtd": null,
+      "estorno_valor": null,
+      "estorno_meio": null,
+      "nota": null,
+      "atualizado_em": null,
+      "atualizado_por": null,
+      "concluido_em": null,
+      "concluido_por": null
+    },
+    "criado_por": "tally-webhook",
+    "criado_em": "2026-11-03T14:47:54.004Z",
+    "atualizado_em": "2026-11-03T14:47:54.004Z",
+    "tally_meta": {
+      "eventId": "sync_Eq7Qyxq",
+      "responseId": "Eq7Qyxq",
+      "formId": "rjY7Wl",
+      "createdAt": "2026-11-03T14:47:44.000Z",
+      "raw_onde_comprou": "Site da Pro Hunters (prohunters.com.br)",
+      "raw_desejo": "Devolução (arrependimento de compra)",
+      "raw_momento": "Chegou com defeito"
+    },
+    "historico": [
+      {
+        "ts": "2026-11-03T14:47:54.004Z",
+        "acao": "criada",
+        "por": "tally-webhook"
+      }
+    ]
   }
 }
