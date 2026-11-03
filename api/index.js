@@ -1021,6 +1021,24 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // GET /api/crm/diag/colecoes — contagem por coleção (read-only). Serve pra
+  // confirmar se a paginação do store está ativa: se orders/accounts passam de
+  // 1000, a leitura paginada funciona; se travam em 1000, o teto ainda morde.
+  if (req.method === 'GET' && url === '/api/crm/diag/colecoes') {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
+    try {
+      const nomes = ['accounts','orders','activities','contacts','leads','opportunities','onboardings','documentos','armas','envios','romaneios','contratos','referrals'];
+      const out = {};
+      for (const n of nomes) {
+        try { out[n] = Object.keys(await crmStore.getCollection(n)).length; }
+        catch (e) { out[n] = 'erro: ' + (e.message || String(e)).slice(0, 80); }
+      }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, contagem: out }, null, 2));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
   // POST /api/garantias/limpar-tally — DESTRUTIVO: apaga TODAS as garantias com
   // fonte='tally_webhook'. Preserva as manuais. Usado quando acumulou lixo e
   // queremos re-importar do zero. Admin/diretor/auxiliar.
