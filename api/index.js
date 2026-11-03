@@ -2989,8 +2989,8 @@ module.exports = async (req, res) => {
           }
         }
       }
-      // Conta follow-ups por account_id pra mostrar "Tentativa X de 3" no front
-      const MAX_FOLLOWUPS_CLIENTE = 3;
+      // Conta follow-ups por account_id só pra mostrar "Tentativa X" no front
+      // (sem limite — o vendedor reagenda quantas vezes precisar).
       const followCountPorAcc = {};
       if (tarefas.length) {
         const allActs = await crmStore.listDocs('activities', a =>
@@ -3004,7 +3004,7 @@ module.exports = async (req, res) => {
         const aid = t.account_id || t.entidade_id;
         if (aid && followCountPorAcc[aid]) {
           t.followups_cliente = followCountPorAcc[aid];
-          t.followups_max = MAX_FOLLOWUPS_CLIENTE;
+          t.followups_max = null; // sem teto
         }
       }
       // Acumulo: ha quantos dias cada tarefa esta aberta (dia BRT). Tarefa de
@@ -3351,25 +3351,10 @@ module.exports = async (req, res) => {
       const now = new Date().toISOString();
       const dono = donoTarefa || meuLogin;
       const accId = t.account_id || t.entidade_id || null;
-      // ── Limite de 3 follow-ups por cliente ──
-      // Conta quantos follow-ups (pendentes + concluídos com resultado follow_up_agendado)
-      // já existem para o mesmo account_id. Na 4ª tentativa, bloqueia.
-      const MAX_FOLLOWUPS = 3;
-      if (accId) {
-        const followsPrevios = await crmStore.listDocs('activities', a =>
-          a.fonte === 'follow_up' &&
-          (a.account_id || a.entidade_id) === accId &&
-          (a.status === 'pendente' || a.resultado === 'follow_up_agendado'));
-        if (followsPrevios.length >= MAX_FOLLOWUPS) {
-          res.writeHead(400,{'Content-Type':'application/json'});
-          res.end(JSON.stringify({
-            error: 'Limite de ' + MAX_FOLLOWUPS + ' follow-ups atingido para este cliente. Finalize como "Não convertido" — o cliente voltará automaticamente pelo motor de reativação em 30-60 dias.',
-            limite_atingido: true,
-            total_followups: followsPrevios.length
-          }));
-          return;
-        }
-      }
+      // Follow-ups SEM limite: o vendedor pode reagendar quantas vezes precisar
+      // pra converter. (Antes travava na 4ª tentativa; removido a pedido do
+      // comercial.) Mantemos só a contagem — exposta como "Tentativa X" — pra
+      // dar visibilidade, sem bloquear.
       // Nome do cliente pro titulo (busca o account; se nao achar usa o titulo antigo)
       let nomeCliente = null;
       if (accId) { try { const acc = await crmStore.getDoc('accounts', accId); if (acc) nomeCliente = acc.nome || acc.razao_social; } catch(_){} }
