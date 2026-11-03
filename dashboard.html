@@ -6699,11 +6699,10 @@ function tqLinhaTarefa(t, venc){
   var tel = t.cliente_telefone ? crmNormalizaTelBR(t.cliente_telefone) : null;
   var pitch = t.pitch_pronto || '';
   var accIdCta = t.entidade_id || t.account_id || '';
-  // WhatsApp em TODA tarefa: com telefone abre a conversa direto; sem telefone,
-  // o botão pede o número, salva na ficha do cliente e abre o WhatsApp.
-  var cta = tel
-    ? '<a class="tq-cta wa" href="https://wa.me/' + tel + '?text=' + encodeURIComponent(pitch || ('Olá! Aqui é da Pro Hunters.')) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();crmRegistraContato(\'' + id + '\',\'whatsapp\')" title="Abrir WhatsApp com a mensagem pronta">💬 WhatsApp</a>'
-    : '<button class="tq-cta wa" onclick="event.stopPropagation();crmWhatsSemTel(\'' + crmEsc(accIdCta) + '\',\'' + id + '\')" title="Cliente sem telefone — clique para adicionar o número e abrir o WhatsApp">💬 WhatsApp</button>';
+  // CTA = "Ver ficha": abre o painel inline (mesma tela) com as especificidades
+  // do cliente, a tarefa pendente E o botão de WhatsApp já com o número.
+  var cta = '<button class="tq-cta ficha" onclick="event.stopPropagation();tqToggle(\'' + k + '\')" aria-expanded="' + aberto + '" title="Abrir a ficha e a tarefa do cliente sem sair da tela">' +
+    (aberto ? '▴ Fechar' : '📋 Ver ficha') + '</button>';
   var h = '<div class="tq-row' + (aberto ? ' aberto' : '') + (venc ? ' venc' : '') + '" id="tar-' + id + '" data-k="' + k + '">' +
     '<button class="tq-main" onclick="tqToggle(\'' + k + '\')" aria-expanded="' + aberto + '">' +
       '<span class="tq-ic">' + tqIcone(t) + '</span>' +
@@ -6712,12 +6711,21 @@ function tqLinhaTarefa(t, venc){
   if (!aberto) return h;
   var accId = t.entidade_id || t.account_id || '';
   var desc = t.descricao ? String(t.descricao).split(/\n?💡/)[0].trim() : '';
+  // Botão de WhatsApp JÁ com o número do cliente. Abre direto a conversa no
+  // WhatsApp Web, numa janela nomeada ("phWhatsWeb") que é reaproveitada a cada
+  // clique — não fica abrindo uma aba nova por tarefa.
+  var waMsg = encodeURIComponent(pitch || 'Olá! Aqui é da Pro Hunters.');
+  var waBtn = tel
+    ? '<a class="tq-waline" href="https://web.whatsapp.com/send?phone=' + tel + '&text=' + waMsg + '" target="phWhatsWeb" rel="noopener noreferrer" onclick="crmRegistraContato(\'' + id + '\',\'whatsapp\')" title="Abrir a conversa no WhatsApp Web">💬 WhatsApp' + (t.cliente_telefone ? ' · ' + crmEsc(t.cliente_telefone) : '') + '</a>'
+    : '<button class="tq-waline semtel" onclick="crmWhatsSemTel(\'' + crmEsc(accId) + '\',\'' + id + '\')" title="Cliente sem telefone — adicione o número e abra o WhatsApp">💬 Adicionar número e abrir WhatsApp</button>';
   h += '<div class="tq-det">' +
+    '<div class="tq-warow">' + waBtn + '</div>' +
     (desc ? '<div class="tq-desc">' + crmEsc(desc) + '</div>' : '') +
     (pitch ? '<div class="tq-pitch"><div class="tar-pitch">' + crmEsc(pitch) + '</div><button onclick="crmCopiarPitch(\'' + id + '\', this)">📋 Copiar</button></div>' : '') +
-    '<div class="tq-links">' + (t.cliente_telefone ? '<span>📞 ' + crmEsc(t.cliente_telefone) + '</span>' : '') +
-      (accId ? '<a href="#" onclick="crmAbrirFicha(\'' + crmEsc(accId) + '\');return false">Ver ficha do cliente</a>' : '') +
-      (t.prazo ? '<span>Prazo ' + crmFmtDate(t.prazo) + (t.hora ? ' ' + crmEsc(t.hora) : '') + '</span>' : '') + '</div>' +
+    '<div class="tq-links">' +
+      (accId ? '<a href="#" onclick="crmAbrirFicha(\'' + crmEsc(accId) + '\');return false">Abrir ficha completa →</a>' : '') +
+      (t.prazo ? '<span>Prazo ' + crmFmtDate(t.prazo) + (t.hora ? ' ' + crmEsc(t.hora) : '') + '</span>' : '') +
+      (t.followups_cliente ? '<span>Tentativa ' + t.followups_cliente + '</span>' : '') + '</div>' +
     '<div class="tq-fim"><span>Como terminou?</span>' +
       '<button class="ok" onclick="crmConcluirTarefa(\'' + id + '\', \'convertida\')">✓ Vendeu</button>' +
       '<button onclick="crmFinalizarModal(\'' + id + '\', \'nao\')">Não vendeu</button>' +
@@ -7049,27 +7057,15 @@ function crmAbrirFollowUp(id){
   var nome = t.cliente_nome || 'cliente';
   var descAtual = t.descricao || t.titulo || '';
   var fuCount = t.followups_cliente || 0;
-  var fuMax = t.followups_max || 3;
   var fuAtual = fuCount + 1; // esta seria a próxima tentativa
-  // Se já atingiu o limite, mostra aviso e bloqueia
-  if (fuCount >= fuMax) {
-    var htmlBlock = '<div id="crm-mdl-followup" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10055;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)crmFecharFollowUp()">' +
-      '<div style="background:#fff;border-radius:12px;max-width:460px;width:100%;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,.3);text-align:center">' +
-        '<div style="font-size:36px;margin-bottom:8px">🔄</div>' +
-        '<h3 style="margin:0 0 8px;color:#c62828">Limite de follow-ups atingido</h3>' +
-        '<p style="font-size:13px;color:#555;margin:0 0 16px">Você já reagendou <b>' + fuCount + ' vez' + (fuCount > 1 ? 'es' : '') + '</b> para <b>' + crmEsc(nome) + '</b>.<br><br>' +
-          'Finalize como <b>"Não convertido"</b> com o motivo adequado. O cliente voltará automaticamente pelo motor de reativação em 30-60 dias.</p>' +
-        '<button onclick="crmFecharFollowUp()" style="background:#0e6bd4;color:#fff;border:none;border-radius:6px;padding:10px 22px;font-weight:700;cursor:pointer">Entendi</button>' +
-      '</div></div>';
-    document.body.insertAdjacentHTML('beforeend', htmlBlock);
-    return;
-  }
+  // Sem limite de follow-ups: o vendedor reagenda quantas vezes precisar.
   // Default: amanhã
   var amanha = new Date(Date.now() + 86400000).toISOString().slice(0,10);
   var hojeStr = new Date().toISOString().slice(0,10);
+  // A partir da 4ª tentativa, muda a cor do selo só como alerta visual (não bloqueia).
   var fuTag = fuCount > 0
     ? '<span style="display:inline-block;margin-left:8px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;' +
-        (fuAtual >= fuMax ? 'background:#fff3e0;color:#e65100' : 'background:#e3f2fd;color:#1565c0') + '">Tentativa ' + fuAtual + ' de ' + fuMax + '</span>'
+        (fuAtual >= 4 ? 'background:#fff3e0;color:#e65100' : 'background:#e3f2fd;color:#1565c0') + '">Tentativa ' + fuAtual + '</span>'
     : '';
   var html = '<div id="crm-mdl-followup" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10055;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)crmFecharFollowUp()">' +
     '<div style="background:#fff;border-radius:12px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,.3)">' +
@@ -13680,6 +13676,10 @@ async function cartSalvarNotas(id){
 #tab-crm .tq-dots i.at{background:#111412}
 #tab-crm .tq-cta{flex:0 0 auto;border:1px solid #d5d8d5;background:#fff;color:#111412;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;font-family:inherit}
 #tab-crm .tq-cta.wa{background:#25D366;border-color:#25D366;color:#fff}
+#tab-crm .tq-cta.ficha{background:#1f9d55;border-color:#1f9d55;color:#fff}
+#tab-crm .tq-warow{margin:10px 0 2px}
+#tab-crm .tq-waline{display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;font-family:inherit}
+#tab-crm .tq-waline.semtel{background:#128C7E}
 #tab-crm .tq-cta.pri{background:#111412;border-color:#111412;color:#fff}
 #tab-crm .tq-cta.bad{background:#d03b3b;border-color:#d03b3b;color:#fff}
 #tab-crm .tq-det{padding:4px 16px 14px 58px;background:#fafbfa;border-top:1px dashed #e7ebe7}
