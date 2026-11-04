@@ -2491,22 +2491,29 @@ var SALE_SOUNDS = [
 ];
 
 var lastSaleSoundIdx = -1;
+var _lastSalePlayTs = 0;
+// Toca SOMENTE os 2 MP3s enviados (aleatório entre os dois) e SOMENTE no acesso
+// da Maria (auxiliar) — a tela que fica na TV. Assim o som sai uma vez, na TV,
+// e não em cada tela de vendedor. O debounce de 1.5s evita tocar 2x no mesmo
+// evento (ex.: venda que também troca o líder).
 function playSaleSound() {
- // Garante que não repete o mesmo som duas vezes seguidas
- var idx;
- do { idx = Math.floor(Math.random() * SALE_SOUNDS.length); }
- while (idx === lastSaleSoundIdx && SALE_SOUNDS.length > 1);
+ if (!window.IS_SOM_TV) return;
+ var now = Date.now();
+ if (now - _lastSalePlayTs < 1500) return;
+ _lastSalePlayTs = now;
+ var n = _saleAudios.length;
+ if (!n) return;
+ var idx = Math.floor(Math.random() * n);
+ if (idx === lastSaleSoundIdx && n > 1) idx = (idx + 1) % n; // não repete o mesmo seguido
  lastSaleSoundIdx = idx;
- SALE_SOUNDS[idx]();
+ try { var a = _saleAudios[idx].cloneNode(); a.volume = 0.5; a.play().catch(function(){}); } catch (e) {}
 }
 
 
 // Som de troca de lideranca (coroa mudou de dono): pequena fanfarra, mais longa e festiva
 function playCrownSound() {
- const notes = [523.25, 659.25, 783.99, 1046.50]; // C5 E5 G5 C6 (arpejo maior subindo)
- notes.forEach((f, i) => playTone(f, i * 0.11, 0.26, 'square', 0.16));
- playTone(1318.51, 0.52, 0.55, 'sawtooth', 0.18); // E6 final, sustentada
- playTone(1567.98, 0.52, 0.55, 'sawtooth', 0.12); // G6 junto, da corpo de "acorde"
+ // Só os 2 MP3s (via playSaleSound) — gate na Maria + debounce já tratados lá.
+ playSaleSound();
 }
 
 // Detecta troca de lider entre uma renderizacao do podio e a proxima, pra tocar
@@ -2915,10 +2922,13 @@ async function pollComercialData() {
  const resp = await fetch('/api/comercial');
  if (!resp.ok) return;
  const payload = await resp.json();
+ if (payload.role !== undefined) window.IS_SOM_TV = (payload.role === 'auxiliar');
+ let houveVendaNova = false; // faturamento subiu = venda nova entrou (toca na TV)
  (payload.sellers || []).forEach(saved => {
  const s = sellers.find(x => x.id === saved.id);
  if (!s) return;
  if (s.fat !== saved.fat) {
+ if (Number(saved.fat) > Number(s.fat)) houveVendaNova = true;
  s.fat = saved.fat;
  const fatEl = document.getElementById(`inp-${saved.id}-fat`);
  if (fatEl && document.activeElement !== fatEl) fatEl.value = saved.fat;
@@ -2929,11 +2939,15 @@ async function pollComercialData() {
  // Site: pega o valor mais recente do servidor (outras pessoas podem lançar)
  const novoSite = Number(payload.siteFat) || 0;
  if (novoSite !== (Number(window.siteFat) || 0)) {
+   if (novoSite > (Number(window.siteFat) || 0)) houveVendaNova = true;
    window.siteFat = novoSite;
  }
  renderSiteAndTotal();
  renderAll();
  loadPistaMeta(); // mantém a régua em sincronia com vendas de outras pessoas
+ // Som da venda SÓ na TV (Maria/auxiliar) — o playSaleSound já faz o gate.
+ // O debounce evita duplicar se renderAll() já tocou por troca de líder.
+ if (houveVendaNova) playSaleSound();
  } catch (e) { /* silencioso — tenta de novo no proximo ciclo */ }
 }
 
@@ -3006,6 +3020,8 @@ async function loadData() {
  const payload = await resp.json();
 
  window.CAN_EDIT_COMERCIAL = !!payload.canEdit;
+ // Som de venda só toca no acesso da Maria (auxiliar) — a tela da TV.
+ window.IS_SOM_TV = (payload.role === 'auxiliar');
  currentMesReferencia = payload.mesReferencia || null;
  historyData = payload.history || [];
  window.siteFat = Number(payload.siteFat) || 0;
