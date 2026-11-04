@@ -3950,9 +3950,13 @@ module.exports = async (req, res) => {
         res.end(JSON.stringify({error:'Este cliente esta atribuido a outro vendedor.'}));
         return;
       }
-      const orders = await crmStore.listDocs('orders', o => o.account_id === accId);
+      // Busca FILTRADA no banco (só os docs deste cliente) em vez de carregar a
+      // coleção inteira — orders tem ~2400 linhas e o getCollection estourava o
+      // statement_timeout. Pedidos casam por account_id; atividades por
+      // account_id OU entidade_id (algumas legadas usam entidade_id).
+      const orders = await crmStore.listDocsByField('orders', 'account_id', accId);
       orders.sort((a, b) => String(b.data_pedido || '').localeCompare(String(a.data_pedido || '')));
-      const activities = await crmStore.listDocs('activities', a => a.account_id === accId || (a.entidade_tipo === 'account' && a.entidade_id === accId));
+      const activities = await crmStore.listDocsByField('activities', ['account_id', 'entidade_id'], accId);
       activities.sort((a, b) => String(b.criado_em || '').localeCompare(String(a.criado_em || '')));
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ account, orders, activities }));
