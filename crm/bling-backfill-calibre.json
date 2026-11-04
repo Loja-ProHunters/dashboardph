@@ -7,26 +7,6 @@
   "ate": "2026-11-04",
   "meses": 12,
   "ids_pendentes": [
-    "27296425726",
-    "27296365746",
-    "27267832504",
-    "27258969915",
-    "27258716986",
-    "27255342935",
-    "27249498057",
-    "27246702566",
-    "27239343349",
-    "27238453455",
-    "27236905063",
-    "27230913065",
-    "27226751857",
-    "27210897086",
-    "27208584664",
-    "27199461430",
-    "27199408246",
-    "27190975230",
-    "27190592154",
-    "27189886595",
     "27186977272",
     "27186908884",
     "27182091505",
@@ -432,13 +412,16 @@
     "24237183957"
   ],
   "total_original": 423,
-  "processados": 0,
-  "accounts_criadas": 0,
-  "orders_criadas": 0,
+  "processados": 20,
+  "accounts_criadas": 17,
+  "orders_criadas": 19,
   "orders_atualizadas": 0,
   "ja_existentes": 0,
   "rate_limit_perdidos": 0,
   "erros_outros": 0,
-  "avisos": [],
-  "truncado_paginacao": false
+  "avisos": [
+    "pedido 27267832504: sem CPF/CNPJ do contato — pulando"
+  ],
+  "truncado_paginacao": false,
+  "ultimo_lote_em": "2026-11-04T12:12:14.852Z"
 }
