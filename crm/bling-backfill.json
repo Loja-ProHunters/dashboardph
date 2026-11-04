@@ -1805,24 +1805,19 @@
     "24245235704",
     "24242797029",
     "24238254154",
-    "24234090855",
-    "26928461934",
-    "26923930437"
+    "24234090855"
   ],
   "total_original": 2099,
-  "processados": 298,
-  "accounts_criadas": 158,
-  "orders_criadas": 257,
+  "processados": 300,
+  "accounts_criadas": 155,
+  "orders_criadas": 240,
   "orders_atualizadas": 0,
-  "ja_existentes": 41,
-  "rate_limit_perdidos": 2,
+  "ja_existentes": 60,
+  "rate_limit_perdidos": 0,
   "erros_outros": 0,
-  "avisos": [
-    "pedido 26928461934 [prohunters]: Bling API \"prohunters\" 429 em GET /pedidos/vendas/26928461934: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
-    "pedido 26923930437 [prohunters]: Bling API \"prohunters\" 429 em GET /pedidos/vendas/26923930437: O limite de requisições por segundo foi atingido, tente novamente mais tarde."
-  ],
+  "avisos": [],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-11-04T12:55:39.600Z",
+  "ultimo_lote_em": "2026-11-04T12:55:47.133Z",
   "ticks_hoje_data": "2026-11-04",
-  "ticks_hoje_count": 14
+  "ticks_hoje_count": 11
 }
