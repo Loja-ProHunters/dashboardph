@@ -637,6 +637,43 @@ tbody td {
 }
 
 .podium-race{width:100%;max-width:640px;position:relative;z-index:2}
+
+/* ═══ MODO TV — pódio em tela cheia pra sala acompanhar ═══ */
+.tv-btn{margin-top:18px;background:var(--black3);border:1px solid var(--border2);color:#cfcfcf;border-radius:99px;padding:8px 18px;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;cursor:pointer;font-family:inherit;transition:border-color .2s,color .2s,box-shadow .2s}
+.tv-btn:hover{border-color:#f0c96b;color:#f0c96b;box-shadow:0 0 20px -6px rgba(240,201,107,.55)}
+.tv-exit{display:none}
+body.tv-mode{overflow:hidden}
+body.tv-mode header,
+body.tv-mode .tabs-bar,
+body.tv-mode .meta-track,
+body.tv-mode .podium-race,
+body.tv-mode .registrar-venda-card,
+body.tv-mode .last-champion-banner,
+body.tv-mode .tv-btn,
+body.tv-mode .tab-panel:not(#tab-podio){display:none !important}
+body.tv-mode main{padding:0;max-width:none;margin:0}
+body.tv-mode #tab-podio{display:flex !important;align-items:center;justify-content:center;min-height:100vh}
+body.tv-mode .podium-stage{min-height:100vh;width:100vw;padding:0}
+body.tv-mode .podium-layout{max-width:none;transform:scale(1.4);transform-origin:center center}
+body.tv-mode .podium-title{font-size:42px}
+body.tv-mode .podium-title-wrap{margin-bottom:44px}
+/* flutuação dos vendedores (defasada por posição) */
+body.tv-mode .podium-block{opacity:1 !important;animation:tvFloat 4.6s ease-in-out infinite}
+body.tv-mode .podium-block.pos-1{animation-delay:0s}
+body.tv-mode .podium-block.pos-2{animation-delay:.9s}
+body.tv-mode .podium-block.pos-3{animation-delay:1.7s}
+@keyframes tvFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+/* brilho pulsante nas fotos, cor por posição */
+body.tv-mode .podium-photo{animation:tvGlowGold 3.2s ease-in-out infinite}
+@keyframes tvGlowGold{0%,100%{filter:drop-shadow(0 0 6px rgba(240,201,107,.35))}50%{filter:drop-shadow(0 0 28px rgba(240,201,107,.9))}}
+body.tv-mode .podium-block.pos-2 .podium-photo{animation-name:tvGlowSilver}
+body.tv-mode .podium-block.pos-3 .podium-photo{animation-name:tvGlowBronze}
+@keyframes tvGlowSilver{0%,100%{filter:drop-shadow(0 0 5px rgba(200,204,208,.3))}50%{filter:drop-shadow(0 0 22px rgba(200,204,208,.75))}}
+@keyframes tvGlowBronze{0%,100%{filter:drop-shadow(0 0 5px rgba(205,138,76,.3))}50%{filter:drop-shadow(0 0 22px rgba(205,138,76,.75))}}
+body.tv-mode .tv-exit{display:block;position:fixed;top:20px;right:24px;z-index:99999;background:rgba(0,0,0,.5);border:1px solid var(--border2);color:#bbb;border-radius:99px;padding:9px 18px;font-size:12px;font-weight:700;letter-spacing:.5px;cursor:pointer;font-family:inherit;opacity:.3;transition:opacity .25s,border-color .2s,color .2s}
+body.tv-mode .tv-exit:hover{opacity:1;border-color:var(--red);color:var(--red)}
+@media (max-width:980px){ body.tv-mode .podium-layout{transform:scale(1)} }
+
 .hist-trophy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
 .hist-trophy-card{
   background:var(--black3);border:1px solid var(--border2);border-radius:14px;padding:20px;text-align:center;
@@ -998,6 +1035,7 @@ tbody td {
  TAB 0 — PÓDIO (COMPETIÇÃO AO VIVO)
 ═══════════════════════════════════════════ -->
 <div class="tab-panel active" id="tab-podio">
+ <button class="tv-exit" onclick="toggleTvMode()" title="Sair do modo TV (Esc)">✕ Sair do Modo TV</button>
 
  <!-- ═══════════════════════════════════════════
       PISTA DA META DIÁRIA — régua gamificada compacta
@@ -1078,6 +1116,7 @@ tbody td {
    <span class="pe-sep">·</span>
    <span>Total do mês: <b id="tg-value">R$ 0</b></span>
  </div>
+ <button class="tv-btn" onclick="toggleTvMode()" title="Exibir só o pódio em tela cheia na TV da sala">📺 Modo TV</button>
  </div>
  <div class="podium-stand" id="podium-stand"></div>
  <div class="podium-race" id="podium-race"></div>
@@ -3013,6 +3052,36 @@ function showTab(name) {
  document.getElementById('tab-' + name)?.classList.add('active');
  event.target.classList.add('active');
 }
+
+// ── Modo TV: mostra só o pódio em tela cheia (pra TV da sala) ──
+// Liga/desliga a classe .tv-mode (que o CSS usa pra esconder tudo menos o
+// pódio e aplicar brilho/flutuação) e entra/sai do fullscreen do navegador.
+function toggleTvMode() {
+ const ligar = !document.body.classList.contains('tv-mode');
+ document.body.classList.toggle('tv-mode', ligar);
+ try {
+   if (ligar) {
+     const el = document.documentElement;
+     (el.requestFullscreen || el.webkitRequestFullscreen || function(){}).call(el);
+   } else if (document.fullscreenElement || document.webkitFullscreenElement) {
+     (document.exitFullscreen || document.webkitExitFullscreen || function(){}).call(document);
+   }
+ } catch (e) { /* fullscreen pode ser bloqueado; o modo TV funciona mesmo assim */ }
+}
+// Se o usuário sair do fullscreen (tecla Esc do navegador), desliga o modo TV junto.
+document.addEventListener('fullscreenchange', function(){
+ if (!document.fullscreenElement && !document.webkitFullscreenElement) document.body.classList.remove('tv-mode');
+});
+document.addEventListener('webkitfullscreenchange', function(){
+ if (!document.webkitFullscreenElement) document.body.classList.remove('tv-mode');
+});
+// Esc também desliga quando o fullscreen não estava ativo (ex.: navegador bloqueou).
+document.addEventListener('keydown', function(e){
+ if (e.key === 'Escape' && document.body.classList.contains('tv-mode') &&
+     !document.fullscreenElement && !document.webkitFullscreenElement) {
+   document.body.classList.remove('tv-mode');
+ }
+});
 
 // ── Header date ──
 function updateDate() {
