@@ -249,24 +249,30 @@
     "24269008842",
     "24266209976",
     "24502678423",
-    "24237183957"
+    "24237183957",
+    "26694323157",
+    "26687662886",
+    "26622335935"
   ],
   "total_original": 423,
-  "processados": 180,
+  "processados": 177,
   "accounts_criadas": 61,
   "orders_criadas": 83,
   "orders_atualizadas": 0,
-  "ja_existentes": 93,
-  "rate_limit_perdidos": 0,
+  "ja_existentes": 90,
+  "rate_limit_perdidos": 3,
   "erros_outros": 0,
   "avisos": [
     "pedido 27267832504: sem CPF/CNPJ do contato — pulando",
     "pedido 26706630294: sem CPF/CNPJ do contato — pulando",
+    "pedido 26694323157 [calibre]: Bling API \"calibre\" 429 em GET /pedidos/vendas/26694323157: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
+    "pedido 26687662886 [calibre]: Bling API \"calibre\" 429 em GET /pedidos/vendas/26687662886: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
+    "pedido 26622335935 [calibre]: Bling API \"calibre\" 429 em GET /pedidos/vendas/26622335935: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 26514625892: sem CPF/CNPJ do contato — pulando",
     "pedido 26514594775: sem CPF/CNPJ do contato — pulando"
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-11-04T12:51:55.697Z",
+  "ultimo_lote_em": "2026-11-04T12:51:59.145Z",
   "ticks_hoje_data": "2026-11-04",
-  "ticks_hoje_count": 9
+  "ticks_hoje_count": 8
 }
