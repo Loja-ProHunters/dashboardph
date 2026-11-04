@@ -5739,7 +5739,9 @@ module.exports = async (req, res) => {
     try {
       const data = await getComercialData();
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ...data, canEdit: canEditComercial(sess) }));
+      // role: o front usa pra tocar o som de venda SÓ no acesso da auxiliar (Maria),
+      // que é a tela que fica na TV — evita o som tocar em cada tela de vendedor.
+      res.end(JSON.stringify({ ...data, canEdit: canEditComercial(sess), role: getRole(sess.usuario, sess) }));
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Erro ao carregar dados: ' + e.message }));
