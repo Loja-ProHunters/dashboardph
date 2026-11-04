@@ -6651,11 +6651,15 @@ function tqFiltrar(){
   if (f !== 'contratos') D.tarefas.forEach(function(t){
     // Tarefas agendadas pro futuro (follow-up) não aparecem na fila do vendedor
     if (t.agendada_futura) return;
-    var l = tqLimite(t), venc = !!(l && l < agora), antiga = (t.dias_em_aberto || 0) > 0;
+    // Vermelho só quando o PRAZO já passou (dia anterior). Vence HOJE = amarelo,
+    // pra não misturar reagendamento do dia com atraso de verdade.
+    var prazoDia = (t.prazo || '').slice(0, 10), hojeDia = agora.slice(0, 10);
+    var venc = !!(prazoDia && prazoDia < hojeDia), hoje = !!(prazoDia && prazoDia === hojeDia);
+    var antiga = (t.dias_em_aberto || 0) > 0;
     if (f === 'vencidas' && !venc) return;
     if (f === 'antigas' && !antiga) return;
     if (f === 'hoje' && antiga) return;
-    linhas.push({ k: 't:' + t.id, t: t, venc: venc });
+    linhas.push({ k: 't:' + t.id, t: t, venc: venc, hoje: hoje });
   });
   return linhas;
 }
@@ -6664,7 +6668,7 @@ function tqDesenhar(){
   var view = document.getElementById('crm-view'); if (!view || !TQ.dados) return;
   var D = TQ.dados, agora = tqAgoraBRT(), rs = D.resumo || {};
   var tarefasVisiveis = D.tarefas.filter(function(t){ return !t.agendada_futura; });
-  var nVenc = tarefasVisiveis.filter(function(t){ var l = tqLimite(t); return l && l < agora; }).length;
+  var nVenc = tarefasVisiveis.filter(function(t){ var p = (t.prazo || '').slice(0, 10); return p && p < agora.slice(0, 10); }).length;
   var nAnt = tarefasVisiveis.filter(function(t){ return (t.dias_em_aberto || 0) > 0; }).length;
   var nHoje = tarefasVisiveis.length - nAnt;
   var feitas = rs.executadas_hoje || 0, meta = rs.cota_dia || 0;
@@ -6683,7 +6687,7 @@ function tqDesenhar(){
     h += '<div class="tq-vazio"><div>✓</div><b>' + (total ? 'Nada neste filtro.' : 'Nenhuma tarefa pendente.') + '</b><span>' + (total ? '' : 'Novas tarefas chegam todo dia às 8h.') + '</span></div>';
     view.innerHTML = h; return;
   }
-  h += '<div class="tq-lista">' + linhas.slice(0, TQ.limite).map(function(x){ return x.ct ? tqLinhaContrato(x.ct) : tqLinhaTarefa(x.t, x.venc); }).join('') + '</div>';
+  h += '<div class="tq-lista">' + linhas.slice(0, TQ.limite).map(function(x){ return x.ct ? tqLinhaContrato(x.ct) : tqLinhaTarefa(x.t, x.venc, x.hoje); }).join('') + '</div>';
   if (linhas.length > TQ.limite) h += '<button class="tq-mais" onclick="TQ.limite+=15;tqDesenhar()">Mostrar mais ' + Math.min(15, linhas.length - TQ.limite) + ' (de ' + (linhas.length - TQ.limite) + ')</button>';
   view.innerHTML = h;
 }
@@ -6691,11 +6695,12 @@ function tqFiltro(f){ TQ.filtro = f; TQ.limite = 15; TQ.aberto = null; tqDesenha
 function tqToggle(k){ TQ.aberto = TQ.aberto === k ? null : k; tqDesenhar(); var el = document.querySelector('[data-k="' + k + '"]'); if (el && TQ.aberto) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
 
 // ── Linha de tarefa comercial
-function tqLinhaTarefa(t, venc){
+function tqLinhaTarefa(t, venc, hoje){
   var k = 't:' + t.id, aberto = TQ.aberto === k, id = crmEsc(t.id);
-  var tag = venc ? '<span class="tq-tag bad">Vencida</span>' :
+  var tag = venc ? '<span class="tq-tag bad">Atrasada</span>' :
+    (hoje ? '<span class="tq-tag hoje">Para hoje</span>' :
     ((t.dias_em_aberto || 0) > 0 ? '<span class="tq-tag warn">há ' + t.dias_em_aberto + 'd</span>' :
-    (t.hora ? '<span class="tq-tag">' + crmEsc(t.hora) + '</span>' : ''));
+    (t.hora ? '<span class="tq-tag">' + crmEsc(t.hora) + '</span>' : '')));
   var tel = t.cliente_telefone ? crmNormalizaTelBR(t.cliente_telefone) : null;
   var pitch = t.pitch_pronto || '';
   var accIdCta = t.entidade_id || t.account_id || '';
@@ -6703,7 +6708,7 @@ function tqLinhaTarefa(t, venc){
   // do cliente, a tarefa pendente E o botão de WhatsApp já com o número.
   var cta = '<button class="tq-cta ficha" onclick="event.stopPropagation();tqToggle(\'' + k + '\')" aria-expanded="' + aberto + '" title="Abrir a ficha e a tarefa do cliente sem sair da tela">' +
     (aberto ? '▴ Fechar' : '📋 Ver ficha') + '</button>';
-  var h = '<div class="tq-row' + (aberto ? ' aberto' : '') + (venc ? ' venc' : '') + '" id="tar-' + id + '" data-k="' + k + '">' +
+  var h = '<div class="tq-row' + (aberto ? ' aberto' : '') + (venc ? ' venc' : (hoje ? ' hoje' : '')) + '" id="tar-' + id + '" data-k="' + k + '">' +
     '<button class="tq-main" onclick="tqToggle(\'' + k + '\')" aria-expanded="' + aberto + '">' +
       '<span class="tq-ic">' + tqIcone(t) + '</span>' +
       '<span class="tq-txt"><b class="tar-tit">' + crmEsc(t.cliente_nome || 'Cliente') + '</b><small>' + crmEsc(tqMotivo(t)) + '</small></span>' + tag +
@@ -13659,6 +13664,7 @@ async function cartSalvarNotas(id){
 #tab-crm .tq-lista > .tq-row:first-child{border-top:none}
 #tab-crm .tq-row.aberto{background:#fafbfa}
 #tab-crm .tq-row.venc{box-shadow:inset 3px 0 0 #d03b3b}
+#tab-crm .tq-row.hoje{box-shadow:inset 3px 0 0 #e8b004}
 #tab-crm .tq-row.ct{box-shadow:inset 3px 0 0 #111412}
 #tab-crm .tq-row.ct.venc{box-shadow:inset 3px 0 0 #d03b3b}
 #tab-crm .tq-main{flex:1;min-width:0;display:flex;align-items:center;gap:12px;background:none;border:none;padding:10px 0 10px 14px;cursor:pointer;text-align:left;font-family:inherit;color:inherit}
@@ -13669,6 +13675,7 @@ async function cartSalvarNotas(id){
 #tab-crm .tq-tag{flex:0 0 auto;font-size:11.5px;font-weight:700;color:#52514e;background:#f0efec;border-radius:99px;padding:2px 9px;white-space:nowrap}
 #tab-crm .tq-tag.warn{background:#fff4dc;color:#7a4b06}
 #tab-crm .tq-tag.bad{background:#fbe9e9;color:#9e2424}
+#tab-crm .tq-tag.hoje{background:#fdf1b8;color:#6b5600}
 #tab-crm .tq-chev{flex:0 0 14px;color:#9aa09a;font-size:11px}
 #tab-crm .tq-dots{display:flex;gap:3px;flex:0 0 auto}
 #tab-crm .tq-dots i{width:7px;height:7px;border-radius:50%;background:#dcdedc;display:block}
