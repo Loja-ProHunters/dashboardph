@@ -1933,11 +1933,14 @@ module.exports = async (req, res) => {
       const q = new URL(req.url, 'http://x').searchParams;
       const max = Math.max(1, Math.min(200, parseInt(q.get('max') || '60', 10)));
       const forcar = q.get('forcar') === '1' || q.get('forcar') === 'true';
-      const resultado = await blingSync.enriquecerTelefones({ maxLookups: max, forcar });
+      // repuxar=1 → reconfere tambem os accounts que ja tem numero mas e fixo,
+      // trocando pelo CELULAR do Bling quando houver (regra do botao do WhatsApp).
+      const repuxar = q.get('repuxar') === '1' || q.get('repuxar') === 'true';
+      const resultado = await blingSync.enriquecerTelefones({ maxLookups: max, forcar, repuxarNaoCelular: repuxar });
       // AUTO-CHAIN: se ainda faltam clientes pra buscar, dispara o proximo lote.
       if (resultado && resultado.faltam > 0 && resultado.lookups > 0) {
         const host = req.headers['x-forwarded-host'] || req.headers.host || 'dashboardph.vercel.app';
-        const nextUrl = 'https://' + host + '/api/crm/cron/telefones-backfill?max=' + max + (forcar ? '&forcar=1' : '');
+        const nextUrl = 'https://' + host + '/api/crm/cron/telefones-backfill?max=' + max + (forcar ? '&forcar=1' : '') + (repuxar ? '&repuxar=1' : '');
         try {
           const https = require('https');
           const u2 = new URL(nextUrl);
