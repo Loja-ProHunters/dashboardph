@@ -7,6 +7,26 @@
   "ate": "2026-11-04",
   "meses": 12,
   "ids_pendentes": [
+    "26449248036",
+    "26448659089",
+    "26447615178",
+    "26447333740",
+    "26445926488",
+    "26445808865",
+    "26445414698",
+    "26439637409",
+    "26439507140",
+    "26439322270",
+    "26438065457",
+    "26437513002",
+    "26436784976",
+    "26434342165",
+    "26431326250",
+    "26428961051",
+    "26443059593",
+    "26426280088",
+    "26426084080",
+    "26426033184",
     "26425025709",
     "26424819071",
     "26424643478",
@@ -1396,11 +1416,11 @@
     "26862889640"
   ],
   "total_original": 2099,
-  "processados": 712,
+  "processados": 692,
   "accounts_criadas": 158,
   "orders_criadas": 469,
   "orders_atualizadas": 0,
-  "ja_existentes": 240,
+  "ja_existentes": 221,
   "rate_limit_perdidos": 8,
   "erros_outros": 0,
   "avisos": [
@@ -1413,11 +1433,10 @@
     "pedido 26862918808 [prohunters]: Bling API \"prohunters\" 429 em GET /pedidos/vendas/26862918808: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 26862889640 [prohunters]: Bling API \"prohunters\" 429 em GET /pedidos/vendas/26862889640: O limite de requisições por segundo foi atingido, tente novamente mais tarde.",
     "pedido 26588132464: sem CPF/CNPJ do contato — pulando",
-    "pedido 26472508948: sem CPF/CNPJ do contato — pulando",
-    "pedido 26439637409: sem CPF/CNPJ do contato — pulando"
+    "pedido 26472508948: sem CPF/CNPJ do contato — pulando"
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-11-05T13:18:33.595Z",
+  "ultimo_lote_em": "2026-11-05T13:17:57.390Z",
   "ticks_hoje_data": "2026-11-05",
-  "ticks_hoje_count": 14
+  "ticks_hoje_count": 15
 }
