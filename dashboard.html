@@ -12573,8 +12573,16 @@ window.PROD = (function(){
     if (!linhas.length) h += '<div class="pg-ok-geral">✓ Nada neste filtro.</div>';
     else h += '<div class="pg-tab-wrap"><table class="pg-tab"><thead><tr><th>Situação</th><th>Pedido</th><th>Cliente</th><th>Arma</th><th>Vendedor</th><th>Desde a venda</th><th></th></tr></thead><tbody>' +
       linhas.map(function(l){ var s = SIT_CONTRATO[l.situacao] || { txt: l.situacao, cls: 'pg-st-neutro', ic: '' };
-        var acoes = l.situacao === 'assinado_a_conferir' && l.tarefa_assinatura_id ?
-          '<button class="pg-mini ok" onclick="PROD._conferir(\'' + l.tarefa_assinatura_id + '\',true,this)">✓ Está na pasta</button><button class="pg-mini bad" onclick="PROD._conferir(\'' + l.tarefa_assinatura_id + '\',false,this)">✗ Não está</button>' : '';
+        var acoes = '';
+        if (l.tarefa_assinatura_id) {
+          if (l.situacao === 'assinado_a_conferir') {
+            acoes = '<button class="pg-mini ok" onclick="PROD._conferir(\'' + l.tarefa_assinatura_id + '\',true,this)">✓ Está na pasta</button><button class="pg-mini bad" onclick="PROD._conferir(\'' + l.tarefa_assinatura_id + '\',false,this)">✗ Não está</button>';
+          } else if (l.situacao === 'nao_encontrado') {
+            // Consultor regularizou e agora o contrato ESTA na pasta — a conferente
+            // dá o OK pessoalmente e a tarefa evolui pra conferido (concluída).
+            acoes = '<button class="pg-mini ok" onclick="PROD._resolver(\'' + l.tarefa_assinatura_id + '\',this)">✓ Resolvido · está na pasta</button>';
+          }
+        }
         var an = l.anulacao ? '<small><b>' + esc(l.anulacao.motivo_label || l.anulacao.motivo) + '</b> — ' + esc(l.anulacao.descricao) + ' (' + esc(l.anulacao.por) + ', ' + dm(l.anulacao.em) + ')</small>' : '';
         return '<tr><td><span class="pg-chip ' + s.cls + '">' + s.ic + ' ' + s.txt + '</span>' + an + '</td><td>' + esc(l.bling_numero || '—') + '<small>' + dm(l.data_pedido) + '</small></td><td>' + esc(l.cliente_nome || '—') + '<small>' + moeda(l.valor_total) + '</small></td>' +
           '<td class="pg-arma">' + esc((l.armas || []).join(' + ')) + '</td><td>' + ((l.atribuir_vendedor && !SO_CONTRATOS) ? '<select class="pg-mini" onchange="PROD._atribuir(\'' + esc(l.order_id) + '\', this)"><option value="">Escolher…</option><option value="dickmann">Pedro</option><option value="boschetto">Enzo</option><option value="mathias">Wesley</option></select>' + (l.vendedor_bling_nome ? '<small>Bling: ' + esc(l.vendedor_bling_nome) + '</small>' : '<small>sem vendedor no Bling</small>') : (l.atribuir_vendedor ? '<small>' + (l.vendedor_bling_nome ? 'Bling: ' + esc(l.vendedor_bling_nome) : 'sem vendedor') + '</small>' : esc(l.vendedor) + (l.vendedor_bling_nome ? '<small>' + esc(l.vendedor_bling_nome) + '</small>' : ''))) + '</td><td>' + (l.dias_venda != null ? l.dias_venda : l.dias) + 'd' + (l.avisos_cancelamento ? '<small>' + l.avisos_cancelamento + ' aviso(s)</small>' : '') + '</td><td class="pg-acts">' + acoes + '</td></tr>';
@@ -12588,14 +12596,22 @@ window.PROD = (function(){
   function _tabela(id){ state.tabelas[id] = !state.tabelas[id]; render(); }
   function _todasAcoes(){ state.verTodasAcoes = true; render(); }
   function _filtroC(f){ state.filtroContrato = f; render(); }
-  async function _conferir(id, ok, btn){
+  async function _conferir(id, ok, btn, obs){
     if (btn) btn.disabled = true;
     try {
-      var r = await fetch('/api/crm/contratos/' + encodeURIComponent(id) + '/verificar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: ok }) });
+      var r = await fetch('/api/crm/contratos/' + encodeURIComponent(id) + '/verificar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: ok, obs: obs || null }) });
       var d = await r.json(); if (!r.ok) throw new Error(d.error || 'Erro');
       if (typeof crmToast === 'function') crmToast(ok ? 'Contrato conferido.' : 'Registrado: contrato NÃO estava na pasta.', ok ? 'ok' : 'erro', 3500);
       recarregar();
     } catch(e){ if (btn) btn.disabled = false; if (typeof crmToast === 'function') crmToast('Erro: ' + e.message, 'erro', 5000); }
+  }
+  // Resolve um contrato que estava "Não estava na pasta": o consultor
+  // regularizou, a conferente confere pessoalmente e dá o OK → vira conferido.
+  // Confirma antes (é uma declaração formal) e guarda a observação.
+  async function _resolver(id, btn){
+    if (!confirm('Confirmar que o contrato AGORA está na pasta?\n\nVocê está dando o OK pessoalmente. A tarefa vai para CONFERIDO (concluída) e fica registrado quem resolveu, com data e hora. O histórico de que o contrato não estava na pasta é preservado.')) return;
+    var obs = 'Regularizado e conferido na pasta';
+    await _conferir(id, true, btn, obs);
   }
   async function _atribuir(orderId, sel){
     if (!sel.value) return;
@@ -12621,7 +12637,7 @@ window.PROD = (function(){
   var _rz = null;
   window.addEventListener('resize', function(){ clearTimeout(_rz); _rz = setTimeout(function(){ var t = el('tab-produtividade'); if (state.dados && !state.dados._soContratos && t && t.classList.contains('on')) { chartExec(); chartFila(); chartRes(); chartMot(); } }, 200); });
 
-  return { init: init, recarregar: recarregar, _abrir: _abrir, _tabela: _tabela, _todasAcoes: _todasAcoes, _filtroC: _filtroC, _conferir: _conferir, _varrer: _varrer, _atribuir: _atribuir,
+  return { init: init, recarregar: recarregar, _abrir: _abrir, _tabela: _tabela, _todasAcoes: _todasAcoes, _filtroC: _filtroC, _conferir: _conferir, _resolver: _resolver, _varrer: _varrer, _atribuir: _atribuir,
     toggleAtrasadas: function(){} };
 })();
 </script>
