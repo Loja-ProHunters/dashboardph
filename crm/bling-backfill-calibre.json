@@ -1,28 +1,18 @@
 {
   "contaId": "calibre",
-  "status": "em_andamento",
+  "status": "concluido",
   "iniciado_em": "2026-11-04T12:07:42.699Z",
   "iniciado_por": "auto-recuperar",
   "desde": "2025-11-04",
   "ate": "2026-11-04",
   "meses": 12,
-  "ids_pendentes": [
-    "24266209976",
-    "24502678423",
-    "24237183957",
-    "26694323157",
-    "26687662886",
-    "25814419376",
-    "25796917127",
-    "25780239690",
-    "25505463737"
-  ],
+  "ids_pendentes": [],
   "total_original": 423,
-  "processados": 414,
+  "processados": 423,
   "accounts_criadas": 86,
   "orders_criadas": 151,
   "orders_atualizadas": 0,
-  "ja_existentes": 257,
+  "ja_existentes": 266,
   "rate_limit_perdidos": 6,
   "erros_outros": 0,
   "avisos": [
@@ -40,7 +30,8 @@
     "pedido 24764824960: sem CPF/CNPJ do contato — pulando"
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-11-05T13:00:02.025Z",
+  "ultimo_lote_em": "2026-11-05T13:00:55.059Z",
   "ticks_hoje_data": "2026-11-05",
-  "ticks_hoje_count": 3
+  "ticks_hoje_count": 3,
+  "concluido_em": "2026-11-05T13:00:56.370Z"
 }
