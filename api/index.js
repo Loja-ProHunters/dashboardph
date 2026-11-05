@@ -88,6 +88,26 @@ function canEditComercial(sess) { return isAdminOrDiretor(sess); }
 // Decodifica o id de envio vindo da URL (pode conter %2C etc quando o numero
 // do pedido tem virgula/espaco). Tolera id malformado caindo no valor cru.
 function _decEnvioId(s) { try { return decodeURIComponent(String(s || '')); } catch (_) { return String(s || ''); } }
+
+// ESTEIRA DE 20 — dispara (fire-and-forget) a geracao do lote pra REPOR a vaga
+// que o vendedor acabou de abrir ao concluir uma tarefa. Nao bloqueia a resposta
+// da conclusao: chama o gerador num request interno separado (auth por header
+// x-gen-chain). O gerador agora mantem a fila em 20 (cria so o que falta).
+function _dispararRefillEsteira(req) {
+  try {
+    const host = req.headers['x-forwarded-host'] || req.headers.host || 'dashboardph.vercel.app';
+    const https = require('https');
+    const u2 = new URL('https://' + host + '/api/crm/tarefas/gerar-lote');
+    const rq = https.request({
+      hostname: u2.hostname, path: u2.pathname, method: 'POST',
+      headers: { 'x-gen-chain': config.sessionSecret, 'Content-Length': 0, 'User-Agent': 'esteira-refill' },
+      timeout: 4000,
+    }, () => {});
+    rq.on('error', () => {});
+    rq.on('timeout', () => rq.destroy());
+    rq.end();
+  } catch (_) { /* silencia — refill e best-effort; o lote diario tambem repoe */ }
+}
 // Dashboard Comercial agora e visivel pra TODOS os usuarios logados (inclusive
 // auxiliar e comex) — a ferramenta virou o KPI compartilhado da empresa.
 // Edicao continua so admin/diretor via canEditComercial.
@@ -969,6 +989,39 @@ module.exports = async (req, res) => {
       const r = await prod.calcularProdutividade();
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify(r));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/ranking-execucao — CORRIDA DE EXECUÇÃO (aberta a todos do CRM).
+  // Ranking mensal por tarefas executadas (com contato/resultado) + % conversão.
+  if (url === '/api/crm/ranking-execucao' && req.method === 'GET') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const rankingExecucao = require('../lib/crm/rankingExecucao');
+      // Vendedores ativos (role 'vendas'); fallback pros 3 conhecidos.
+      let vendedores = [];
+      try {
+        const usersStore = require('../lib/usersStore');
+        const todos = await usersStore.getAllUsers();
+        for (const [login, u] of Object.entries(todos || {})) {
+          if (u && u.ativo === false) continue;
+          if (String((u && u.role) || '').toLowerCase() !== 'vendas') continue;
+          vendedores.push({ login: String(login).toLowerCase(), nome: (u && u.nome) || login });
+        }
+      } catch (_) {}
+      if (!vendedores.length) vendedores = [
+        { login: 'dickmann', nome: 'Pedro Henrique Dickmann' },
+        { login: 'boschetto', nome: 'Enzo dos Santos Boschetto' },
+        { login: 'mathias', nome: 'Wesley Mathias Ciesielsky' },
+      ];
+      const activities = await crmStore.listDocs('activities');
+      const r = rankingExecucao.montar(activities, vendedores, new Date());
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
+      res.end(JSON.stringify(Object.assign({}, r, { meu_login: String(sess.usuario || '').toLowerCase() })));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
@@ -2792,7 +2845,7 @@ module.exports = async (req, res) => {
       // Contratos de arma primeiro (obrigacao legal) — falha aqui nao trava o lote
       let contratosRes = null;
       try { contratosRes = await contratosArma.processar(); } catch (e) { contratosRes = { ok: false, erro: e.message }; }
-      const r = await automacaoUpsell.disparaReativacao();
+      const r = await automacaoUpsell.disparaReativacao({ forcar: true });
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify(Object.assign({}, r, { contratos_arma: contratosRes })));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
@@ -3345,6 +3398,8 @@ module.exports = async (req, res) => {
       if (observacao) fimPatch.observacao_conclusao = observacao;
       if (payload.pedido_numero) fimPatch.pedido_numero_informado = String(payload.pedido_numero).trim().slice(0, 30);
       await crmStore.updateDoc('activities', id, fimPatch, sess.usuario);
+      // ESTEIRA: concluiu uma → abre vaga → repoe ate 20 (nao bloqueia a resposta).
+      _dispararRefillEsteira(req);
       // Se a tarefa era de um cliente da carteira, atualiza o "ultimo contato"
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
@@ -3419,6 +3474,9 @@ module.exports = async (req, res) => {
         criada_por_vendedor: sess.usuario,
       };
       await crmStore.createDoc('activities', followDoc, sess.usuario);
+      // ESTEIRA: a tarefa atual saiu da fila de hoje (virou follow-up futuro) →
+      // abre vaga → repoe ate 20.
+      _dispararRefillEsteira(req);
       res.writeHead(201,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, follow_up: followDoc }));
     } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
@@ -3464,10 +3522,14 @@ module.exports = async (req, res) => {
   // acumulam (regra da gestao). Idempotente no dia — se o lote de hoje ja
   // saiu (20 por vendedor), nao cria mais nada. So admin/diretor.
   if (req.method === 'POST' && (url === '/api/crm/tarefas/gerar-lote' || url === '/api/crm/tarefas/resetar-regerar')) {
+    // Chamada interna da esteira (refill ao concluir tarefa) passa por header;
+    // caso contrario exige sessao admin/diretor.
+    const chainOk = req.headers['x-gen-chain'] && req.headers['x-gen-chain'] === config.sessionSecret;
     const sess = getSession(req);
-    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
+    if (!chainOk && (!sess || !crmUtils.canSeeAll(sess))) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
     try {
-      const geracao = await automacaoUpsell.gerarTarefasDiarias();
+      // Admin/diretor forcam (ignora throttle); a esteira (chain) respeita o throttle.
+      const geracao = await automacaoUpsell.gerarTarefasDiarias({ forcar: !chainOk });
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ ok: true, canceladas: 0, geracao }));
     } catch (e) {
