@@ -3920,7 +3920,7 @@ var TABS_POR_ROLE = {
   // Auxiliar NAO precisa dessa aba porque o botao "CRM" dele ja foi renomeado
   // pra "Op. Controlado" (ele so acessa isso mesmo).
   vendas:     ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','controlado','parceiros','ia','gerador'],
-  auxiliar:   ['inicio','solicitacoes','contratos','contatos','comercial','crm','garantias'],
+  auxiliar:   ['inicio','solicitacoes','contratos','contatos','comercial','crm','garantias','produtividade'],
   financeiro: ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','controlado','parceiros','ia','gerador'],
   marketing:  ['inicio','solicitacoes','processos','contratos','contatos','calculadora','comercial','crm','parceiros','ia','gerador'],
   comex:      ['inicio','solicitacoes','comercial','ia'],
@@ -3997,6 +3997,20 @@ window.onload = function() {
         if (lblCrm) lblCrm.textContent = 'Op. Controlado';
         var badge = _niCrmAux.querySelector('.badge');
         if (badge) badge.style.display = 'none';
+      }
+      // Produtividade pra auxiliar = so conferencia de contratos. Renomeia o
+      // item e tira o selo ADMIN pra nao confundir com o painel gerencial.
+      var _niProdAux = document.getElementById('ni-produtividade');
+      if (_niProdAux) {
+        _niProdAux.style.display = '';
+        var lblProd = _niProdAux.querySelector('.ni-tx');
+        if (lblProd) lblProd.textContent = 'Conferência de Contratos';
+        var badgeProd = _niProdAux.querySelector('.badge-admin');
+        if (badgeProd) badgeProd.style.display = 'none';
+      }
+      // Ajusta o cabecalho da aba (breadcrumb) pra auxiliar.
+      if (typeof tabMeta !== 'undefined' && tabMeta.produtividade) {
+        tabMeta.produtividade = ['Conferência de Contratos', 'Confira o contrato assinado na pasta e marque o check'];
       }
     }
   }
@@ -12191,6 +12205,10 @@ window.GAR = (function(){
 // ═══════════════════════════════════════════════════════════════
 window.PROD = (function(){
   var state = { dados: null, inicializado: false, tabelas: {}, abertos: {} };
+  // Auxiliar (Maria): modo enxuto — SO a conferencia de contratos, sem os
+  // numeros dos vendedores. Puxa /api/crm/contratos/painel no lugar da
+  // produtividade inteira, entao os dados de desempenho nem chegam no browser.
+  var SO_CONTRATOS = (typeof USER_ROLE !== 'undefined' && USER_ROLE === 'auxiliar');
   // Cores: vendedores = slots 1-3 da paleta categórica validada (CVD ok, todos os pares)
   var COR_VEND = ['#2a78d6', '#eb6834', '#1baf7a'];
   var COR_RES = { convertida: '#2a78d6', follow_up: '#1baf7a', nao_convertida: '#eb6834', cancelada: '#b9b8b0' };
@@ -12225,10 +12243,13 @@ window.PROD = (function(){
     var root = el('pg-root');
     if (root && state.dados) root.style.opacity = '.55'; // mantém o quadro enquanto recarrega
     try {
-      var r = await fetch('/api/crm/produtividade', { cache: 'no-store' });
+      var url = SO_CONTRATOS ? '/api/crm/contratos/painel' : '/api/crm/produtividade';
+      var r = await fetch(url, { cache: 'no-store' });
       var d = await r.json();
       if (!r.ok) throw new Error(d.error || r.status);
-      state.dados = d;
+      // No modo contratos, a resposta JA e o painel de contratos { totais, linhas }.
+      // Embrulha no formato que a funcao contratos(d) espera: d.contratos.
+      state.dados = SO_CONTRATOS ? { contratos: d, _soContratos: true, gerado_em: new Date().toISOString() } : d;
       render();
     } catch(e) {
       if (root) root.innerHTML = '<div class="pg-vazio">Erro ao carregar: ' + esc(e.message) + '</div>';
@@ -12238,6 +12259,16 @@ window.PROD = (function(){
   // ─── Render principal ──────────────────────────────────────────
   function render(){
     var d = state.dados, root = el('pg-root'); if (!d || !root) return;
+    // ── Modo conferencia (auxiliar): so o cabecalho + a tabela de contratos ──
+    if (d._soContratos) {
+      var horaC = new Date(d.gerado_em).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      root.innerHTML =
+        '<div class="pg-top"><div><h2>Conferência de Contratos</h2>' +
+          '<span>Confira o contrato assinado na pasta e marque o check · atualizado às ' + horaC + '</span></div>' +
+          '<div class="pg-top-acts"><button class="pg-btn" onclick="PROD.recarregar()">↻ Atualizar</button></div></div>' +
+        contratos(d);
+      return;
+    }
     var vend = d.vendedores || [];
     vend.forEach(function(v, i){ v._cor = COR_VEND[i % COR_VEND.length]; });
     // cor segue o vendedor (ordem alfabética fixa, não muda com status)
@@ -12522,7 +12553,7 @@ window.PROD = (function(){
   function contratos(d){
     var c = d.contratos || { totais: {}, linhas: [] }, t = c.totais || {};
     var h = '<div class="pg-sec">Contratos de venda de arma <small>regra: toda venda de arma precisa de contrato assinado</small>' +
-      '<button class="pg-btn sec" onclick="PROD._varrer(this)">Verificar vendas de arma agora</button></div>';
+      (SO_CONTRATOS ? '' : '<button class="pg-btn sec" onclick="PROD._varrer(this)">Verificar vendas de arma agora</button>') + '</div>';
     if (!t.total) return h + '<div class="pg-card"><div class="pg-ok-geral">Nenhuma venda de arma nos últimos 90 dias com contrato em aberto.</div></div>';
     var filtro = state.filtroContrato || 'pendentes';
     var linhas = (c.linhas || []).filter(function(l){
@@ -12546,7 +12577,7 @@ window.PROD = (function(){
           '<button class="pg-mini ok" onclick="PROD._conferir(\'' + l.tarefa_assinatura_id + '\',true,this)">✓ Está na pasta</button><button class="pg-mini bad" onclick="PROD._conferir(\'' + l.tarefa_assinatura_id + '\',false,this)">✗ Não está</button>' : '';
         var an = l.anulacao ? '<small><b>' + esc(l.anulacao.motivo_label || l.anulacao.motivo) + '</b> — ' + esc(l.anulacao.descricao) + ' (' + esc(l.anulacao.por) + ', ' + dm(l.anulacao.em) + ')</small>' : '';
         return '<tr><td><span class="pg-chip ' + s.cls + '">' + s.ic + ' ' + s.txt + '</span>' + an + '</td><td>' + esc(l.bling_numero || '—') + '<small>' + dm(l.data_pedido) + '</small></td><td>' + esc(l.cliente_nome || '—') + '<small>' + moeda(l.valor_total) + '</small></td>' +
-          '<td class="pg-arma">' + esc((l.armas || []).join(' + ')) + '</td><td>' + (l.atribuir_vendedor ? '<select class="pg-mini" onchange="PROD._atribuir(\'' + esc(l.order_id) + '\', this)"><option value="">Escolher…</option><option value="dickmann">Pedro</option><option value="boschetto">Enzo</option><option value="mathias">Wesley</option></select>' + (l.vendedor_bling_nome ? '<small>Bling: ' + esc(l.vendedor_bling_nome) + '</small>' : '<small>sem vendedor no Bling</small>') : esc(l.vendedor) + (l.vendedor_bling_nome ? '<small>' + esc(l.vendedor_bling_nome) + '</small>' : '')) + '</td><td>' + (l.dias_venda != null ? l.dias_venda : l.dias) + 'd' + (l.avisos_cancelamento ? '<small>' + l.avisos_cancelamento + ' aviso(s)</small>' : '') + '</td><td class="pg-acts">' + acoes + '</td></tr>';
+          '<td class="pg-arma">' + esc((l.armas || []).join(' + ')) + '</td><td>' + ((l.atribuir_vendedor && !SO_CONTRATOS) ? '<select class="pg-mini" onchange="PROD._atribuir(\'' + esc(l.order_id) + '\', this)"><option value="">Escolher…</option><option value="dickmann">Pedro</option><option value="boschetto">Enzo</option><option value="mathias">Wesley</option></select>' + (l.vendedor_bling_nome ? '<small>Bling: ' + esc(l.vendedor_bling_nome) + '</small>' : '<small>sem vendedor no Bling</small>') : (l.atribuir_vendedor ? '<small>' + (l.vendedor_bling_nome ? 'Bling: ' + esc(l.vendedor_bling_nome) : 'sem vendedor') + '</small>' : esc(l.vendedor) + (l.vendedor_bling_nome ? '<small>' + esc(l.vendedor_bling_nome) + '</small>' : ''))) + '</td><td>' + (l.dias_venda != null ? l.dias_venda : l.dias) + 'd' + (l.avisos_cancelamento ? '<small>' + l.avisos_cancelamento + ' aviso(s)</small>' : '') + '</td><td class="pg-acts">' + acoes + '</td></tr>';
       }).join('') + '</tbody></table></div>';
     return h + '</div>';
   }
@@ -12588,7 +12619,7 @@ window.PROD = (function(){
   }
 
   var _rz = null;
-  window.addEventListener('resize', function(){ clearTimeout(_rz); _rz = setTimeout(function(){ var t = el('tab-produtividade'); if (state.dados && t && t.classList.contains('on')) { chartExec(); chartFila(); chartRes(); chartMot(); } }, 200); });
+  window.addEventListener('resize', function(){ clearTimeout(_rz); _rz = setTimeout(function(){ var t = el('tab-produtividade'); if (state.dados && !state.dados._soContratos && t && t.classList.contains('on')) { chartExec(); chartFila(); chartRes(); chartMot(); } }, 200); });
 
   return { init: init, recarregar: recarregar, _abrir: _abrir, _tabela: _tabela, _todasAcoes: _todasAcoes, _filtroC: _filtroC, _conferir: _conferir, _varrer: _varrer, _atribuir: _atribuir,
     toggleAtrasadas: function(){} };
