@@ -2892,7 +2892,9 @@ module.exports = async (req, res) => {
 
   if (url === '/api/crm/contratos' || url.startsWith('/api/crm/contratos/') || url.startsWith('/api/crm/contratos?')) {
     const sess = getSession(req);
-    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    // Auxiliar (Maria) entra aqui SO pra conferencia de contratos (painel + verificar);
+    // as acoes de gestao/vendas dentro do bloco continuam barradas individualmente.
+    if (!sess || !(crmUtils.canAccessCRM(sess) || crmUtils.canConferirContratos(sess))) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     const enviar = (code, obj) => { res.writeHead(code,{'Content-Type':'application/json','Cache-Control':'no-store'}); res.end(JSON.stringify(obj)); };
     const pathOnly = url.split('?')[0];
     try {
@@ -2900,7 +2902,8 @@ module.exports = async (req, res) => {
       if (req.method === 'GET' && pathOnly === '/api/crm/contratos/painel') {
         const acts = await crmStore.listDocs('activities', a => a && a.fonte === 'contrato_arma');
         const login = String(sess.usuario || '').toLowerCase();
-        const meus = crmUtils.canSeeAll(sess) ? acts : acts.filter(a => String(a.owner_id || a.dono || '').toLowerCase() === login);
+        // Gestao e auxiliar (conferente) veem TODOS os contratos; vendedor so os dele.
+        const meus = crmUtils.canConferirContratos(sess) ? acts : acts.filter(a => String(a.owner_id || a.dono || '').toLowerCase() === login);
         enviar(200, contratosArma.painel(meus)); return;
       }
       // GET /api/crm/contratos/meus[?todos=1] — cards operacionais (1 por venda de arma)
@@ -2934,7 +2937,7 @@ module.exports = async (req, res) => {
       // POST /api/crm/contratos/:tarefaId/verificar  body: { ok: true|false, obs? } — gestao confere a pasta
       const mV = pathOnly.match(/^\/api\/crm\/contratos\/([A-Za-z0-9_\-]+)\/verificar$/);
       if (req.method === 'POST' && mV) {
-        if (!crmUtils.canSeeAll(sess)) { enviar(403, { error: 'Só gestão confere contratos.' }); return; }
+        if (!crmUtils.canConferirContratos(sess)) { enviar(403, { error: 'Sem permissão para conferir contratos.' }); return; }
         let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch (_) {}
         enviar(200, await contratosArma.verificar(mV[1], sess, payload.ok === true, payload.obs)); return;
       }
@@ -6549,7 +6552,9 @@ module.exports = async (req, res) => {
     const canUseIaFlag = canUseIA(sess) ? 'true' : 'false';
     const canManageKBFlag = canManageKB(sess) ? 'true' : 'false';
     const canGerGar = canGerenciarGarantias(sess) ? 'true' : 'false';
-    const canVerProd = isAdminOrDiretor(sess) ? 'true' : 'false';
+    // Auxiliar tambem revela o item de menu — mas o frontend abre um modo
+    // enxuto (SO a conferencia de contratos), sem os numeros dos vendedores.
+    const canVerProd = (isAdminOrDiretor(sess) || userRole === 'auxiliar') ? 'true' : 'false';
     const canVerWAInt = canVerWAInteligencia(sess) ? 'true' : 'false';
     const usuarioEsc = String(sess.usuario || '').replace(/"/g, '\\"');
     const nomeEsc = String(sess.nome || '').replace(/"/g, '\\"');
