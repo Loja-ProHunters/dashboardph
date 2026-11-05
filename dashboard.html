@@ -5473,7 +5473,16 @@ async function crmRenderPainel(){
       '</div>'
     : '';
 
-  view.innerHTML = welcome + kpisHtml + migrateBtn + blingCard + fenixCard + fenixMapCard;
+  // Corrida de Execução no topo do Painel — a gestão (admin/diretor) não tem a
+  // aba "Minhas Tarefas", então o pódio dos vendedores aparece aqui.
+  var corridaHtml = '';
+  try {
+    var rk = await fetch('/api/crm/ranking-execucao', { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+    if (rk) { window.TQ = window.TQ || {}; window.TQ.corrida = rk; }
+    if (typeof tqCorridaHTML === 'function') corridaHtml = tqCorridaHTML();
+  } catch (_) {}
+
+  view.innerHTML = corridaHtml + welcome + kpisHtml + migrateBtn + blingCard + fenixCard + fenixMapCard;
   if (sess.isAdmin) crmBlingRefreshStatus();
   crmFenixInit();
   if (sess.isAdmin) fenixmapRefreshStats();
@@ -6698,12 +6707,22 @@ function tqCorridaHTML(){
     '</div>';
   }).join('');
   return '<div class="tqc-card">'+
-    '<div class="tqc-head" onclick="TQ.corridaAberta=(TQ.corridaAberta===false);tqDesenhar()">'+
+    '<div class="tqc-head" onclick="tqCorridaToggle()">'+
       '<span class="tqc-tit">🏆 Corrida de Execução <em>· '+tqMesLabel(c.mes)+'</em></span>'+
       '<span class="tqc-toggle">'+(aberto?'▾':'▸')+'</span>'+
     '</div>'+
     (aberto ? '<div class="tqc-body">'+rows+'<div class="tqc-leg">Conta tarefa executada <b>com contato/resultado</b>. Pontos = execuções + conversões×2.</div></div>' : '')+
   '</div>';
+}
+// Abre/fecha o pódio re-renderizando SÓ o card no lugar (funciona tanto na fila
+// de tarefas do vendedor quanto no Painel do CRM da gestão).
+function tqCorridaToggle(){
+  window.TQ = window.TQ || {};
+  window.TQ.corridaAberta = (window.TQ.corridaAberta === false);
+  var card = document.querySelector('.tqc-card');
+  if (!card) return;
+  var tmp = document.createElement('div'); tmp.innerHTML = tqCorridaHTML();
+  if (tmp.firstChild) card.replaceWith(tmp.firstChild); else card.remove();
 }
 function tqDesenhar(){
   var view = document.getElementById('crm-view'); if (!view || !TQ.dados) return;
