@@ -32,6 +32,10 @@ const coocorrencia      = require('../lib/crm/coocorrencia');
 const { sugerirParaCliente } = require('../lib/crm/sugerir');
 const automacaoUpsell   = require('../lib/crm/automacaoUpsell');
 const catalogoBling     = require('../lib/crm/catalogoBling');
+const disciplina        = require('../lib/crm/disciplina');
+const carteira          = require('../lib/crm/carteira');
+const contratosArma     = require('../lib/crm/contratosArma');
+const reatribuicao      = require('../lib/crm/reatribuicao');
 
 // Bling API v3
 const blingOauth      = require('../lib/bling/oauth');
@@ -48,6 +52,11 @@ const freteAprendizado = require('../lib/frete/aprendizado');
 const envios        = require('../lib/crm/envios');
 const romaneios     = require('../lib/crm/romaneios');
 const { getFile: _ghGet, saveFile: _ghSave } = require('../lib/githubStore');
+
+// WhatsApp — Evolution API (piloto)
+const waMensagens = require('../lib/whatsapp/mensagens');
+const waInteligencia = require('../lib/whatsapp/inteligencia');
+const waSync = require('../lib/whatsapp/sync');
 
 // Papel do usuário: agora vem da sessão (que traz o role guardado no cadastro).
 // Fallback pro esquema antigo (baseado no nome do usuário) fica só como safety-net.
@@ -76,6 +85,29 @@ function isAdminOrDiretor(sess) {
   return r === 'admin' || r === 'diretor';
 }
 function canEditComercial(sess) { return isAdminOrDiretor(sess); }
+// Decodifica o id de envio vindo da URL (pode conter %2C etc quando o numero
+// do pedido tem virgula/espaco). Tolera id malformado caindo no valor cru.
+function _decEnvioId(s) { try { return decodeURIComponent(String(s || '')); } catch (_) { return String(s || ''); } }
+
+// ESTEIRA DE 20 — dispara (fire-and-forget) a geracao do lote pra REPOR a vaga
+// que o vendedor acabou de abrir ao concluir uma tarefa. Nao bloqueia a resposta
+// da conclusao: chama o gerador num request interno separado (auth por header
+// x-gen-chain). O gerador agora mantem a fila em 20 (cria so o que falta).
+function _dispararRefillEsteira(req) {
+  try {
+    const host = req.headers['x-forwarded-host'] || req.headers.host || 'dashboardph.vercel.app';
+    const https = require('https');
+    const u2 = new URL('https://' + host + '/api/crm/tarefas/gerar-lote');
+    const rq = https.request({
+      hostname: u2.hostname, path: u2.pathname, method: 'POST',
+      headers: { 'x-gen-chain': config.sessionSecret, 'Content-Length': 0, 'User-Agent': 'esteira-refill' },
+      timeout: 4000,
+    }, () => {});
+    rq.on('error', () => {});
+    rq.on('timeout', () => rq.destroy());
+    rq.end();
+  } catch (_) { /* silencia — refill e best-effort; o lote diario tambem repoe */ }
+}
 // Dashboard Comercial agora e visivel pra TODOS os usuarios logados (inclusive
 // auxiliar e comex) — a ferramenta virou o KPI compartilhado da empresa.
 // Edicao continua so admin/diretor via canEditComercial.
@@ -86,6 +118,203 @@ function canUseIA(sess) {
   if (!sess) return false;
   const r = getRole(sess.usuario, sess);
   return r !== 'auxiliar';
+}
+// WhatsApp Inteligência: admin, diretor, gerência. Vendedor/auxiliar NÃO vê.
+function canVerWAInteligencia(sess) {
+  if (!sess) return false;
+  const r = getRole(sess.usuario, sess);
+  return r === 'admin' || r === 'diretor' || r === 'gerencia';
+}
+
+// ── Romaneio Correios (HTML print-ready) ────────────────────────────
+// Recebe o doc salvo do romaneio (romaneios_correios) e devolve a folha pronta
+// pra impressão. Usado na geração E na reimpressão a partir da lista.
+function _correiosRomaneioHtml(rom) {
+  const _esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const numero = rom.numero || '';
+  const ano = String(rom.data || '').slice(0, 4) || String(new Date().getFullYear());
+  const dataFmt = String(rom.data || '').split('-').reverse().join('/');
+  const itens = Array.isArray(rom.itens) ? rom.itens : [];
+  const linhas = itens.map(function(it, i) {
+    const empTag = it.empresa === 'calibre' ? 'CR' : 'PH';
+    return '<tr>' +
+      '<td class="c">' + (i + 1) + '</td>' +
+      '<td>' + _esc(it.pedido_numero) + '</td>' +
+      '<td>' + _esc(empTag) + '</td>' +
+      '<td>' + _esc(it.cliente_nome) + '</td>' +
+      '<td style="font-family:monospace;font-size:11px">' + _esc(it.codigo_rastreio) + '</td>' +
+      '</tr>';
+  }).join('');
+  return '<!doctype html>' +
+  '<html><head><meta charset="utf-8">' +
+  '<title>Romaneio Correios ' + _esc(numero) + '/' + ano + '</title>' +
+  '<style>' +
+    '* { box-sizing: border-box; }' +
+    'body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #111; padding: 20px 26px; margin: 0; }' +
+    '.hd { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 2px solid #1565c0; padding-bottom: 10px; }' +
+    '.hd .l { max-width: 65%; }' +
+    '.hd .r { text-align: right; }' +
+    'h1 { margin: 0 0 4px; font-size: 18px; color: #1565c0; font-weight: 700; }' +
+    '.sub { font-size: 12px; color: #444; }' +
+    '.meta { font-size: 11.5px; color: #555; margin-top: 4px; }' +
+    '.meta b { color: #111; }' +
+    'table { width: 100%; border-collapse: collapse; margin-top: 8px; }' +
+    'th { background: #1565c0; color: #fff; padding: 7px 6px; text-align: left; font-size: 11px; font-weight: 700; border: 1px solid #1565c0; }' +
+    'td { padding: 6px 6px; border: 1px solid #d0d0d0; font-size: 11.5px; vertical-align: top; }' +
+    '.c { text-align: center; }' +
+    'tr:nth-child(even) td { background: #fafafa; }' +
+    '.total-row td { background: #e3f2fd; font-weight: 700; border-top: 2px solid #1565c0; }' +
+    '.foot { margin-top: 22px; padding-top: 10px; border-top: 1px dashed #999; font-size: 10px; color: #777; display: flex; justify-content: space-between; }' +
+    '@media print { body { padding: 12mm; } .no-print { display: none !important; } }' +
+    '.no-print { position: fixed; top: 10px; right: 10px; }' +
+    '.btn-print { background: #1565c0; color: #fff; border: 0; border-radius: 6px; padding: 10px 16px; cursor: pointer; font-size: 13px; font-weight: 700; box-shadow: 0 4px 10px rgba(0,0,0,.15); }' +
+  '</style></head><body>' +
+    '<div class="no-print"><button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button></div>' +
+    '<div class="hd">' +
+      '<div class="l">' +
+        '<h1>📮 Romaneio Correios</h1>' +
+        '<div class="sub">Pro Hunters + Calibre Restrito</div>' +
+        '<div class="meta">Transportadora: <b>Correios — Empresa Brasileira de Correios e Telégrafos</b></div>' +
+      '</div>' +
+      '<div class="r">' +
+        '<div style="font-size:20px;font-weight:700;color:#1565c0">Nº ' + _esc(numero) + '</div>' +
+        '<div class="meta">Emitido em <b>' + dataFmt + '</b></div>' +
+        '<div class="meta">Gerado por: ' + _esc(rom.gerado_por || '') + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<table>' +
+      '<thead><tr>' +
+        '<th style="width:32px">#</th>' +
+        '<th style="width:80px">Pedido</th>' +
+        '<th style="width:50px">Empr.</th>' +
+        '<th>Destinatário</th>' +
+        '<th style="width:180px">Código de Rastreio</th>' +
+      '</tr></thead>' +
+      '<tbody>' + linhas +
+        '<tr class="total-row">' +
+          '<td class="c" colspan="4" style="text-align:right">TOTAL DE OBJETOS</td>' +
+          '<td class="c">' + itens.length + '</td>' +
+        '</tr>' +
+      '</tbody>' +
+    '</table>' +
+    '<div style="margin-top:30px;padding:14px 18px;border:1px solid #999;border-radius:6px;background:#f9f9f9;font-size:12.5px;line-height:1.9">' +
+      '<div style="line-height:2.4;letter-spacing:.3px">Conferido por: __________________________________________________________</div>' +
+      '<div style="line-height:2.4;letter-spacing:.3px">Data: ____/____/______ · Assinatura: ________________________________________________</div>' +
+    '</div>' +
+    '<div class="foot">' +
+      '<div>Sistema Pro Hunters CRM · Documento gerado eletronicamente</div>' +
+      '<div>Romaneio Correios ' + _esc(rom.id) + '</div>' +
+    '</div>' +
+  '</body></html>';
+}
+
+// ── Dossiê de feedback (HTML print-ready) ───────────────────────────
+// Recebe o nome do vendedor e o registro da última análise. Gera uma folha
+// pronta pra imprimir (ou salvar em PDF pelo navegador) pra reunião de feedback.
+function _dossieHtml(nome, a) {
+  const esc = (s) => String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const item = (x) => typeof x === 'string' ? x : (x && (x.descricao || x.sugestao || x.titulo || x.alerta || x.motivo) || JSON.stringify(x));
+  const fmt = (iso) => { if (!iso) return '—'; const d = new Date(iso); return isNaN(d) ? '—' : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }); };
+  const hoje = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  const semAnalise = !a || a.score_geral == null;
+  const score = (a && a.score_geral != null) ? Number(a.score_geral) : null;
+  const corScore = score == null ? '#888' : (score >= 7 ? '#0a6e2e' : score >= 5 ? '#b26a00' : '#b01515');
+  const fortes = (a && a.pontos_fortes) || [];
+  const fracos = (a && a.pontos_fracos) || [];
+  const sugestoes = (a && a.sugestoes) || [];
+  const alertas = (a && a.alertas) || [];
+  const destaques = (a && a.conversas_destaque) || [];
+  const negativas = destaques.filter(d => { const t = String(d && d.tipo || '').toLowerCase(); return t.indexOf('neg') === 0 || t === 'ruim' || t === 'atencao' || t === 'negativa'; });
+  const m = (a && a.metricas) || {};
+  const tr = m.tempo_resposta || {};
+
+  const prBadge = (p) => {
+    const x = String(p || '').toLowerCase();
+    const cor = x.indexOf('alta') === 0 ? '#b01515' : x.indexOf('med') === 0 ? '#b26a00' : '#555';
+    const txt = x.indexOf('alta') === 0 ? 'Alta' : x.indexOf('med') === 0 ? 'Média' : (p ? 'Baixa' : '');
+    return txt ? `<span style="font-size:10px;font-weight:700;color:#fff;background:${cor};border-radius:10px;padding:1px 8px;margin-left:6px">${txt}</span>` : '';
+  };
+  const linhasAnotacao = Array(7).fill('<div class="an-line"></div>').join('');
+
+  const corpo = semAnalise
+    ? `<div class="vazio">Ainda não há análise de IA concluída para este vendedor no período. A análise roda automaticamente toda segunda-feira.</div>`
+    : `
+    <div class="score-row">
+      <div class="score-box" style="border-color:${corScore}">
+        <div class="score-num" style="color:${corScore}">${score.toFixed(1)}</div>
+        <div class="score-lbl">nota da semana</div>
+      </div>
+      <div class="resumo">
+        <div class="sec-tit">Resumo do desempenho</div>
+        <p>${esc(a.resumo || '—')}</p>
+        <div class="metinline">${esc(a.conversas_analisadas || 0)} conversas analisadas · tempo médio de resposta ${tr.medio_minutos != null ? esc(tr.medio_minutos) + ' min' : '—'} · ${esc(m.total_mensagens || 0)} mensagens (${esc(m.conversas_iniciadas || 0)} conversas iniciadas pelo vendedor)</div>
+      </div>
+    </div>
+
+    ${fortes.length ? `<div class="sec"><div class="sec-tit verde">✓ Pontos fortes</div><ul>${fortes.map(p => `<li>${esc(item(p))}</li>`).join('')}</ul></div>` : ''}
+
+    <div class="sec"><div class="sec-tit vermelho">⚠ Pontos a melhorar / erros</div>
+      ${fracos.length ? `<ul>${fracos.map(p => `<li>${esc(item(p))}</li>`).join('')}</ul>` : '<p class="muted">Nenhum ponto fraco crítico registrado.</p>'}
+      ${alertas.length ? `<div class="alertas"><b>Alertas:</b><ul>${alertas.map(al => `<li>${esc(item(al))}</li>`).join('')}</ul></div>` : ''}
+      ${negativas.length ? `<div class="exemplos"><b>Exemplos de conversas pra revisar:</b>${negativas.map(c => `<div class="ex"><span class="ex-cli">${esc(c.cliente || c.telefone || 'Conversa')}</span> — ${esc(c.motivo || c.descricao || '')}</div>`).join('')}</div>` : ''}
+    </div>
+
+    ${sugestoes.length ? `<div class="sec"><div class="sec-tit azul">→ Plano de ação (próxima semana)</div><ol>${sugestoes.map(s => `<li>${esc(item(s))}${prBadge(s && s.prioridade)}</li>`).join('')}</ol></div>` : ''}
+    `;
+
+  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dossiê — ${esc(nome)}</title>
+<style>
+  *{box-sizing:border-box}
+  body{font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;font-size:13px;line-height:1.5;margin:0;padding:26px 30px;max-width:820px;margin:0 auto}
+  .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #0a6e2e;padding-bottom:12px;margin-bottom:18px}
+  .hd h1{margin:0;font-size:20px;color:#0a6e2e}
+  .hd .sub{font-size:12px;color:#555;margin-top:3px}
+  .hd .r{text-align:right;font-size:11.5px;color:#555}
+  .score-row{display:flex;gap:18px;align-items:stretch;margin-bottom:16px}
+  .score-box{border:3px solid #0a6e2e;border-radius:12px;padding:12px 18px;text-align:center;min-width:120px;display:flex;flex-direction:column;justify-content:center}
+  .score-num{font-size:44px;font-weight:800;line-height:1}
+  .score-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:#666;margin-top:4px}
+  .resumo{flex:1}
+  .metinline{font-size:11px;color:#555;margin-top:8px;border-top:1px dashed #ccc;padding-top:6px}
+  .sec{margin:16px 0;page-break-inside:avoid}
+  .sec-tit{font-size:14px;font-weight:700;margin-bottom:7px;padding-bottom:3px;border-bottom:1px solid #e0e0e0}
+  .sec-tit.verde{color:#0a6e2e}.sec-tit.vermelho{color:#b01515}.sec-tit.azul{color:#0e6bd4}
+  ul,ol{margin:6px 0;padding-left:22px}
+  li{margin:4px 0}
+  .muted{color:#888;font-size:12px}
+  .alertas{background:#fff6f6;border:1px solid #f0c9c9;border-radius:6px;padding:8px 12px;margin-top:8px}
+  .alertas ul{margin:4px 0}
+  .exemplos{margin-top:10px}
+  .ex{background:#fafafa;border-left:3px solid #d49b1a;padding:6px 10px;margin:5px 0;font-size:12px}
+  .ex-cli{font-weight:700}
+  .anot{margin-top:20px;page-break-inside:avoid}
+  .an-line{border-bottom:1px solid #bbb;height:26px}
+  .assin{display:flex;justify-content:space-between;margin-top:34px;gap:30px}
+  .assin div{flex:1;border-top:1px solid #333;padding-top:5px;font-size:11px;text-align:center;color:#555}
+  .vazio{background:#f7f7f7;border-radius:8px;padding:30px;text-align:center;color:#777}
+  .no-print{position:fixed;top:12px;right:14px}
+  .btn-print{background:#0a6e2e;color:#fff;border:0;border-radius:6px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+  @media print{body{padding:0}.no-print{display:none!important}}
+</style></head><body>
+  <div class="no-print"><button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button></div>
+  <div class="hd">
+    <div><h1>Dossiê de Feedback</h1><div class="sub">WhatsApp · <b>${esc(nome)}</b></div></div>
+    <div class="r">Período analisado: <b>${fmt(a && a.periodo_de)}</b> a <b>${fmt(a && a.periodo_ate)}</b><br>Gerado em ${hoje}</div>
+  </div>
+  ${corpo}
+  <div class="sec anot">
+    <div class="sec-tit">Anotações da reunião</div>
+    ${linhasAnotacao}
+  </div>
+  <div class="assin">
+    <div>Gestor responsável</div>
+    <div>${esc(nome)}</div>
+  </div>
+</body></html>`;
 }
 // Base de Conhecimento (edita e ve): so admin/diretor.
 function canManageKB(sess) { return isAdminOrDiretor(sess); }
@@ -551,7 +780,10 @@ module.exports = async (req, res) => {
   // Exclui tambem /mensagens — senao o handler generico captura o GET das
   // mensagens de uma solicitacao especifica (bug: estava retornando a lista
   // inteira de solicitacoes em vez do array de mensagens, chat ficava vazio).
-  if (url.startsWith('/api/solicitacoes') && req.method === 'GET' && !url.match(/\/(contador|categorias|usuarios|mensagens)(\?|$)/)) {
+  // BUG CORRIGIDO: /chats-nao-lidos caia AQUI e devolvia { total: nº de
+  // solicitacoes recebidas } — o balao do chat mostrava "3" sem nenhuma
+  // mensagem nao lida. Agora ele vai pro handler certo (logo abaixo).
+  if (url.startsWith('/api/solicitacoes') && req.method === 'GET' && !url.match(/\/(contador|categorias|usuarios|mensagens|chats-nao-lidos)(\?|$)/)) {
     const sess = getSession(req);
     if (!sess) { res.writeHead(401,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nao autorizado.'})); return; }
     try {
@@ -760,6 +992,73 @@ module.exports = async (req, res) => {
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
+    return;
+  }
+
+  // GET /api/crm/diag/reagendamentos?vendedor=dickmann — DIAGNOSTICO (read-only).
+  // Mostra de onde vem o numero de "reagendou" (follow_up_agendado) no painel:
+  // quantos foram concluidos pelo PROPRIO vendedor, quantos sem autor (registros
+  // antigos) e quantos passaram por reatribuicao. Admin/diretor. Nao altera nada.
+  if (req.method === 'GET' && url.startsWith('/api/crm/diag/reagendamentos')) {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
+    try {
+      const q = new URL(url, 'http://x');
+      const vend = String(q.searchParams.get('vendedor') || 'dickmann').trim().toLowerCase();
+      const acts = await crmStore.listDocs('activities');
+      const norm = (v) => String(v || '').trim().toLowerCase();
+      const dono = (a) => norm(a.owner_id || a.dono);
+      const JAN = 14;
+      const limite = new Date(Date.now() - JAN * 86400000).toISOString();
+      const finEm = (a) => a.status === 'concluida' ? (a.concluida_em || a.concluido_em || a.atualizado_em || null)
+        : (a.status === 'cancelada' ? (a.cancelada_em || a.atualizado_em || null) : null);
+      const doVend = acts.filter(a => a && dono(a) === vend && a.resultado === 'follow_up_agendado' && a.status === 'concluida');
+      const janela = doVend.filter(a => { const e = finEm(a); return e && e >= limite; });
+      const dist = { total_all_time: doVend.length, na_janela_14d: janela.length,
+        concluida_por_vazio: 0, concluida_por_ele: 0, concluida_por_outro: 0, com_reatribuicao: 0 };
+      const porConcluidaPor = {}, porCriadoPor = {};
+      for (const a of janela) {
+        const cp = norm(a.concluida_por);
+        if (!cp) dist.concluida_por_vazio++;
+        else if (cp === vend) dist.concluida_por_ele++;
+        else dist.concluida_por_outro++;
+        porConcluidaPor[cp || '(vazio)'] = (porConcluidaPor[cp || '(vazio)'] || 0) + 1;
+        const crp = norm(a.criado_por);
+        porCriadoPor[crp || '(vazio)'] = (porCriadoPor[crp || '(vazio)'] || 0) + 1;
+        if (a.reatribuido_de || a.reatribuido_em) dist.com_reatribuicao++;
+      }
+      const amostra = janela.slice(0, 20).map(a => ({
+        id: a.id, titulo: String(a.titulo || '').slice(0, 45),
+        owner_id: a.owner_id || null, dono: a.dono || null,
+        concluida_por: a.concluida_por || null, criado_por: a.criado_por || null,
+        concluida_em: a.concluida_em || a.concluido_em || null, criado_em: a.criado_em || null,
+        fonte: a.fonte || null, lote_dia: a.lote_dia || null,
+        reatribuido_de: a.reatribuido_de || null, origem_tarefa_id: a.origem_tarefa_id || null,
+      }));
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ vendedor: vend, janela_dias: JAN, distribuicao: dist,
+        por_concluida_por: porConcluidaPor, por_criado_por: porCriadoPor, amostra }, null, 2));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/diag/colecoes — contagem por coleção (read-only). Serve pra
+  // confirmar se a paginação do store está ativa: se orders/accounts passam de
+  // 1000, a leitura paginada funciona; se travam em 1000, o teto ainda morde.
+  if (req.method === 'GET' && url === '/api/crm/diag/colecoes') {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
+    try {
+      const nomes = ['accounts','orders','activities','contacts','leads','opportunities','onboardings','documentos','armas','envios','romaneios','contratos','referrals'];
+      const out = {};
+      for (const n of nomes) {
+        try { out[n] = Object.keys(await crmStore.getCollection(n)).length; }
+        catch (e) { out[n] = 'erro: ' + (e.message || String(e)).slice(0, 80); }
+      }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, contagem: out }, null, 2));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
   }
 
@@ -1053,6 +1352,23 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // POST /api/garantias/:id/observacao body: { texto } — sobrescreve a observação do caso
+  if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/observacao$/)) {
+    const sess = getSession(req);
+    if (!sess || !canGerenciarGarantias(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissao.'})); return; }
+    try {
+      const gar = require('../lib/garantias');
+      const id = url.split('/')[3];
+      const body = await readBody(req);
+      const { texto } = JSON.parse(body || '{}');
+      const g = await gar.salvarObservacao(id, texto, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, garantia: g }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
   // POST /api/garantias/:id/reavaliar body: { tipo_produto, forma_compra, ... }
   if (req.method === 'POST' && url.match(/^\/api\/garantias\/[a-zA-Z0-9_\-]+\/reavaliar$/)) {
     const sess = getSession(req);
@@ -1217,6 +1533,596 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // WhatsApp — Evolution API (piloto Enzo/boschetto)
+  // ═══════════════════════════════════════════════════════════════
+
+  // POST /api/whatsapp/webhook — recebe eventos da Evolution API
+  // Protegido por apikey no header ou no body (a Evolution manda no payload).
+  // Sem sessão — a Evolution chama de fora.
+  if (req.method === 'POST' && url === '/api/whatsapp/webhook') {
+    try {
+      const body = await readBody(req);
+      const payload = JSON.parse(body || '{}');
+
+      // Autenticação: apikey no header OU config.evolutionWebhookSecret
+      const headerKey = req.headers['apikey'] || req.headers['x-evolution-key'] || '';
+      const payloadKey = payload.apikey || '';
+      const segredo = config.evolutionWebhookSecret;
+      if (segredo && headerKey !== segredo && payloadKey !== segredo) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Webhook não autorizado.' }));
+        return;
+      }
+
+      const evento = payload.event || '';
+
+      // CONNECTION_UPDATE — só loga
+      if (evento === 'CONNECTION_UPDATE' || evento === 'connection.update') {
+        const state = payload.data && payload.data.state;
+        console.log('[WA] connection.update:', payload.instance, state);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, evento, state }));
+        return;
+      }
+
+      // MESSAGES_UPSERT — grava mensagem
+      if (evento === 'MESSAGES_UPSERT' || evento === 'messages.upsert') {
+        const resultado = await waMensagens.processarMensagem(payload);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, ...resultado }));
+        return;
+      }
+
+      // SEND_MESSAGE — mensagem enviada pelo vendedor
+      if (evento === 'SEND_MESSAGE' || evento === 'send.message') {
+        const resultado = await waMensagens.processarMensagem(payload);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, ...resultado }));
+        return;
+      }
+
+      // Outros eventos — aceita silenciosamente
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, evento, ignorado: true }));
+    } catch (e) {
+      console.error('[WA] Erro no webhook:', e.message);
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/conversas — lista conversas agrupadas por contato
+  // Requer sessão admin/diretor
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/conversas')) {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      // /api/whatsapp/conversas?instancia=enzo&limite=50
+      const params = new URL(url, 'http://x').searchParams;
+      const conversas = await waMensagens.listarConversas({
+        instancia: params.get('instancia') || undefined,
+        limite: parseInt(params.get('limite') || '50', 10),
+        offset: parseInt(params.get('offset') || '0', 10),
+      });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, conversas }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/mensagens/:telefone — mensagens de uma conversa
+  if (req.method === 'GET' && url.match(/^\/api\/whatsapp\/mensagens\/\d+/)) {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const telefone = url.split('/')[4];
+      const params = new URL(url, 'http://x').searchParams;
+      const mensagens = await waMensagens.mensagensPorTelefone(telefone, {
+        limite: parseInt(params.get('limite') || '100', 10),
+        antes_de: params.get('antes_de') || null,
+      });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, mensagens }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/metricas — métricas de conversas
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/metricas')) {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const params = new URL(url, 'http://x').searchParams;
+      const m = await waMensagens.metricas({
+        instancia: params.get('instancia') || undefined,
+        de: params.get('de') || undefined,
+        ate: params.get('ate') || undefined,
+      });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, metricas: m }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/health — verifica conexão com Supabase
+  if (req.method === 'GET' && url === '/api/whatsapp/health') {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const { ping } = require('../lib/supabaseClient');
+      await ping();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, supabase: 'connected' }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: e.message }));
+    }
+    return;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // WhatsApp Inteligência — Métricas + Análise com IA
+  // Visível somente para admin/diretor/gerência
+  // ═══════════════════════════════════════════════════════════════
+
+  // GET /api/whatsapp/inteligencia/metricas — métricas detalhadas por vendedor
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/inteligencia/metricas')) {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const params = new URL(req.url, 'http://x').searchParams;
+      const instancia = params.get('instancia') || null;
+      const de = params.get('de') || null;
+      const ate = params.get('ate') || null;
+      const metricas = await waInteligencia.calcularMetricas(instancia, de, ate);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(metricas));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/inteligencia/vendedores — lista instâncias/vendedores configurados
+  if (req.method === 'GET' && url === '/api/whatsapp/inteligencia/vendedores') {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    const lista = Object.entries(waInteligencia.INSTANCIAS_VENDEDORES).map(([inst, v]) => ({
+      instancia: inst, nome: v.nome, id: v.id,
+    }));
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ vendedores: lista }));
+    return;
+  }
+
+  // GET /api/whatsapp/inteligencia/ultima-analise?vendedor=Pedro+Dickmann
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/inteligencia/ultima-analise')) {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const params = new URL(req.url, 'http://x').searchParams;
+      const vendedor = params.get('vendedor') || '';
+      if (!vendedor) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Parâmetro vendedor obrigatório.' }));
+        return;
+      }
+      const analise = await waInteligencia.obterUltimaAnalise(vendedor);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(analise || { nenhuma: true }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/inteligencia/analise/:id — detalhe de uma análise
+  if (req.method === 'GET' && url.match(/^\/api\/whatsapp\/inteligencia\/analise\/\d+/)) {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const id = parseInt(url.split('/').pop(), 10);
+      const analise = await waInteligencia.obterAnalise(id);
+      if (!analise) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Análise não encontrada.' }));
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(analise));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/inteligencia/historico — lista análises passadas
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/inteligencia/historico')) {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const params = new URL(req.url, 'http://x').searchParams;
+      const vendedor = params.get('vendedor') || undefined;
+      const limite = parseInt(params.get('limite') || '20', 10);
+      const analises = await waInteligencia.listarAnalises({ vendedor, limite });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(analises));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/inteligencia/equipe — diagnóstico geral da equipe.
+  // Para cada vendedor configurado: última análise (nota + métricas) + evolução
+  // semanal das notas. Alimenta os gráficos comparativos da visão geral.
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/inteligencia/equipe')) {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao.' }));
+      return;
+    }
+    try {
+      const cfg = waInteligencia.INSTANCIAS_VENDEDORES || {};
+      const vendedores = [];
+      for (const [instancia, info] of Object.entries(cfg)) {
+        let ultima = null, hist = [];
+        try { ultima = await waInteligencia.obterUltimaAnalise(info.nome); } catch (_) {}
+        try { hist = await waInteligencia.listarAnalises({ vendedor: info.nome, limite: 12 }); } catch (_) {}
+        const evolucao = (hist || [])
+          .filter(h => h.score_geral !== null && h.score_geral !== undefined)
+          .map(h => ({ periodo_ate: h.periodo_ate, score: h.score_geral }))
+          .sort((a, b) => String(a.periodo_ate).localeCompare(String(b.periodo_ate)));
+        vendedores.push({
+          id: info.id,
+          nome: info.nome,
+          instancia,
+          tem_analise: !!(ultima && ultima.score_geral !== null && ultima.score_geral !== undefined),
+          score: ultima ? ultima.score_geral : null,
+          resumo: ultima ? ultima.resumo : null,
+          criado_em: ultima ? ultima.criado_em : null,
+          periodo_de: ultima ? ultima.periodo_de : null,
+          periodo_ate: ultima ? ultima.periodo_ate : null,
+          conversas_analisadas: ultima ? ultima.conversas_analisadas : null,
+          metricas: ultima ? ultima.metricas : null,
+          evolucao,
+        });
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ vendedores, gerado_em: new Date().toISOString() }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/whatsapp/inteligencia/dossie?vendedor=<nome>  (ou &id=<n>)
+  // Página HTML pronta pra impressão: dossiê de feedback do vendedor.
+  // Nota + resumo + pontos fortes · erros com exemplos · plano de ação · anotações.
+  if (req.method === 'GET' && url.startsWith('/api/whatsapp/inteligencia/dossie')) {
+    const sess = getSession(req);
+    if (!sess || !canVerWAInteligencia(sess)) {
+      res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end('<h2>Sem permissão</h2>');
+      return;
+    }
+    try {
+      const params = new URL(req.url, 'http://x').searchParams;
+      const idParam = params.get('id');
+      const vendedor = params.get('vendedor') || '';
+      let a = null;
+      if (idParam) a = await waInteligencia.obterAnalise(parseInt(idParam, 10));
+      else if (vendedor) a = await waInteligencia.obterUltimaAnalise(vendedor);
+      const html = _dossieHtml(vendedor || (a && a.vendedor) || 'Vendedor', a);
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(html);
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end('<h2>Erro: ' + String(e.message).replace(/</g, '&lt;') + '</h2>');
+    }
+    return;
+  }
+
+  // GET /api/crm/cron/whatsapp-sync — cron a cada 5-10 min
+  // Puxa mensagens recentes da Evolution API e grava no Supabase.
+  // Alternativa ao webhook (que depende de rede do EasyPanel).
+  // Protegido por CRON_SECRET ou sessão admin.
+  if (req.method === 'GET' && url === '/api/crm/cron/whatsapp-sync') {
+    const secret = config.cronSecret;
+    const headerSecret = req.headers['x-cron-secret'] || '';
+    if (secret && headerSecret !== secret) {
+      const sess = getSession(req);
+      if (!sess || !isAdminOrDiretor(sess)) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Não autorizado.' }));
+        return;
+      }
+    }
+    try {
+      const resultados = await waSync.sincronizarTodas();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, resultados }));
+    } catch (e) {
+      console.error('[WA-SYNC] Erro no cron:', e.message);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/crm/cron/whatsapp-backfill?instancia=X&paginas=N — puxa o histórico
+  // profundo de UMA instância (usado quando um vendedor acabou de conectar).
+  // Protegido por CRON_SECRET ou sessão admin/diretor.
+  if (req.method === 'GET' && url.startsWith('/api/crm/cron/whatsapp-backfill')) {
+    const secret = config.cronSecret;
+    const headerSecret = req.headers['x-cron-secret'] || '';
+    if (secret && headerSecret !== secret) {
+      const sess = getSession(req);
+      if (!sess || !isAdminOrDiretor(sess)) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Não autorizado.' }));
+        return;
+      }
+    }
+    try {
+      const q = new URL(req.url, 'http://x').searchParams;
+      const instancia = q.get('instancia');
+      const paginas = parseInt(q.get('paginas') || '15', 10);
+      if (!instancia) throw new Error('Parâmetro instancia obrigatório.');
+      const resultado = await waSync.backfillInstancia(instancia, paginas);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, resultado }));
+    } catch (e) {
+      console.error('[WA-BACKFILL] Erro:', e.message);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/crm/cron/telefones-backfill?max=N[&forcar=1] — preenche o telefone
+  // dos clientes buscando a ficha completa no Bling (/contatos/{id}). O detalhe
+  // do pedido nao traz numero, entao os accounts ficavam sem telefone e a tarefa
+  // pedia pra cadastrar na mao. Roda em lotes (max chamadas de API) e faz
+  // auto-chain ate zerar. Protegido por CRON_SECRET, sessao admin, Vercel Cron
+  // ou token de self-invocation.
+  if (req.method === 'GET' && url.startsWith('/api/crm/cron/telefones-backfill')) {
+    const secret = config.cronSecret;
+    const headerSecret = req.headers['x-cron-secret'] || '';
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const chainToken = req.headers['x-bling-chain'] === config.sessionSecret;
+    if (!(vercelCron || chainToken || (secret && headerSecret === secret))) {
+      const sess = getSession(req);
+      if (!sess || !isAdminOrDiretor(sess)) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Não autorizado.' }));
+        return;
+      }
+    }
+    try {
+      const q = new URL(req.url, 'http://x').searchParams;
+      const max = Math.max(1, Math.min(200, parseInt(q.get('max') || '60', 10)));
+      const forcar = q.get('forcar') === '1' || q.get('forcar') === 'true';
+      // repuxar=1 → reconfere tambem os accounts que ja tem numero mas e fixo,
+      // trocando pelo CELULAR do Bling quando houver (regra do botao do WhatsApp).
+      const repuxar = q.get('repuxar') === '1' || q.get('repuxar') === 'true';
+      const resultado = await blingSync.enriquecerTelefones({ maxLookups: max, forcar, repuxarNaoCelular: repuxar });
+      // AUTO-CHAIN: se ainda faltam clientes pra buscar, dispara o proximo lote.
+      if (resultado && resultado.faltam > 0 && resultado.lookups > 0) {
+        const host = req.headers['x-forwarded-host'] || req.headers.host || 'dashboardph.vercel.app';
+        const nextUrl = 'https://' + host + '/api/crm/cron/telefones-backfill?max=' + max + (forcar ? '&forcar=1' : '') + (repuxar ? '&repuxar=1' : '');
+        try {
+          const https = require('https');
+          const u2 = new URL(nextUrl);
+          const chainReq = https.request({
+            hostname: u2.hostname, path: u2.pathname + u2.search, method: 'GET',
+            headers: { 'x-bling-chain': config.sessionSecret, 'User-Agent': 'tel-backfill-chain' },
+            timeout: 3000,
+          }, () => {});
+          chainReq.on('error', () => {});
+          chainReq.on('timeout', () => chainReq.destroy());
+          chainReq.end();
+        } catch (e) { /* silencia */ }
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, ...resultado, chained: !!(resultado && resultado.faltam > 0 && resultado.lookups > 0) }));
+    } catch (e) {
+      console.error('[TEL-BACKFILL] Erro:', e.message);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/crm/cron/whatsapp-analise — cron semanal (toda segunda)
+  // Chamado pelo cron-job.org. Protegido por CRON_SECRET no header.
+  // Roda análise pra TODOS os vendedores configurados.
+  if (req.method === 'GET' && url === '/api/crm/cron/whatsapp-analise') {
+    const secret = config.cronSecret;
+    const headerSecret = req.headers['x-cron-secret'] || '';
+    if (secret && headerSecret !== secret) {
+      // Também aceita via sessão admin
+      const sess = getSession(req);
+      if (!sess || !canVerWAInteligencia(sess)) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Não autorizado.' }));
+        return;
+      }
+    }
+    try {
+      const agora = new Date();
+      const ate = agora.toISOString();
+      const de = new Date(agora.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+      const resultados = {};
+      for (const [instancia, vendedor] of Object.entries(waInteligencia.INSTANCIAS_VENDEDORES)) {
+        try {
+          const analise = await waInteligencia.analisarVendedor(instancia, vendedor.nome, de, ate);
+          resultados[vendedor.nome] = {
+            ok: true,
+            score: analise.score_geral,
+            conversas: analise.conversas_analisadas,
+          };
+        } catch (e) {
+          resultados[vendedor.nome] = { ok: false, error: e.message };
+        }
+      }
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, periodo: { de, ate }, resultados }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // Migração CRM GitHub → Supabase (roda UMA vez)
+  // ═══════════════════════════════════════════════════════════════
+
+  // GET /api/migrate-to-supabase — lê 14 coleções do GitHub JSON e popula Supabase
+  // Protegido: só gerência/admin (via sessão).
+  // Idempotente: usa upsert — pode rodar várias vezes sem duplicar.
+  if (req.method === 'GET' && url === '/api/migrate-to-supabase') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao. Só gerência.' }));
+      return;
+    }
+    try {
+      const { getClient } = require('../lib/supabaseClient');
+      const sb = getClient();
+      const colecoes = [
+        'accounts', 'contacts', 'leads', 'referrals',
+        'opportunities', 'activities', 'orders', 'onboardings',
+        'documentos', 'armas', 'envios', 'romaneios',
+        'tarefas', 'contratos'
+      ];
+
+      const resultado = {};
+      let totalDocs = 0;
+
+      for (const col of colecoes) {
+        try {
+          // Lê do GitHub (branch de dados)
+          let raw;
+          try {
+            raw = await _ghGet('crm/' + col + '.json');
+          } catch (e) {
+            if (e && e.statusCode === 404) {
+              resultado[col] = { status: 'vazio', docs: 0, motivo: 'arquivo não existe no GitHub' };
+              continue;
+            }
+            throw e;
+          }
+
+          let data;
+          try { data = JSON.parse(raw); } catch (_) { data = {}; }
+          if (!data || typeof data !== 'object' || Array.isArray(data)) data = {};
+
+          const entries = Object.entries(data);
+          if (entries.length === 0) {
+            resultado[col] = { status: 'vazio', docs: 0 };
+            continue;
+          }
+
+          // Monta linhas para upsert
+          const rows = entries.map(([id, doc]) => ({
+            colecao: col,
+            id,
+            data: doc,
+            owner_id:       doc.vendedor_id || doc.owner_id || null,
+            criado_em:      doc.criado_em      || new Date().toISOString(),
+            atualizado_em:  doc.atualizado_em  || new Date().toISOString(),
+            criado_por:     doc.criado_por     || null,
+            atualizado_por: doc.atualizado_por || null,
+          }));
+
+          // Upsert em batches de 500
+          for (let i = 0; i < rows.length; i += 500) {
+            const batch = rows.slice(i, i + 500);
+            const { error: errUp } = await sb
+              .from('crm_docs')
+              .upsert(batch, { onConflict: 'colecao,id' });
+            if (errUp) throw errUp;
+          }
+
+          resultado[col] = { status: 'ok', docs: entries.length };
+          totalDocs += entries.length;
+        } catch (e) {
+          resultado[col] = { status: 'erro', error: e.message };
+        }
+      }
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        ok: true,
+        total_docs: totalDocs,
+        colecoes: resultado,
+        mensagem: 'Migração concluída. Verifique os status acima.'
+      }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: e.message }));
+    }
+    return;
+  }
+
   // GET /api/access-log — últimos eventos (só gerência)
   if (req.method === 'GET' && url === '/api/access-log') {
     const sess = getSession(req);
@@ -1295,7 +2201,8 @@ module.exports = async (req, res) => {
   if (crmMatch && crmMatch[1] !== 'session-info' && crmMatch[1] !== 'migrate-parceiros' && crmMatch[1] !== 'docs' && crmMatch[1] !== 'cron' && crmMatch[1] !== 'fenix'
       && crmMatch[1] !== 'coocorrencia' && crmMatch[1] !== 'sugerir' && crmMatch[1] !== 'tarefas' && crmMatch[1] !== 'ficha'
       && crmMatch[1] !== 'catalogo' && crmMatch[1] !== 'prospeccao' && crmMatch[1] !== 'vendedores' && crmMatch[1] !== 'bling'
-      && crmMatch[1] !== 'frete' && crmMatch[1] !== 'envios' && crmMatch[1] !== 'controlado' && crmMatch[1] !== 'romaneios') {
+      && crmMatch[1] !== 'frete' && crmMatch[1] !== 'envios' && crmMatch[1] !== 'controlado' && crmMatch[1] !== 'romaneios'
+      && crmMatch[1] !== 'carteira' && crmMatch[1] !== 'contratos' && crmMatch[1] !== 'correios') {
     const colName = crmMatch[1];
     const docId = crmMatch[2] || null;
     const reg = crmColl.REGISTRY[colName];
@@ -1902,9 +2809,12 @@ module.exports = async (req, res) => {
     const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
     if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
     try {
-      const r = await automacaoUpsell.disparaReativacao();
+      // Contratos de arma primeiro (obrigacao legal) — falha aqui nao trava o lote
+      let contratosRes = null;
+      try { contratosRes = await contratosArma.processar(); } catch (e) { contratosRes = { ok: false, erro: e.message }; }
+      const r = await automacaoUpsell.disparaReativacao({ forcar: true });
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify(r));
+      res.end(JSON.stringify(Object.assign({}, r, { contratos_arma: contratosRes })));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
   }
@@ -1976,6 +2886,86 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // ═════════════════════════════════════════════════════════════
+  // CONTRATOS DE ARMA DE FOGO (lib/crm/contratosArma.js)
+  // Toda venda de arma gera: "gerar e enviar contrato" (na hora) e "salvar
+  // contrato assinado" (aparece 48h depois). Sem assinatura -> ligacao de aviso
+  // de cancelamento pro vendedor responsavel.
+  // ═════════════════════════════════════════════════════════════
+  // GET /api/crm/cron/contratos — puxa pedidos novos do Bling (ultimo dia) e cria
+  // as tarefas de contrato. Pra rodar de hora em hora no cron-job.org.
+  if (req.method === 'GET' && url === '/api/crm/cron/contratos') {
+    const sess = getSession(req);
+    const vercelCron = req.headers['x-vercel-cron'] === '1';
+    const cronToken = req.headers['x-cron-secret'];
+    const autorizado = vercelCron || (sess && crmUtils.canSeeAll(sess)) || (config.cronSecret && cronToken === config.cronSecret);
+    if (!autorizado) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem autorização.'})); return; }
+    const out = { ok: true };
+    try {
+      const usersJson = await _loadUsersMap();
+      out.bling = await blingBackfill.syncIncrementalTodas({ dias: 1, usersJson });
+    } catch (e) { out.bling = { ok: false, erro: e.message }; }
+    try { out.contratos = await contratosArma.processar(); } catch (e) { out.ok = false; out.contratos = { ok: false, erro: e.message }; }
+    res.writeHead(out.ok ? 200 : 500,{'Content-Type':'application/json'}); res.end(JSON.stringify(out));
+    return;
+  }
+
+  if (url === '/api/crm/contratos' || url.startsWith('/api/crm/contratos/') || url.startsWith('/api/crm/contratos?')) {
+    const sess = getSession(req);
+    // Auxiliar (Maria) entra aqui SO pra conferencia de contratos (painel + verificar);
+    // as acoes de gestao/vendas dentro do bloco continuam barradas individualmente.
+    if (!sess || !(crmUtils.canAccessCRM(sess) || crmUtils.canConferirContratos(sess))) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    const enviar = (code, obj) => { res.writeHead(code,{'Content-Type':'application/json','Cache-Control':'no-store'}); res.end(JSON.stringify(obj)); };
+    const pathOnly = url.split('?')[0];
+    try {
+      // GET /api/crm/contratos/painel — gestao ve todos; vendedor ve os dele
+      if (req.method === 'GET' && pathOnly === '/api/crm/contratos/painel') {
+        const acts = await crmStore.listDocs('activities', a => a && a.fonte === 'contrato_arma');
+        const login = String(sess.usuario || '').toLowerCase();
+        // Gestao e auxiliar (conferente) veem TODOS os contratos; vendedor so os dele.
+        const meus = crmUtils.canConferirContratos(sess) ? acts : acts.filter(a => String(a.owner_id || a.dono || '').toLowerCase() === login);
+        enviar(200, contratosArma.painel(meus)); return;
+      }
+      // GET /api/crm/contratos/meus[?todos=1] — cards operacionais (1 por venda de arma)
+      if (req.method === 'GET' && pathOnly === '/api/crm/contratos/meus') {
+        const u = new URL('http://x' + (req.url || ''));
+        const acts = await crmStore.listDocs('activities', a => a && a.fonte === 'contrato_arma');
+        const login = String(sess.usuario || '').toLowerCase();
+        const todos = u.searchParams.get('todos') === '1' && crmUtils.canSeeAll(sess);
+        const lista = contratosArma.cards(acts, todos ? null : login);
+        enviar(200, { cards: lista, total: lista.length }); return;
+      }
+      // POST /api/crm/contratos/processar — gestao forca a varredura agora
+      if (req.method === 'POST' && pathOnly === '/api/crm/contratos/processar') {
+        if (!crmUtils.canSeeAll(sess)) { enviar(403, { error: 'Só gestão.' }); return; }
+        enviar(200, await contratosArma.processar()); return;
+      }
+      // POST /api/crm/contratos/tarefa/:id  body: { acao, canal?, observacao?, confirmo? }
+      const mT = pathOnly.match(/^\/api\/crm\/contratos\/tarefa\/([A-Za-z0-9_\-]+)$/);
+      if (req.method === 'POST' && mT) {
+        if (!crmUtils.canEditCRM(sess)) { enviar(403, { error: 'Seu perfil pode consultar mas não alterar.' }); return; }
+        let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch (_) {}
+        enviar(200, await contratosArma.registrarAcao(mT[1], String(payload.acao || ''), sess, payload)); return;
+      }
+      // POST /api/crm/contratos/:orderId/atribuir  body: { login } — gestao escolhe o vendedor
+      const mA = pathOnly.match(/^\/api\/crm\/contratos\/([A-Za-z0-9_\-]+)\/atribuir$/);
+      if (req.method === 'POST' && mA) {
+        if (!crmUtils.canSeeAll(sess)) { enviar(403, { error: 'Só gestão.' }); return; }
+        let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch (_) {}
+        enviar(200, await contratosArma.atribuir(mA[1], payload.login, sess)); return;
+      }
+      // POST /api/crm/contratos/:tarefaId/verificar  body: { ok: true|false, obs? } — gestao confere a pasta
+      const mV = pathOnly.match(/^\/api\/crm\/contratos\/([A-Za-z0-9_\-]+)\/verificar$/);
+      if (req.method === 'POST' && mV) {
+        if (!crmUtils.canConferirContratos(sess)) { enviar(403, { error: 'Sem permissão para conferir contratos.' }); return; }
+        let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch (_) {}
+        enviar(200, await contratosArma.verificar(mV[1], sess, payload.ok === true, payload.obs)); return;
+      }
+      enviar(404, { error: 'Rota de contratos não encontrada' });
+    } catch (e) { enviar(e.status || 500, { error: e.message }); }
+    return;
+  }
+
   // ── GET /api/crm/tarefas/minhas — fila do PROPRIO usuario logado.
   // Admin ve so as tarefas dele (login==gerencia). Se quiser ver TODAS as
   // tarefas de todos os vendedores, passa ?todos=1 na URL — util pra dashboard
@@ -1994,11 +2984,15 @@ module.exports = async (req, res) => {
       // devolve vazio. Com ?todos=1, ve a fila consolidada de todos.
       let tarefas = [];
       if (ehAdmin && !verTodas) {
-        tarefas = [];
+        // Gestao nao tem fila comercial propria — mas contrato de arma de venda
+        // sem vendedor mapeado cai pra ela e PRECISA aparecer.
+        tarefas = await crmStore.listDocs('activities', a =>
+          a.status === 'pendente' && disciplina.ehContrato(a) && disciplina.disponivel(a) &&
+          String(a.owner_id || a.dono || '').toLowerCase() === login);
       } else {
         const scopeAll = verTodas && ehAdmin;
         tarefas = await crmStore.listDocs('activities', a =>
-          a.status === 'pendente' && (scopeAll || String(a.owner_id || a.dono || '').toLowerCase() === login));
+          a.status === 'pendente' && disciplina.disponivel(a) && (scopeAll || String(a.owner_id || a.dono || '').toLowerCase() === login));
       }
       // Ordena: vencidas (prazo+hora < agora) primeiro, depois por prazo+hora
       const agora = new Date();
@@ -2009,6 +3003,9 @@ module.exports = async (req, res) => {
       }
       const agoraISO = agora.toISOString().slice(0, 16);
       tarefas.sort((a, b) => {
+        // Contrato de arma (obrigatorio) sempre no topo
+        const aC = disciplina.ehContrato(a) ? 0 : 1, bC = disciplina.ehContrato(b) ? 0 : 1;
+        if (aC !== bC) return aC - bC;
         const aLim = _tsLimite(a);
         const bLim = _tsLimite(b);
         const aOver = aLim < agoraISO ? 0 : 1;
@@ -2039,8 +3036,47 @@ module.exports = async (req, res) => {
           }
         }
       }
+      // Conta follow-ups por account_id só pra mostrar "Tentativa X" no front
+      // (sem limite — o vendedor reagenda quantas vezes precisar).
+      const followCountPorAcc = {};
+      if (tarefas.length) {
+        const allActs = await crmStore.listDocs('activities', a =>
+          a.fonte === 'follow_up' && (a.status === 'pendente' || a.resultado === 'follow_up_agendado'));
+        for (const a of allActs) {
+          const aid = a.account_id || a.entidade_id;
+          if (aid) followCountPorAcc[aid] = (followCountPorAcc[aid] || 0) + 1;
+        }
+      }
+      for (const t of tarefas) {
+        const aid = t.account_id || t.entidade_id;
+        if (aid && followCountPorAcc[aid]) {
+          t.followups_cliente = followCountPorAcc[aid];
+          t.followups_max = null; // sem teto
+        }
+      }
+      // Acumulo: ha quantos dias cada tarefa esta aberta (dia BRT). Tarefa de
+      // dia anterior NAO some — fica na fila marcada como "acumulada".
+      const hojeBRT = disciplina.hojeBRT();
+      let deHoje = 0, acumuladas = 0, vencidas = 0, contratosAbertos = 0;
+      for (const t of tarefas) {
+        if (disciplina.ehContrato(t)) { contratosAbertos++; t.dias_em_aberto = 0; if (t.prazo && t.prazo < hojeBRT) vencidas++; continue; }
+        const origem = t.lote_dia || disciplina.dataBRT(t.criado_em);
+        t.dia_origem = origem || null;
+        // "Agendada pro futuro" = tarefa cujo DIA DE INÍCIO (lote_dia) ainda não
+        // chegou. Vale só pra follow-up e tarefa manual que o vendedor agendou
+        // pra uma data futura (o lote_dia dessas é a data escolhida). As tarefas
+        // automáticas do dia têm lote_dia = hoje, então aparecem na fila HOJE.
+        // ANTES: escondia pelo PRAZO (deadline +5 dias), o que ocultava o lote
+        // inteiro do dia e inchava o contador "agendadas".
+        const inicioFuturo = !!(origem && origem > hojeBRT);
+        t.dias_em_aberto = inicioFuturo ? 0 : (origem ? Math.max(0, Math.round((Date.parse(hojeBRT) - Date.parse(origem)) / 86400000)) : 0);
+        t.agendada_futura = inicioFuturo;  // flag para o front esconder da fila do vendedor
+        if (inicioFuturo) continue;        // não conta no resumo da fila de hoje
+        if (t.dias_em_aberto > 0) acumuladas++; else deHoje++;
+        if (t.prazo && t.prazo < hojeBRT) vencidas++;
+      }
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ tarefas, total: tarefas.length }));
+      res.end(JSON.stringify({ tarefas, total: tarefas.length, resumo: { de_hoje: deHoje, acumuladas, vencidas, contratos: contratosAbertos } }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
   }
@@ -2081,7 +3117,7 @@ module.exports = async (req, res) => {
           throw new Error('Telefone do cliente obrigatório');
         }
         const dadosAcc = {
-          tipo: 'pessoa_fisica', // default — vendedor edita depois na ficha se precisar
+          tipo: 'pf', // pessoa fisica (enum account_tipo = ['pf','pj']); vendedor edita depois na ficha se precisar
           nome: String(payload.cliente_nome).trim().slice(0, 200),
           telefone: String(payload.cliente_telefone).trim().slice(0, 60),
           cpf_cnpj: payload.cliente_cpf ? String(payload.cliente_cpf).trim() : null,
@@ -2113,6 +3149,7 @@ module.exports = async (req, res) => {
         titulo: tituloFinal,
         descricao: String(descricao).trim().slice(0, 2000),
         prazo: prazoLimpo,
+        lote_dia: prazoLimpo, // "início" = data escolhida: se futura, fica agendada até lá; se hoje, aparece hoje
         hora: horaLimpa, // novo campo opcional — alertas usam
         concluido_em: null,
         concluido_com_order_id: null,
@@ -2134,6 +3171,145 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // ── POST /api/crm/tarefas/:id/contato  body: { canal: 'whatsapp'|'ligacao'|'presencial' }
+  // Registra que o vendedor ENTROU EM CONTATO (o botao WhatsApp chama sozinho).
+  // E a evidencia usada pra separar "nao convertido de verdade" de "tirei da frente".
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/tarefas\/[a-zA-Z0-9_\-]+\/contato$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const id = url.split('/')[4];
+      let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch(_){}
+      const canal = disciplina.CANAIS[payload.canal] ? payload.canal : 'whatsapp';
+      const t = await crmStore.getDoc('activities', id);
+      if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
+      const meuLogin = String(sess.usuario || '').toLowerCase();
+      const donoTarefa = String(t.owner_id || t.dono || '').toLowerCase();
+      if (donoTarefa !== meuLogin) { res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, ignorado: 'nao_e_dono' })); return; }
+      const now = new Date().toISOString();
+      const contatos = Array.isArray(t.contatos) ? t.contatos.slice(-19) : [];
+      contatos.push({ canal, em: now });
+      await crmStore.updateDoc('activities', id, {
+        contatos, primeiro_contato_em: t.primeiro_contato_em || now, ultimo_contato_em: now,
+      }, sess.usuario);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/tarefas/resumo — leve, pro BALAO FLUTUANTE (polling).
+  // Vendedor: sua fila (abertas/hoje/acumuladas/vencidas), 3 mais urgentes e
+  // os alertas de disciplina. Gestao: contagem de alertas da equipe.
+  if (req.method === 'GET' && url === '/api/crm/tarefas/resumo') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const login = String(sess.usuario || '').toLowerCase();
+      const acts = await crmStore.listDocs('activities');
+      const d = disciplina.calcular(acts, login);
+      const hoje = d.hoje;
+      const ehGestao = crmUtils.canSeeAll(sess);
+      const abertas = acts.filter(a => a.status === 'pendente' && disciplina.disponivel(a) &&
+        String(a.owner_id || a.dono || '').toLowerCase() === login && (!ehGestao || disciplina.ehContrato(a)));
+      abertas.sort((x, y) => {
+        const cx = disciplina.ehContrato(x) ? 0 : 1, cy = disciplina.ehContrato(y) ? 0 : 1;
+        if (cx !== cy) return cx - cy;
+        return String((x.prazo || '9999') + (x.hora || '')).localeCompare(String((y.prazo || '9999') + (y.hora || '')));
+      });
+      const top = abertas.slice(0, 3);
+      let accMap = {};
+      if (top.length) {
+        const ids = new Set(top.map(t => t.account_id || t.entidade_id).filter(Boolean));
+        const accs = await crmStore.listDocs('accounts', a => ids.has(a.id));
+        for (const a of accs) accMap[a.id] = a;
+      }
+      const proximas = top.map(t => {
+        const acc = accMap[t.account_id || t.entidade_id] || {};
+        return { id: t.id, titulo: t.titulo, prazo: t.prazo, hora: t.hora || null, vencida: !!(t.prazo && t.prazo < hoje), contrato: disciplina.ehContrato(t),
+          cliente_nome: acc.nome || acc.razao_social || null, dias_em_aberto: Math.max(0, Math.round((Date.parse(hoje) - Date.parse(t.lote_dia || disciplina.dataBRT(t.criado_em) || hoje)) / 86400000)) };
+      });
+      const fila = ehGestao ? { abertas: contratosArma.cards(acts, login).length, de_hoje: 0, acumuladas: 0, vencidas: abertas.filter(t => t.prazo && t.prazo < hoje).length, mais_antiga_dias: 0 } : d.fila;
+      const out = { ok: true, ...fila, contratos_abertos: contratosArma.cards(acts, login).length,
+        executadas_hoje: d.execucao.executadas_hoje, cota_dia: ehGestao ? 0 : disciplina.COTA_DIA,
+        saude: d.saude, alertas: ehGestao ? [] : d.alertas.map(a => ({ codigo: a.codigo, nivel: a.nivel, titulo: a.titulo, mensagem: a.mensagem_vendedor })), proximas };
+      if (ehGestao) {
+        const eq = disciplina.paraEquipeSync(acts, automacaoUpsell.VENDEDORES_ATIVOS);
+        let criticos = 0, comAlerta = 0;
+        for (const v of Object.values(eq)) {
+          const g = v.alertas.filter(a => !a.so_vendedor);
+          if (g.length) comAlerta++;
+          criticos += g.filter(a => a.nivel === 'critico').length;
+        }
+        out.equipe = { vendedores_com_alerta: comAlerta, alertas_criticos: criticos };
+      }
+      res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'}); res.end(JSON.stringify(out));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── GET /api/crm/tarefas/disciplina[?vendedor=login] — metricas completas.
+  // Vendedor ve as proprias; admin/diretor pode pedir de qualquer vendedor.
+  if (req.method === 'GET' && url.startsWith('/api/crm/tarefas/disciplina')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const u = new URL('http://x' + (req.url || ''));
+      let alvo = String(sess.usuario || '').toLowerCase();
+      if (u.searchParams.get('vendedor') && crmUtils.canSeeAll(sess)) alvo = String(u.searchParams.get('vendedor')).toLowerCase();
+      const d = await disciplina.paraVendedor(alvo);
+      d.motivos_labels = disciplina.MOTIVOS_NAO_CONVERSAO;
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(d));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // MINHA CARTEIRA — livro de clientes do consultor (lib/crm/carteira.js)
+  // ═════════════════════════════════════════════════════════════
+  if (url === '/api/crm/carteira' || url.startsWith('/api/crm/carteira?') || url.startsWith('/api/crm/carteira/')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    const login = String(sess.usuario || '').toLowerCase();
+    const enviar = (code, obj) => { res.writeHead(code,{'Content-Type':'application/json','Cache-Control':'no-store'}); res.end(JSON.stringify(obj)); };
+    const falhar = (e) => enviar(e.status || 500, { error: e.message, account_id: e.account_id || undefined });
+    const pathOnly = url.split('?')[0];
+    try {
+      // GET /api/crm/carteira[?vendedor=login]
+      if (req.method === 'GET' && pathOnly === '/api/crm/carteira') {
+        const u = new URL('http://x' + (req.url || ''));
+        let alvo = login;
+        const pedido = u.searchParams.get('vendedor');
+        if (crmUtils.canSeeAll(sess)) alvo = String(pedido || automacaoUpsell.VENDEDORES_ATIVOS[0] || login).toLowerCase();
+        const dados = await carteira.listar(alvo);
+        dados.opcoes = { temperaturas: carteira.TEMPERATURAS, origens: carteira.ORIGENS, limite_esfriando: carteira.LIMITE_ESFRIANDO };
+        dados.somente_leitura = alvo !== login;
+        if (crmUtils.canSeeAll(sess)) dados.vendedores = automacaoUpsell.VENDEDORES_ATIVOS;
+        enviar(200, dados); return;
+      }
+      if (!crmUtils.canEditCRM(sess)) { enviar(403, { error: 'Seu perfil pode consultar mas não alterar a carteira.' }); return; }
+      // POST /api/crm/carteira/cliente — cadastra cliente novo + proximo passo
+      if (req.method === 'POST' && pathOnly === '/api/crm/carteira/cliente') {
+        let body = {}; try { body = JSON.parse((await readBody(req)) || '{}'); } catch(_){}
+        const r = await carteira.adicionarCliente(login, body, automacaoUpsell.VENDEDORES_ATIVOS);
+        enviar(201, { ok: true, account_id: r.account.id, tarefa_id: r.tarefa ? r.tarefa.id : null, assumido: r.assumido }); return;
+      }
+      const mPasso = pathOnly.match(/^\/api\/crm\/carteira\/([a-zA-Z0-9_\-]+)\/proximo-passo$/);
+      if (req.method === 'POST' && mPasso) {
+        let body = {}; try { body = JSON.parse((await readBody(req)) || '{}'); } catch(_){}
+        const t = await carteira.definirProximoPasso(login, mPasso[1], body);
+        enviar(200, { ok: true, tarefa_id: t.id, prazo: t.prazo }); return;
+      }
+      const mAcc = pathOnly.match(/^\/api\/crm\/carteira\/([a-zA-Z0-9_\-]+)$/);
+      if ((req.method === 'PATCH' || req.method === 'POST') && mAcc) {
+        let body = {}; try { body = JSON.parse((await readBody(req)) || '{}'); } catch(_){}
+        await carteira.atualizar(login, mAcc[1], body);
+        enviar(200, { ok: true }); return;
+      }
+      enviar(404, { error: 'Rota da carteira não encontrada' });
+    } catch (e) { falhar(e); }
+    return;
+  }
+
   // ── POST /api/crm/tarefas/:id/concluir  body: { resultado: 'convertida'|'nao_convertida' }
   if (req.method === 'POST' && url.match(/^\/api\/crm\/tarefas\/[a-zA-Z0-9_\-]+\/concluir$/)) {
     const sess = getSession(req);
@@ -2149,8 +3325,24 @@ module.exports = async (req, res) => {
       let payload = {};
       try { payload = JSON.parse(body || '{}'); } catch(e){}
       const resultado = payload.resultado;
+      // Registro de COMO a tarefa foi trabalhada — base das metricas de
+      // disciplina. "Nao convertido" exige motivo (anti "tirar da frente").
+      const canal = payload.canal && disciplina.CANAIS[payload.canal] ? payload.canal : null;
+      const motivo = payload.motivo && disciplina.MOTIVOS_NAO_CONVERSAO[payload.motivo] ? payload.motivo : null;
+      const observacao = payload.observacao ? String(payload.observacao).trim().slice(0, 1000) : null;
+      if (resultado === 'nao_convertida' && !motivo) {
+        res.writeHead(400,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Informe o motivo do "não convertido" (se a tela não mostrar o campo, atualize a página com F5).'}));
+        return;
+      }
+      if (resultado === 'nao_convertida' && motivo === 'outro' && !observacao) {
+        res.writeHead(400,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Descreva o motivo em "observação".'}));
+        return;
+      }
       const t = await crmStore.getDoc('activities', id);
       if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
+      if (disciplina.ehContrato(t)) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa de contrato: use os botões do contrato (atualize a página com F5).'})); return; }
       // SEGURANÇA IDOR: so o DONO da tarefa (ou admin/diretor) pode concluir.
       // Antes qualquer vendedor podia concluir tarefa alheia via curl, sabotando
       // o ranking do colega e a automacao de renovacao de docs regulatorios.
@@ -2161,10 +3353,21 @@ module.exports = async (req, res) => {
         res.end(JSON.stringify({error:'Esta tarefa nao esta atribuida a voce.'}));
         return;
       }
-      await crmStore.updateDoc('activities', id, {
+      if (t.status !== 'pendente') {
+        res.writeHead(409,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa já foi finalizada.'})); return;
+      }
+      const fimPatch = {
         ...t, status: 'concluida', resultado: resultado || 'concluida',
         concluida_em: new Date().toISOString(), concluida_por: sess.usuario,
-      }, sess.usuario);
+      };
+      if (canal) fimPatch.canal_contato = canal;
+      if (motivo) fimPatch.motivo_nao_conversao = motivo;
+      if (observacao) fimPatch.observacao_conclusao = observacao;
+      if (payload.pedido_numero) fimPatch.pedido_numero_informado = String(payload.pedido_numero).trim().slice(0, 30);
+      await crmStore.updateDoc('activities', id, fimPatch, sess.usuario);
+      // ESTEIRA: concluiu uma → abre vaga → repoe ate 20 (nao bloqueia a resposta).
+      _dispararRefillEsteira(req);
+      // Se a tarefa era de um cliente da carteira, atualiza o "ultimo contato"
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
@@ -2193,9 +3396,14 @@ module.exports = async (req, res) => {
       if (!crmUtils.canSeeAll(sess) && donoTarefa !== meuLogin) {
         res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa nao esta atribuida a voce.'})); return;
       }
+      if (disciplina.ehContrato(t)) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa de contrato não aceita follow-up: use os botões do contrato.'})); return; }
       const now = new Date().toISOString();
       const dono = donoTarefa || meuLogin;
       const accId = t.account_id || t.entidade_id || null;
+      // Follow-ups SEM limite: o vendedor pode reagendar quantas vezes precisar
+      // pra converter. (Antes travava na 4ª tentativa; removido a pedido do
+      // comercial.) Mantemos só a contagem — exposta como "Tentativa X" — pra
+      // dar visibilidade, sem bloquear.
       // Nome do cliente pro titulo (busca o account; se nao achar usa o titulo antigo)
       let nomeCliente = null;
       if (accId) { try { const acc = await crmStore.getDoc('accounts', accId); if (acc) nomeCliente = acc.nome || acc.razao_social; } catch(_){} }
@@ -2206,6 +3414,7 @@ module.exports = async (req, res) => {
       }, sess.usuario);
       // 2) Cria a tarefa de follow-up
       const novoId = crmUtils.uuid();
+      const prazoStr = String(prazo).slice(0, 10);
       const followDoc = {
         id: novoId,
         tipo: 'follow_up',
@@ -2215,7 +3424,8 @@ module.exports = async (req, res) => {
         entidade_id: accId,
         titulo: '📅 Follow-up — ' + (nomeCliente || 'cliente'),
         descricao: String(descricao).trim().slice(0, 2000),
-        prazo: String(prazo).slice(0, 10),
+        prazo: prazoStr,
+        lote_dia: prazoStr,   // garante que dias_em_aberto conta a partir do prazo, não de hoje
         hora: hora ? String(hora).slice(0, 5) : null,
         concluido_em: null,
         concluido_com_order_id: null,
@@ -2231,6 +3441,9 @@ module.exports = async (req, res) => {
         criada_por_vendedor: sess.usuario,
       };
       await crmStore.createDoc('activities', followDoc, sess.usuario);
+      // ESTEIRA: a tarefa atual saiu da fila de hoje (virou follow-up futuro) →
+      // abre vaga → repoe ate 20.
+      _dispararRefillEsteira(req);
       res.writeHead(201,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, follow_up: followDoc }));
     } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
@@ -2257,6 +3470,9 @@ module.exports = async (req, res) => {
       if (!crmUtils.canSeeAll(sess) && donoTarefa !== meuLogin) {
         res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa nao esta atribuida a voce.'})); return;
       }
+      if (disciplina.ehContrato(t) && !crmUtils.canSeeAll(sess)) {
+        res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Contrato de arma é obrigatório e não pode ser cancelado pelo vendedor. Se a venda foi cancelada, avise a gerência.'})); return;
+      }
       await crmStore.updateDoc('activities', id, {
         ...t, status: 'cancelada', resultado: 'cancelada',
         cancelada_em: new Date().toISOString(), cancelada_por: sess.usuario,
@@ -2264,6 +3480,28 @@ module.exports = async (req, res) => {
       }, sess.usuario);
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── POST /api/crm/tarefas/gerar-lote (alias legado: /resetar-regerar)
+  // Dispara AGORA a geracao do lote do dia (mesmo motor do cron das 8h).
+  // NAO cancela nada: as pendentes de dias anteriores continuam na fila e
+  // acumulam (regra da gestao). Idempotente no dia — se o lote de hoje ja
+  // saiu (20 por vendedor), nao cria mais nada. So admin/diretor.
+  if (req.method === 'POST' && (url === '/api/crm/tarefas/gerar-lote' || url === '/api/crm/tarefas/resetar-regerar')) {
+    // Chamada interna da esteira (refill ao concluir tarefa) passa por header;
+    // caso contrario exige sessao admin/diretor.
+    const chainOk = req.headers['x-gen-chain'] && req.headers['x-gen-chain'] === config.sessionSecret;
+    const sess = getSession(req);
+    if (!chainOk && (!sess || !crmUtils.canSeeAll(sess))) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
+    try {
+      // Admin/diretor forcam (ignora throttle); a esteira (chain) respeita o throttle.
+      const geracao = await automacaoUpsell.gerarTarefasDiarias({ forcar: !chainOk });
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, canceladas: 0, geracao }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
     return;
   }
 
@@ -2587,208 +3825,139 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // ── POST /api/crm/vendedores/reatribuir-iniciar — lista IDs pra processar
-  //     Body opcional: { forcar: true } → ignora checkpoint anterior e recomeça
+  // ═════════════════════════════════════════════════════════════
+  // REATRIBUICAO v3 (20/10/2026) — corrige o vendedor de TODOS os pedidos
+  // relendo o campo "Vendedor" no Bling COM A CONTA CERTA (Pro Hunters ou
+  // Calibre), e depois corrige dono dos clientes, tarefas abertas e contratos.
+  //   iniciar → tick (lotes de 15, ~350ms entre chamadas) → finalizar (auto)
+  // Regras:
+  //   • vendedor (Wesley/Enzo/Pedro) → pedido e cliente sao dele
+  //   • sem vendedor / Tray (e-commerce) → rodizio aleatorio e equilibrado
+  // ═════════════════════════════════════════════════════════════
+  const _REATRIB_VEND = ['dickmann', 'boschetto', 'mathias'];
+
+  // ── POST /api/crm/vendedores/reatribuir-iniciar
   if (req.method === 'POST' && url === '/api/crm/vendedores/reatribuir-iniciar') {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
     try {
-      const orders = await crmStore.listDocs('orders', o => o.status !== 'cancelado');
-      const ids = orders.map(o => o.bling_pedido_id).filter(Boolean);
-      let vendedorMapaBling = {};
-      try { vendedorMapaBling = await blingVendedores.puxarMapa({ forcar: true }); } catch(e) {}
+      const orders = await crmStore.listDocs('orders', o => o && o.status !== 'cancelado' && o.bling_pedido_id);
+      // Contas/clientes com tarefa aberta e pedidos de arma vao PRIMEIRO na fila
+      const acts = await crmStore.listDocs('activities', a => a && a.status === 'pendente');
+      const accPrio = new Set(acts.map(a => a.account_id || a.entidade_id).filter(Boolean));
+      const contratos = new Set(acts.filter(a => a.fonte === 'contrato_arma').map(a => a.order_id));
+      const fila = orders.map(o => ({ o: o.id, b: String(o.bling_pedido_id), c: o.bling_conta_origem || 'prohunters',
+        p: contratos.has(o.id) ? 0 : (accPrio.has(o.account_id) ? 1 : 2) }));
+      fila.sort((x, y) => x.p - y.p);
+      const mapas = {};
+      for (const c of ['prohunters', 'calibre']) {
+        try { mapas[c] = await blingVendedores.puxarMapa({ forcar: true, contaId: c }); } catch (e) { mapas[c] = {}; }
+      }
       const cp = {
-        status: 'em_andamento',
-        iniciado_em: new Date().toISOString(),
-        iniciado_por: sess.usuario,
-        total: ids.length,
-        processados: 0,
-        atualizados: 0,
-        ids_pendentes: ids,
-        vendedores_bling: vendedorMapaBling,
-        mudancas_por_login: {},
-        contadores: {
-          atualizados: 0, sem_vendedor_no_bling: 0, vendedor_nao_mapeado: 0,
-          ja_mapeado_correto: 0, order_nao_achado: 0, erro_rate_limit: 0, erro_outro: 0,
-        },
+        versao: 3, status: 'em_andamento',
+        iniciado_em: new Date().toISOString(), iniciado_por: sess.usuario,
+        total: fila.length, processados: 0,
+        fila: fila.map(x => [x.o, x.b, x.c]),
+        mapas_vendedores: mapas,
+        updates: {},           // orderId -> vendedor_bling (aplicado no final, 1 escrita)
+        contadores: { vendedor: 0, ecommerce: 0, interno: 0, nao_mapeado: 0, mudou_vendedor: 0, erro_rate_limit: 0, erro_outro: 0 },
+        por_vendedor: {}, nomes_nao_mapeados: {},
       };
       await _reatribSalvar(cp);
+      const resumo = Object.assign({}, cp); delete resumo.fila; delete resumo.mapas_vendedores; delete resumo.updates;
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ ok: true, checkpoint: cp }));
+      res.end(JSON.stringify({ ok: true, checkpoint: resumo, vendedores_bling: Object.fromEntries(Object.entries(mapas).map(([k, m]) => [k, Object.values(m).map(v => v.nome)])) }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
     return;
   }
 
-  // ── POST /api/crm/vendedores/reatribuir-tick — processa lote com delay+retry
-  //     v2: 400ms entre requests, retry em 429/503, contadores detalhados por motivo.
+  // ── POST /api/crm/vendedores/reatribuir-tick — processa 1 lote
   if (req.method === 'POST' && url === '/api/crm/vendedores/reatribuir-tick') {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
+    const resumir = (cp) => { const r = Object.assign({}, cp); delete r.fila; delete r.mapas_vendedores; delete r.updates; r.restantes = (cp.fila || []).length; return r; };
     try {
       const cp = await _reatribLer();
-      if (!cp || cp.status !== 'em_andamento') { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nenhuma reatribuição em andamento.'})); return; }
-      if (!cp.ids_pendentes || !cp.ids_pendentes.length) {
-        await _finalizarReatribuicao(cp);
-        res.writeHead(200,{'Content-Type':'application/json'});
-        res.end(JSON.stringify({ ok: true, terminou: true, checkpoint: cp }));
-        return;
+      if (!cp || cp.status !== 'em_andamento' || cp.versao !== 3) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Nenhuma reatribuição v3 em andamento — clique em iniciar.'})); return; }
+      if (!cp.fila.length) {
+        await _finalizarReatribuicaoV3(cp, sess);
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, terminou: true, checkpoint: resumir(cp) })); return;
       }
-      const LOTE = 15;              // menor lote pra caber no timeout com delay
-      const DELAY_MS = 400;         // 2.5 req/s → respeita rate limit do Bling
+      const LOTE = 15, DELAY_MS = 350;
       const sleep = ms => new Promise(r => setTimeout(r, ms));
-      const lote = cp.ids_pendentes.slice(0, LOTE);
-      const resto = cp.ids_pendentes.slice(LOTE);
-
+      const lote = cp.fila.slice(0, LOTE);
       const usersJson = await _loadUsersMap();
       const ordersAtual = await crmStore.getCollection('orders');
-      const idxBling = {};
-      for (const [oid, o] of Object.entries(ordersAtual)) {
-        if (o && o.bling_pedido_id) idxBling[String(o.bling_pedido_id)] = oid;
-      }
-
-      // Contadores detalhados (persistidos no checkpoint)
-      const contadores = cp.contadores || {
-        atualizados: 0,
-        sem_vendedor_no_bling: 0,   // vendedor.id = 0 ou null → gerencia
-        vendedor_nao_mapeado: 0,    // vendedor cadastrado no Bling mas não é do CRM (Luis, Redin, Tray)
-        ja_mapeado_correto: 0,      // order já estava com vendedor certo
-        order_nao_achado: 0,        // bling_id não bateu com nenhum order local
-        erro_rate_limit: 0,         // 429/503 mesmo após retry
-        erro_outro: 0,              // outra exceção
-      };
-      const mudancas = cp.mudancas_por_login || {};
-
-      // Processa 1 pedido com retry em 429/503
-      async function processar(blingId) {
-        let detalhe = null;
-        let tentativas = 0;
-        while (tentativas < 3) {
-          tentativas++;
-          try {
-            detalhe = await blingSync.puxarDetalhePedido(blingId);
+      const ct = cp.contadores;
+      for (let i = 0; i < lote.length; i++) {
+        const [orderId, blingId, conta] = lote[i];
+        let det = null;
+        for (let t = 1; t <= 3 && !det; t++) {
+          try { det = await blingSync.puxarDetalhePedido(blingId, conta); }
+          catch (e) {
+            if ((e.status === 429 || e.status === 503) && t < 3) { await sleep(1000 * t); continue; }
+            if (e.status === 429 || e.status === 503) ct.erro_rate_limit++; else ct.erro_outro++;
             break;
-          } catch (e) {
-            const status = e.status || 0;
-            if (status === 429 || status === 503) {
-              // Backoff progressivo: 1s, 2s, 4s
-              await sleep(1000 * Math.pow(2, tentativas - 1));
-              if (tentativas >= 3) { contadores.erro_rate_limit++; return; }
-              continue;
-            }
-            contadores.erro_outro++;
-            return;
           }
         }
-        if (!detalhe) { contadores.erro_outro++; return; }
-
-        // Extrai vendedor cru pra saber se foi realmente null ou só não mapeou
-        const v = detalhe.vendedor || null;
-        const vendIdBling = v && (v.id || (v.contato && v.contato.id)) || null;
-        const semVendBling = !vendIdBling || String(vendIdBling) === '0';
-
-        const vendLogin = await blingSync.mapearVendedor(detalhe, usersJson, {
-          vendedorMapaBling: cp.vendedores_bling || {},
-        });
-
-        if (!vendLogin) {
-          if (semVendBling) contadores.sem_vendedor_no_bling++;
-          else contadores.vendedor_nao_mapeado++;
-          return;
+        if (det) {
+          const idv = await blingSync.identificarVendedor(det, usersJson, { contaId: conta, vendedorMapaBling: (cp.mapas_vendedores || {})[conta] || {} });
+          ct[idv.origem] = (ct[idv.origem] || 0) + 1;
+          if (idv.origem === 'vendedor') cp.por_vendedor[idv.login] = (cp.por_vendedor[idv.login] || 0) + 1;
+          if (idv.origem === 'nao_mapeado' && idv.bling_nome) cp.nomes_nao_mapeados[idv.bling_nome] = (cp.nomes_nao_mapeados[idv.bling_nome] || 0) + 1;
+          const o = ordersAtual[orderId];
+          if (o && idv.origem === 'vendedor' && String(o.vendedor_id || '').toLowerCase() !== idv.login) ct.mudou_vendedor++;
+          cp.updates[orderId] = { id: idv.bling_id, nome: idv.bling_nome, conta, login: idv.login, origem: idv.origem, lido_em: new Date().toISOString() };
         }
-        const orderId = idxBling[String(blingId)];
-        if (!orderId) { contadores.order_nao_achado++; return; }
-        const order = ordersAtual[orderId];
-        if (!order) { contadores.order_nao_achado++; return; }
-        if (order.vendedor_id === vendLogin) { contadores.ja_mapeado_correto++; return; }
-        order.vendedor_id = vendLogin;
-        order.atualizado_em = new Date().toISOString();
-        order.atualizado_por = 'reatribuicao';
-        contadores.atualizados++;
-        mudancas[vendLogin] = (mudancas[vendLogin] || 0) + 1;
-      }
-
-      // Loop com delay entre chamadas
-      for (let i = 0; i < lote.length; i++) {
-        await processar(lote[i]);
         if (i < lote.length - 1) await sleep(DELAY_MS);
       }
-
-      // Salva orders (1 write) se algo mudou
-      if (contadores.atualizados > 0) {
-        await crmStore.saveCollection('orders', ordersAtual, 'Reatribuição v2: +' + contadores.atualizados + ' orders acumulado');
-      }
-
-      cp.ids_pendentes = resto;
-      cp.processados = (cp.processados || 0) + lote.length;
-      cp.contadores = contadores;
-      cp.atualizados = contadores.atualizados; // mantém compat com UI anterior
-      cp.mudancas_por_login = mudancas;
+      cp.fila = cp.fila.slice(LOTE);
+      cp.processados += lote.length;
       cp.ultimo_tick_em = new Date().toISOString();
-
-      if (cp.ids_pendentes.length === 0) {
-        await _finalizarReatribuicao(cp);
-        res.writeHead(200,{'Content-Type':'application/json'});
-        res.end(JSON.stringify({ ok: true, terminou: true, atualizados_neste_lote: 'ver contadores', contadores, checkpoint: cp }));
-        return;
+      if (!cp.fila.length) {
+        await _finalizarReatribuicaoV3(cp, sess);
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, terminou: true, checkpoint: resumir(cp) })); return;
       }
       await _reatribSalvar(cp);
-      res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ ok: true, terminou: false, contadores, checkpoint: cp }));
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, terminou: false, checkpoint: resumir(cp) }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error: e.message || String(e)}));
     }
     return;
   }
 
-  // ── GET /api/crm/vendedores/reatribuir-status — mostra checkpoint atual
+  // ── GET /api/crm/vendedores/reatribuir-status
   if (req.method === 'GET' && url === '/api/crm/vendedores/reatribuir-status') {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gerência.'})); return; }
     try {
       const cp = await _reatribLer();
-      res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ checkpoint: cp }));
+      if (cp) { delete cp.fila; delete cp.mapas_vendedores; delete cp.updates; }
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ checkpoint: cp }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
   }
 
-  // Helper interno: depois de terminar, recalcula owner_id de cada account = vendedor mais frequente
-  async function _finalizarReatribuicao(cp) {
-    const ordersAtual = await crmStore.getCollection('orders');
-    const accountsAtual = await crmStore.getCollection('accounts');
-    // Agrega: accountId → { login → count }
-    const contPorAcc = {};
-    for (const o of Object.values(ordersAtual)) {
-      if (!o || !o.account_id) continue;
-      if (!o.vendedor_id || o.vendedor_id === 'gerencia') continue;
-      const aid = o.account_id;
-      if (!contPorAcc[aid]) contPorAcc[aid] = {};
-      contPorAcc[aid][o.vendedor_id] = (contPorAcc[aid][o.vendedor_id] || 0) + 1;
-    }
-    let accsAtualizadas = 0;
-    for (const [aid, counts] of Object.entries(contPorAcc)) {
-      const acc = accountsAtual[aid];
-      if (!acc) continue;
-      // Vendedor mais frequente
-      const [top] = Object.entries(counts).sort((a,b) => b[1] - a[1]);
-      if (!top) continue;
-      const [novoOwner] = top;
-      if (acc.owner_id === novoOwner) continue;
-      acc.owner_id = novoOwner;
-      acc.atualizado_em = new Date().toISOString();
-      acc.atualizado_por = 'reatribuicao';
-      accsAtualizadas++;
-    }
-    if (accsAtualizadas > 0) {
-      await crmStore.saveCollection('accounts', accountsAtual, 'Reatribuição: owner_id de ' + accsAtualizadas + ' accounts');
-    }
+  // Aplica tudo de uma vez: pedidos → clientes → tarefas abertas → contratos
+  async function _finalizarReatribuicaoV3(cp, sess) {
+    const agora = new Date().toISOString();
+    const r = await reatribuicao.aplicar({
+      orders: await crmStore.getCollection('orders'),
+      accounts: await crmStore.getCollection('accounts'),
+      activities: await crmStore.getCollection('activities'),
+      updates: cp.updates || {}, agora,
+    });
+    await crmStore.saveCollection('orders', r.orders, 'Reatribuição v3: vendedor do Bling em ' + r.resumo.pedidos_atualizados + ' pedidos');
+    await crmStore.saveCollection('accounts', r.accounts, 'Reatribuição v3: dono de ' + r.resumo.clientes_novo_dono + ' clientes');
+    await crmStore.saveCollection('activities', r.activities, 'Reatribuição v3: ' + r.resumo.tarefas_reatribuidas + ' tarefas abertas corrigidas');
+    let contratos = null;
+    try { contratos = await contratosArma.processar({ maxLeituras: 0 }); } catch (e) { contratos = { erro: e.message }; }
     cp.status = 'concluido';
     cp.concluido_em = new Date().toISOString();
-    cp.accounts_atualizadas = accsAtualizadas;
-    // Limpa mapa Bling pra não pesar no checkpoint
-    delete cp.vendedores_bling;
+    cp.resultado = Object.assign({}, r.resumo, { contratos_corrigidos: contratos && contratos.contratos_corrigidos, contratos: contratos });
+    cp.fila = []; delete cp.mapas_vendedores; delete cp.updates;
     await _reatribSalvar(cp);
   }
 
@@ -2819,9 +3988,13 @@ module.exports = async (req, res) => {
         res.end(JSON.stringify({error:'Este cliente esta atribuido a outro vendedor.'}));
         return;
       }
-      const orders = await crmStore.listDocs('orders', o => o.account_id === accId);
+      // Busca FILTRADA no banco (só os docs deste cliente) em vez de carregar a
+      // coleção inteira — orders tem ~2400 linhas e o getCollection estourava o
+      // statement_timeout. Pedidos casam por account_id; atividades por
+      // account_id OU entidade_id (algumas legadas usam entidade_id).
+      const orders = await crmStore.listDocsByField('orders', 'account_id', accId);
       orders.sort((a, b) => String(b.data_pedido || '').localeCompare(String(a.data_pedido || '')));
-      const activities = await crmStore.listDocs('activities', a => a.account_id === accId || (a.entidade_tipo === 'account' && a.entidade_id === accId));
+      const activities = await crmStore.listDocsByField('activities', ['account_id', 'entidade_id'], accId);
       activities.sort((a, b) => String(b.criado_em || '').localeCompare(String(a.criado_em || '')));
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ account, orders, activities }));
@@ -3062,7 +4235,7 @@ module.exports = async (req, res) => {
   }
 
   // GET /api/crm/envios — fila. Query: status, empresa, dono_proximo, atrasados
-  if (req.method === 'GET' && url.startsWith('/api/crm/envios') && !url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+/)) {
+  if (req.method === 'GET' && url.startsWith('/api/crm/envios') && !url.match(/^\/api\/crm\/envios\/[^/]+/)) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
@@ -3097,6 +4270,11 @@ module.exports = async (req, res) => {
           nf_numero: e.nf_numero,
           gt_numero: e.gt_numero,
           volumes_qtd: e.volumes_qtd,
+          grupo_volume_id: e.grupo_volume_id || null,
+          grupo_volume_qtd: e.grupo_volume_qtd || null,
+          grupo_volume_lider: e.grupo_volume_lider || false,
+          liberacao_em: e.liberacao_em || null,
+          liberacao_por: e.liberacao_por || null,
           romaneio_id: e.romaneio_id,
           romaneio_numero: e.romaneio_numero,
           coletado_em: e.coletado_em,
@@ -3113,12 +4291,25 @@ module.exports = async (req, res) => {
           atualizado_em: e.atualizado_em,
         };
       });
+      // Ciclo: Fila de envio (em andamento) -> Prontos para envio (liberacao final
+      // feita, aguardando a transportadora) -> Enviados (romaneio gerado na coleta)
+      const _ativo = x => x.status !== 'enviado' && x.status !== 'cancelado' && x.status !== 'retirado' && !x.romaneio_id;
+      const contagem = {
+        fila: enriched.filter(x => _ativo(x) && !x.pronto_coleta).length,
+        prontos: enriched.filter(x => _ativo(x) && x.pronto_coleta).length,
+      };
       let filtrado = enriched;
       if (statusFilter) filtrado = filtrado.filter(x => x.status === statusFilter);
-      else if (modo === 'enviados') filtrado = filtrado.filter(x => x.status === 'enviado');
+      // Um envio com romaneio_id JA foi coletado/enviado — trata como enviado mesmo
+      // que o status tenha ficado travado em 'pronto_coleta' por algum motivo (ex:
+      // revalidacao do checklist que reverteu o status apos a coleta). Isso impede
+      // que pedidos ja romaneados fiquem presos na Fila.
+      else if (modo === 'enviados') filtrado = filtrado.filter(x => x.status === 'enviado' || (x.romaneio_id && x.status !== 'cancelado' && x.status !== 'retirado'));
       else if (modo === 'retirados') filtrado = filtrado.filter(x => x.status === 'retirado');
       else if (modo === 'cancelados') filtrado = filtrado.filter(x => x.status === 'cancelado');
-      else if (modo === 'pendentes') filtrado = filtrado.filter(x => x.status !== 'enviado' && x.status !== 'cancelado' && x.status !== 'retirado');
+      else if (modo === 'pendentes') filtrado = filtrado.filter(x => _ativo(x) && !x.pronto_coleta);
+      else if (modo === 'prontos') filtrado = filtrado.filter(x => _ativo(x) && x.pronto_coleta);
+      else if (modo === 'ativos') filtrado = filtrado.filter(x => _ativo(x));
       if (empresaFilter) filtrado = filtrado.filter(x => x.empresa === empresaFilter);
       if (q) filtrado = filtrado.filter(x => {
         const hay = ((x.cliente_nome||'') + ' ' + (x.numero||'') + ' ' + (x.cliente_cpf_cnpj||'') + ' ' + (x.cliente_cidade||'') + ' ' + (x.nf_numero||'')).toLowerCase();
@@ -3130,10 +4321,11 @@ module.exports = async (req, res) => {
         if (modo === 'enviados') return String(b.coletado_em || b.atualizado_em || '').localeCompare(String(a.coletado_em || a.atualizado_em || ''));
         if (modo === 'retirados') return String(b.retirado_em || b.atualizado_em || '').localeCompare(String(a.retirado_em || a.atualizado_em || ''));
         if (modo === 'cancelados') return String(b.cancelado_em || b.atualizado_em || '').localeCompare(String(a.cancelado_em || a.atualizado_em || ''));
+        if (modo === 'prontos') return String(a.liberacao_em || a.atualizado_em || '').localeCompare(String(b.liberacao_em || b.atualizado_em || ''));
         if (a.pronto_coleta !== b.pronto_coleta) return a.pronto_coleta ? 1 : -1;
         return String(b.atualizado_em || '').localeCompare(String(a.atualizado_em || ''));
       });
-      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envios: filtrado }));
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envios: filtrado, contagem }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
@@ -3150,7 +4342,9 @@ module.exports = async (req, res) => {
       const prontos = list.filter(e => (e.status === 'pronto_coleta' || envios.estadoChecklist(e).pronto_coleta) && !e.romaneio_id && e.status !== 'enviado' && e.status !== 'cancelado' && e.status !== 'retirado' && e.transportadora !== 'retirada');
       const grupos = {};
       for (const e of prontos) {
-        const t = e.transportadora || 'sem_transportadora';
+        // Agrupa por FAMILIA: ezequiel + ezequiel_gollog caem no mesmo romaneio
+        // (fisicamente a Ezequiel coleta os dois; o Gollog so entra no destino).
+        const t = romaneios.familiaTransportadora(e.transportadora);
         if (!grupos[t]) grupos[t] = [];
         grupos[t].push({
           id: e.id, empresa: e.empresa, numero: e.numero,
@@ -3167,11 +4361,14 @@ module.exports = async (req, res) => {
   }
 
   // GET /api/crm/envios/:id — detalhe do envio + checklist
-  if (req.method === 'GET' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+$/)) {
+  // [^/]+ (nao so [A-Za-z0-9_-]): o id e 'env_<empresa>_<numero>' e o numero
+  // do Bling pode ter virgula/espaco (ex.: "1333,50"). Encodado na URL vira
+  // %2C etc — por isso casamos qualquer char menos barra e decodificamos.
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/envios\/[^/]+$/)) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
-      const id = url.split('/').pop();
+      const id = _decEnvioId(url.split('/').pop());
       const env = await crmStore.getDoc('envios', id);
       if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio não encontrado'})); return; }
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envio: env, checklist: envios.estadoChecklist(env) }));
@@ -3182,11 +4379,11 @@ module.exports = async (req, res) => {
   }
 
   // PATCH /api/crm/envios/:id — atualiza campos do envio (aciona passos)
-  if (req.method === 'PATCH' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+$/)) {
+  if (req.method === 'PATCH' && url.match(/^\/api\/crm\/envios\/[^/]+$/)) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
-      const id = url.split('/').pop();
+      const id = _decEnvioId(url.split('/').pop());
       const env = await crmStore.getDoc('envios', id);
       if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio não encontrado'})); return; }
       const body = await readBody(req);
@@ -3227,13 +4424,13 @@ module.exports = async (req, res) => {
   //
   // Permissao: admin, diretor, vendas ou auxiliar (mesmo perfil que edita a fila).
   // Log com IP na auditoria pra rastrear correcoes indevidas.
-  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/reverter-passo$/)) {
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[^/]+\/reverter-passo$/)) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessControlado(sess)) {
       res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
     }
     try {
-      const id = url.split('/')[4];
+      const id = _decEnvioId(url.split('/')[4]);
       const env = await crmStore.getDoc('envios', id);
       if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio nao encontrado'})); return; }
       if (env.status === 'enviado' || env.status === 'cancelado') {
@@ -3261,13 +4458,13 @@ module.exports = async (req, res) => {
   // PERMISSAO: SOMENTE gerencia (admin/diretor). Vendedor/auxiliar nao pode
   // cancelar — se precisar, pede pra gerencia. Evita cancelamento acidental
   // de envios validos por quem opera no dia-a-dia.
-  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/cancelar$/)) {
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[^/]+\/cancelar$/)) {
     const sess = getSession(req);
     if (!sess || !isAdminOrDiretor(sess)) {
       res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Somente gerencia (admin/diretor) pode cancelar envios.'})); return;
     }
     try {
-      const id = url.split('/')[4];
+      const id = _decEnvioId(url.split('/')[4]);
       const env = await crmStore.getDoc('envios', id);
       if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio nao encontrado'})); return; }
       const body = await readBody(req);
@@ -3288,13 +4485,13 @@ module.exports = async (req, res) => {
   // Cliente retirou o pedido presencialmente (sem transportadora). Marca o envio
   // como retirado e dispara notificacao PRO FINANCEIRO + GERENCIA via solicitacoes.
   // Precisa ter NF emitida — ninguem retira sem nota fiscal.
-  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/marcar-retirado$/)) {
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[^/]+\/marcar-retirado$/)) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessControlado(sess)) {
       res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
     }
     try {
-      const id = url.split('/')[4];
+      const id = _decEnvioId(url.split('/')[4]);
       const env = await crmStore.getDoc('envios', id);
       if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio nao encontrado'})); return; }
       const body = await readBody(req);
@@ -3313,6 +4510,84 @@ module.exports = async (req, res) => {
 
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ ok: true, envio: salvo }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/envios/unificar-volumes — agrupa 2+ envios na MESMA caixa.
+  //   Body: { envio_ids: [...], volumes: N }  (N = volumes da caixa combinada, padrão 1)
+  // No romaneio o grupo conta como `volumes` no total (não a soma de cada pedido).
+  // Usado quando dois pedidos (geralmente do mesmo cliente) vão juntos numa caixa só.
+  if (req.method === 'POST' && url === '/api/crm/envios/unificar-volumes') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      const { envio_ids, volumes } = JSON.parse(body || '{}');
+      if (!Array.isArray(envio_ids) || envio_ids.length < 2) throw new Error('Selecione pelo menos 2 envios para unificar.');
+      const vol = Math.max(1, parseInt(volumes, 10) || 1);
+      // Carrega e valida
+      const docs = [];
+      let familia = null;
+      for (const eid of envio_ids) {
+        const e = await crmStore.getDoc('envios', eid);
+        if (!e) throw new Error('Envio não encontrado: ' + eid);
+        if (e.status === 'enviado' || e.status === 'cancelado' || e.status === 'retirado') {
+          throw new Error('Envio #' + e.numero + ' não pode ser unificado (' + e.status + ').');
+        }
+        const fam = romaneios.familiaTransportadora(e.transportadora);
+        if (familia === null) familia = fam;
+        else if (fam !== familia) throw new Error('Só dá pra unificar envios da mesma transportadora. Envio #' + e.numero + ' está em outra rota.');
+        docs.push(e);
+      }
+      const grupoId = 'vg_' + crmUtils.uuid();
+      const now = new Date().toISOString();
+      const atualizados = [];
+      for (let i = 0; i < docs.length; i++) {
+        const salvo = await crmStore.updateDoc('envios', docs[i].id, {
+          grupo_volume_id: grupoId,
+          grupo_volume_qtd: vol,
+          grupo_volume_lider: i === 0,
+          grupo_volume_por: sess.usuario,
+          grupo_volume_em: now,
+        }, sess.usuario);
+        atualizados.push(salvo);
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, grupo_volume_id: grupoId, volumes: vol, envios: atualizados }));
+    } catch (e) {
+      res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // POST /api/crm/envios/desunificar-volumes — desfaz a caixa unida.
+  //   Body: { grupo_volume_id }  ou  { envio_id }  (desfaz o grupo inteiro)
+  if (req.method === 'POST' && url === '/api/crm/envios/desunificar-volumes') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      let { grupo_volume_id, envio_id } = JSON.parse(body || '{}');
+      if (!grupo_volume_id && envio_id) {
+        const e = await crmStore.getDoc('envios', envio_id);
+        if (e) grupo_volume_id = e.grupo_volume_id;
+      }
+      if (!grupo_volume_id) throw new Error('Grupo de volume não informado.');
+      const todos = await crmStore.listDocs('envios', e => e.grupo_volume_id === grupo_volume_id);
+      let desfeitos = 0;
+      for (const e of todos) {
+        if (e.status === 'enviado') continue; // já saiu no romaneio — não mexe
+        await crmStore.updateDoc('envios', e.id, {
+          grupo_volume_id: null, grupo_volume_qtd: null, grupo_volume_lider: null,
+          grupo_volume_por: null, grupo_volume_em: null,
+        }, sess.usuario);
+        desfeitos++;
+      }
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ ok: true, desfeitos }));
     } catch (e) {
       res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
@@ -3342,6 +4617,9 @@ module.exports = async (req, res) => {
       for (const eid of envio_ids) {
         const e = await crmStore.getDoc('envios', eid);
         if (!e) throw new Error('Envio não encontrado: ' + eid);
+        // So entra no romaneio o que esta em "Prontos para envio"
+        if (e.status === 'cancelado' || e.status === 'retirado' || e.status === 'enviado') throw new Error('Envio #' + e.numero + ' não está mais disponível (' + e.status + ').');
+        if (!envios.estadoChecklist(e).pronto_coleta) throw new Error('Envio #' + e.numero + ' ainda não está pronto para coleta (falta concluir o checklist).');
         envDocs.push(e);
       }
       const rom = await romaneios.criar({ envios: envDocs, transportadora, gerado_por: sess.usuario });
@@ -3456,6 +4734,364 @@ module.exports = async (req, res) => {
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, romaneio: salvo }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // ROMANEIO CORREIOS — bipa rastreio, busca pedido no Bling, gera romaneio
+  // ═════════════════════════════════════════════════════════════
+
+  // POST /api/crm/correios/buscar-rastreio
+  // Body: { codigo: "AP640299478BR" }
+  // Busca o pedido no Bling (ambas contas) que contenha esse código de rastreio.
+  if (req.method === 'POST' && url === '/api/crm/correios/buscar-rastreio') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const body = await readBody(req);
+      const { codigo } = JSON.parse(body || '{}');
+      if (!codigo || String(codigo).trim().length < 5) {
+        res.writeHead(400,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Código de rastreio inválido'}));
+        return;
+      }
+      const cod = String(codigo).trim().toUpperCase();
+
+      // Busca nas 2 contas Bling (prohunters + calibre)
+      const contas = ['prohunters', 'calibre'];
+      let resultado = null;
+
+      for (const conta of contas) {
+        try {
+          // Verifica se a conta está ativa
+          const cfg = (config.blingContas || {})[conta];
+          if (!cfg || !cfg.ativa) continue;
+
+          // Busca pedidos recentes (últimos 4 dias) paginando
+          const dataLimite = new Date();
+          dataLimite.setDate(dataLimite.getDate() - 4);
+          const dataInicial = dataLimite.toISOString().slice(0, 10);
+          const dataFinal = new Date().toISOString().slice(0, 10);
+
+          let pagina = 1;
+          const maxPaginas = 3; // segurança: máximo 3 páginas (300 pedidos, 4 dias)
+
+          while (pagina <= maxPaginas && !resultado) {
+            const listaResp = await blingApi.get('/pedidos/vendas', {
+              dataInicial, dataFinal, limite: 100, pagina,
+            }, conta);
+            const lista = (listaResp && listaResp.data) || [];
+            if (!lista.length) break;
+
+            // Para cada pedido da página, busca detalhe e verifica tracking
+            for (const p of lista) {
+              try {
+                const det = await blingApi.get('/pedidos/vendas/' + p.id, null, conta);
+                const pedido = det.data || det;
+                const transporte = pedido.transporte || {};
+                const volumes = transporte.volumes || [];
+
+                // Verifica tracking em cada volume
+                for (const vol of volumes) {
+                  const tracking = String(vol.codigoRastreamento || vol.etiqueta || vol.codigo || '').trim().toUpperCase();
+                  if (tracking === cod) {
+                    const contato = pedido.contato || {};
+                    resultado = {
+                      encontrado: true,
+                      codigo_rastreio: cod,
+                      pedido_numero: String(pedido.numero || p.numero || ''),
+                      pedido_id: String(pedido.id || p.id || ''),
+                      cliente_nome: contato.nome || contato.razao || 'Sem nome',
+                      empresa: conta,
+                      empresa_label: conta === 'calibre' ? 'Calibre' : 'Pro Hunters',
+                    };
+                    break;
+                  }
+                }
+                if (resultado) break;
+
+                // Verifica também na etiqueta do transporte (campo legado)
+                if (!resultado) {
+                  const etiquetaGeral = String(transporte.etiqueta || '').trim().toUpperCase();
+                  if (etiquetaGeral === cod) {
+                    const contato = pedido.contato || {};
+                    resultado = {
+                      encontrado: true,
+                      codigo_rastreio: cod,
+                      pedido_numero: String(pedido.numero || p.numero || ''),
+                      pedido_id: String(pedido.id || p.id || ''),
+                      cliente_nome: contato.nome || contato.razao || 'Sem nome',
+                      empresa: conta,
+                      empresa_label: conta === 'calibre' ? 'Calibre' : 'Pro Hunters',
+                    };
+                  }
+                }
+                if (resultado) break;
+
+                // Verifica no JSON inteiro (fallback — caso o campo tenha nome diferente)
+                if (!resultado) {
+                  const json = JSON.stringify(pedido);
+                  if (json.includes(cod)) {
+                    const contato = pedido.contato || {};
+                    resultado = {
+                      encontrado: true,
+                      codigo_rastreio: cod,
+                      pedido_numero: String(pedido.numero || p.numero || ''),
+                      pedido_id: String(pedido.id || p.id || ''),
+                      cliente_nome: contato.nome || contato.razao || 'Sem nome',
+                      empresa: conta,
+                      empresa_label: conta === 'calibre' ? 'Calibre' : 'Pro Hunters',
+                    };
+                  }
+                }
+                if (resultado) break;
+              } catch (detErr) {
+                // Ignora erro no detalhe de um pedido específico
+                continue;
+              }
+            }
+            pagina++;
+          }
+          if (resultado) break;
+        } catch (contaErr) {
+          // Conta pode não ter token válido — segue pra próxima
+          console.warn('[Correios] Erro buscando na conta ' + conta + ':', contaErr.message);
+          continue;
+        }
+      }
+
+      if (resultado) {
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify(resultado));
+      } else {
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ encontrado: false, codigo_rastreio: cod, erro: 'Código não encontrado nos pedidos dos últimos 90 dias' }));
+      }
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({error: e.message}));
+    }
+    return;
+  }
+
+  // GET /api/crm/correios/romaneio-pdf?data=<JSON>
+  // Gera HTML print-ready do romaneio de Correios.
+  // Query param data: JSON array de itens [{codigo_rastreio, pedido_numero, cliente_nome, empresa, empresa_label}]
+  if (req.method === 'POST' && url === '/api/crm/correios/gerar-romaneio-pdf') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'text/html'}); res.end('<h2>Sem acesso</h2>'); return; }
+    try {
+      const body = await readBody(req);
+      const { itens } = JSON.parse(body || '{}');
+      if (!Array.isArray(itens) || !itens.length) {
+        res.writeHead(400,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'Nenhum item para o romaneio'}));
+        return;
+      }
+
+      // Número sequencial do romaneio Correios (separado dos romaneios de transportadora)
+      const ano = new Date().getFullYear();
+      const allCorreios = await crmStore.getCollection('romaneios_correios');
+      const doAno = Object.values(allCorreios || {}).filter(r => String(r.data || '').startsWith(String(ano)));
+      const numero = String(doAno.length + 1).padStart(4, '0');
+      const data = new Date().toISOString().slice(0, 10);
+      const id = 'rcor_' + data.replace(/-/g, '') + '_' + numero;
+
+      // Salva o romaneio no CRM
+      const romDoc = {
+        id,
+        numero,
+        data,
+        tipo: 'correios',
+        itens: itens.map(function(it) {
+          return {
+            codigo_rastreio: it.codigo_rastreio,
+            pedido_numero: it.pedido_numero,
+            cliente_nome: it.cliente_nome,
+            empresa: it.empresa,
+            empresa_label: it.empresa_label,
+          };
+        }),
+        total_itens: itens.length,
+        gerado_por: sess.usuario,
+        criado_em: new Date().toISOString(),
+      };
+      await crmStore.createDoc('romaneios_correios', romDoc, sess.usuario);
+
+      // Gera HTML PDF
+      const _esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      const dataFmt = data.split('-').reverse().join('/');
+
+      const linhas = itens.map(function(it, i) {
+        const empTag = it.empresa === 'calibre' ? 'CR' : 'PH';
+        return '<tr>' +
+          '<td class="c">' + (i + 1) + '</td>' +
+          '<td>' + _esc(it.pedido_numero) + '</td>' +
+          '<td>' + _esc(empTag) + '</td>' +
+          '<td>' + _esc(it.cliente_nome) + '</td>' +
+          '<td style="font-family:monospace;font-size:11px">' + _esc(it.codigo_rastreio) + '</td>' +
+          '</tr>';
+      }).join('');
+
+      const html = '<!doctype html>' +
+      '<html><head><meta charset="utf-8">' +
+      '<title>Romaneio Correios ' + _esc(numero) + '/' + ano + '</title>' +
+      '<style>' +
+        '* { box-sizing: border-box; }' +
+        'body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #111; padding: 20px 26px; margin: 0; }' +
+        '.hd { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 2px solid #1565c0; padding-bottom: 10px; }' +
+        '.hd .l { max-width: 65%; }' +
+        '.hd .r { text-align: right; }' +
+        'h1 { margin: 0 0 4px; font-size: 18px; color: #1565c0; font-weight: 700; }' +
+        '.sub { font-size: 12px; color: #444; }' +
+        '.meta { font-size: 11.5px; color: #555; margin-top: 4px; }' +
+        '.meta b { color: #111; }' +
+        'table { width: 100%; border-collapse: collapse; margin-top: 8px; }' +
+        'th { background: #1565c0; color: #fff; padding: 7px 6px; text-align: left; font-size: 11px; font-weight: 700; border: 1px solid #1565c0; }' +
+        'td { padding: 6px 6px; border: 1px solid #d0d0d0; font-size: 11.5px; vertical-align: top; }' +
+        '.c { text-align: center; }' +
+        'tr:nth-child(even) td { background: #fafafa; }' +
+        '.total-row td { background: #e3f2fd; font-weight: 700; border-top: 2px solid #1565c0; }' +
+        '.foot { margin-top: 22px; padding-top: 10px; border-top: 1px dashed #999; font-size: 10px; color: #777; display: flex; justify-content: space-between; }' +
+        '@media print { body { padding: 12mm; } .no-print { display: none !important; } }' +
+        '.no-print { position: fixed; top: 10px; right: 10px; }' +
+        '.btn-print { background: #1565c0; color: #fff; border: 0; border-radius: 6px; padding: 10px 16px; cursor: pointer; font-size: 13px; font-weight: 700; box-shadow: 0 4px 10px rgba(0,0,0,.15); }' +
+      '</style></head><body>' +
+        '<div class="no-print"><button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button></div>' +
+        '<div class="hd">' +
+          '<div class="l">' +
+            '<h1>📮 Romaneio Correios</h1>' +
+            '<div class="sub">Pro Hunters + Calibre Restrito</div>' +
+            '<div class="meta">Transportadora: <b>Correios — Empresa Brasileira de Correios e Telégrafos</b></div>' +
+          '</div>' +
+          '<div class="r">' +
+            '<div style="font-size:20px;font-weight:700;color:#1565c0">Nº ' + _esc(numero) + '</div>' +
+            '<div class="meta">Emitido em <b>' + dataFmt + '</b></div>' +
+            '<div class="meta">Gerado por: ' + _esc(sess.usuario) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<table>' +
+          '<thead><tr>' +
+            '<th style="width:32px">#</th>' +
+            '<th style="width:80px">Pedido</th>' +
+            '<th style="width:50px">Empr.</th>' +
+            '<th>Destinatário</th>' +
+            '<th style="width:180px">Código de Rastreio</th>' +
+          '</tr></thead>' +
+          '<tbody>' + linhas +
+            '<tr class="total-row">' +
+              '<td class="c" colspan="4" style="text-align:right">TOTAL DE OBJETOS</td>' +
+              '<td class="c">' + itens.length + '</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
+        '<div style="margin-top:30px;padding:14px 18px;border:1px solid #999;border-radius:6px;background:#f9f9f9;font-size:12.5px;line-height:1.9">' +
+          '<div style="line-height:2.4;letter-spacing:.3px">Conferido por: __________________________________________________________</div>' +
+          '<div style="line-height:2.4;letter-spacing:.3px">Data: ____/____/______ · Assinatura: ________________________________________________</div>' +
+        '</div>' +
+        '<div class="foot">' +
+          '<div>Sistema Pro Hunters CRM · Documento gerado eletronicamente</div>' +
+          '<div>Romaneio Correios ' + _esc(id) + '</div>' +
+        '</div>' +
+      '</body></html>';
+
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ id: id, numero: numero, html: html }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({ error: e.message || 'Erro ao gerar romaneio' }));
+    }
+    return;
+  }
+
+  // GET /api/crm/correios/romaneio/:id/pdf — HTML print-ready pra (re)impressão
+  // Carrega o romaneio salvo e renderiza a folha. Precisa vir ANTES da rota de
+  // detalhe (/romaneio/:id), senão o regex de detalhe captura o ".../pdf".
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/correios\/romaneio\/[A-Za-z0-9_\-]+\/pdf$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'text/html'}); res.end('<h2>Sem acesso</h2>'); return; }
+    try {
+      const romId = url.split('/')[5];
+      const rom = await crmStore.getDoc('romaneios_correios', romId);
+      if (!rom) { res.writeHead(404,{'Content-Type':'text/html'}); res.end('<h2>Romaneio não encontrado</h2>'); return; }
+      res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});
+      res.end(_correiosRomaneioHtml(rom));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'text/html'}); res.end('<h2>Erro: ' + String(e.message).replace(/</g,'&lt;') + '</h2>');
+    }
+    return;
+  }
+
+  // GET /api/crm/correios/romaneios — lista romaneios emitidos
+  const jh = { 'Content-Type': 'application/json' };
+  if (req.method === 'GET' && url === '/api/crm/correios/romaneios') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,jh); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const all = await crmStore.getCollection('romaneios_correios');
+      const lista = Object.values(all || {}).sort(function(a, b) {
+        return (b.criado_em || '').localeCompare(a.criado_em || '');
+      });
+      res.writeHead(200, jh);
+      res.end(JSON.stringify({ romaneios: lista }));
+    } catch (e) {
+      res.writeHead(500, jh);
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/crm/correios/enviados — lista todos os envios individuais de todos os romaneios
+  if (req.method === 'GET' && url === '/api/crm/correios/enviados') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,jh); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const all = await crmStore.getCollection('romaneios_correios');
+      const enviados = [];
+      for (const rom of Object.values(all || {})) {
+        if (!Array.isArray(rom.itens)) continue;
+        for (const it of rom.itens) {
+          enviados.push({
+            codigo_rastreio: it.codigo_rastreio,
+            pedido_numero: it.pedido_numero,
+            cliente_nome: it.cliente_nome,
+            empresa: it.empresa,
+            empresa_label: it.empresa_label,
+            romaneio_numero: rom.numero,
+            romaneio_id: rom.id,
+            romaneio_data: rom.data,
+            gerado_por: rom.gerado_por,
+          });
+        }
+      }
+      // Ordena por data mais recente
+      enviados.sort(function(a, b) {
+        return (b.romaneio_data || '').localeCompare(a.romaneio_data || '');
+      });
+      res.writeHead(200, jh);
+      res.end(JSON.stringify({ enviados: enviados }));
+    } catch (e) {
+      res.writeHead(500, jh);
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/crm/correios/romaneio/:id — detalhe de um romaneio
+  if (req.method === 'GET' && url.startsWith('/api/crm/correios/romaneio/')) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,jh); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      const romId = url.split('/api/crm/correios/romaneio/')[1];
+      if (!romId) { res.writeHead(400, jh); res.end(JSON.stringify({error:'ID obrigatório'})); return; }
+      const doc = await crmStore.getDoc('romaneios_correios', romId);
+      if (!doc) { res.writeHead(404, jh); res.end(JSON.stringify({error:'Romaneio não encontrado'})); return; }
+      res.writeHead(200, jh);
+      res.end(JSON.stringify({ romaneio: doc }));
+    } catch (e) {
+      res.writeHead(500, jh);
+      res.end(JSON.stringify({ error: e.message }));
     }
     return;
   }
@@ -3849,6 +5485,10 @@ module.exports = async (req, res) => {
     try {
       const usersJson = await _loadUsersMap();
       const r = await blingBackfill.syncIncrementalTodas({ dias: 1, usersJson });
+      try { r.contratos_arma = await contratosArma.processar(); } catch (e) { r.contratos_arma = { ok: false, erro: e.message }; }
+      // Enriquece telefones dos clientes novos/sem numero (lote pequeno por dia —
+      // o backfill dedicado faz o grosso; aqui so mantem em dia o que entra novo).
+      try { r.telefones = await blingSync.enriquecerTelefones({ maxLookups: 40 }); } catch (e) { r.telefones = { ok: false, erro: e.message }; }
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify(r));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
@@ -4144,7 +5784,9 @@ module.exports = async (req, res) => {
     try {
       const data = await getComercialData();
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ...data, canEdit: canEditComercial(sess) }));
+      // role: o front usa pra tocar o som de venda SÓ no acesso da auxiliar (Maria),
+      // que é a tela que fica na TV — evita o som tocar em cada tela de vendedor.
+      res.end(JSON.stringify({ ...data, canEdit: canEditComercial(sess), role: getRole(sess.usuario, sess) }));
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Erro ao carregar dados: ' + e.message }));
@@ -4170,9 +5812,22 @@ module.exports = async (req, res) => {
     try {
       const incoming = JSON.parse(body);
       const atual = await getComercialData();
+      // PROTECAO: um browser com estado velho (aberto de um mes anterior) NAO
+      // pode REGREDIR o mes de referencia nem ressuscitar sellers de um mes ja
+      // fechado. Se o incoming vem com mesReferencia mais antigo que o atual,
+      // descartamos mesReferencia e sellers do incoming (mantemos o do servidor).
+      const incMes = incoming.mesReferencia;
+      const mesRegrediu = incMes && atual.mesReferencia && String(incMes) < String(atual.mesReferencia);
+      if (mesRegrediu) {
+        console.warn('[comercial] POST ignorou regressao de mes: incoming=' + incMes + ' < atual=' + atual.mesReferencia + ' (sellers/mesReferencia do incoming descartados).');
+      }
       const merged = {
         ...atual,
         ...incoming,
+        // Nao deixa o mes regredir.
+        mesReferencia: mesRegrediu ? atual.mesReferencia : (incMes || atual.mesReferencia),
+        // Se o mes regrediu, mantem os sellers do servidor (nao revive mes fechado).
+        sellers: mesRegrediu ? atual.sellers : (incoming.sellers || atual.sellers),
         // Campos que so a rota especifica de site pode mexer: preserva o valor
         // atual quando o incoming nao trouxer (ou trouxer undefined/null).
         siteFat: (incoming.siteFat === undefined || incoming.siteFat === null)
@@ -4209,6 +5864,58 @@ module.exports = async (req, res) => {
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Erro ao fechar o mes: ' + e.message }));
+    }
+    return;
+  }
+
+  // GET /api/comercial/git-historico[?sha=XXX][&max=N] — RECUPERACAO (admin).
+  // Read-only: le o historico de commits do comercial-data.json na branch de
+  // DADOS. Sem sha: lista os ultimos commits (sha, data, mensagem) + resumo do
+  // estado em cada um. Com sha: devolve o conteudo COMPLETO daquele commit.
+  // Serve pra recuperar os numeros reais de um mes que foi fechado errado.
+  if (req.method === 'GET' && url.startsWith('/api/comercial/git-historico')) {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só admin/diretor.'})); return; }
+    try {
+      const cfg = require('../config');
+      const gh = require('../lib/githubStore');
+      const repo = cfg.githubRepo;
+      const branch = cfg.dataBranch || 'data';
+      const q = new URL('http://x' + (req.url || '')).searchParams;
+      const sha = q.get('sha');
+      if (sha) {
+        const r = await gh.githubRequest('GET', '/repos/' + repo + '/contents/comercial-data.json?ref=' + encodeURIComponent(sha));
+        const text = Buffer.from(String(r.content || '').replace(/\s/g, ''), 'base64').toString('utf-8');
+        let parsed = null; try { parsed = JSON.parse(text); } catch (_) {}
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, sha, data: parsed, raw: parsed ? undefined : text }));
+        return;
+      }
+      const max = Math.max(1, Math.min(50, parseInt(q.get('max') || '25', 10)));
+      const commits = await gh.githubRequest('GET', '/repos/' + repo + '/commits?sha=' + encodeURIComponent(branch) + '&path=comercial-data.json&per_page=' + max);
+      const lista = (Array.isArray(commits) ? commits : []).map(c => ({ sha: c.sha, data: c.commit && c.commit.author && c.commit.author.date, msg: c.commit && c.commit.message }));
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, branch, commits: lista }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST /api/comercial/restaurar — RECUPERACAO (admin). Sobrescreve o
+  // comercial-data.json com o objeto enviado em body.data. Usado pra corrigir
+  // um fechamento errado (repor o mes certo no historico e o mes corrente).
+  // Valida o minimo pra nao gravar lixo.
+  if (req.method === 'POST' && url === '/api/comercial/restaurar') {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só admin/diretor.'})); return; }
+    try {
+      const { data } = JSON.parse((await readBody(req)) || '{}');
+      if (!data || !Array.isArray(data.sellers) || !data.mesReferencia || !Array.isArray(data.history)) {
+        res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Objeto inválido: precisa de sellers[], mesReferencia e history[].'})); return;
+      }
+      await saveComercialData(data);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, mesReferencia: data.mesReferencia, sellers: data.sellers.length, history: data.history.length }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({ error: e.message }));
     }
     return;
   }
@@ -4939,7 +6646,10 @@ module.exports = async (req, res) => {
     const canUseIaFlag = canUseIA(sess) ? 'true' : 'false';
     const canManageKBFlag = canManageKB(sess) ? 'true' : 'false';
     const canGerGar = canGerenciarGarantias(sess) ? 'true' : 'false';
-    const canVerProd = isAdminOrDiretor(sess) ? 'true' : 'false';
+    // Auxiliar tambem revela o item de menu — mas o frontend abre um modo
+    // enxuto (SO a conferencia de contratos), sem os numeros dos vendedores.
+    const canVerProd = (isAdminOrDiretor(sess) || userRole === 'auxiliar') ? 'true' : 'false';
+    const canVerWAInt = canVerWAInteligencia(sess) ? 'true' : 'false';
     const usuarioEsc = String(sess.usuario || '').replace(/"/g, '\\"');
     const nomeEsc = String(sess.nome || '').replace(/"/g, '\\"');
     const roleEsc = String(userRole || '').replace(/"/g, '\\"');
@@ -4953,6 +6663,7 @@ module.exports = async (req, res) => {
       'var CAN_USE_IA=' + canUseIaFlag + '; var CAN_MANAGE_KB=' + canManageKBFlag + '; ' +
       'var CAN_GERENCIAR_GARANTIAS=' + canGerGar + '; ' +
       'var CAN_VER_PRODUTIVIDADE=' + canVerProd + '; ' +
+      'var CAN_VER_WA_INTELIGENCIA=' + canVerWAInt + '; ' +
       'var MUST_CHANGE_PASSWORD=' + mustChange + ';'
     );
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
