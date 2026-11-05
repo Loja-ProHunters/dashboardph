@@ -998,9 +998,9 @@
   "total_original": 2099,
   "processados": 1112,
   "accounts_criadas": 164,
-  "orders_criadas": 566,
+  "orders_criadas": 575,
   "orders_atualizadas": 0,
-  "ja_existentes": 541,
+  "ja_existentes": 532,
   "rate_limit_perdidos": 8,
   "erros_outros": 0,
   "avisos": [
@@ -1019,7 +1019,7 @@
     "pedido 26235186301: sem CPF/CNPJ do contato — pulando"
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-11-05T13:42:26.856Z",
+  "ultimo_lote_em": "2026-11-05T13:43:23.381Z",
   "ticks_hoje_data": "2026-11-05",
-  "ticks_hoje_count": 31
+  "ticks_hoje_count": 29
 }
