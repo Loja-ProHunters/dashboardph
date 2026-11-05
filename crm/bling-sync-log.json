@@ -1,5 +1,15 @@
 [
   {
+    "ts": "2026-11-05T13:00:56.666Z",
+    "tipo": "backfill_concluido",
+    "contaId": "calibre",
+    "pedidos_processados": 423,
+    "accounts_criadas": 86,
+    "orders_criadas": 151,
+    "ja_existentes": 266,
+    "rate_limit_perdidos": 6
+  },
+  {
     "ts": "2026-11-04T12:07:45.563Z",
     "tipo": "auto_recuperar_disparado",
     "contaId": "calibre",
