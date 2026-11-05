@@ -161,7 +161,27 @@ function _clienteKey(acc) {
   return 'acc:' + ((acc && acc.id) || '');
 }
 
-async function gerarTarefasDiarias() {
+// Contrato de arma NAO entra na fila comercial (tem secao propria). Mesma regra
+// do disciplina.ehContrato — inline aqui pra nao criar dependencia.
+function _ehContrato(a) {
+  return !!a && (String(a.tipo || '').indexOf('contrato') === 0 || a.fonte === 'contrato_arma');
+}
+
+// Throttle da esteira: varias conclusoes em sequencia disparam varios refills.
+// Como a cota "manter 20" repoe TODAS as vagas abertas numa unica rodada, basta
+// 1 geracao a cada janela curta — colapsa a rajada sem perder reposicao e evita
+// empilhar rodadas do gerador (que carrega a base). O lote diario e o botao da
+// gestao passam forcar:true e ignoram o throttle.
+let _ultimaGeracaoTs = 0;
+const _THROTTLE_MS = 8000;
+
+async function gerarTarefasDiarias(opts) {
+  opts = opts || {};
+  const agora = Date.now();
+  if (!opts.forcar && (agora - _ultimaGeracaoTs) < _THROTTLE_MS) {
+    return { ok: true, throttled: true, motivo: 'geracao ha <8s — esteira ja reposta nessa rodada' };
+  }
+  _ultimaGeracaoTs = agora;
   const inicio = Date.now();
   const hoje = _hojeISO();
 
@@ -202,6 +222,11 @@ async function gerarTarefasDiarias() {
   // Idempotente no dia: se o cron rodar 2x, a segunda rodada so completa o que
   // faltou das 20 de HOJE (conta pelo lote_dia gravado em cada tarefa).
   const criadasHojePorVendedor = {};
+  // FILA COMERCIAL disponivel HOJE por vendedor (nao-contrato, nao agendada pro
+  // futuro). Base da nova cota "ESTEIRA DE 20": o gerador MANTEM a fila em 20 —
+  // completa ate 20, nao SOMA 20 todo dia. Assim a lista nao acumula/estoura, e
+  // conforme o vendedor conclui, abre vaga que e reposta (ate 20).
+  const pendentesComercialPorVendedor = {};
   // Ultimo contato por cliente (tarefa finalizada ou WhatsApp registrado) —
   // usado pela fonte "carteira_parado".
   const ultimoContatoPorAccount = {};
@@ -212,6 +237,12 @@ async function gerarTarefasDiarias() {
     const ehDoGerador = a.gerada_automaticamente &&
       (a.lote_dia === hojeBRT || (a.criado_por === 'cron-oportunidades' && _dataBRT(a.criado_em) === hojeBRT));
     if (ehDoGerador && owner) criadasHojePorVendedor[owner] = (criadasHojePorVendedor[owner] || 0) + 1;
+    // Conta a fila comercial disponivel hoje (exclui contrato e follow-up agendado
+    // pro futuro) — e o que o vendedor ve como "para fazer hoje".
+    if (a.status === 'pendente' && owner && !_ehContrato(a)) {
+      const origemP = a.lote_dia || _dataBRT(a.criado_em) || hojeBRT;
+      if (!(origemP > hojeBRT)) pendentesComercialPorVendedor[owner] = (pendentesComercialPorVendedor[owner] || 0) + 1;
+    }
     const accId = a.account_id || a.entidade_id;
     if (!accId) continue;
     // Trava de intervalo por cliente (cross-fonte, por CPF). So tarefas
@@ -433,15 +464,18 @@ async function gerarTarefasDiarias() {
     (porOwner[owner] = porOwner[owner] || []).push({ ...c, owner_id: owner, flexivel });
   }
 
-  // COTA DO DIA = TAREFAS_POR_VENDEDOR - (ja criadas HOJE pra ele).
-  // Pendentes de dias anteriores NAO reduzem a cota — elas ficam e acumulam.
+  // COTA = ESTEIRA DE 20. Mantem a fila comercial do vendedor em 20: cria so o
+  // que falta pra CHEGAR em 20 (20 - pendentes de hoje). NAO soma 20 todo dia.
+  // Resultado: a lista nunca estoura/acumula; conforme o vendedor conclui, abre
+  // vaga e o gerador (rodando de novo) repoe ate 20. Quem conclui mais, recebe
+  // mais (reposicao) e portanto executa mais — base da avaliacao/ranking.
   const finais = [];
   const cotaPorVendedor = {};
   const sobras = []; // flexiveis que o "dono do rodizio" nao precisou usar
   for (const owner of Object.keys(porOwner)) {
     porOwner[owner].sort((a, b) => b.score - a.score);
-    const jaCriadasHoje = criadasHojePorVendedor[owner] || 0;
-    const cota = Math.max(0, TAREFAS_POR_VENDEDOR - jaCriadasHoje);
+    const pendCom = pendentesComercialPorVendedor[owner] || 0;
+    const cota = Math.max(0, TAREFAS_POR_VENDEDOR - pendCom);
     cotaPorVendedor[owner] = cota;
     // Rodizio entre fontes (variedade garantida); fontes de RESERVA so completam.
     const escolhidos = cota > 0 ? _selecionarBalanceado(porOwner[owner], cota) : [];
@@ -619,6 +653,7 @@ async function gerarTarefasDiarias() {
     lote_dia: hojeBRT,
     // Pendentes ACUMULADAS antes desta rodada (nao reduzem mais a cota — so informativo)
     pendentes_antes: pendentesPorVendedor,
+    pendentes_comercial_antes: pendentesComercialPorVendedor, // base da esteira de 20
     criadas_hoje_antes: criadasHojePorVendedor,
     cota_por_vendedor: cotaPorVendedor,
     por_vendedor: porVendedorContagem,
