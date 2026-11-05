@@ -6310,12 +6310,12 @@
     "status": "aguardando_cliente",
     "resultado": null,
     "produto_fisico": {
-      "status": "aguardando_chegada",
+      "status": "recebido_loja",
       "rastreio_entrada": "AP664145145BR",
       "aguardando_desde": "2026-10-27T13:30:28.716Z",
-      "recebido_em": null,
-      "recebido_por": null,
-      "localizacao_loja": null,
+      "recebido_em": "2026-11-05T11:44:19.764Z",
+      "recebido_por": "auxiliar",
+      "localizacao_loja": "Prateleira",
       "etiqueta_impressa_em": null,
       "etiqueta_impressa_por": null,
       "envio_fabricante": null,
@@ -6338,7 +6338,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-26T11:50:27.675Z",
-    "atualizado_em": "2026-10-27T13:30:55.671Z",
+    "atualizado_em": "2026-11-05T11:44:19.764Z",
     "tally_meta": {
       "eventId": "sync_je4xOkJ",
       "responseId": "je4xOkJ",
@@ -6381,6 +6381,13 @@
         "por": "auxiliar",
         "de": "em_analise",
         "para": "aguardando_cliente",
+        "nota": null
+      },
+      {
+        "ts": "2026-11-05T11:44:19.764Z",
+        "acao": "produto_recebido",
+        "por": "auxiliar",
+        "localizacao": "Prateleira",
         "nota": null
       }
     ]
