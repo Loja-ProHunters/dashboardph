@@ -1578,9 +1578,9 @@
   "total_original": 2099,
   "processados": 532,
   "accounts_criadas": 158,
-  "orders_criadas": 391,
+  "orders_criadas": 371,
   "orders_atualizadas": 0,
-  "ja_existentes": 141,
+  "ja_existentes": 161,
   "rate_limit_perdidos": 8,
   "erros_outros": 0,
   "avisos": [
@@ -1594,7 +1594,7 @@
     "pedido 26862889640 [prohunters]: Bling API \"prohunters\" 429 em GET /pedidos/vendas/26862889640: O limite de requisições por segundo foi atingido, tente novamente mais tarde."
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-11-05T13:06:32.342Z",
+  "ultimo_lote_em": "2026-11-05T13:06:49.770Z",
   "ticks_hoje_data": "2026-11-05",
-  "ticks_hoje_count": 7
+  "ticks_hoje_count": 6
 }
