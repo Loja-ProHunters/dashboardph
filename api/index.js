@@ -85,6 +85,9 @@ function isAdminOrDiretor(sess) {
   return r === 'admin' || r === 'diretor';
 }
 function canEditComercial(sess) { return isAdminOrDiretor(sess); }
+// Decodifica o id de envio vindo da URL (pode conter %2C etc quando o numero
+// do pedido tem virgula/espaco). Tolera id malformado caindo no valor cru.
+function _decEnvioId(s) { try { return decodeURIComponent(String(s || '')); } catch (_) { return String(s || ''); } }
 // Dashboard Comercial agora e visivel pra TODOS os usuarios logados (inclusive
 // auxiliar e comex) — a ferramenta virou o KPI compartilhado da empresa.
 // Edicao continua so admin/diretor via canEditComercial.
@@ -4200,7 +4203,7 @@ module.exports = async (req, res) => {
   }
 
   // GET /api/crm/envios — fila. Query: status, empresa, dono_proximo, atrasados
-  if (req.method === 'GET' && url.startsWith('/api/crm/envios') && !url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+/)) {
+  if (req.method === 'GET' && url.startsWith('/api/crm/envios') && !url.match(/^\/api\/crm\/envios\/[^/]+/)) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
@@ -4326,11 +4329,14 @@ module.exports = async (req, res) => {
   }
 
   // GET /api/crm/envios/:id — detalhe do envio + checklist
-  if (req.method === 'GET' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+$/)) {
+  // [^/]+ (nao so [A-Za-z0-9_-]): o id e 'env_<empresa>_<numero>' e o numero
+  // do Bling pode ter virgula/espaco (ex.: "1333,50"). Encodado na URL vira
+  // %2C etc — por isso casamos qualquer char menos barra e decodificamos.
+  if (req.method === 'GET' && url.match(/^\/api\/crm\/envios\/[^/]+$/)) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
-      const id = url.split('/').pop();
+      const id = _decEnvioId(url.split('/').pop());
       const env = await crmStore.getDoc('envios', id);
       if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio não encontrado'})); return; }
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, envio: env, checklist: envios.estadoChecklist(env) }));
@@ -4341,11 +4347,11 @@ module.exports = async (req, res) => {
   }
 
   // PATCH /api/crm/envios/:id — atualiza campos do envio (aciona passos)
-  if (req.method === 'PATCH' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+$/)) {
+  if (req.method === 'PATCH' && url.match(/^\/api\/crm\/envios\/[^/]+$/)) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessControlado(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
     try {
-      const id = url.split('/').pop();
+      const id = _decEnvioId(url.split('/').pop());
       const env = await crmStore.getDoc('envios', id);
       if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio não encontrado'})); return; }
       const body = await readBody(req);
@@ -4386,13 +4392,13 @@ module.exports = async (req, res) => {
   //
   // Permissao: admin, diretor, vendas ou auxiliar (mesmo perfil que edita a fila).
   // Log com IP na auditoria pra rastrear correcoes indevidas.
-  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/reverter-passo$/)) {
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[^/]+\/reverter-passo$/)) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessControlado(sess)) {
       res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
     }
     try {
-      const id = url.split('/')[4];
+      const id = _decEnvioId(url.split('/')[4]);
       const env = await crmStore.getDoc('envios', id);
       if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio nao encontrado'})); return; }
       if (env.status === 'enviado' || env.status === 'cancelado') {
@@ -4420,13 +4426,13 @@ module.exports = async (req, res) => {
   // PERMISSAO: SOMENTE gerencia (admin/diretor). Vendedor/auxiliar nao pode
   // cancelar — se precisar, pede pra gerencia. Evita cancelamento acidental
   // de envios validos por quem opera no dia-a-dia.
-  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/cancelar$/)) {
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[^/]+\/cancelar$/)) {
     const sess = getSession(req);
     if (!sess || !isAdminOrDiretor(sess)) {
       res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Somente gerencia (admin/diretor) pode cancelar envios.'})); return;
     }
     try {
-      const id = url.split('/')[4];
+      const id = _decEnvioId(url.split('/')[4]);
       const env = await crmStore.getDoc('envios', id);
       if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio nao encontrado'})); return; }
       const body = await readBody(req);
@@ -4447,13 +4453,13 @@ module.exports = async (req, res) => {
   // Cliente retirou o pedido presencialmente (sem transportadora). Marca o envio
   // como retirado e dispara notificacao PRO FINANCEIRO + GERENCIA via solicitacoes.
   // Precisa ter NF emitida — ninguem retira sem nota fiscal.
-  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[a-zA-Z0-9_\-]+\/marcar-retirado$/)) {
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/envios\/[^/]+\/marcar-retirado$/)) {
     const sess = getSession(req);
     if (!sess || !crmUtils.canAccessControlado(sess)) {
       res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return;
     }
     try {
-      const id = url.split('/')[4];
+      const id = _decEnvioId(url.split('/')[4]);
       const env = await crmStore.getDoc('envios', id);
       if (!env) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Envio nao encontrado'})); return; }
       const body = await readBody(req);
