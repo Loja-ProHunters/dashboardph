@@ -5783,9 +5783,22 @@ module.exports = async (req, res) => {
     try {
       const incoming = JSON.parse(body);
       const atual = await getComercialData();
+      // PROTECAO: um browser com estado velho (aberto de um mes anterior) NAO
+      // pode REGREDIR o mes de referencia nem ressuscitar sellers de um mes ja
+      // fechado. Se o incoming vem com mesReferencia mais antigo que o atual,
+      // descartamos mesReferencia e sellers do incoming (mantemos o do servidor).
+      const incMes = incoming.mesReferencia;
+      const mesRegrediu = incMes && atual.mesReferencia && String(incMes) < String(atual.mesReferencia);
+      if (mesRegrediu) {
+        console.warn('[comercial] POST ignorou regressao de mes: incoming=' + incMes + ' < atual=' + atual.mesReferencia + ' (sellers/mesReferencia do incoming descartados).');
+      }
       const merged = {
         ...atual,
         ...incoming,
+        // Nao deixa o mes regredir.
+        mesReferencia: mesRegrediu ? atual.mesReferencia : (incMes || atual.mesReferencia),
+        // Se o mes regrediu, mantem os sellers do servidor (nao revive mes fechado).
+        sellers: mesRegrediu ? atual.sellers : (incoming.sellers || atual.sellers),
         // Campos que so a rota especifica de site pode mexer: preserva o valor
         // atual quando o incoming nao trouxer (ou trouxer undefined/null).
         siteFat: (incoming.siteFat === undefined || incoming.siteFat === null)
@@ -5822,6 +5835,58 @@ module.exports = async (req, res) => {
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Erro ao fechar o mes: ' + e.message }));
+    }
+    return;
+  }
+
+  // GET /api/comercial/git-historico[?sha=XXX][&max=N] — RECUPERACAO (admin).
+  // Read-only: le o historico de commits do comercial-data.json na branch de
+  // DADOS. Sem sha: lista os ultimos commits (sha, data, mensagem) + resumo do
+  // estado em cada um. Com sha: devolve o conteudo COMPLETO daquele commit.
+  // Serve pra recuperar os numeros reais de um mes que foi fechado errado.
+  if (req.method === 'GET' && url.startsWith('/api/comercial/git-historico')) {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só admin/diretor.'})); return; }
+    try {
+      const cfg = require('../config');
+      const gh = require('../lib/githubStore');
+      const repo = cfg.githubRepo;
+      const branch = cfg.dataBranch || 'data';
+      const q = new URL('http://x' + (req.url || '')).searchParams;
+      const sha = q.get('sha');
+      if (sha) {
+        const r = await gh.githubRequest('GET', '/repos/' + repo + '/contents/comercial-data.json?ref=' + encodeURIComponent(sha));
+        const text = Buffer.from(String(r.content || '').replace(/\s/g, ''), 'base64').toString('utf-8');
+        let parsed = null; try { parsed = JSON.parse(text); } catch (_) {}
+        res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, sha, data: parsed, raw: parsed ? undefined : text }));
+        return;
+      }
+      const max = Math.max(1, Math.min(50, parseInt(q.get('max') || '25', 10)));
+      const commits = await gh.githubRequest('GET', '/repos/' + repo + '/commits?sha=' + encodeURIComponent(branch) + '&path=comercial-data.json&per_page=' + max);
+      const lista = (Array.isArray(commits) ? commits : []).map(c => ({ sha: c.sha, data: c.commit && c.commit.author && c.commit.author.date, msg: c.commit && c.commit.message }));
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, branch, commits: lista }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST /api/comercial/restaurar — RECUPERACAO (admin). Sobrescreve o
+  // comercial-data.json com o objeto enviado em body.data. Usado pra corrigir
+  // um fechamento errado (repor o mes certo no historico e o mes corrente).
+  // Valida o minimo pra nao gravar lixo.
+  if (req.method === 'POST' && url === '/api/comercial/restaurar') {
+    const sess = getSession(req);
+    if (!sess || !isAdminOrDiretor(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só admin/diretor.'})); return; }
+    try {
+      const { data } = JSON.parse((await readBody(req)) || '{}');
+      if (!data || !Array.isArray(data.sellers) || !data.mesReferencia || !Array.isArray(data.history)) {
+        res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Objeto inválido: precisa de sellers[], mesReferencia e history[].'})); return;
+      }
+      await saveComercialData(data);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, mesReferencia: data.mesReferencia, sellers: data.sellers.length, history: data.history.length }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({ error: e.message }));
     }
     return;
   }
