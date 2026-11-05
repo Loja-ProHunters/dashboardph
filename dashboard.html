@@ -6633,12 +6633,14 @@ async function crmRenderTarefas(){
   try {
     var pC = fetch('/api/crm/contratos/meus', { cache: 'no-store' }).then(function(x){ return x.ok ? x.json() : { cards: [] }; }).catch(function(){ return { cards: [] }; });
     var pR = fetch('/api/crm/tarefas/resumo', { cache: 'no-store' }).then(function(x){ return x.ok ? x.json() : {}; }).catch(function(){ return {}; });
+    var pRank = fetch('/api/crm/ranking-execucao', { cache: 'no-store' }).then(function(x){ return x.ok ? x.json() : null; }).catch(function(){ return null; });
     var r = await fetch('/api/crm/tarefas/minhas');
     var d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Erro ao carregar tarefas.');
     var tarefas = (d.tarefas || []).filter(function(t){ return t.fonte !== 'contrato_arma'; });
     var contratos = ((await pC) || {}).cards || [];
     var resumo = (await pR) || {};
+    TQ.corrida = await pRank; // Corrida de Execução (ranking mensal aberto)
     window.CRM.tarefasCache = tarefas;
     window.CRM.contratosCards = contratos;
     // Badge mostra só tarefas VISÍVEIS (exclui follow-ups futuros)
@@ -6678,6 +6680,31 @@ function tqFiltrar(){
   return linhas;
 }
 
+function tqMesLabel(m){ var mm=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']; var p=String(m||'').split('-'); return p.length===2 ? (mm[parseInt(p[1],10)-1]+'/'+p[0]) : (m||''); }
+function tqCorridaHTML(){
+  var c = TQ.corrida; if (!c || !c.ranking || !c.ranking.length) return '';
+  var meu = String(c.meu_login||'').toLowerCase();
+  var medal = ['🥇','🥈','🥉'];
+  var aberto = TQ.corridaAberta !== false;
+  var rows = c.ranking.map(function(r,i){
+    var eu = r.login === meu;
+    var conv = (r.conversao==null) ? '—' : (r.conversao+'%');
+    return '<div class="tqc-row'+(eu?' eu':'')+(i===0?' lider':'')+'">'+
+      '<span class="tqc-pos">'+(medal[i]||(r.posicao+'º'))+'</span>'+
+      '<span class="tqc-nome">'+crmEsc(r.primeiro_nome||r.nome)+(eu?' <b>(você)</b>':'')+'</span>'+
+      '<span class="tqc-m"><b>'+r.executadas+'</b><i>exec</i></span>'+
+      '<span class="tqc-m"><b>'+conv+'</b><i>conv</i></span>'+
+      '<span class="tqc-m tqc-score"><b>'+r.score+'</b><i>pts</i></span>'+
+    '</div>';
+  }).join('');
+  return '<div class="tqc-card">'+
+    '<div class="tqc-head" onclick="TQ.corridaAberta=(TQ.corridaAberta===false);tqDesenhar()">'+
+      '<span class="tqc-tit">🏆 Corrida de Execução <em>· '+tqMesLabel(c.mes)+'</em></span>'+
+      '<span class="tqc-toggle">'+(aberto?'▾':'▸')+'</span>'+
+    '</div>'+
+    (aberto ? '<div class="tqc-body">'+rows+'<div class="tqc-leg">Conta tarefa executada <b>com contato/resultado</b>. Pontos = execuções + conversões×2.</div></div>' : '')+
+  '</div>';
+}
 function tqDesenhar(){
   var view = document.getElementById('crm-view'); if (!view || !TQ.dados) return;
   var D = TQ.dados, agora = tqAgoraBRT(), rs = D.resumo || {};
@@ -6689,7 +6716,7 @@ function tqDesenhar(){
   var total = tarefasVisiveis.length + D.contratos.length;
   var nAgendadas = D.tarefas.filter(function(t){ return !!t.agendada_futura; }).length;
   var agendadasTag = nAgendadas > 0 ? '<span class="tq-agendadas">📅 ' + nAgendadas + ' agendada' + (nAgendadas > 1 ? 's' : '') + '</span>' : '';
-  var h = '<div class="tq-head"><div class="tq-head-l"><h3>' + (total ? total + ' para fazer' : 'Fila em dia') + agendadasTag + '</h3>' +
+  var h = tqCorridaHTML() + '<div class="tq-head"><div class="tq-head-l"><h3>' + (total ? total + ' para fazer' : 'Fila em dia') + agendadasTag + '</h3>' +
     (meta ? '<div class="tq-prog"><span>Feitas hoje <b>' + feitas + '</b> de ' + meta + '</span><i><b style="width:' + Math.min(100, Math.round(feitas / meta * 100)) + '%"></b></i></div>' : '') + '</div>' +
     '<button class="tq-btn-sec" onclick="crmAbrirModalNovaTarefa()">+ Nova tarefa</button></div>';
   var fs = [['todas', 'Tudo', total], ['contratos', '📝 Contratos', D.contratos.length], ['vencidas', 'Vencidas', nVenc], ['antigas', 'Antigas', nAnt], ['hoje', 'De hoje', nHoje]];
@@ -13689,6 +13716,26 @@ async function cartSalvarNotas(id){
   · 4 Conferido pela gestão
 ═══════════════════════════════════════════════════════════════ -->
 <style>
+/* ── Corrida de Execução (ranking mensal) ─────────────── */
+#tab-crm .tqc-card{border:1px solid #e7e5e0;border-radius:14px;background:linear-gradient(180deg,#faf9f6,#fff);margin:0 0 16px;overflow:hidden}
+#tab-crm .tqc-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;user-select:none}
+#tab-crm .tqc-tit{font-size:14px;font-weight:800;color:#111412;letter-spacing:.2px}
+#tab-crm .tqc-tit em{font-style:normal;font-weight:600;color:#8a8880}
+#tab-crm .tqc-toggle{color:#9a9790;font-size:13px}
+#tab-crm .tqc-body{padding:4px 10px 10px}
+#tab-crm .tqc-row{display:grid;grid-template-columns:34px 1fr auto auto auto;align-items:center;gap:8px;padding:8px 8px;border-radius:10px}
+#tab-crm .tqc-row+.tqc-row{margin-top:2px}
+#tab-crm .tqc-row.lider{background:#fff7e6}
+#tab-crm .tqc-row.eu{outline:2px solid #1baf7a;outline-offset:-2px;background:#f0faf6}
+#tab-crm .tqc-pos{font-size:16px;text-align:center}
+#tab-crm .tqc-nome{font-size:13.5px;font-weight:700;color:#1d201e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tab-crm .tqc-nome b{color:#1baf7a;font-weight:700}
+#tab-crm .tqc-m{text-align:center;min-width:46px;line-height:1.05}
+#tab-crm .tqc-m b{display:block;font-size:15px;font-weight:800;color:#111412}
+#tab-crm .tqc-m i{font-style:normal;font-size:10px;color:#9a9790;text-transform:uppercase;letter-spacing:.3px}
+#tab-crm .tqc-score b{color:#c98a04}
+#tab-crm .tqc-leg{font-size:11px;color:#9a9790;padding:8px 8px 2px}
+@media(max-width:560px){#tab-crm .tqc-m{min-width:38px}#tab-crm .tqc-m b{font-size:14px}}
 /* ── Minhas Tarefas v4 (lista enxuta) ─────────────────── */
 #tab-crm .tq-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:2px 0 12px;flex-wrap:wrap}
 #tab-crm .tq-head h3{margin:0;font-size:18px;color:#111412;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
