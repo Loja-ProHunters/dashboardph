@@ -6338,7 +6338,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-26T11:50:27.675Z",
-    "atualizado_em": "2026-11-05T11:44:19.764Z",
+    "atualizado_em": "2026-11-06T12:26:48.799Z",
     "tally_meta": {
       "eventId": "sync_je4xOkJ",
       "responseId": "je4xOkJ",
@@ -6389,8 +6389,21 @@
         "por": "auxiliar",
         "localizacao": "Prateleira",
         "nota": null
+      },
+      {
+        "ts": "2026-11-06T12:26:48.799Z",
+        "acao": "observacao_atualizada",
+        "por": "auxiliar",
+        "nota": "Cliente quer estorno",
+        "anterior": null
       }
-    ]
+    ],
+    "observacao": {
+      "texto": "Cliente quer estorno",
+      "por": "auxiliar",
+      "em": "2026-11-06T12:26:48.799Z",
+      "versao": 1
+    }
   },
   "cc6fdcb0-febd-4a32-97b5-00eb56a35de4": {
     "id": "cc6fdcb0-febd-4a32-97b5-00eb56a35de4",
