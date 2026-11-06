@@ -6658,7 +6658,7 @@ async function crmRenderTarefas(){
     window.CRM.tarefasAgendadas = tarefas.filter(function(t){ return !!t.agendada_futura; }).length;
     var agora = tqAgoraBRT();
     window.CRM.tarefasOverdue = tarefas.filter(function(t){ var l = tqLimite(t); return l && l < agora; }).length + contratos.filter(function(c){ return c.atrasado; }).length;
-    TQ.dados = { tarefas: tarefas, contratos: contratos, resumo: resumo };
+    TQ.dados = { tarefas: tarefas, contratos: contratos, resumo: resumo, emAndamento: (d.em_andamento || []) };
     crmRenderSubTabs();
     tqDesenhar();
     crmMostraTooltipUmaVez('tarefas_v4',
@@ -6745,10 +6745,12 @@ function tqDesenhar(){
   var linhas = tqFiltrar();
   if (!linhas.length) {
     h += '<div class="tq-vazio"><div>✓</div><b>' + (total ? 'Nada neste filtro.' : 'Nenhuma tarefa pendente.') + '</b><span>' + (total ? '' : 'Novas tarefas chegam todo dia às 8h.') + '</span></div>';
+    h += tqEmAndamentoSecHTML();
     view.innerHTML = h; return;
   }
   h += '<div class="tq-lista">' + linhas.slice(0, TQ.limite).map(function(x){ return x.ct ? tqLinhaContrato(x.ct) : tqLinhaTarefa(x.t, x.venc, x.hoje); }).join('') + '</div>';
   if (linhas.length > TQ.limite) h += '<button class="tq-mais" onclick="TQ.limite+=15;tqDesenhar()">Mostrar mais ' + Math.min(15, linhas.length - TQ.limite) + ' (de ' + (linhas.length - TQ.limite) + ')</button>';
+  h += tqEmAndamentoSecHTML();
   view.innerHTML = h;
 }
 function tqFiltro(f){ TQ.filtro = f; TQ.limite = 15; TQ.aberto = null; tqDesenhar(); }
@@ -6791,13 +6793,66 @@ function tqLinhaTarefa(t, venc, hoje){
       (accId ? '<a href="#" onclick="crmAbrirFicha(\'' + crmEsc(accId) + '\');return false">Abrir ficha completa →</a>' : '') +
       (t.prazo ? '<span>Prazo ' + crmFmtDate(t.prazo) + (t.hora ? ' ' + crmEsc(t.hora) : '') + '</span>' : '') +
       (t.followups_cliente ? '<span>Tentativa ' + t.followups_cliente + '</span>' : '') + '</div>' +
-    '<div class="tq-fim"><span>Como terminou?</span>' +
+    '<div class="tq-andou"><span>Já acionei, aguardando o cliente:</span>' +
+      '<button onclick="crmEmAndamento(\'' + id + '\', \'whatsapp\')">💬 WhatsApp</button>' +
+      '<button onclick="crmEmAndamento(\'' + id + '\', \'ligacao\')">📞 Ligação</button>' +
+      '<button onclick="crmEmAndamento(\'' + id + '\', \'presencial\')">🤝 Presencial</button></div>' +
+    '<div class="tq-fim"><span>Ou já saiu o desfecho?</span>' +
       '<button class="ok" onclick="crmConcluirTarefa(\'' + id + '\', \'convertida\')">✓ Vendeu</button>' +
       '<button onclick="crmFinalizarModal(\'' + id + '\', \'nao\')">Não vendeu</button>' +
       '<button onclick="crmAbrirFollowUp(\'' + id + '\')">📅 Retornar depois</button>' +
       '<button class="lnk" onclick="crmFinalizarModal(\'' + id + '\', \'cancelar\')">Tarefa inválida</button></div>' +
   '</div>';
   return h;
+}
+// Marca a tarefa como "em andamento" (acionou o cliente, aguardando desfecho).
+// Sai da fila "pra fazer" e abre vaga na esteira.
+async function crmEmAndamento(id, canal){
+  try {
+    var r = await fetch('/api/crm/tarefas/' + encodeURIComponent(id) + '/em-andamento', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ canal: canal })
+    });
+    var d = await r.json(); if (!r.ok) throw new Error(d.error || 'Erro');
+    if (typeof crmToast === 'function') crmToast('Movida pra "Em andamento". Entrou outra no lugar.', 'ok', 3000);
+    if (typeof crmRenderTarefas === 'function') crmRenderTarefas();
+  } catch(e){ if (typeof crmToast === 'function') crmToast('Erro: ' + e.message, 'erro', 5000); }
+}
+// Volta uma tarefa de "em andamento" pra fila "pra fazer".
+async function crmVoltarFila(id){
+  try {
+    var r = await fetch('/api/crm/tarefas/' + encodeURIComponent(id) + '/voltar-fila', { method: 'POST' });
+    var d = await r.json(); if (!r.ok) throw new Error(d.error || 'Erro');
+    if (typeof crmToast === 'function') crmToast('Voltou pra fila.', 'ok', 2500);
+    if (typeof crmRenderTarefas === 'function') crmRenderTarefas();
+  } catch(e){ if (typeof crmToast === 'function') crmToast('Erro: ' + e.message, 'erro', 5000); }
+}
+// Linha compacta da lista "Em andamento"
+function tqLinhaEmAndamento(t){
+  var id = crmEsc(t.id);
+  var d = t.dias_em_andamento || 0;
+  var idadeCls = d >= 7 ? 'bad' : (d >= 3 ? 'warn' : '');
+  var idade = d === 0 ? 'hoje' : ('há ' + d + 'd');
+  var canalLbl = ({whatsapp:'💬', ligacao:'📞', presencial:'🤝'})[t.canal_contato] || '•';
+  return '<div class="tq-ea-row">' +
+    '<span class="tq-ea-ic">' + canalLbl + '</span>' +
+    '<span class="tq-ea-txt"><b>' + crmEsc(t.cliente_nome || 'Cliente') + '</b><small>' + crmEsc(tqMotivo(t)) + '</small></span>' +
+    '<span class="tq-ea-idade ' + idadeCls + '">' + idade + '</span>' +
+    '<span class="tq-ea-acts">' +
+      '<button class="ok" onclick="crmConcluirTarefa(\'' + id + '\', \'convertida\')" title="Cliente comprou">✓ Vendeu</button>' +
+      '<button onclick="crmFinalizarModal(\'' + id + '\', \'nao\')" title="Não comprou">Não</button>' +
+      '<button class="lnk" onclick="crmVoltarFila(\'' + id + '\')" title="Voltar pra fila de tarefas">↩</button>' +
+    '</span></div>';
+}
+
+// Seção "Em andamento" (lista à parte, não conta na fila "pra fazer")
+function tqEmAndamentoSecHTML(){
+  var ea = (TQ.dados && TQ.dados.emAndamento) || [];
+  if (!ea.length) return '';
+  var antigos = ea.filter(function(t){ return (t.dias_em_andamento||0) >= 7; }).length;
+  return '<div class="tq-ea-sec">' +
+    '<div class="tq-ea-head">⏳ Em andamento <small>acionados, aguardando o cliente</small>' +
+      '<span class="tq-ea-cnt' + (antigos?' bad':'') + '">' + ea.length + (antigos ? ' · ' + antigos + ' parado' + (antigos>1?'s':'') : '') + '</span></div>' +
+    ea.map(tqLinhaEmAndamento).join('') + '</div>';
 }
 
 // ── Linha de contrato de arma (operacional)
@@ -12588,6 +12643,10 @@ window.PROD = (function(){
       '<button class="pg-link" onclick="crmIrPara(\'carteira\',{vendedor:\'' + esc(v.login) + '\'})">abrir →</button></div>';
     var k = v.contratos || {};
     if (k.total) h += '<div class="pg-det-row"><b>📝 Contratos de arma</b><span>' + k.total + ' venda(s) · ' + (k.pendentes||0) + ' pendente(s) · ' + (k.atrasados||0) + ' atrasado(s)</span></div>';
+    var ea = (v.fila && v.fila.em_andamento) || 0;
+    var tmf = v.execucao && v.execucao.tempo_medio_finalizacao_dias;
+    var eaAntigo = (v.fila && v.fila.em_andamento_mais_antigo_dias) || 0;
+    if (ea || tmf != null) h += '<div class="pg-det-row"><b>⏳ Em execução</b><span>' + ea + ' em andamento' + (eaAntigo >= 7 ? ' · ⚠️ mais antigo há ' + eaAntigo + 'd' : '') + (tmf != null ? ' · tempo médio p/ finalizar: ' + tmf + 'd' : '') + '</span></div>';
     if (v.mais_antigas && v.mais_antigas.length) {
       h += '<div class="pg-det-lista"><b>Tarefas mais antigas na fila (' + v.abertas_total + ' abertas)</b>' + v.mais_antigas.slice(0, 8).map(function(t){
         return '<div><span>' + esc(t.cliente_nome || t.titulo || 'Tarefa') + '</span><em>' + t.dias + 'd</em></div>'; }).join('') + '</div>';
@@ -13755,6 +13814,28 @@ async function cartSalvarNotas(id){
 #tab-crm .tqc-score b{color:#c98a04}
 #tab-crm .tqc-leg{font-size:11px;color:#9a9790;padding:8px 8px 2px}
 @media(max-width:560px){#tab-crm .tqc-m{min-width:38px}#tab-crm .tqc-m b{font-size:14px}}
+/* ── Em andamento (acionado, aguardando desfecho) ────── */
+#tab-crm .tq-andou{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 2px;padding-top:10px;border-top:1px dashed #e7e5e0}
+#tab-crm .tq-andou>span{font-size:12px;color:#6d6b66;font-weight:600;margin-right:2px}
+#tab-crm .tq-andou button{font-size:12px;padding:5px 10px;border:1px solid #d8e6df;background:#f0faf6;color:#0f7a52;border-radius:7px;cursor:pointer;font-weight:600}
+#tab-crm .tq-andou button:hover{background:#e3f5ec}
+#tab-crm .tq-ea-sec{margin-top:18px;border:1px solid #ece4d8;border-radius:12px;background:#fffdf8;overflow:hidden}
+#tab-crm .tq-ea-head{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:13px;font-weight:800;color:#8a6d1a;background:#fdf6e6;border-bottom:1px solid #f0e6cf}
+#tab-crm .tq-ea-head small{font-weight:500;color:#a89a7a}
+#tab-crm .tq-ea-cnt{margin-left:auto;font-size:12px;font-weight:800;color:#8a6d1a;background:#f6ebcf;padding:2px 9px;border-radius:20px}
+#tab-crm .tq-ea-cnt.bad{color:#b42318;background:#fde3df}
+#tab-crm .tq-ea-row{display:grid;grid-template-columns:28px 1fr auto auto;align-items:center;gap:10px;padding:9px 14px;border-top:1px solid #f3ecdd}
+#tab-crm .tq-ea-ic{font-size:15px;text-align:center}
+#tab-crm .tq-ea-txt b{display:block;font-size:13.5px;color:#1d201e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tab-crm .tq-ea-txt small{font-size:11.5px;color:#9a9790}
+#tab-crm .tq-ea-idade{font-size:12px;font-weight:700;color:#8a8880;white-space:nowrap}
+#tab-crm .tq-ea-idade.warn{color:#b9790b}
+#tab-crm .tq-ea-idade.bad{color:#b42318}
+#tab-crm .tq-ea-acts{display:flex;gap:5px}
+#tab-crm .tq-ea-acts button{font-size:12px;padding:4px 9px;border:1px solid #e0ddd6;background:#fff;border-radius:7px;cursor:pointer;font-weight:600;color:#333}
+#tab-crm .tq-ea-acts button.ok{border-color:#9ad9bd;background:#eafaf2;color:#0f7a52}
+#tab-crm .tq-ea-acts button.lnk{border:none;background:none;color:#9a9790}
+@media(max-width:560px){#tab-crm .tq-ea-row{grid-template-columns:24px 1fr auto}#tab-crm .tq-ea-acts{grid-column:1/-1;justify-content:flex-end;margin-top:4px}}
 /* ── Minhas Tarefas v4 (lista enxuta) ─────────────────── */
 #tab-crm .tq-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:2px 0 12px;flex-wrap:wrap}
 #tab-crm .tq-head h3{margin:0;font-size:18px;color:#111412;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
