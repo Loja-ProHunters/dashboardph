@@ -3027,6 +3027,15 @@ module.exports = async (req, res) => {
         tarefas = await crmStore.listDocs('activities', a =>
           a.status === 'pendente' && disciplina.disponivel(a) && (scopeAll || String(a.owner_id || a.dono || '').toLowerCase() === login));
       }
+      // EM ANDAMENTO: tarefas que o vendedor acionou e aguardam desfecho — lista
+      // à parte (não contam na fila "pra fazer"). Admin sem ?todos=1 não tem.
+      let emAndamento = [];
+      if (!(ehAdmin && !verTodas)) {
+        const scopeAllEA = verTodas && ehAdmin;
+        emAndamento = await crmStore.listDocs('activities', a =>
+          a.status === 'em_andamento' && !disciplina.ehContrato(a) &&
+          (scopeAllEA || String(a.owner_id || a.dono || '').toLowerCase() === login));
+      }
       // Ordena: vencidas (prazo+hora < agora) primeiro, depois por prazo+hora
       const agora = new Date();
       const hoje = agora.toISOString().slice(0, 10);
@@ -3049,15 +3058,14 @@ module.exports = async (req, res) => {
       // Enriquece cada tarefa com dados do cliente (nome + telefone) pra UI
       // montar botão "💬 WhatsApp" com link direto wa.me já com pitch como texto.
       // Lookup via mapa O(1) — evita N queries ao storage pra listas grandes.
-      if (tarefas.length) {
+      if (tarefas.length || emAndamento.length) {
         const accounts = await crmStore.listDocs('accounts');
         const accMap = {};
         for (const a of accounts) accMap[a.id] = a;
-        for (const t of tarefas) {
+        const _enriquecer = async (t) => {
           let acc = null;
           if (t.entidade_tipo === 'account' && t.entidade_id) acc = accMap[t.entidade_id];
           else if (t.entidade_tipo === 'order' && t.entidade_id) {
-            // Pra tarefa de pedido, tenta pegar o account via orders
             try {
               const o = await crmStore.getDoc('orders', t.entidade_id);
               if (o && o.account_id) acc = accMap[o.account_id];
@@ -3067,7 +3075,18 @@ module.exports = async (req, res) => {
             t.cliente_nome = acc.nome || acc.razao_social || null;
             t.cliente_telefone = acc.telefone || null;
           }
+        };
+        for (const t of tarefas) await _enriquecer(t);
+        for (const t of emAndamento) await _enriquecer(t);
+      }
+      // Idade de cada "em andamento" (dias desde que acionou o cliente).
+      {
+        const hojeEA = disciplina.hojeBRT();
+        for (const t of emAndamento) {
+          const desde = disciplina.dataBRT(t.em_andamento_em) || t.lote_dia || disciplina.dataBRT(t.criado_em);
+          t.dias_em_andamento = desde ? Math.max(0, Math.round((Date.parse(hojeEA) - Date.parse(desde)) / 86400000)) : 0;
         }
+        emAndamento.sort((a, b) => (b.dias_em_andamento || 0) - (a.dias_em_andamento || 0));
       }
       // Conta follow-ups por account_id só pra mostrar "Tentativa X" no front
       // (sem limite — o vendedor reagenda quantas vezes precisar).
@@ -3109,7 +3128,7 @@ module.exports = async (req, res) => {
         if (t.prazo && t.prazo < hojeBRT) vencidas++;
       }
       res.writeHead(200,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({ tarefas, total: tarefas.length, resumo: { de_hoje: deHoje, acumuladas, vencidas, contratos: contratosAbertos } }));
+      res.end(JSON.stringify({ tarefas, total: tarefas.length, em_andamento: emAndamento, resumo: { de_hoje: deHoje, acumuladas, vencidas, contratos: contratosAbertos, em_andamento: emAndamento.length } }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
   }
@@ -3386,9 +3405,12 @@ module.exports = async (req, res) => {
         res.end(JSON.stringify({error:'Esta tarefa nao esta atribuida a voce.'}));
         return;
       }
-      if (t.status !== 'pendente') {
+      // Pode finalizar de 'pendente' (direto) OU de 'em_andamento' (já acionou
+      // o cliente e agora saiu o desfecho). Qualquer outro status = já finalizada.
+      if (t.status !== 'pendente' && t.status !== 'em_andamento') {
         res.writeHead(409,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa já foi finalizada.'})); return;
       }
+      const eraPendente = t.status === 'pendente'; // só repõe vaga se estava na fila "pra fazer"
       const fimPatch = {
         ...t, status: 'concluida', resultado: resultado || 'concluida',
         concluida_em: new Date().toISOString(), concluida_por: sess.usuario,
@@ -3398,9 +3420,70 @@ module.exports = async (req, res) => {
       if (observacao) fimPatch.observacao_conclusao = observacao;
       if (payload.pedido_numero) fimPatch.pedido_numero_informado = String(payload.pedido_numero).trim().slice(0, 30);
       await crmStore.updateDoc('activities', id, fimPatch, sess.usuario);
-      // ESTEIRA: concluiu uma → abre vaga → repoe ate 20 (nao bloqueia a resposta).
-      _dispararRefillEsteira(req);
+      // ESTEIRA: só repõe se a tarefa estava na fila "pra fazer". Se já estava
+      // 'em_andamento', a vaga foi aberta quando ele acionou o cliente — não
+      // abre outra agora.
+      if (eraPendente) _dispararRefillEsteira(req);
       // Se a tarefa era de um cliente da carteira, atualiza o "ultimo contato"
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── POST /api/crm/tarefas/:id/em-andamento  body: { canal }
+  // O vendedor ACIONOU o cliente (ligou/mandou msg) mas o desfecho ainda vai
+  // levar tempo. A tarefa sai da fila "pra fazer" (abre vaga na esteira) e vai
+  // pra lista "Em andamento", rastreada pela idade. NÃO pontua no ranking — só
+  // conta quando finalizar com desfecho. Exige canal (contato registrado).
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/tarefas\/[a-zA-Z0-9_\-]+\/em-andamento$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!crmUtils.canEditCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Seu perfil pode consultar mas não mexer em tarefas.'})); return; }
+    try {
+      const id = url.split('/')[4];
+      let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch(e){}
+      const canal = payload.canal && disciplina.CANAIS[payload.canal] ? payload.canal : null;
+      if (!canal) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Registre o canal do contato (WhatsApp, Ligação ou Presencial) para marcar em andamento.'})); return; }
+      const t = await crmStore.getDoc('activities', id);
+      if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
+      if (disciplina.ehContrato(t)) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa de contrato: use os botões do contrato.'})); return; }
+      const meuLogin = String(sess.usuario || '').toLowerCase();
+      const donoTarefa = String(t.owner_id || t.dono || '').toLowerCase();
+      if (!crmUtils.canSeeAll(sess) && donoTarefa !== meuLogin) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa não está atribuída a você.'})); return; }
+      if (t.status !== 'pendente') { res.writeHead(409,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só dá pra marcar em andamento uma tarefa que está pendente.'})); return; }
+      const now = new Date().toISOString();
+      const obs = payload.observacao ? String(payload.observacao).trim().slice(0, 1000) : null;
+      await crmStore.updateDoc('activities', id, {
+        ...t, status: 'em_andamento',
+        em_andamento_em: now, em_andamento_por: sess.usuario,
+        canal_contato: canal,
+        primeiro_contato_em: t.primeiro_contato_em || now,
+        em_andamento_obs: obs,
+      }, sess.usuario);
+      // Abre vaga na esteira: a tarefa saiu da fila "pra fazer".
+      _dispararRefillEsteira(req);
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
+    } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
+    return;
+  }
+
+  // ── POST /api/crm/tarefas/:id/voltar-fila — desfaz o "em andamento" e volta
+  // a tarefa pra fila "pra fazer" (caso tenha marcado por engano).
+  if (req.method === 'POST' && url.match(/^\/api\/crm\/tarefas\/[a-zA-Z0-9_\-]+\/voltar-fila$/)) {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    if (!crmUtils.canEditCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem permissão.'})); return; }
+    try {
+      const id = url.split('/')[4];
+      const t = await crmStore.getDoc('activities', id);
+      if (!t) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Tarefa não encontrada'})); return; }
+      const meuLogin = String(sess.usuario || '').toLowerCase();
+      const donoTarefa = String(t.owner_id || t.dono || '').toLowerCase();
+      if (!crmUtils.canSeeAll(sess) && donoTarefa !== meuLogin) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa não está atribuída a você.'})); return; }
+      if (t.status !== 'em_andamento') { res.writeHead(409,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Esta tarefa não está em andamento.'})); return; }
+      const next = { ...t, status: 'pendente' };
+      delete next.em_andamento_em; delete next.em_andamento_por; delete next.em_andamento_obs;
+      await crmStore.updateDoc('activities', id, next, sess.usuario);
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
