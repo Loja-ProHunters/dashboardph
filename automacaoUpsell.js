@@ -234,9 +234,12 @@ async function gerarTarefasDiarias(opts) {
   const accountsComTarefaAberta = new Set();
   for (const a of todasActs) {
     const owner = _normLogin(a.owner_id || a.dono);
-    const ehDoGerador = a.gerada_automaticamente &&
-      (a.lote_dia === hojeBRT || (a.criado_por === 'cron-oportunidades' && _dataBRT(a.criado_em) === hojeBRT));
-    if (ehDoGerador && owner) criadasHojePorVendedor[owner] = (criadasHojePorVendedor[owner] || 0) + 1;
+    // Conta TODAS as tarefas automaticas criadas HOJE (gerador diario + acoes do
+    // vendedor: upsell pos-venda, avaliacao). Assim as tarefas disparadas por acao
+    // ENTRAM nas 20 do dia — nunca passa de 20 geradas/dia por vendedor.
+    const criadaHojeAuto = a.gerada_automaticamente && !_ehContrato(a) && a.status !== 'cancelada' &&
+      (a.lote_dia === hojeBRT || _dataBRT(a.criado_em) === hojeBRT);
+    if (criadaHojeAuto && owner) criadasHojePorVendedor[owner] = (criadasHojePorVendedor[owner] || 0) + 1;
     // Conta a fila comercial disponivel hoje (exclui contrato e follow-up agendado
     // pro futuro) — e o que o vendedor ve como "para fazer hoje".
     if (a.status === 'pendente' && owner && !_ehContrato(a)) {
@@ -464,18 +467,30 @@ async function gerarTarefasDiarias(opts) {
     (porOwner[owner] = porOwner[owner] || []).push({ ...c, owner_id: owner, flexivel });
   }
 
-  // COTA = ESTEIRA DE 20. Mantem a fila comercial do vendedor em 20: cria so o
-  // que falta pra CHEGAR em 20 (20 - pendentes de hoje). NAO soma 20 todo dia.
-  // Resultado: a lista nunca estoura/acumula; conforme o vendedor conclui, abre
-  // vaga e o gerador (rodando de novo) repoe ate 20. Quem conclui mais, recebe
-  // mais (reposicao) e portanto executa mais — base da avaliacao/ranking.
+  // COTA = 20 POR DIA (fixo). Cria so o que falta pra completar 20 CRIADAS HOJE
+  // (nao olha as pendentes de dias anteriores — elas ficam e ACUMULAM, que e o
+  // sinal pra gestao de quem nao executou). As automaticas disparadas por acao
+  // do vendedor (upsell pos-venda, avaliacao) JA entram em criadasHojePorVendedor,
+  // entao contam dentro das 20 — nunca passa de 20 geradas/dia.
+  // Conforme o vendedor conclui, a lista ABAIXA (nao ha reposicao na hora) — e o
+  // que da a sensacao de "dever cumprido". No dia seguinte entram 20 novas.
+  // opts.apenasVendedor + opts.extra: geracao MANUAL de N extras pra um vendedor
+  // (botao "gerar mais" da gestao), ignorando o teto diario.
+  const soVendedor = opts.apenasVendedor ? _normLogin(opts.apenasVendedor) : null;
+  const extraManual = Math.max(0, parseInt(opts.extra, 10) || 0);
   const finais = [];
   const cotaPorVendedor = {};
   const sobras = []; // flexiveis que o "dono do rodizio" nao precisou usar
   for (const owner of Object.keys(porOwner)) {
+    if (soVendedor && owner !== soVendedor) { cotaPorVendedor[owner] = 0; continue; }
     porOwner[owner].sort((a, b) => b.score - a.score);
-    const pendCom = pendentesComercialPorVendedor[owner] || 0;
-    const cota = Math.max(0, TAREFAS_POR_VENDEDOR - pendCom);
+    let cota;
+    if (soVendedor && extraManual) {
+      cota = extraManual; // geracao manual: N extras, ignora o teto do dia
+    } else {
+      const criadasHoje = criadasHojePorVendedor[owner] || 0;
+      cota = Math.max(0, TAREFAS_POR_VENDEDOR - criadasHoje);
+    }
     cotaPorVendedor[owner] = cota;
     // Rodizio entre fontes (variedade garantida); fontes de RESERVA so completam.
     const escolhidos = cota > 0 ? _selecionarBalanceado(porOwner[owner], cota) : [];
