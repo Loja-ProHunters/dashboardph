@@ -6491,8 +6491,8 @@
       "divergiu_do_sistema": true,
       "sugestao_original": "analise_manual"
     },
-    "status": "aguardando_cliente",
-    "resultado": null,
+    "status": "resolvido",
+    "resultado": "troca",
     "produto_fisico": {
       "status": "recebido_loja",
       "rastreio_entrada": "AP664145145BR",
@@ -6506,7 +6506,7 @@
       "resolucao_fabricante": null
     },
     "procedimento_interno": {
-      "status": "nao_aplicavel",
+      "status": "pendente",
       "pedido_substituto": null,
       "pedido_substituto_data": null,
       "baixa_estoque_feita": false,
@@ -6522,7 +6522,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-26T13:43:58.160Z",
-    "atualizado_em": "2026-11-09T17:16:02.043Z",
+    "atualizado_em": "2026-11-09T17:21:53.174Z",
     "tally_meta": {
       "eventId": "sync_J1jbgyo",
       "responseId": "J1jbgyo",
@@ -6573,6 +6573,13 @@
         "por": "auxiliar",
         "localizacao": "prateleira da porta",
         "nota": null
+      },
+      {
+        "ts": "2026-11-09T17:21:53.174Z",
+        "acao": "resolvida",
+        "por": "auxiliar",
+        "resultado": "troca",
+        "nota": "Entrega foi para o Pedro"
       }
     ]
   },
