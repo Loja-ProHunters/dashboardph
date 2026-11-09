@@ -11134,6 +11134,11 @@ window.addEventListener('load', function(){
 .pg-top-acts{display:flex;gap:8px;flex-wrap:wrap}
 .pg-top-acts .pg-btn.sec{margin-left:0}
 .pg-btn:disabled{opacity:.6;cursor:wait}
+.pg-gerar{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed #e7e5e0;font-size:12.5px;color:#52514e}
+.pg-gerar span{font-weight:600}
+.pg-gerar input{width:64px;padding:5px 8px;border:1px solid #d8d5cd;border-radius:7px;font-size:13px}
+.pg-gerar .pg-mini{font-size:12px;padding:5px 12px;border:1px solid #2a78d6;background:#2a78d6;color:#fff;border-radius:7px;cursor:pointer;font-weight:600}
+.pg-gerar .pg-mini:hover{background:#1f66ba}
 .pg-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
 .pg-tile{background:var(--pg-surf);border:1px solid rgba(11,11,11,.10);border-radius:12px;padding:14px 16px}
 .pg-tile-l{font-size:12px;color:var(--pg-ink2);font-weight:600}
@@ -12378,8 +12383,11 @@ window.PROD = (function(){
     state.vendFixos = ordemFixa;
 
     var hora = new Date(d.gerado_em).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    var ehAdminProd = (typeof IS_ADMIN !== 'undefined' && IS_ADMIN);
     var h = '<div class="pg-top"><div><h2>Execução da equipe</h2><span>Atualizado às ' + hora + ' · regras iguais às que o vendedor vê</span></div>' +
-      '<div class="pg-top-acts">' + ((typeof IS_ADMIN !== 'undefined' && IS_ADMIN) ? '<button class="pg-btn sec" onclick="crmResetarRegerar(this)" title="Gera agora as 20 tarefas do dia de cada vendedor (não apaga nada; idempotente no dia)">⚡ Gerar lote de hoje</button>' : '') +
+      '<div class="pg-top-acts">' + (ehAdminProd ? '<button class="pg-btn sec" onclick="crmResetarRegerar(this)" title="Gera agora as 20 do dia de cada vendedor (conta pelo que já foi criado hoje; não apaga nada)">⚡ Gerar lote de hoje</button>' +
+        '<button class="pg-btn sec" id="pg-pausa-btn" onclick="PROD._togglePausa(this)" title="Liga/desliga a geração automática de tarefas">⏸ Pausa</button>' +
+        '<button class="pg-btn sec" onclick="PROD._limparBacklog(this)" title="Cancela as automáticas antigas acumuladas, deixando ~20 por vendedor">🧹 Limpar backlog</button>' : '') +
       '<button class="pg-btn" onclick="PROD.recarregar()">↻ Atualizar</button></div></div>';
     h += kpis(d);
     h += acoes(d);
@@ -12393,6 +12401,7 @@ window.PROD = (function(){
     h += contratos(d);
     root.innerHTML = h;
     chartExec(); chartFila(); chartRes(); chartMot();
+    try { _syncPausaBtn(); } catch(_){}
   }
 
   // ─── 4 indicadores ─────────────────────────────────────────────
@@ -12651,6 +12660,13 @@ window.PROD = (function(){
       h += '<div class="pg-det-lista"><b>Tarefas mais antigas na fila (' + v.abertas_total + ' abertas)</b>' + v.mais_antigas.slice(0, 8).map(function(t){
         return '<div><span>' + esc(t.cliente_nome || t.titulo || 'Tarefa') + '</span><em>' + t.dias + 'd</em></div>'; }).join('') + '</div>';
     }
+    // Admin: gerar N tarefas extras pra este vendedor (acabou as dele)
+    if (typeof IS_ADMIN !== 'undefined' && IS_ADMIN) {
+      var gid = 'pg-ger-' + esc(v.login);
+      h += '<div class="pg-gerar"><span>Gerar mais tarefas:</span>' +
+        '<input type="number" id="' + gid + '" min="1" max="50" value="5" />' +
+        '<button class="pg-mini" onclick="PROD._gerarMais(\'' + esc(v.login) + '\',\'' + gid + '\',this)">Gerar</button></div>';
+    }
     return h + '</div>';
   }
 
@@ -12739,10 +12755,56 @@ window.PROD = (function(){
     finally { if (btn) { btn.disabled = false; btn.textContent = 'Verificar vendas de arma agora'; } }
   }
 
+  // Liga/desliga a pausa da geração automática
+  async function _togglePausa(btn){
+    try {
+      var st = await (await fetch('/api/crm/tarefas/pausa',{cache:'no-store'})).json();
+      var novo = !st.pausada;
+      if (!confirm(novo ? 'PAUSAR a geração automática de tarefas?\n\nO lote diário e as automáticas param até você religar. Contratos de arma não são afetados.' : 'RELIGAR a geração automática de tarefas?')) return;
+      var r = await fetch('/api/crm/tarefas/pausa',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ pausar: novo }) });
+      var d = await r.json(); if (!r.ok) throw new Error(d.error||'Erro');
+      if (typeof crmToast==='function') crmToast(novo ? 'Geração PAUSADA.' : 'Geração religada.', 'ok', 3500);
+      _syncPausaBtn();
+    } catch(e){ if (typeof crmToast==='function') crmToast('Erro: '+e.message,'erro',5000); }
+  }
+  async function _syncPausaBtn(){
+    try {
+      var st = await (await fetch('/api/crm/tarefas/pausa',{cache:'no-store'})).json();
+      var b = el('pg-pausa-btn'); if (b){ b.textContent = st.pausada ? '▶ Religar geração' : '⏸ Pausa'; b.style.background = st.pausada ? '#fde3df' : ''; b.style.color = st.pausada ? '#b42318' : ''; }
+    } catch(_){}
+  }
+  // Limpeza única do backlog (deixa ~20 por vendedor)
+  async function _limparBacklog(btn){
+    if (!confirm('LIMPAR o backlog agora?\n\nCancela as tarefas automáticas ANTIGAS acumuladas de cada vendedor, deixando as ~20 mais recentes. Mantém manuais, follow-ups, pós-venda e em-andamento. O cancelamento é do sistema (não conta como atraso).\n\nConfirmar?')) return;
+    if (btn){ btn.disabled = true; btn.textContent = '🧹 Limpando…'; }
+    try {
+      var r = await fetch('/api/crm/tarefas/limpar-backlog',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ manter: 20 }) });
+      var d = await r.json(); if (!r.ok) throw new Error(d.error||'Erro');
+      var tot = Object.keys(d.por_vendedor||{}).reduce(function(s,k){ return s + (d.por_vendedor[k].cancelou||0); }, 0);
+      if (typeof crmToast==='function') crmToast('Backlog limpo: ' + tot + ' tarefa(s) antiga(s) cancelada(s). Cada vendedor ficou com ~' + d.manter + '.', 'ok', 7000);
+      recarregar();
+    } catch(e){ if (typeof crmToast==='function') crmToast('Erro: '+e.message,'erro',6000); }
+    finally { if (btn){ btn.disabled = false; btn.textContent = '🧹 Limpar backlog'; } }
+  }
+  // Gera N tarefas extras pra um vendedor (botão no card do vendedor)
+  async function _gerarMais(login, inputId, btn){
+    var inp = el(inputId); var n = inp ? parseInt(inp.value,10) : 0;
+    if (!n || n < 1) { if (typeof crmToast==='function') crmToast('Escolha quantas tarefas gerar.','erro',3000); return; }
+    if (btn){ btn.disabled = true; btn.textContent = 'Gerando…'; }
+    try {
+      var r = await fetch('/api/crm/tarefas/gerar-para-vendedor',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ login: login, quantidade: n }) });
+      var d = await r.json(); if (!r.ok) throw new Error(d.error||'Erro');
+      if (typeof crmToast==='function') crmToast('Geradas ' + (d.criadas||0) + ' tarefa(s) extra(s) pra ' + login + '.', 'ok', 5000);
+      recarregar();
+    } catch(e){ if (typeof crmToast==='function') crmToast('Erro: '+e.message,'erro',6000); }
+    finally { if (btn){ btn.disabled = false; btn.textContent = 'Gerar'; } }
+  }
+
   var _rz = null;
   window.addEventListener('resize', function(){ clearTimeout(_rz); _rz = setTimeout(function(){ var t = el('tab-produtividade'); if (state.dados && !state.dados._soContratos && t && t.classList.contains('on')) { chartExec(); chartFila(); chartRes(); chartMot(); } }, 200); });
 
   return { init: init, recarregar: recarregar, _abrir: _abrir, _tabela: _tabela, _todasAcoes: _todasAcoes, _filtroC: _filtroC, _conferir: _conferir, _resolver: _resolver, _varrer: _varrer, _atribuir: _atribuir,
+    _togglePausa: _togglePausa, _syncPausaBtn: _syncPausaBtn, _limparBacklog: _limparBacklog, _gerarMais: _gerarMais,
     toggleAtrasadas: function(){} };
 })();
 </script>
