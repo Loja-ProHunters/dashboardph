@@ -3695,16 +3695,20 @@ module.exports = async (req, res) => {
 
   // ── POST /api/crm/tarefas/limpar-backlog  body: { manter }
   // Limpeza ÚNICA: por vendedor, mantém as `manter` (padrão 20) tarefas
-  // automáticas genéricas pendentes MAIS RECENTES e CANCELA o resto (o acúmulo
-  // velho). Preserva manuais, follow-ups, pós-venda, "em andamento" e contratos.
-  // Cancelamento marcado como do SISTEMA — não conta como atraso do vendedor.
+  // AUTOMÁTICAS pendentes MAIS RECENTES e CANCELA o resto (o acúmulo velho).
+  // Inclui TODAS as fontes automáticas — reativação, cross-sell, aniversário,
+  // carteira parada E pós-venda/upsell. O pós-venda era o grosso do backlog
+  // (um por pedido antigo, gerado em massa) e ANTES ficava de fora, por isso
+  // a fila não baixava. Preserva o que é compromisso real do vendedor:
+  // follow-ups manuais (gerada_automaticamente=false), tarefas manuais,
+  // "em andamento" e contratos. Cancelamento marcado como do SISTEMA — não
+  // conta como atraso do vendedor.
   if (req.method === 'POST' && url === '/api/crm/tarefas/limpar-backlog') {
     const sess = getSession(req);
     if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só admin/diretor.'})); return; }
     try {
       let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch(e){}
       const manter = Math.max(0, Math.min(100, parseInt(payload.manter, 10) || 20));
-      const FONTES_AUTO = ['reativacao_match','reativacao','cross_sell','aniversario','carteira_parado','reativacao_longa','trigger'];
       const now = new Date().toISOString();
       const resumo = {};
       await crmStore.mutate('activities', col => {
@@ -3713,10 +3717,11 @@ module.exports = async (req, res) => {
           const a = col[id];
           if (!a || a.status !== 'pendente') continue;
           if (disciplina.ehContrato(a)) continue;
-          const fonte = a.fonte || '';
-          // Só mexe nas AUTOMÁTICAS GENÉRICAS. Pós-venda, follow-up e manual ficam.
-          const ehAutoGenerica = a.gerada_automaticamente && FONTES_AUTO.indexOf(fonte) !== -1 && fonte !== 'posvenda';
-          if (!ehAutoGenerica) continue;
+          // Mexe em QUALQUER automática (inclusive pós-venda/upsell). O que é
+          // compromisso manual do vendedor (follow-up agendado, tarefa criada
+          // à mão) tem gerada_automaticamente=false e fica intocado.
+          const ehAutoLimpavel = a.gerada_automaticamente === true;
+          if (!ehAutoLimpavel) continue;
           const owner = String(a.owner_id || a.dono || '').toLowerCase();
           (porVend[owner] = porVend[owner] || []).push(a);
         }
