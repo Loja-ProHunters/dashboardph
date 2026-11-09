@@ -108,6 +108,22 @@ function _dispararRefillEsteira(req) {
     rq.end();
   } catch (_) { /* silencia — refill e best-effort; o lote diario tambem repoe */ }
 }
+
+// ── PAUSA DA GERAÇÃO DE TAREFAS ───────────────────────────────────
+// Flag global (doc em crm_docs, colecao 'config', id 'geracao_tarefas').
+// Quando pausada: o lote diario, a esteira e o pos-venda NAO criam tarefa
+// nova — a equipe finaliza o backlog sem a fila crescer. Contratos de arma
+// (obrigacao legal) NAO sao afetados.
+async function _geracaoTarefasPausada() {
+  try { const c = await crmStore.getDoc('config', 'geracao_tarefas'); return !!(c && c.pausada); }
+  catch (_) { return false; }
+}
+async function _setGeracaoTarefasPausa(pausar, actor) {
+  const doc = { id: 'geracao_tarefas', pausada: !!pausar, atualizado_por: actor || null, atualizado_em: new Date().toISOString() };
+  const existe = await crmStore.getDoc('config', 'geracao_tarefas');
+  if (existe) return crmStore.updateDoc('config', 'geracao_tarefas', doc, actor);
+  return crmStore.createDoc('config', doc, actor);
+}
 // Dashboard Comercial agora e visivel pra TODOS os usuarios logados (inclusive
 // auxiliar e comex) — a ferramenta virou o KPI compartilhado da empresa.
 // Edicao continua so admin/diretor via canEditComercial.
@@ -2845,7 +2861,11 @@ module.exports = async (req, res) => {
       // Contratos de arma primeiro (obrigacao legal) — falha aqui nao trava o lote
       let contratosRes = null;
       try { contratosRes = await contratosArma.processar(); } catch (e) { contratosRes = { ok: false, erro: e.message }; }
-      const r = await automacaoUpsell.disparaReativacao({ forcar: true });
+      // Contratos de arma SEMPRE rodam (obrigacao legal). A geracao de tarefas
+      // comerciais respeita a pausa global.
+      let r;
+      if (await _geracaoTarefasPausada()) { r = { ok: true, pausado: true, motivo: 'geracao de tarefas pausada pela gestao', tarefas_criadas: 0 }; }
+      else { r = await automacaoUpsell.disparaReativacao({ forcar: true }); }
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify(Object.assign({}, r, { contratos_arma: contratosRes })));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
@@ -3420,11 +3440,10 @@ module.exports = async (req, res) => {
       if (observacao) fimPatch.observacao_conclusao = observacao;
       if (payload.pedido_numero) fimPatch.pedido_numero_informado = String(payload.pedido_numero).trim().slice(0, 30);
       await crmStore.updateDoc('activities', id, fimPatch, sess.usuario);
-      // ESTEIRA: só repõe se a tarefa estava na fila "pra fazer". Se já estava
-      // 'em_andamento', a vaga foi aberta quando ele acionou o cliente — não
-      // abre outra agora.
-      if (eraPendente) _dispararRefillEsteira(req);
-      // Se a tarefa era de um cliente da carteira, atualiza o "ultimo contato"
+      // NÃO repõe na hora (sem esteira): conforme o vendedor conclui, a lista
+      // ABAIXA — é o que dá a sensação de "dever cumprido". As 20 do dia seguinte
+      // entram na geração diária. (eraPendente fica só pra referência.)
+      void eraPendente;
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
@@ -3460,8 +3479,8 @@ module.exports = async (req, res) => {
         primeiro_contato_em: t.primeiro_contato_em || now,
         em_andamento_obs: obs,
       }, sess.usuario);
-      // Abre vaga na esteira: a tarefa saiu da fila "pra fazer".
-      _dispararRefillEsteira(req);
+      // Sem esteira: a tarefa saiu da fila "pra fazer" e a lista ABAIXA. Não
+      // repõe na hora — as novas entram na geração diária (20/dia).
       res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true }));
     } catch (e) { res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
@@ -3557,9 +3576,8 @@ module.exports = async (req, res) => {
         criada_por_vendedor: sess.usuario,
       };
       await crmStore.createDoc('activities', followDoc, sess.usuario);
-      // ESTEIRA: a tarefa atual saiu da fila de hoje (virou follow-up futuro) →
-      // abre vaga → repoe ate 20.
-      _dispararRefillEsteira(req);
+      // Sem esteira: a tarefa atual saiu da fila de hoje (virou follow-up futuro)
+      // e a lista ABAIXA. Não repõe na hora.
       res.writeHead(201,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, follow_up: followDoc }));
     } catch (e) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); }
     return;
@@ -3611,10 +3629,112 @@ module.exports = async (req, res) => {
     const sess = getSession(req);
     if (!chainOk && (!sess || !crmUtils.canSeeAll(sess))) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'So admin/diretor.'})); return; }
     try {
+      // Pausa global: nao gera nada (nem lote diario, nem esteira).
+      if (await _geracaoTarefasPausada()) {
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ok: true, pausado: true, geracao: { pausado: true, tarefas_criadas: 0, motivo: 'geracao pausada pela gestao' } }));
+        return;
+      }
       // Admin/diretor forcam (ignora throttle); a esteira (chain) respeita o throttle.
       const geracao = await automacaoUpsell.gerarTarefasDiarias({ forcar: !chainOk });
       res.writeHead(200,{'Content-Type':'application/json'});
       res.end(JSON.stringify({ ok: true, canceladas: 0, geracao }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ── GET/POST /api/crm/tarefas/pausa — liga/desliga a pausa da geração.
+  // GET: estado atual (qualquer um do CRM vê). POST {pausar:bool}: só admin/diretor.
+  if (url === '/api/crm/tarefas/pausa') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canAccessCRM(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Sem acesso'})); return; }
+    try {
+      if (req.method === 'GET') {
+        const c = await crmStore.getDoc('config', 'geracao_tarefas');
+        res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});
+        res.end(JSON.stringify({ pausada: !!(c && c.pausada), atualizado_por: c && c.atualizado_por || null, atualizado_em: c && c.atualizado_em || null }));
+        return;
+      }
+      if (req.method === 'POST') {
+        if (!crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só gestão (admin/diretor) pode pausar a geração.'})); return; }
+        let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch(e){}
+        const pausar = payload.pausar === true || payload.pausar === 'true';
+        await _setGeracaoTarefasPausa(pausar, sess.usuario);
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({ ok: true, pausada: pausar }));
+        return;
+      }
+      res.writeHead(405,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Método não suportado'}));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ── POST /api/crm/tarefas/gerar-para-vendedor  body: { login, quantidade }
+  // Gestão gera N tarefas EXTRAS pra UM vendedor (ex.: "Pedro acabou as dele").
+  // Ignora o teto diário de 20 — é geração sob demanda. Só admin/diretor.
+  if (req.method === 'POST' && url === '/api/crm/tarefas/gerar-para-vendedor') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só admin/diretor.'})); return; }
+    try {
+      let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch(e){}
+      const login = String(payload.login || '').toLowerCase().trim();
+      const n = Math.max(1, Math.min(50, parseInt(payload.quantidade, 10) || 0));
+      if (!login) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Informe o vendedor.'})); return; }
+      const geracao = await automacaoUpsell.gerarTarefasDiarias({ apenasVendedor: login, extra: n, forcar: true });
+      const criadas = (geracao && geracao.por_vendedor && geracao.por_vendedor[login]) || (geracao && geracao.tarefas_criadas) || 0;
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, login, pedido: n, criadas, geracao }));
+    } catch (e) {
+      res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
+    }
+    return;
+  }
+
+  // ── POST /api/crm/tarefas/limpar-backlog  body: { manter }
+  // Limpeza ÚNICA: por vendedor, mantém as `manter` (padrão 20) tarefas
+  // automáticas genéricas pendentes MAIS RECENTES e CANCELA o resto (o acúmulo
+  // velho). Preserva manuais, follow-ups, pós-venda, "em andamento" e contratos.
+  // Cancelamento marcado como do SISTEMA — não conta como atraso do vendedor.
+  if (req.method === 'POST' && url === '/api/crm/tarefas/limpar-backlog') {
+    const sess = getSession(req);
+    if (!sess || !crmUtils.canSeeAll(sess)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Só admin/diretor.'})); return; }
+    try {
+      let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch(e){}
+      const manter = Math.max(0, Math.min(100, parseInt(payload.manter, 10) || 20));
+      const FONTES_AUTO = ['reativacao_match','reativacao','cross_sell','aniversario','carteira_parado','reativacao_longa','trigger'];
+      const now = new Date().toISOString();
+      const resumo = {};
+      await crmStore.mutate('activities', col => {
+        const porVend = {};
+        for (const id of Object.keys(col)) {
+          const a = col[id];
+          if (!a || a.status !== 'pendente') continue;
+          if (disciplina.ehContrato(a)) continue;
+          const fonte = a.fonte || '';
+          // Só mexe nas AUTOMÁTICAS GENÉRICAS. Pós-venda, follow-up e manual ficam.
+          const ehAutoGenerica = a.gerada_automaticamente && FONTES_AUTO.indexOf(fonte) !== -1 && fonte !== 'posvenda';
+          if (!ehAutoGenerica) continue;
+          const owner = String(a.owner_id || a.dono || '').toLowerCase();
+          (porVend[owner] = porVend[owner] || []).push(a);
+        }
+        for (const owner of Object.keys(porVend)) {
+          const arr = porVend[owner];
+          arr.sort((x, y) => String(y.lote_dia || y.criado_em || '').localeCompare(String(x.lote_dia || x.criado_em || '')));
+          const cancelar = arr.slice(manter); // mantém as `manter` mais recentes
+          for (const a of cancelar) {
+            a.status = 'cancelada';
+            a.cancelada_em = now; a.cancelada_por = 'sistema';
+            a.cancelamento_motivo = 'limpeza-backlog-sistema';
+            a.atualizado_em = now; a.atualizado_por = 'sistema-limpeza';
+          }
+          resumo[owner] = { tinha_auto: arr.length, cancelou: cancelar.length, manteve: Math.min(manter, arr.length) };
+        }
+        return col;
+      }, 'Limpeza de backlog: cancela automaticas antigas acumuladas');
+      res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({ ok: true, manter, por_vendedor: resumo }));
     } catch (e) {
       res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message}));
     }
