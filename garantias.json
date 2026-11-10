@@ -1725,8 +1725,8 @@
       "divergiu_do_sistema": true,
       "sugestao_original": "analise_manual"
     },
-    "status": "aguardando_cliente",
-    "resultado": null,
+    "status": "resolvido",
+    "resultado": "negada",
     "produto_fisico": {
       "status": "nao_solicitado",
       "rastreio_entrada": null,
@@ -1741,7 +1741,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-05T11:28:09.009Z",
-    "atualizado_em": "2026-10-21T11:39:14.643Z",
+    "atualizado_em": "2026-11-10T16:52:59.047Z",
     "tally_meta": {
       "eventId": "sync_lazBVMX",
       "responseId": "lazBVMX",
@@ -1786,6 +1786,13 @@
         "por": "auxiliar",
         "nota": "Esperando cliente encaminhar lanterna",
         "anterior": null
+      },
+      {
+        "ts": "2026-11-10T16:52:59.047Z",
+        "acao": "resolvida",
+        "por": "auxiliar",
+        "resultado": "negada",
+        "nota": "cliente não deu retorno"
       }
     ],
     "procedimento_interno": {
