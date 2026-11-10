@@ -5612,10 +5612,10 @@
       "calculado_em": "2026-10-15T11:52:39.879Z"
     },
     "decisao_operador": {
-      "valor": "procedente_troca",
-      "justificativa": "roca por produto adequado",
+      "valor": "improcedente_sem_direito",
+      "justificativa": "Produto incompleto",
       "por": "auxiliar",
-      "em": "2026-10-20T12:13:40.231Z",
+      "em": "2026-11-10T16:55:18.384Z",
       "divergiu_do_sistema": true,
       "sugestao_original": "analise_manual"
     },
@@ -5650,7 +5650,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-15T11:52:39.879Z",
-    "atualizado_em": "2026-10-21T11:45:40.957Z",
+    "atualizado_em": "2026-11-10T16:55:18.384Z",
     "tally_meta": {
       "eventId": "sync_RW19qWp",
       "responseId": "RW19qWp",
@@ -5701,6 +5701,13 @@
         "por": "auxiliar",
         "nota": "Esperando resposta do cliente",
         "anterior": null
+      },
+      {
+        "ts": "2026-11-10T16:55:18.384Z",
+        "acao": "decisao_registrada",
+        "por": "auxiliar",
+        "valor": "improcedente_sem_direito",
+        "divergiu": true
       }
     ],
     "observacao": {
