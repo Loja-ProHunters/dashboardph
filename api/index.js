@@ -7,7 +7,7 @@ const { gerarContrato } = require('../lib/contracts');
 const { gerarGT } = require('../lib/gt');
 const { extrairNF } = require('../lib/nfExtract');
 const { extrairPedido } = require('../lib/pedidoExtract');
-const { getComercialData, saveComercialData, resetMonth, registrarVenda, registrarVendaSite } = require('../lib/comercialStore');
+const { getComercialData, saveComercialData, mutateComercial, resetMonth, registrarVenda, registrarVendaSite, ajustarFat } = require('../lib/comercialStore');
 const { getContatos, saveContatos } = require('../lib/contatosStore');
 const { getEditorial, saveEditorial } = require('../lib/editorialStore');
 const { getTarifas, saveTarifas } = require('../lib/tarifasStore');
@@ -6052,33 +6052,37 @@ module.exports = async (req, res) => {
     const body = await readBody(req);
     try {
       const incoming = JSON.parse(body);
-      const atual = await getComercialData();
-      // PROTECAO: um browser com estado velho (aberto de um mes anterior) NAO
-      // pode REGREDIR o mes de referencia nem ressuscitar sellers de um mes ja
-      // fechado. Se o incoming vem com mesReferencia mais antigo que o atual,
-      // descartamos mesReferencia e sellers do incoming (mantemos o do servidor).
-      const incMes = incoming.mesReferencia;
-      const mesRegrediu = incMes && atual.mesReferencia && String(incMes) < String(atual.mesReferencia);
-      if (mesRegrediu) {
-        console.warn('[comercial] POST ignorou regressao de mes: incoming=' + incMes + ' < atual=' + atual.mesReferencia + ' (sellers/mesReferencia do incoming descartados).');
-      }
-      const merged = {
-        ...atual,
-        ...incoming,
-        // Nao deixa o mes regredir.
-        mesReferencia: mesRegrediu ? atual.mesReferencia : (incMes || atual.mesReferencia),
-        // Se o mes regrediu, mantem os sellers do servidor (nao revive mes fechado).
-        sellers: mesRegrediu ? atual.sellers : (incoming.sellers || atual.sellers),
-        // Campos que so a rota especifica de site pode mexer: preserva o valor
-        // atual quando o incoming nao trouxer (ou trouxer undefined/null).
-        siteFat: (incoming.siteFat === undefined || incoming.siteFat === null)
-          ? (Number(atual.siteFat) || 0)
-          : Number(incoming.siteFat) || 0,
-        // history so persiste se veio explicito; senao mantem o do disco pra
-        // nao apagar meses fechados quando o frontend nao carrega historico.
-        history: Array.isArray(incoming.history) ? incoming.history : (atual.history || []),
-      };
-      await saveComercialData(merged);
+      // CAMPOS que o autosave do quadro PODE editar. Faturamento (fat), site
+      // (siteFat), history e mesReferencia FICAM DE FORA DE PROPÓSITO:
+      //  - fat só muda por registrar-venda / ajustar-fat (escritor único);
+      //  - siteFat só por registrar-venda-site;
+      //  - history/mes só por reset-month / rollover.
+      // Era justamente o autosave mandar o `fat` que o browser tinha carregado
+      // (muitas vezes VELHO, de antes de uma venda) que fazia o número
+      // "retroceder". Agora o quadro é fisicamente incapaz de regredir a venda.
+      const CAMPOS_DISCIPLINA = ['etiqueta', 'tarefas', 'atrasos', 'faltas', 'advertencias', 'advertenciasLog', 'name', 'foto'];
+      await mutateComercial(atual => {
+        const incMes = incoming.mesReferencia;
+        // Só aplica edições de vendedor se o browser está no MESMO mês do
+        // servidor (não mistura disciplina de um mês com outro).
+        const mesOk = !incMes || String(incMes) === String(atual.mesReferencia);
+        if (mesOk && Array.isArray(incoming.sellers)) {
+          const byId = {};
+          (atual.sellers || []).forEach(s => { byId[s.id] = s; });
+          for (const inc of incoming.sellers) {
+            const s = byId[inc.id];
+            if (!s) continue;
+            for (const k of CAMPOS_DISCIPLINA) {
+              if (inc[k] !== undefined) s[k] = inc[k];
+            }
+          }
+        } else if (!mesOk) {
+          console.warn('[comercial] POST: mes do browser (' + incMes + ') != servidor (' + atual.mesReferencia + ') — ignorei edicoes de vendedores pra nao misturar meses.');
+        }
+        if (incoming.diasCorridos !== undefined) atual.diasCorridos = incoming.diasCorridos;
+        if (incoming.diasMes !== undefined) atual.diasMes = incoming.diasMes;
+        return atual;
+      }, 'quadro comercial: disciplina (fat/site/history preservados)');
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
     } catch (e) {
@@ -6200,6 +6204,36 @@ module.exports = async (req, res) => {
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Erro ao registrar venda: ' + e.message }));
+    }
+    return;
+  }
+
+  // POST /api/comercial/ajustar-fat body:{sellerId,valor} — DEFINE o
+  // faturamento de um vendedor (valor absoluto). Correção manual da gerência
+  // (ex.: tirar uma venda lançada errada). É o único caminho além de
+  // registrar-venda que mexe em fat — o autosave do quadro não mexe mais, então
+  // nada do quadro consegue regredir a venda. Só admin/gerência.
+  if (req.method === 'POST' && url === '/api/comercial/ajustar-fat') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Sem permissao para ajustar faturamento.' }));
+      return;
+    }
+    const body = await readBody(req);
+    try {
+      const { sellerId, valor } = JSON.parse(body || '{}');
+      const id = Number(sellerId);
+      const v = Number(valor);
+      if (!id || !Number.isFinite(v) || v < 0) {
+        throw new Error('Informe o vendedor e um faturamento válido (zero ou mais).');
+      }
+      const data = await ajustarFat(id, v);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, sellers: data.sellers }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Erro ao ajustar faturamento: ' + e.message }));
     }
     return;
   }
