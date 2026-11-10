@@ -6506,7 +6506,7 @@
       "resolucao_fabricante": null
     },
     "procedimento_interno": {
-      "status": "pendente",
+      "status": "concluido",
       "pedido_substituto": null,
       "pedido_substituto_data": null,
       "baixa_estoque_feita": false,
@@ -6517,12 +6517,12 @@
       "nota": null,
       "atualizado_em": null,
       "atualizado_por": null,
-      "concluido_em": null,
-      "concluido_por": null
+      "concluido_em": "2026-11-10T12:54:14.579Z",
+      "concluido_por": "auxiliar"
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-26T13:43:58.160Z",
-    "atualizado_em": "2026-11-09T17:21:53.174Z",
+    "atualizado_em": "2026-11-10T12:54:14.579Z",
     "tally_meta": {
       "eventId": "sync_J1jbgyo",
       "responseId": "J1jbgyo",
@@ -6580,6 +6580,11 @@
         "por": "auxiliar",
         "resultado": "troca",
         "nota": "Entrega foi para o Pedro"
+      },
+      {
+        "ts": "2026-11-10T12:54:14.579Z",
+        "acao": "procedimento_interno_concluido",
+        "por": "auxiliar"
       }
     ]
   },
