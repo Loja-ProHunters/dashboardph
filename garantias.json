@@ -5848,7 +5848,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-15T16:21:43.610Z",
-    "atualizado_em": "2026-10-27T15:12:41.227Z",
+    "atualizado_em": "2026-11-10T16:56:14.200Z",
     "tally_meta": {
       "eventId": "sync_Dq9r59j",
       "responseId": "Dq9r59j",
@@ -5913,13 +5913,20 @@
         "por": "auxiliar",
         "nota": "Produto com defeito chegou dia 27/10/2026. iremos iniciar os testes hoje ainda",
         "anterior": "Esperando cliente postar objeto nos correios"
+      },
+      {
+        "ts": "2026-11-10T16:56:14.200Z",
+        "acao": "observacao_atualizada",
+        "por": "auxiliar",
+        "nota": "Gerencia está testando",
+        "anterior": "Produto com defeito chegou dia 27/10/2026. iremos iniciar os testes hoje ainda"
       }
     ],
     "observacao": {
-      "texto": "Produto com defeito chegou dia 27/10/2026. iremos iniciar os testes hoje ainda",
+      "texto": "Gerencia está testando",
       "por": "auxiliar",
-      "em": "2026-10-27T15:12:41.227Z",
-      "versao": 2
+      "em": "2026-11-10T16:56:14.200Z",
+      "versao": 3
     }
   },
   "e415d10b-4a2b-4fe1-9c18-6e4b8b8767b9": {
