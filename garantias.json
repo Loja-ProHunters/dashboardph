@@ -6745,7 +6745,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-29T12:16:55.270Z",
-    "atualizado_em": "2026-11-10T17:01:51.992Z",
+    "atualizado_em": "2026-11-10T17:03:42.612Z",
     "tally_meta": {
       "eventId": "sync_QoN5W0p",
       "responseId": "QoN5W0p",
@@ -6796,13 +6796,20 @@
         "por": "auxiliar",
         "nota": "Aguardando produto",
         "anterior": null
+      },
+      {
+        "ts": "2026-11-10T17:03:42.612Z",
+        "acao": "observacao_atualizada",
+        "por": "auxiliar",
+        "nota": "Aguardando produto, previsão 16/11",
+        "anterior": "Aguardando produto"
       }
     ],
     "observacao": {
-      "texto": "Aguardando produto",
+      "texto": "Aguardando produto, previsão 16/11",
       "por": "auxiliar",
-      "em": "2026-11-10T17:01:51.992Z",
-      "versao": 1
+      "em": "2026-11-10T17:03:42.612Z",
+      "versao": 2
     }
   },
   "818a6c25-f618-405a-80bd-94cd8857dfc4": {
