@@ -1637,6 +1637,7 @@ function fatStep(sellerId, delta) {
  hidden.value = novo;
  display.value = fmtBRL(novo);
  recalculate();
+ salvarFatServer(sellerId); // persiste o fat pelo caminho dedicado (nao pelo autosave)
 }
 function fatOnFocus(sellerId) {
  const hidden = document.getElementById(`inp-${sellerId}-fat`);
@@ -1656,6 +1657,7 @@ function fatOnBlur(sellerId) {
  hidden.value = n;
  display.value = fmtBRL(n);
  recalculate();
+ salvarFatServer(sellerId); // persiste o fat pelo caminho dedicado (nao pelo autosave)
 }
 // Etiqueta/Tarefas — botão − para descontar 1 ponto
 function pontoStep(sellerId, campo, delta) {
@@ -3009,6 +3011,30 @@ async function saveData() {
  showSaveStatus('Falha ao salvar (conexao)');
  }
  }, 600); // debounce: agrupa digitacoes rapidas num unico salvamento
+}
+
+// Salva o FATURAMENTO de um vendedor pelo endpoint dedicado (ajustar-fat).
+// O autosave do quadro (saveData) NÃO grava mais fat — fat só muda por venda
+// ou por essa correção manual. É isso que impede o número de retroceder quando
+// o gerente mexe em outro campo com um fat velho carregado no browser.
+let _fatSaveTimers = {};
+function salvarFatServer(sellerId) {
+ if (!window.CAN_EDIT_COMERCIAL) return; // só gerência corrige faturamento
+ clearTimeout(_fatSaveTimers[sellerId]);
+ _fatSaveTimers[sellerId] = setTimeout(async () => {
+   const hidden = document.getElementById(`inp-${sellerId}-fat`);
+   const valor = parseFloat(hidden && hidden.value) || 0;
+   try {
+     const r = await fetch('/api/comercial/ajustar-fat', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({ sellerId, valor }),
+     });
+     showSaveStatus(r.ok ? 'Faturamento salvo' : 'Falha ao salvar faturamento');
+   } catch (e) {
+     showSaveStatus('Falha ao salvar faturamento (conexao)');
+   }
+ }, 700);
 }
 
 let currentMesReferencia = null;
