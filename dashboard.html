@@ -2652,6 +2652,39 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
 #tab-parceiros .pc-hint{font-size:11px;color:var(--gy);margin-top:-6px;margin-bottom:10px}
 #tab-parceiros .pc-err{background:var(--rl);color:var(--r);border:1px solid #f5c0c0;padding:9px 12px;border-radius:var(--r-sm);font-size:12px;margin-bottom:10px;display:none}
 #tab-parceiros .pc-err.on{display:block}
+/* sub-abas Operacional | Análise */
+#tab-parceiros .pc-subtabs{display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid var(--bd)}
+#tab-parceiros .pc-subtab{background:none;border:none;border-bottom:2px solid transparent;color:var(--gy);font-size:13px;font-weight:700;padding:10px 16px;cursor:pointer;font-family:inherit;transition:color .18s,border-color .18s;margin-bottom:-1px}
+#tab-parceiros .pc-subtab:hover{color:var(--gd)}
+#tab-parceiros .pc-subtab.on{color:var(--gd);border-bottom-color:var(--g)}
+/* análise visual */
+#tab-parceiros .an-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+#tab-parceiros .an-kpi{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r-md);padding:14px 16px;box-shadow:var(--sh-1)}
+#tab-parceiros .an-kpi-l{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gy);font-weight:700;margin-bottom:5px}
+#tab-parceiros .an-kpi-v{font-size:22px;font-weight:700;color:var(--gd);letter-spacing:-.02em;line-height:1}
+#tab-parceiros .an-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-bottom:6px}
+#tab-parceiros .an-card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r-md);padding:18px;box-shadow:var(--sh-1)}
+#tab-parceiros .an-card.full{grid-column:1/-1;margin-bottom:14px}
+#tab-parceiros .an-ttl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--dk)}
+#tab-parceiros .an-sub{font-size:11px;color:var(--gl2);margin:3px 0 14px}
+#tab-parceiros .an-chart svg{display:block;width:100%;height:auto;overflow:visible}
+#tab-parceiros .an-empty{padding:28px 10px;text-align:center;color:var(--gl2);font-size:12.5px}
+#tab-parceiros .an-bars{display:flex;flex-direction:column;gap:9px}
+#tab-parceiros .an-bar-row{display:grid;grid-template-columns:minmax(80px,120px) 1fr auto;gap:10px;align-items:center;font-size:12px}
+#tab-parceiros .an-bar-lbl{font-weight:600;color:var(--k);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tab-parceiros .an-bar-track{background:var(--gl);border-radius:5px;height:18px;overflow:hidden}
+#tab-parceiros .an-bar-fill{background:var(--g);height:100%;border-radius:5px;min-width:2px}
+#tab-parceiros .an-bar-val{font-variant-numeric:tabular-nums;font-weight:700;color:var(--gd);white-space:nowrap;font-size:11.5px}
+#tab-parceiros .an-inf{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
+#tab-parceiros .an-infc{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r-md);padding:16px 18px;box-shadow:var(--sh-1)}
+#tab-parceiros .an-infc-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+#tab-parceiros .an-infc-n{font-size:14px;font-weight:700;color:var(--k)}
+#tab-parceiros .an-infc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
+#tab-parceiros .an-infc-s{text-align:center;background:var(--bg);border-radius:var(--r-sm);padding:9px 4px}
+#tab-parceiros .an-infc-s .v{font-size:15px;font-weight:700;color:var(--gd);letter-spacing:-.02em}
+#tab-parceiros .an-infc-s .l{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--gy);font-weight:700;margin-top:2px}
+#tab-parceiros .an-infc-top{font-size:11.5px;color:var(--gy);border-top:1px dashed var(--bd);padding-top:10px;margin-top:6px;line-height:1.6}
+#tab-parceiros .an-infc-top b{color:var(--k)}
 @media(max-width:768px){
   #tab-parceiros .pc-inf-body{grid-template-columns:1fr 1fr}
   #tab-parceiros .pc-fld-row{grid-template-columns:1fr}
@@ -2661,15 +2694,20 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
 <!-- ═══ VISÃO GERÊNCIA ═══ -->
 <div id="pc-gerencia" hidden>
   <div class="pc-topline">
-    <span class="pc-mode" id="pc-modo">MODO TESTE</span>
+    <span class="pc-mode on" id="pc-modo">Conectado</span>
     <span class="user-pill" id="pc-lastsync">Nunca sincronizado</span>
-    <button class="pc-btn ghost" onclick="pcOpenTrayCfg()">⚙ Configurar Tray</button>
     <div style="flex:1"></div>
     <button class="pc-btn" id="pc-btn-sync" onclick="pcSync()">↻ Sincronizar lojas</button>
     <button class="pc-btn pri" onclick="pcOpenInf()">+ Influenciador</button>
     <button class="pc-btn" onclick="pcOpenVenda()">+ Venda manual</button>
   </div>
 
+  <div class="pc-subtabs">
+    <button class="pc-subtab on" id="pc-sub-op" onclick="pcShowSub('op')">📋 Operacional</button>
+    <button class="pc-subtab" id="pc-sub-analise" onclick="pcShowSub('analise')">📊 Análise visual</button>
+  </div>
+
+  <div id="pc-op">
   <div class="pc-kpi">
     <div class="pc-kpi-c"><div class="pc-kpi-l">Influenciadores ativos</div><div class="pc-kpi-v" id="pc-k-inf">0</div><div class="pc-kpi-s" id="pc-k-inf-s">de 0 cadastrados</div></div>
     <div class="pc-kpi-c"><div class="pc-kpi-l">Vendas com cupom (mês)</div><div class="pc-kpi-v" id="pc-k-vmes">0</div><div class="pc-kpi-s" id="pc-k-vmes-s">R$ 0,00 em volume</div></div>
@@ -2688,6 +2726,12 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
 
   <div class="pc-sec">Pagamentos</div>
   <div id="pc-pags-wrap"></div>
+  </div><!-- /pc-op -->
+
+  <!-- ═══ ABA ANÁLISE VISUAL ═══ -->
+  <div id="pc-analise" hidden>
+    <div id="pc-analise-wrap"></div>
+  </div>
 </div>
 
 <!-- ═══ VISÃO VENDAS (só ranking) ═══ -->
@@ -2823,15 +2867,168 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
     var anoIni=hoje.getFullYear()+'-01-01';
     var pagoAno=d.pagamentos.filter(function(p){return (p.data||'')>=anoIni;}).reduce(function(a,p){return a+(p.valor||0);},0);
     $('pc-k-pago').textContent=fmtBRL(pagoAno);
-    // Modo Tray
+    // Status das lojas WooCommerce (conexão automática via env)
     var m=$('pc-modo');
-    if(d.tray && d.tray.configurado){ m.textContent='TRAY CONECTADA'; m.classList.add('on'); } else { m.textContent='MODO TESTE'; m.classList.remove('on'); }
-    $('pc-lastsync').textContent = d.tray && d.tray.ultimaSync ? ('Última sync: '+new Date(d.tray.ultimaSync).toLocaleString('pt-BR')) : 'Nunca sincronizado';
+    var lojas=(d.woo&&d.woo.lojas)||[];
+    if(lojas.length){ m.textContent=lojas.length+(lojas.length>1?' lojas conectadas':' loja conectada'); m.classList.add('on'); }
+    else { m.textContent='Sem loja conectada'; m.classList.remove('on'); }
+    $('pc-lastsync').textContent = d.woo && d.woo.ultimaSync ? ('Última sync: '+new Date(d.woo.ultimaSync).toLocaleString('pt-BR')) : 'Nunca sincronizado';
     // filtro
     var sel=$('pc-flt-inf'); var cur=sel.value;
     sel.innerHTML='<option value="">Todos influenciadores</option>'+d.influenciadores.map(function(i){return '<option value="'+i.id+'">'+esc(i.nome)+'</option>';}).join('');
     sel.value=cur;
     pcRenderInfs(); _pcRenderVendas(); pcRenderPags();
+    if(_pcSub==='analise') pcRenderAnalise();
+  }
+
+  // ═══ SUB-ABAS: Operacional | Análise ═══
+  var _pcSub='op';
+  window.pcShowSub=function(which){
+    _pcSub=which;
+    $('pc-op').hidden = (which!=='op');
+    $('pc-analise').hidden = (which!=='analise');
+    $('pc-sub-op').classList.toggle('on', which==='op');
+    $('pc-sub-analise').classList.toggle('on', which==='analise');
+    if(which==='analise') pcRenderAnalise();
+  };
+
+  // nome bonito da loja a partir do slug (usa o que veio do backend)
+  function _lojaNome(slug){
+    var lojas=(PC.dados&&PC.dados.woo&&PC.dados.woo.lojas)||[];
+    var l=lojas.find(function(x){return x.slug===slug;});
+    return (l&&l.nome)||slug||'—';
+  }
+  function _mesCurto(ym){ // '2026-11' -> 'nov/26'
+    var mm=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+    var p=String(ym).split('-'); if(p.length<2) return ym;
+    return mm[(parseInt(p[1],10)||1)-1]+'/'+p[0].slice(2);
+  }
+  function _ultimosMeses(n){
+    var out=[]; var dt=new Date();
+    for(var i=n-1;i>=0;i--){ var x=new Date(dt.getFullYear(),dt.getMonth()-i,1); out.push(x.getFullYear()+'-'+('0'+(x.getMonth()+1)).slice(-2)); }
+    return out;
+  }
+
+  // barras horizontais (div) — forma certa pra ranking/magnitude
+  function anBars(items, fmt){
+    if(!items.length) return '<div class="an-empty">Sem dados ainda.</div>';
+    var max=Math.max.apply(null, items.map(function(i){return i.valor;}).concat([1]));
+    return '<div class="an-bars">'+items.map(function(i){
+      var pct=Math.max(2,Math.round((i.valor/max)*100));
+      return '<div class="an-bar-row"><div class="an-bar-lbl" title="'+esc(i.label)+'">'+esc(i.label)+'</div>'
+        +'<div class="an-bar-track"><div class="an-bar-fill" style="width:'+pct+'%"></div></div>'
+        +'<div class="an-bar-val">'+(fmt?fmt(i.valor):i.valor)+(i.sub?' <span style="color:var(--gy);font-weight:600">'+esc(i.sub)+'</span>':'')+'</div></div>';
+    }).join('')+'</div>';
+  }
+
+  // linha/área mensal (SVG) com tooltip nativo nos pontos
+  function anLine(points){
+    if(!points.length||points.every(function(p){return !p.value;})) return '<div class="an-empty">Sem vendas no período.</div>';
+    var W=680,H=170,pl=10,pr=10,pt=14,pb=24;
+    var n=points.length, max=Math.max.apply(null, points.map(function(p){return p.value;}).concat([1]));
+    var iw=W-pl-pr, ih=H-pt-pb;
+    var X=function(i){ return pl+(n<=1?iw/2:(i/(n-1))*iw); };
+    var Y=function(v){ return pt+ih-(v/max)*ih; };
+    var line=points.map(function(p,i){return X(i).toFixed(1)+','+Y(p.value).toFixed(1);}).join(' ');
+    var area='M'+X(0).toFixed(1)+','+(pt+ih)+' L'+line.split(' ').join(' L')+' L'+X(n-1).toFixed(1)+','+(pt+ih)+' Z';
+    var dots=points.map(function(p,i){return '<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(p.value).toFixed(1)+'" r="3.6" fill="#2f8f4e" stroke="#fff" stroke-width="1.5"><title>'+esc(p.label)+': '+fmtBRL(p.value)+'</title></circle>';}).join('');
+    var labs=points.map(function(p,i){return '<text x="'+X(i).toFixed(1)+'" y="'+(H-7)+'" text-anchor="middle" font-size="9.5" fill="#8a9690">'+esc(p.short)+'</text>';}).join('');
+    return '<svg class="an-svg" viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'
+      +'<path d="'+area+'" fill="#e4f2e8"/>'
+      +'<polyline points="'+line+'" fill="none" stroke="#2f8f4e" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
+      +dots+labs+'</svg>';
+  }
+  // sparkline pequeno
+  function anSpark(vals){
+    var W=240,H=42,n=vals.length,max=Math.max.apply(null,vals.concat([1]));
+    if(!n) return '';
+    var X=function(i){return (n<=1?W/2:(i/(n-1))*(W-4))+2;};
+    var Y=function(v){return 4+(H-8)-(v/max)*(H-8);};
+    var line=vals.map(function(v,i){return X(i).toFixed(1)+','+Y(v).toFixed(1);}).join(' ');
+    var area='M'+X(0).toFixed(1)+','+(H-4)+' L'+line.split(' ').join(' L')+' L'+X(n-1).toFixed(1)+','+(H-4)+' Z';
+    return '<svg class="an-spark" viewBox="0 0 '+W+' '+H+'" style="width:100%;height:42px"><path d="'+area+'" fill="#e4f2e8"/><polyline points="'+line+'" fill="none" stroke="#2f8f4e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
+  function pcRenderAnalise(){
+    var wrap=$('pc-analise-wrap'); if(!wrap) return;
+    var d=PC.dados; if(!d){ wrap.innerHTML=''; return; }
+    var vendas=(d.vendas||[]).filter(function(v){return !v.cancelada;});
+    var infById={}; (d.influenciadores||[]).forEach(function(i){infById[i.id]=i;});
+
+    if(!vendas.length){
+      wrap.innerHTML='<div class="an-card full"><div class="an-empty">Nenhuma venda de cupom ainda. Clique em <b>↻ Sincronizar lojas</b> pra puxar os pedidos das lojas, ou lance uma venda manual.</div></div>';
+      return;
+    }
+
+    // ── agregações ──
+    var meses=_ultimosMeses(12);
+    var totVol=0, totCom=0;
+    var porMesTot={}; meses.forEach(function(m){porMesTot[m]=0;});
+    var porLoja={}, prodTot={}, porInf={};
+    vendas.forEach(function(v){
+      var vol=Number(v.valorLiquido)||0, com=Number(v.comissao)||0;
+      totVol+=vol; totCom+=com;
+      var ym=(v.data||'').slice(0,7); if(porMesTot[ym]!==undefined) porMesTot[ym]+=vol;
+      var ls=v.loja||'—'; porLoja[ls]=(porLoja[ls]||0)+vol;
+      (v.produtos||[]).forEach(function(p){ var k=p.nome||'—'; if(!prodTot[k])prodTot[k]={vol:0,qty:0}; prodTot[k].vol+=Number(p.total)||0; prodTot[k].qty+=Number(p.qty)||0; });
+      var id=v.influenciadorId; if(!porInf[id])porInf[id]={vol:0,com:0,n:0,mes:{},loja:{},prod:{}};
+      var pi=porInf[id]; pi.vol+=vol; pi.com+=com; pi.n++;
+      pi.mes[ym]=(pi.mes[ym]||0)+vol; pi.loja[ls]=(pi.loja[ls]||0)+vol;
+      (v.produtos||[]).forEach(function(p){ var k=p.nome||'—'; pi.prod[k]=(pi.prod[k]||0)+(Number(p.total)||0); });
+    });
+    var nVendas=vendas.length, ticket=nVendas?totVol/nVendas:0;
+
+    // ── ranking influenciadores por volume ──
+    var rank=Object.keys(porInf).map(function(id){
+      var inf=infById[id]||{}; return {label:(inf.nome||'—'), valor:porInf[id].vol, sub:porInf[id].n+' vd', _id:id};
+    }).sort(function(a,b){return b.valor-a.valor;});
+
+    // ── por loja ──
+    var lojaBars=Object.keys(porLoja).map(function(s){return {label:_lojaNome(s),valor:porLoja[s]};}).sort(function(a,b){return b.valor-a.valor;});
+
+    // ── top produtos (por volume) ──
+    var prodBars=Object.keys(prodTot).map(function(k){return {label:k,valor:prodTot[k].vol,sub:prodTot[k].qty+'un'};}).sort(function(a,b){return b.valor-a.valor;}).slice(0,8);
+
+    // ── evolução mensal (total) ──
+    var linePts=meses.map(function(m){return {label:_mesCurto(m),short:_mesCurto(m),value:porMesTot[m]};});
+
+    var html='';
+    // KPIs
+    html+='<div class="an-kpis">'
+      +'<div class="an-kpi"><div class="an-kpi-l">Volume total</div><div class="an-kpi-v">'+fmtBRL(totVol)+'</div></div>'
+      +'<div class="an-kpi"><div class="an-kpi-l">Vendas com cupom</div><div class="an-kpi-v">'+nVendas+'</div></div>'
+      +'<div class="an-kpi"><div class="an-kpi-l">Comissão total</div><div class="an-kpi-v">'+fmtBRL(totCom)+'</div></div>'
+      +'<div class="an-kpi"><div class="an-kpi-l">Ticket médio</div><div class="an-kpi-v">'+fmtBRL(ticket)+'</div></div>'
+      +'</div>';
+    // Evolução (full)
+    html+='<div class="an-card full"><div class="an-ttl">Evolução de vendas por cupom</div><div class="an-sub">Volume mensal (últimos 12 meses)</div><div class="an-chart">'+anLine(linePts)+'</div></div>';
+    // grid: ranking + loja + produtos
+    html+='<div class="an-grid">';
+    html+='<div class="an-card"><div class="an-ttl">Ranking de influenciadores</div><div class="an-sub">Por volume de vendas</div>'+anBars(rank,fmtBRL)+'</div>';
+    html+='<div class="an-card"><div class="an-ttl">Vendas por loja</div><div class="an-sub">De onde vieram as vendas de cupom</div>'+anBars(lojaBars,fmtBRL)+'</div>';
+    html+='<div class="an-card"><div class="an-ttl">Produtos que mais convertem</div><div class="an-sub">Top produtos vendidos com cupom</div>'+anBars(prodBars,fmtBRL)+'</div>';
+    html+='</div>';
+    // Por influenciador (deep)
+    html+='<div class="pc-sec">Análise por parceiro</div>';
+    html+='<div class="an-inf">'+rank.map(function(r){
+      var pi=porInf[r._id]; var inf=infById[r._id]||{};
+      var tk=pi.n?pi.vol/pi.n:0;
+      var spark=meses.map(function(m){return pi.mes[m]||0;});
+      var topProd=Object.keys(pi.prod).map(function(k){return {k:k,v:pi.prod[k]};}).sort(function(a,b){return b.v-a.v;})[0];
+      var lojaTxt=Object.keys(pi.loja).map(function(s){return _lojaNome(s)+' '+fmtBRL(pi.loja[s]);}).join(' · ');
+      return '<div class="an-infc"><div class="an-infc-hd"><div class="an-infc-n">'+esc(inf.nome||'—')+'</div><span class="pc-cupom">'+esc(inf.cupom||'')+'</span></div>'
+        +'<div class="an-infc-stats">'
+        +'<div class="an-infc-s"><div class="v">'+fmtBRL(pi.vol)+'</div><div class="l">Volume</div></div>'
+        +'<div class="an-infc-s"><div class="v">'+pi.n+'</div><div class="l">Vendas</div></div>'
+        +'<div class="an-infc-s"><div class="v">'+fmtBRL(tk)+'</div><div class="l">Ticket</div></div>'
+        +'</div>'
+        +anSpark(spark)
+        +'<div class="an-infc-top">Comissão: <b>'+fmtBRL(pi.com)+'</b>'
+        +(topProd?'<br>Mais vende: <b>'+esc(topProd.k)+'</b> ('+fmtBRL(topProd.v)+')':'')
+        +(lojaTxt?'<br>Por loja: '+esc(lojaTxt):'')+'</div></div>';
+    }).join('')+'</div>';
+
+    wrap.innerHTML=html;
   }
 
   function pcRenderInfs(){
