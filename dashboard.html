@@ -3080,7 +3080,7 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
           +'<td class="n">'+fmtBRL(v.valorFrete)+'</td>'
           +'<td class="n">'+fmtBRL(v.valorLiquido)+'</td>'
           +'<td class="n" style="color:var(--gd);font-weight:700">'+fmtBRL(v.comissao)+'</td>'
-          +'<td><span class="pc-badge '+(v.origem==='manual'?'':'ok')+'" style="text-transform:none">'+(v.origem==='tray-teste'?'TRAY (teste)':v.origem==='manual'?'Manual':'TRAY')+'</span></td>'
+          +'<td><span class="pc-badge '+(v.origem==='manual'?'':'ok')+'" style="text-transform:none">'+(v.origem==='manual'?'Manual':v.origem==='tray-teste'?'Tray (teste)':'WooCommerce')+'</span></td>'
           +'<td>'+(v.cancelada?'':'<button class="pc-btn rm" style="padding:4px 10px;font-size:11px" onclick="pcCancelarVenda(\''+v.id+'\')">Cancelar</button>')+'</td>'
           +'</tr>';
       }).join('')+'</tbody></table></div>';
