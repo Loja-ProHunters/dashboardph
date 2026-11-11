@@ -6913,6 +6913,38 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // GET /api/parceiros/cupons-loja — lista os cupons que EXISTEM nas lojas
+  // WooCommerce e cruza com os influenciadores cadastrados. Serve pra descobrir
+  // parceiros novos (cupom na loja ainda sem influenciador vinculado), mesmo
+  // com zero vendas. Só gerência.
+  if (req.method === 'GET' && url === '/api/parceiros/cupons-loja') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'Só gerência.' })); return; }
+    try {
+      if (!wooClient.lojasAtivas().length) throw new Error('Nenhuma loja WooCommerce configurada.');
+      const d = await getParceiros();
+      const regs = {};
+      d.influenciadores.forEach(i => { if (i.cupom) regs[String(i.cupom).trim().toUpperCase()] = i; });
+      const r = await wooAfiliados.listarCupons();
+      // cupons genéricos comuns que não são parceiro — marca como "sistema" pra não poluir
+      const GENERICOS = ['PRIMEIRACOMPRA', 'PHPOINTS', 'FRETEGRATIS', 'BEMVINDO', 'DESCONTO'];
+      const cupons = r.cupons.map(c => ({
+        code: c.code, usos: c.usos, lojas: c.lojas, criado: c.criado, tipo: c.tipo, valor: c.valor, descricao: c.descricao,
+        cadastrado: !!regs[c.code],
+        influenciador: regs[c.code] ? regs[c.code].nome : null,
+        generico: GENERICOS.indexOf(c.code) !== -1,
+      }));
+      const naoCadastrados = cupons.filter(c => !c.cadastrado && !c.generico)
+        .sort((a, b) => (b.usos - a.usos) || String(b.criado || '').localeCompare(String(a.criado || '')));
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, porLoja: r.porLoja, total: cupons.length, naoCadastrados, cupons }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
   // POST /api/parceiros/tray-config — salva credenciais da Tray (só gerência)
   if (req.method === 'POST' && url === '/api/parceiros/tray-config') {
     const sess = getSession(req);
