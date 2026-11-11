@@ -7134,7 +7134,7 @@
       "divergiu_do_sistema": false,
       "sugestao_original": "analise_manual"
     },
-    "status": "em_analise",
+    "status": "aguardando_cliente",
     "resultado": null,
     "produto_fisico": {
       "status": "nao_solicitado",
@@ -7165,7 +7165,7 @@
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-11-06T14:58:31.794Z",
-    "atualizado_em": "2026-11-10T17:09:38.355Z",
+    "atualizado_em": "2026-11-11T15:16:51.054Z",
     "tally_meta": {
       "eventId": "sync_Eq7V7N4",
       "responseId": "Eq7V7N4",
@@ -7194,6 +7194,14 @@
         "por": "auxiliar",
         "de": "aberto",
         "para": "em_analise",
+        "nota": null
+      },
+      {
+        "ts": "2026-11-11T15:16:51.054Z",
+        "acao": "status_mudou",
+        "por": "auxiliar",
+        "de": "em_analise",
+        "para": "aguardando_cliente",
         "nota": null
       }
     ]
