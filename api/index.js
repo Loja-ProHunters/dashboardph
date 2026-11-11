@@ -13,6 +13,7 @@ const { getEditorial, saveEditorial } = require('../lib/editorialStore');
 const { getTarifas, saveTarifas } = require('../lib/tarifasStore');
 const { getParceiros, saveParceiros } = require('../lib/parceirosStore');
 const wooClient = require('../lib/woo/client');
+const wooAfiliados = require('../lib/woo/afiliados');
 const contratos = require('../lib/crm/contratos');
 const { verifyPassword, setPassword, upsertUser, deleteUser, getAllUsers, generateTempPassword, getRoleSync } = require('../lib/usersStore');
 const accessLog = require('../lib/accessLog');
@@ -6835,6 +6836,71 @@ module.exports = async (req, res) => {
       await saveParceiros(d);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true, novas, erros, msg, modoTeste }));
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // GET /api/parceiros/woo-amostra[?loja=slug&n=3] — amostra crua de pedidos de
+  // UMA loja, pra validar o formato real da API (coupon_lines, line_items, etc).
+  // Só gerência. Não expõe dados sensíveis além do primeiro nome.
+  if (req.method === 'GET' && url.startsWith('/api/parceiros/woo-amostra')) {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'Só gerência.' })); return; }
+    try {
+      const q = new URL('http://x' + (req.url || '')).searchParams;
+      const amostra = await wooAfiliados.amostraPedidos(q.get('loja') || null, parseInt(q.get('n') || '3', 10));
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, ...amostra }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST /api/parceiros/sync-woo — SYNC REAL: puxa os pedidos pagos das lojas
+  // WooCommerce, atribui por cupom ao influenciador e grava as vendas novas
+  // (dedup por loja#pedido). Substitui o antigo modo-teste da Tray. Só gerência.
+  if (req.method === 'POST' && url === '/api/parceiros/sync-woo') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'Só gerência.' })); return; }
+    try {
+      if (!wooClient.lojasAtivas().length) throw new Error('Nenhuma loja WooCommerce configurada nas variáveis da Vercel (WOO_LOJA_*).');
+      const d = await getParceiros();
+      if (!d.influenciadores.length) throw new Error('Cadastre ao menos um influenciador (com cupom) antes de sincronizar.');
+
+      // Incremental: se já houve sync, pega a partir de ~2 dias antes da última
+      // (margem de segurança). Primeira vez: puxa tudo (backfill).
+      const opts = {};
+      let payload = {}; try { payload = JSON.parse((await readBody(req)) || '{}'); } catch (e) {}
+      if (!payload.tudo && d.woo && d.woo.ultimaSync) {
+        opts.after = new Date(new Date(d.woo.ultimaSync).getTime() - 2 * 86400000).toISOString();
+      }
+
+      const col = await wooAfiliados.coletarVendas(d.influenciadores, opts);
+
+      // dedup por ref (loja#pedido) — cobre vendas antigas que não tinham ref
+      const existentes = new Set();
+      for (const v of (d.vendas || [])) {
+        if (v.ref) existentes.add(v.ref);
+        else if (v.loja && v.pedidoWoo) existentes.add(v.loja + '#' + v.pedidoWoo);
+      }
+      let novas = 0;
+      for (const v of col.vendas) {
+        if (existentes.has(v.ref)) continue;
+        d.vendas.push(Object.assign({ id: _prcId() }, v));
+        existentes.add(v.ref);
+        novas++;
+      }
+
+      d.woo = Object.assign({}, d.woo, { ultimaSync: new Date().toISOString(), porLoja: col.porLoja });
+      await saveParceiros(d);
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, novas, coletadas: col.vendas.length, porLoja: col.porLoja }));
     } catch (e) {
       res.writeHead(400, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: e.message }));
