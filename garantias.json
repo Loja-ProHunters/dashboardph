@@ -5846,7 +5846,7 @@
       "resolucao_fabricante": null
     },
     "procedimento_interno": {
-      "status": "pendente",
+      "status": "concluido",
       "pedido_substituto": null,
       "pedido_substituto_data": null,
       "baixa_estoque_feita": false,
@@ -5857,12 +5857,12 @@
       "nota": null,
       "atualizado_em": null,
       "atualizado_por": null,
-      "concluido_em": null,
-      "concluido_por": null
+      "concluido_em": "2026-11-11T14:42:55.553Z",
+      "concluido_por": "auxiliar"
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-15T16:21:43.610Z",
-    "atualizado_em": "2026-11-11T14:42:44.197Z",
+    "atualizado_em": "2026-11-11T14:42:55.553Z",
     "tally_meta": {
       "eventId": "sync_Dq9r59j",
       "responseId": "Dq9r59j",
@@ -5948,6 +5948,11 @@
         "por": "auxiliar",
         "resultado": "restituicao",
         "nota": null
+      },
+      {
+        "ts": "2026-11-11T14:42:55.553Z",
+        "acao": "procedimento_interno_concluido",
+        "por": "auxiliar"
       }
     ],
     "observacao": {
