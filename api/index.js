@@ -3096,6 +3096,7 @@ module.exports = async (req, res) => {
           if (acc) {
             t.cliente_nome = acc.nome || acc.razao_social || null;
             t.cliente_telefone = acc.telefone || null;
+            t.cliente_cpf = acc.cpf_cnpj || acc.cpf || acc.documento || null;
           }
         };
         for (const t of tarefas) await _enriquecer(t);
