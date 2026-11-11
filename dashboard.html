@@ -2685,6 +2685,24 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
 #tab-parceiros .an-infc-s .l{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--gy);font-weight:700;margin-top:2px}
 #tab-parceiros .an-infc-top{font-size:11.5px;color:var(--gy);border-top:1px dashed var(--bd);padding-top:10px;margin-top:6px;line-height:1.6}
 #tab-parceiros .an-infc-top b{color:var(--k)}
+#tab-parceiros .an-infc.off{opacity:.72}
+/* status badge por parceiro */
+#tab-parceiros .an-st{display:inline-block;font-size:9px;font-weight:800;padding:2px 7px;border-radius:var(--r-full);letter-spacing:.04em;text-transform:uppercase;vertical-align:middle;margin-left:4px}
+#tab-parceiros .an-st.ativo{background:var(--gl);color:var(--gd)}
+#tab-parceiros .an-st.parado{background:#fdf2e0;color:#b4701a}
+#tab-parceiros .an-st.sem{background:var(--rl);color:var(--r)}
+/* card de alerta "precisam de ação" */
+#tab-parceiros .an-alert{border-color:#f0d9b8;background:linear-gradient(180deg,#fffaf2,var(--wh))}
+#tab-parceiros .an-atten{display:flex;flex-direction:column;gap:8px}
+#tab-parceiros .an-at-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 10px;background:var(--wh);border:1px solid var(--bd);border-radius:var(--r-sm)}
+#tab-parceiros .an-at-n{font-weight:700;color:var(--k);font-size:12.5px}
+#tab-parceiros .an-at-st{margin-left:auto;font-size:11.5px;font-weight:600}
+#tab-parceiros .an-at-st.sem{color:var(--r)}
+#tab-parceiros .an-at-st.parado{color:#b4701a}
+/* cupons detectados */
+#tab-parceiros .an-cup{display:flex;flex-direction:column;gap:8px}
+#tab-parceiros .an-cup-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:9px 10px;background:var(--bg);border-radius:var(--r-sm)}
+#tab-parceiros .an-cup-meta{font-size:11.5px;color:var(--gy);flex:1;min-width:120px}
 @media(max-width:768px){
   #tab-parceiros .pc-inf-body{grid-template-columns:1fr 1fr}
   #tab-parceiros .pc-fld-row{grid-template-columns:1fr}
@@ -2955,8 +2973,8 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
     var vendas=(d.vendas||[]).filter(function(v){return !v.cancelada;});
     var infById={}; (d.influenciadores||[]).forEach(function(i){infById[i.id]=i;});
 
-    if(!vendas.length){
-      wrap.innerHTML='<div class="an-card full"><div class="an-empty">Nenhuma venda de cupom ainda. Clique em <b>↻ Sincronizar lojas</b> pra puxar os pedidos das lojas, ou lance uma venda manual.</div></div>';
+    if(!vendas.length && !(d.influenciadores||[]).length){
+      wrap.innerHTML='<div class="an-card full"><div class="an-empty">Nenhuma venda nem influenciador ainda. Clique em <b>+ Influenciador</b> pra cadastrar, ou em <b>↻ Sincronizar lojas</b>.</div></div>';
       return;
     }
 
@@ -2992,14 +3010,38 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
     // ── evolução mensal (total) ──
     var linePts=meses.map(function(m){return {label:_mesCurto(m),short:_mesCurto(m),value:porMesTot[m]};});
 
+    // ── status por parceiro (INCLUI quem não vendeu) ──
+    var hojeMs=Date.now();
+    function _diasDesde(ymd){ return ymd? Math.floor((hojeMs-new Date(ymd+'T12:00:00').getTime())/86400000):null; }
+    var ativosInf=(d.influenciadores||[]).filter(function(i){return i.ativo!==false;});
+    var ultimaPorInf={};
+    vendas.forEach(function(v){ var a=ultimaPorInf[v.influenciadorId]; if(!a||(v.data||'')>a) ultimaPorInf[v.influenciadorId]=v.data; });
+    var infStats=ativosInf.map(function(inf){
+      var pi=porInf[inf.id]||{vol:0,com:0,n:0,mes:{},loja:{},prod:{}};
+      var ultima=ultimaPorInf[inf.id]||null;
+      var diasSem = ultima? _diasDesde(ultima) : _diasDesde((inf.cadastradoEm||'').slice(0,10));
+      var status = pi.n===0 ? 'sem' : (diasSem!=null && diasSem>45 ? 'parado' : 'ativo');
+      return {inf:inf,pi:pi,ultima:ultima,diasSem:diasSem,status:status};
+    });
+    infStats.sort(function(a,b){ var rk={ativo:0,parado:1,sem:2}; if(rk[a.status]!==rk[b.status]) return rk[a.status]-rk[b.status]; return b.pi.vol-a.pi.vol; });
+    var atencao=infStats.filter(function(s){return s.status!=='ativo';});
+
     var html='';
     // KPIs
     html+='<div class="an-kpis">'
       +'<div class="an-kpi"><div class="an-kpi-l">Volume total</div><div class="an-kpi-v">'+fmtBRL(totVol)+'</div></div>'
       +'<div class="an-kpi"><div class="an-kpi-l">Vendas com cupom</div><div class="an-kpi-v">'+nVendas+'</div></div>'
       +'<div class="an-kpi"><div class="an-kpi-l">Comissão total</div><div class="an-kpi-v">'+fmtBRL(totCom)+'</div></div>'
-      +'<div class="an-kpi"><div class="an-kpi-l">Ticket médio</div><div class="an-kpi-v">'+fmtBRL(ticket)+'</div></div>'
+      +'<div class="an-kpi"><div class="an-kpi-l">Parceiros s/ venda ou parados</div><div class="an-kpi-v'+(atencao.length?' r':'')+'">'+atencao.length+'</div></div>'
       +'</div>';
+    // Precisam de atenção
+    if(atencao.length){
+      html+='<div class="an-card full an-alert"><div class="an-ttl">⚠️ Parceiros que precisam de ação</div><div class="an-sub">Sem nenhuma venda, ou parados há mais de 45 dias</div><div class="an-atten">'
+        +atencao.map(function(s){
+          var txt = s.status==='sem' ? ('nunca vendeu'+(s.diasSem!=null?' · cadastrado há '+s.diasSem+'d':'')) : ('parado há '+s.diasSem+'d'+(s.ultima?' · última '+fmtDt(s.ultima):''));
+          return '<div class="an-at-row"><span class="pc-cupom">'+esc(s.inf.cupom||'')+'</span><span class="an-at-n">'+esc(s.inf.nome||'—')+'</span><span class="an-at-st '+(s.status==='sem'?'sem':'parado')+'">'+txt+'</span></div>';
+        }).join('')+'</div></div>';
+    }
     // Evolução (full)
     html+='<div class="an-card full"><div class="an-ttl">Evolução de vendas por cupom</div><div class="an-sub">Volume mensal (últimos 12 meses)</div><div class="an-chart">'+anLine(linePts)+'</div></div>';
     // grid: ranking + loja + produtos
@@ -3008,15 +3050,17 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
     html+='<div class="an-card"><div class="an-ttl">Vendas por loja</div><div class="an-sub">De onde vieram as vendas de cupom</div>'+anBars(lojaBars,fmtBRL)+'</div>';
     html+='<div class="an-card"><div class="an-ttl">Produtos que mais convertem</div><div class="an-sub">Top produtos vendidos com cupom</div>'+anBars(prodBars,fmtBRL)+'</div>';
     html+='</div>';
-    // Por influenciador (deep)
+    // Cupons detectados na loja (carrega assíncrono)
+    html+='<div id="pc-cupons-loja"><div class="an-card full"><div class="an-ttl">Cupons detectados nas lojas</div><div class="an-sub">Procurando cupons não cadastrados…</div></div></div>';
+    // Por parceiro (TODOS, inclusive sem venda)
     html+='<div class="pc-sec">Análise por parceiro</div>';
-    html+='<div class="an-inf">'+rank.map(function(r){
-      var pi=porInf[r._id]; var inf=infById[r._id]||{};
-      var tk=pi.n?pi.vol/pi.n:0;
+    html+='<div class="an-inf">'+infStats.map(function(s){
+      var inf=s.inf, pi=s.pi; var tk=pi.n?pi.vol/pi.n:0;
       var spark=meses.map(function(m){return pi.mes[m]||0;});
       var topProd=Object.keys(pi.prod).map(function(k){return {k:k,v:pi.prod[k]};}).sort(function(a,b){return b.v-a.v;})[0];
-      var lojaTxt=Object.keys(pi.loja).map(function(s){return _lojaNome(s)+' '+fmtBRL(pi.loja[s]);}).join(' · ');
-      return '<div class="an-infc"><div class="an-infc-hd"><div class="an-infc-n">'+esc(inf.nome||'—')+'</div><span class="pc-cupom">'+esc(inf.cupom||'')+'</span></div>'
+      var lojaTxt=Object.keys(pi.loja).map(function(ls){return _lojaNome(ls)+' '+fmtBRL(pi.loja[ls]);}).join(' · ');
+      var badge = s.status==='ativo'?'<span class="an-st ativo">ativo</span>':(s.status==='parado'?'<span class="an-st parado">parado '+s.diasSem+'d</span>':'<span class="an-st sem">sem vendas</span>');
+      return '<div class="an-infc'+(s.status==='sem'?' off':'')+'"><div class="an-infc-hd"><div class="an-infc-n">'+esc(inf.nome||'—')+' '+badge+'</div><span class="pc-cupom">'+esc(inf.cupom||'')+'</span></div>'
         +'<div class="an-infc-stats">'
         +'<div class="an-infc-s"><div class="v">'+fmtBRL(pi.vol)+'</div><div class="l">Volume</div></div>'
         +'<div class="an-infc-s"><div class="v">'+pi.n+'</div><div class="l">Vendas</div></div>'
@@ -3024,12 +3068,45 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
         +'</div>'
         +anSpark(spark)
         +'<div class="an-infc-top">Comissão: <b>'+fmtBRL(pi.com)+'</b>'
+        +(s.ultima?'<br>Última venda: <b>'+fmtDt(s.ultima)+'</b>':'<br><span style="color:var(--r)">Nunca vendeu</span>')
         +(topProd?'<br>Mais vende: <b>'+esc(topProd.k)+'</b> ('+fmtBRL(topProd.v)+')':'')
         +(lojaTxt?'<br>Por loja: '+esc(lojaTxt):'')+'</div></div>';
     }).join('')+'</div>';
 
     wrap.innerHTML=html;
+    pcCarregarCuponsLoja();
   }
+
+  // Carrega os cupons das lojas (WooCommerce) e mostra os que ainda não têm
+  // parceiro cadastrado — inclusive os com zero venda.
+  var _cuponsCache=null;
+  function pcCarregarCuponsLoja(force){
+    var box=$('pc-cupons-loja'); if(!box) return;
+    function render(res){
+      if(!res||res.error){ box.innerHTML='<div class="an-card full"><div class="an-ttl">Cupons detectados nas lojas</div><div class="an-empty">Não consegui ler os cupons agora'+(res&&res.error?' ('+esc(res.error)+')':'')+'. Tente sincronizar de novo.</div></div>'; return; }
+      var nc=res.naoCadastrados||[];
+      var inner='<div class="an-ttl">Cupons detectados nas lojas <span style="color:var(--gy);font-weight:600;text-transform:none;letter-spacing:0">· '+(res.total||0)+' no total</span></div>'
+        +'<div class="an-sub">Cupons que existem nas lojas mas ainda não têm parceiro vinculado — inclusive sem vendas</div>';
+      if(!nc.length){ inner+='<div class="an-empty">Todos os cupons das lojas já estão cadastrados ✅</div>'; }
+      else {
+        inner+='<div class="an-cup">'+nc.map(function(c){
+          var code=String(c.code||'').replace(/[^A-Za-z0-9_\-]/g,'');
+          return '<div class="an-cup-row"><span class="pc-cupom">'+esc(c.code)+'</span>'
+            +'<span class="an-cup-meta">'+(c.usos||0)+' uso'+(c.usos===1?'':'s')+(c.lojas&&c.lojas.length?' · '+esc(c.lojas.join(', ')):'')+(c.criado?' · criado '+fmtDt(c.criado):'')+'</span>'
+            +'<button class="pc-btn pri" style="padding:5px 12px;font-size:11.5px" onclick="pcNovoDeCupom(\''+code+'\')">+ Cadastrar</button></div>';
+        }).join('')+'</div>';
+      }
+      box.innerHTML='<div class="an-card full">'+inner+'</div>';
+    }
+    if(_cuponsCache && !force){ render(_cuponsCache); return; }
+    fetch('/api/parceiros/cupons-loja').then(function(r){return r.json();}).then(function(res){ _cuponsCache=res; render(res); }).catch(function(){ render({error:'conexão'}); });
+  }
+  // abre o modal de novo influenciador já com o cupom preenchido
+  window.pcNovoDeCupom=function(cupom){
+    if(typeof window.pcOpenInf==='function') window.pcOpenInf();
+    var el=$('pc-i-cupom'); if(el) el.value=String(cupom||'').toUpperCase();
+    var nm=$('pc-i-nome'); if(nm) nm.focus();
+  };
 
   function pcRenderInfs(){
     var d=PC.dados; var w=$('pc-infs-wrap');
