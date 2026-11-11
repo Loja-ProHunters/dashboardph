@@ -12,6 +12,7 @@ const { getContatos, saveContatos } = require('../lib/contatosStore');
 const { getEditorial, saveEditorial } = require('../lib/editorialStore');
 const { getTarifas, saveTarifas } = require('../lib/tarifasStore');
 const { getParceiros, saveParceiros } = require('../lib/parceirosStore');
+const wooClient = require('../lib/woo/client');
 const contratos = require('../lib/crm/contratos');
 const { verifyPassword, setPassword, upsertUser, deleteUser, getAllUsers, generateTempPassword, getRoleSync } = require('../lib/usersStore');
 const accessLog = require('../lib/accessLog');
@@ -6448,6 +6449,25 @@ module.exports = async (req, res) => {
     const qtdVendas = dele.length;
     const ultimaVenda = dele.length ? dele.map(v => v.data).sort().slice(-1)[0] : null;
     return { totalVendido, totalComissao, totalPago, saldoAberto, qtdVendas, ultimaVenda };
+  }
+
+  // GET /api/parceiros/woo-ping — testa a conexão com as lojas WooCommerce.
+  // Lê ck/cs das envs da Vercel (via config.lojasWoo) e NUNCA expõe os
+  // segredos — devolve só slug/nome/url e o diagnóstico de cada loja. Serve
+  // pra confirmar que as credenciais funcionam antes de puxar dados. Só gerência.
+  if (req.method === 'GET' && url === '/api/parceiros/woo-ping') {
+    const sess = getSession(req);
+    if (!sess || !canEditComercial(sess)) { res.writeHead(403, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'Só gerência.' })); return; }
+    try {
+      const lojas = wooClient.lojasAtivas().map(l => ({ slug: l.slug, nome: l.nome, url: l.url }));
+      const diag = await wooClient.pingTodas();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, lojasConfiguradas: lojas, teste: diag }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
   }
 
   // GET /api/parceiros — dados completos (só gerência)
