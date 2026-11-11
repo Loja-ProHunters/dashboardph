@@ -2665,7 +2665,7 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
     <span class="user-pill" id="pc-lastsync">Nunca sincronizado</span>
     <button class="pc-btn ghost" onclick="pcOpenTrayCfg()">⚙ Configurar Tray</button>
     <div style="flex:1"></div>
-    <button class="pc-btn" id="pc-btn-sync" onclick="pcSync()">↻ Sincronizar Tray</button>
+    <button class="pc-btn" id="pc-btn-sync" onclick="pcSync()">↻ Sincronizar lojas</button>
     <button class="pc-btn pri" onclick="pcOpenInf()">+ Influenciador</button>
     <button class="pc-btn" onclick="pcOpenVenda()">+ Venda manual</button>
   </div>
@@ -3141,11 +3141,16 @@ async function edInit(){ if(window.__edInit) return; window.__edInit=true; await
 
   window.pcSync=function(){
     var btn=$('pc-btn-sync'); btn.disabled=true; var txtOld=btn.textContent; btn.textContent='Sincronizando…';
-    fetch('/api/parceiros/sync-tray',{method:'POST'})
+    fetch('/api/parceiros/sync-woo',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})
       .then(function(r){return r.json();}).then(function(res){
         btn.disabled=false; btn.textContent=txtOld;
         if(res.error){ alert(res.error); return; }
-        alert(res.msg);
+        var linhas=[]; var pl=res.porLoja||{};
+        Object.keys(pl).forEach(function(k){
+          var l=pl[k];
+          linhas.push((l.nome||k)+': '+(l.erro?('ERRO — '+l.erro):((l.atribuidas||0)+' venda(s) de cupom em '+(l.pedidos||0)+' pedidos')));
+        });
+        alert((res.novas||0)+' venda(s) nova(s) importada(s).\n\n'+linhas.join('\n'));
         pcRefresh();
       }).catch(function(){ btn.disabled=false; btn.textContent=txtOld; alert('Erro na sincronização.'); });
   };
