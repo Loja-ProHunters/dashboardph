@@ -29,6 +29,59 @@ function _montarContasBling() {
   return contas;
 }
 
+// Dicionário de lojas WooCommerce (sites WordPress). Suporta várias lojas via
+// WOO_LOJA1_*, WOO_LOJA2_*, ... Cada loja tem a URL do site + o par
+// consumer_key/consumer_secret da API REST do WooCommerce (WooCommerce >
+// Configurações > Avançado > API REST). "ativa" fica true quando URL+ck+cs
+// estão preenchidas. NENHUM segredo fica no código — tudo vem da env da Vercel.
+// Descobre as lojas pelas envs no formato WOO_LOJA_<SLUG>_URL
+// (ex.: WOO_LOJA_PROHUNTERS_URL). O <SLUG> identifica a loja. Cada loja usa:
+//   WOO_LOJA_<SLUG>_URL   → endereço do site (https://...)
+//   WOO_LOJA_<SLUG>_CK    → consumer_key  (ck_...)
+//   WOO_LOJA_<SLUG>_CS    → consumer_secret (cs_...)
+//   WOO_LOJA_<SLUG>_NOME  → nome de exibição (opcional; cai em WOO_LOJA_<SLUG>
+//                           sem sufixo, ou no próprio slug, se não houver)
+// Também aceita o formato antigo WOO_LOJA1_URL/_CK/_CS/_NOME.
+function _montarLojasWoo() {
+  const lojas = [];
+  const vistos = new Set();
+  const addLoja = (slug, url, ck, cs, nome) => {
+    const chave = String(slug).toLowerCase();
+    if (vistos.has(chave)) return;
+    vistos.add(chave);
+    lojas.push({
+      slug: chave,
+      nome: nome || slug,
+      url: String(url || '').replace(/\/+$/, ''), // tira barra(s) finais
+      consumerKey: ck || '',
+      consumerSecret: cs || '',
+      ativa: !!(url && ck && cs),
+    });
+  };
+  // Formato por slug: WOO_LOJA_<SLUG>_URL
+  for (const chave of Object.keys(process.env)) {
+    const m = /^WOO_LOJA_(.+)_URL$/.exec(chave);
+    if (!m) continue;
+    const slug = m[1];
+    addLoja(
+      slug,
+      process.env['WOO_LOJA_' + slug + '_URL'],
+      process.env['WOO_LOJA_' + slug + '_CK'],
+      process.env['WOO_LOJA_' + slug + '_CS'],
+      process.env['WOO_LOJA_' + slug + '_NOME'] || process.env['WOO_LOJA_' + slug] || slug
+    );
+  }
+  // Formato antigo numerado: WOO_LOJA1_URL, WOO_LOJA2_URL, ...
+  for (let i = 1; i <= 10; i++) {
+    const url = process.env['WOO_LOJA' + i + '_URL'];
+    const ck  = process.env['WOO_LOJA' + i + '_CK'];
+    const cs  = process.env['WOO_LOJA' + i + '_CS'];
+    if (!url && !ck && !cs) continue;
+    addLoja('loja' + i, url, ck, cs, process.env['WOO_LOJA' + i + '_NOME'] || ('Loja ' + i));
+  }
+  return lojas;
+}
+
 // SEGURANÇA CRÍTICA: SESSION_SECRET assina cookies de sessão E deriva chave
 // AES-256-GCM que criptografa tokens OAuth do Bling. Se não vier da env ou for
 // muito curto/default, atacante forja sessões de admin. Falhamos hard no boot
@@ -84,6 +137,9 @@ module.exports = {
   // Bling API v3 — MULTI-CONTA (novo)
   blingContas: _montarContasBling(),
   blingContaPadrao: 'prohunters', // usada quando não passa contaId explícito
+
+  // WooCommerce — lojas WordPress (afiliados/influenciadores + CRM)
+  lojasWoo: _montarLojasWoo(),
 
   // Usuários (padrão: admin/gerencia/auxiliar/vendas)
   users: (() => {
