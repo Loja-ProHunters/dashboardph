@@ -6490,6 +6490,11 @@ module.exports = async (req, res) => {
         vendas: d.vendas,
         pagamentos: d.pagamentos,
         tray: { modoTeste: !!d.tray.modoTeste, ultimaSync: d.tray.ultimaSync, configurado: !!(d.tray.consumer_key && d.tray.code) },
+        woo: {
+          lojas: wooClient.lojasAtivas().map(l => ({ slug: l.slug, nome: l.nome })),
+          ultimaSync: (d.woo && d.woo.ultimaSync) || null,
+          porLoja: (d.woo && d.woo.porLoja) || {},
+        },
         resumos,
         totalDevido,
       }));
