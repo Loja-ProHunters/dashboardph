@@ -6948,13 +6948,28 @@ async function crmRenderTarefas(){
   }
 }
 
+// Busca por nome / CPF / telefone do cliente (TQ.busca).
+function tqNormDig(s){ return String(s||'').replace(/\D/g, ''); }
+function tqMatchBusca(t){
+  var q = (TQ.busca || '').trim().toLowerCase();
+  if (!q) return true;
+  if (String(t.cliente_nome || '').toLowerCase().indexOf(q) !== -1) return true;
+  var qd = q.replace(/\D/g, '');
+  if (qd && qd.length >= 3) {
+    if (tqNormDig(t.cliente_telefone).indexOf(qd) !== -1) return true;
+    if (tqNormDig(t.cliente_cpf).indexOf(qd) !== -1) return true;
+  }
+  return false;
+}
+
 function tqFiltrar(){
   var D = TQ.dados, agora = tqAgoraBRT(), f = TQ.filtro;
   var linhas = [];
-  if (f === 'todas' || f === 'contratos') D.contratos.forEach(function(c){ linhas.push({ k: 'ct:' + c.order_id, ct: c }); });
+  if (f === 'todas' || f === 'contratos') D.contratos.forEach(function(c){ if (tqMatchBusca(c)) linhas.push({ k: 'ct:' + c.order_id, ct: c }); });
   if (f !== 'contratos') D.tarefas.forEach(function(t){
     // Tarefas agendadas pro futuro (follow-up) não aparecem na fila do vendedor
     if (t.agendada_futura) return;
+    if (!tqMatchBusca(t)) return;
     // Vermelho só quando o PRAZO já passou (dia anterior). Vence HOJE = amarelo,
     // pra não misturar reagendamento do dia com atraso de verdade.
     var prazoDia = (t.prazo || '').slice(0, 10), hojeDia = agora.slice(0, 10);
@@ -7014,24 +7029,58 @@ function tqDesenhar(){
   var total = tarefasVisiveis.length + D.contratos.length;
   var nAgendadas = D.tarefas.filter(function(t){ return !!t.agendada_futura; }).length;
   var agendadasTag = nAgendadas > 0 ? '<span class="tq-agendadas">📅 ' + nAgendadas + ' agendada' + (nAgendadas > 1 ? 's' : '') + '</span>' : '';
+  var vista = TQ.vista || 'aberto';
+  var nAnd = (D.emAndamento || []).length;
   var h = tqCorridaHTML() + '<div class="tq-head"><div class="tq-head-l"><h3>' + (total ? total + ' para fazer' : 'Fila em dia') + agendadasTag + '</h3>' +
     (meta ? '<div class="tq-prog"><span>Feitas hoje <b>' + feitas + '</b> de ' + meta + '</span><i><b style="width:' + Math.min(100, Math.round(feitas / meta * 100)) + '%"></b></i></div>' : '') + '</div>' +
     '<button class="tq-btn-sec" onclick="crmAbrirModalNovaTarefa()">+ Nova tarefa</button></div>';
+  // busca por nome / CPF / telefone
+  h += '<input id="tq-busca" class="tq-busca" type="search" placeholder="🔎 Buscar por nome, CPF ou telefone" value="' + crmEsc(TQ.busca || '') + '" oninput="tqBusca(this.value)" autocomplete="off">';
+  // abas: Em aberto | Em andamento
+  h += '<div class="tq-vistas">' +
+    '<button class="tq-vista' + (vista === 'aberto' ? ' on' : '') + '" onclick="tqVista(\'aberto\')">Em aberto <span>' + total + '</span></button>' +
+    '<button class="tq-vista' + (vista === 'andamento' ? ' on' : '') + '" onclick="tqVista(\'andamento\')">Em andamento <span>' + nAnd + '</span></button>' +
+    '</div>';
+
+  // ── VISTA: EM ANDAMENTO ──
+  if (vista === 'andamento') {
+    h += tqEmAndamentoLista();
+    view.innerHTML = h;
+    return;
+  }
+
+  // ── VISTA: EM ABERTO (sub-filtros + fila) ──
   var fs = [['todas', 'Tudo', total], ['contratos', '📝 Contratos', D.contratos.length], ['vencidas', 'Vencidas', nVenc], ['antigas', 'Antigas', nAnt], ['hoje', 'De hoje', nHoje]];
   h += '<div class="tq-filtros">' + fs.filter(function(x){ return x[0] === 'todas' || x[2] > 0; }).map(function(x){
     return '<button class="tq-fil' + (TQ.filtro === x[0] ? ' on' : '') + (x[0] === 'vencidas' || (x[0] === 'contratos' && D.contratos.some(function(c){ return c.atrasado; })) ? ' alerta' : '') + '" onclick="tqFiltro(\'' + x[0] + '\')">' + x[1] + ' <span>' + x[2] + '</span></button>';
   }).join('') + '</div>';
   var linhas = tqFiltrar();
   if (!linhas.length) {
-    h += '<div class="tq-vazio"><div>✓</div><b>' + (total ? 'Nada neste filtro.' : 'Nenhuma tarefa pendente.') + '</b><span>' + (total ? '' : 'Novas tarefas chegam todo dia às 8h.') + '</span></div>';
-    h += tqEmAndamentoSecHTML();
+    var vazioMsg = TQ.busca ? 'Nenhuma tarefa com “' + crmEsc(TQ.busca) + '”.' : (total ? 'Nada neste filtro.' : 'Nenhuma tarefa pendente.');
+    h += '<div class="tq-vazio"><div>' + (TQ.busca ? '🔎' : '✓') + '</div><b>' + vazioMsg + '</b><span>' + ((total || TQ.busca) ? '' : 'Novas tarefas chegam todo dia às 8h.') + '</span></div>';
     view.innerHTML = h; return;
   }
   h += '<div class="tq-lista">' + linhas.slice(0, TQ.limite).map(function(x){ return x.ct ? tqLinhaContrato(x.ct) : tqLinhaTarefa(x.t, x.venc, x.hoje); }).join('') + '</div>';
   if (linhas.length > TQ.limite) h += '<button class="tq-mais" onclick="TQ.limite+=15;tqDesenhar()">Mostrar mais ' + Math.min(15, linhas.length - TQ.limite) + ' (de ' + (linhas.length - TQ.limite) + ')</button>';
-  h += tqEmAndamentoSecHTML();
   view.innerHTML = h;
 }
+// Lista "Em andamento" (respeitando a busca). Vira o conteúdo principal quando
+// a aba "Em andamento" está selecionada.
+function tqEmAndamentoLista(){
+  var ea = (((TQ.dados && TQ.dados.emAndamento) || []).filter(tqMatchBusca));
+  if (!ea.length) {
+    var msg = TQ.busca ? 'Ninguém em andamento com “' + crmEsc(TQ.busca) + '”.' : 'Nada em andamento. Quando você aciona um cliente (WhatsApp/ligação), ele entra aqui aguardando o desfecho.';
+    return '<div class="tq-vazio"><div>⏳</div><b>' + msg + '</b></div>';
+  }
+  var antigos = ea.filter(function(t){ return (t.dias_em_andamento || 0) >= 7; }).length;
+  return '<div class="tq-ea-sec aba">' +
+    '<div class="tq-ea-head">⏳ Acionados, aguardando o cliente' +
+      '<span class="tq-ea-cnt' + (antigos ? ' bad' : '') + '">' + ea.length + (antigos ? ' · ' + antigos + ' parado' + (antigos > 1 ? 's' : '') : '') + '</span></div>' +
+    ea.map(tqLinhaEmAndamento).join('') + '</div>';
+}
+// Busca: re-renderiza e devolve o foco pro campo (sem perder o cursor).
+function tqBusca(v){ TQ.busca = v; TQ.limite = 15; tqDesenhar(); var el = document.getElementById('tq-busca'); if (el) { el.focus(); try { el.setSelectionRange(el.value.length, el.value.length); } catch (e) {} } }
+function tqVista(v){ TQ.vista = v; TQ.limite = 15; TQ.aberto = null; tqDesenhar(); }
 function tqFiltro(f){ TQ.filtro = f; TQ.limite = 15; TQ.aberto = null; tqDesenhar(); }
 function tqToggle(k){ TQ.aberto = TQ.aberto === k ? null : k; tqDesenhar(); var el = document.querySelector('[data-k="' + k + '"]'); if (el && TQ.aberto) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
 
@@ -14186,6 +14235,15 @@ async function cartSalvarNotas(id){
 #tab-crm .tq-prog i b{display:block;height:100%;background:#3d8a49;border-radius:4px}
 #tab-crm .tq-btn-sec{background:#fff;border:1px solid #d5d8d5;color:#111412;border-radius:8px;padding:8px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
 #tab-crm .tq-btn-sec:hover{border-color:#9aa09a}
+#tab-crm .tq-busca{width:100%;box-sizing:border-box;border:1px solid #e2e4e2;border-radius:10px;padding:10px 14px;font-size:13.5px;font-family:inherit;background:#fff;outline:none;margin-bottom:12px}
+#tab-crm .tq-busca:focus{border-color:#5aaa66;box-shadow:0 0 0 3px rgba(90,170,102,.15)}
+#tab-crm .tq-vistas{display:flex;gap:4px;background:#eef0ee;border-radius:10px;padding:3px;margin-bottom:12px;max-width:400px}
+#tab-crm .tq-vista{flex:1;background:transparent;border:none;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:700;color:#52514e;cursor:pointer;font-family:inherit;transition:background .15s,color .15s}
+#tab-crm .tq-vista span{font-weight:800;opacity:.6;margin-left:3px}
+#tab-crm .tq-vista:hover{color:#111412}
+#tab-crm .tq-vista.on{background:#fff;color:#111412;box-shadow:0 1px 2px rgba(17,20,18,.08)}
+#tab-crm .tq-vista.on span{color:#3d8a49;opacity:1}
+#tab-crm .tq-ea-sec.aba{margin-top:0}
 #tab-crm .tq-filtros{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 #tab-crm .tq-fil{background:transparent;border:1px solid transparent;border-radius:99px;padding:6px 12px;font-size:12.5px;font-weight:600;color:#52514e;cursor:pointer;font-family:inherit}
 #tab-crm .tq-fil span{color:#898781;font-weight:700;margin-left:2px}
