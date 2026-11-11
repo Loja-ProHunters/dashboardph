@@ -102,7 +102,209 @@
       "ultimo_contrato_em": "2026-09-28T12:56:42.100Z"
     }
   ],
-  "vendas": [],
+  "vendas": [
+    {
+      "id": "p_mwcdfyualjc0nl",
+      "ref": "prohunters#12882",
+      "loja": "prohunters",
+      "lojaNome": "prohunters",
+      "pedidoWoo": 12882,
+      "pedidoTray": "12882",
+      "cupom": "M3X",
+      "influenciadorId": "p_mugwfhum61xpac",
+      "data": "2026-11-10",
+      "cliente": "RODRIGO P V OLIVEIRA",
+      "valorBruto": 800.94,
+      "valorFrete": 61.43,
+      "valorLiquido": 739.51,
+      "comissaoPct": 5,
+      "comissao": 36.98,
+      "produtos": [
+        {
+          "nome": "Red Dot Maverick-IV 1x20 MiniMIL - Vector Optics",
+          "qty": 1,
+          "total": 739.51
+        }
+      ],
+      "origem": "woo",
+      "statusWoo": "processing",
+      "cancelada": false,
+      "criadaEm": "2026-11-11T17:06:58.978Z"
+    },
+    {
+      "id": "p_mwcdfyuao7xq5j",
+      "ref": "prohunters#12866",
+      "loja": "prohunters",
+      "lojaNome": "prohunters",
+      "pedidoWoo": 12866,
+      "pedidoTray": "12866",
+      "cupom": "M3X",
+      "influenciadorId": "p_mugwfhum61xpac",
+      "data": "2026-11-07",
+      "cliente": "Ítalo Augusto Spolaor Silva Gomes",
+      "valorBruto": 779.45,
+      "valorFrete": 0,
+      "valorLiquido": 779.45,
+      "comissaoPct": 5,
+      "comissao": 38.97,
+      "produtos": [
+        {
+          "nome": "Red Dot Frenzy 1x17x24  - Vector Optics",
+          "qty": 1,
+          "total": 866.06
+        }
+      ],
+      "origem": "woo",
+      "statusWoo": "processing",
+      "cancelada": false,
+      "criadaEm": "2026-11-11T17:06:58.978Z"
+    },
+    {
+      "id": "p_mwcdfyua471edz",
+      "ref": "prohunters#12860",
+      "loja": "prohunters",
+      "lojaNome": "prohunters",
+      "pedidoWoo": 12860,
+      "pedidoTray": "12860",
+      "cupom": "EDCBRASIL",
+      "influenciadorId": "p_mul6y0uwk4uu0h",
+      "data": "2026-11-05",
+      "cliente": "Antonio Nonato Nascimento Junior",
+      "valorBruto": 589.88,
+      "valorFrete": 27.59,
+      "valorLiquido": 562.29,
+      "comissaoPct": 5,
+      "comissao": 28.11,
+      "produtos": [
+        {
+          "nome": "Lanterna para Armas Olight - PL-Mini2 Valkyrie",
+          "qty": 1,
+          "total": 562.29
+        }
+      ],
+      "origem": "woo",
+      "statusWoo": "processing",
+      "cancelada": false,
+      "criadaEm": "2026-11-11T17:06:58.978Z"
+    },
+    {
+      "id": "p_mwcdfyuayd9oov",
+      "ref": "prohunters#12851",
+      "loja": "prohunters",
+      "lojaNome": "prohunters",
+      "pedidoWoo": 12851,
+      "pedidoTray": "12851",
+      "cupom": "EDCBRASIL",
+      "influenciadorId": "p_mul6y0uwk4uu0h",
+      "data": "2026-11-03",
+      "cliente": "Reinaldo Kireeff Covo",
+      "valorBruto": 811.93,
+      "valorFrete": 0,
+      "valorLiquido": 811.93,
+      "comissaoPct": 5,
+      "comissao": 40.6,
+      "produtos": [
+        {
+          "nome": "Canivete Dobrável Ruike P801-SF",
+          "qty": 1,
+          "total": 331.41
+        },
+        {
+          "nome": "Faca com Bainha Ruike F815-B",
+          "qty": 1,
+          "total": 523.25
+        }
+      ],
+      "origem": "woo",
+      "statusWoo": "completed",
+      "cancelada": false,
+      "criadaEm": "2026-11-11T17:06:58.978Z"
+    },
+    {
+      "id": "p_mwcdfyua96qssd",
+      "ref": "prohunters#12846",
+      "loja": "prohunters",
+      "lojaNome": "prohunters",
+      "pedidoWoo": 12846,
+      "pedidoTray": "12846",
+      "cupom": "M3X",
+      "influenciadorId": "p_mugwfhum61xpac",
+      "data": "2026-11-01",
+      "cliente": "Gabriel Henrique Deves",
+      "valorBruto": 622.38,
+      "valorFrete": 28.85,
+      "valorLiquido": 593.53,
+      "comissaoPct": 5,
+      "comissao": 29.68,
+      "produtos": [
+        {
+          "nome": "Lanterna para Armas Olight - PL-Mini2 Valkyrie",
+          "qty": 1,
+          "total": 593.53
+        }
+      ],
+      "origem": "woo",
+      "statusWoo": "completed",
+      "cancelada": false,
+      "criadaEm": "2026-11-11T17:06:58.978Z"
+    },
+    {
+      "id": "p_mwcdfyuawtbkqz",
+      "ref": "prohunters#12806",
+      "loja": "prohunters",
+      "lojaNome": "prohunters",
+      "pedidoWoo": 12806,
+      "pedidoTray": "12806",
+      "cupom": "M3X",
+      "influenciadorId": "p_mugwfhum61xpac",
+      "data": "2026-10-30",
+      "cliente": "Ednei de Souza borges",
+      "valorBruto": 1424.06,
+      "valorFrete": 0,
+      "valorLiquido": 1424.06,
+      "comissaoPct": 5,
+      "comissao": 71.2,
+      "produtos": [
+        {
+          "nome": "Lanterna Fenix HT18R V2.0 3700 Lúmens",
+          "qty": 1,
+          "total": 1499.01
+        }
+      ],
+      "origem": "woo",
+      "statusWoo": "completed",
+      "cancelada": false,
+      "criadaEm": "2026-11-11T17:06:58.978Z"
+    },
+    {
+      "id": "p_mwcdfyuaf61k91",
+      "ref": "prohunters#12511",
+      "loja": "prohunters",
+      "lojaNome": "prohunters",
+      "pedidoWoo": 12511,
+      "pedidoTray": "12511",
+      "cupom": "M3X",
+      "influenciadorId": "p_mugwfhum61xpac",
+      "data": "2026-10-30",
+      "cliente": "Humberto Romero Vaz Junior",
+      "valorBruto": 731.38,
+      "valorFrete": 28.85,
+      "valorLiquido": 702.53,
+      "comissaoPct": 5,
+      "comissao": 35.13,
+      "produtos": [
+        {
+          "nome": "Red Dot Maverick-IV 1x20 MiniSOP FDE - Vector Optics",
+          "qty": 1,
+          "total": 739.51
+        }
+      ],
+      "origem": "woo",
+      "statusWoo": "completed",
+      "cancelada": false,
+      "criadaEm": "2026-11-11T17:06:58.978Z"
+    }
+  ],
   "pagamentos": [],
   "tray": {
     "consumer_key": null,
@@ -110,5 +312,29 @@
     "code": null,
     "ultimaSync": null,
     "modoTeste": true
+  },
+  "woo": {
+    "ultimaSync": "2026-11-11T17:06:58.978Z",
+    "porLoja": {
+      "fenixstore": {
+        "nome": "fenixstore",
+        "pedidos": 370,
+        "comCupom": 0,
+        "atribuidas": 0,
+        "cupons": {}
+      },
+      "prohunters": {
+        "nome": "prohunters",
+        "pedidos": 377,
+        "comCupom": 9,
+        "atribuidas": 7,
+        "cupons": {
+          "M3X": 5,
+          "PRIMEIRACOMPRA": 2,
+          "PHPOINTS": 2,
+          "EDCBRASIL": 2
+        }
+      }
+    }
   }
 }
