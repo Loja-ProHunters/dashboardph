@@ -303,6 +303,44 @@
       "statusWoo": "completed",
       "cancelada": false,
       "criadaEm": "2026-11-11T17:06:58.978Z"
+    },
+    {
+      "id": "p_mwcek3ecyrlno3",
+      "ref": "prohunters#12891",
+      "loja": "prohunters",
+      "lojaNome": "prohunters",
+      "pedidoWoo": 12891,
+      "pedidoTray": "12891",
+      "cupom": "EDCBRASIL",
+      "influenciadorId": "p_mul6y0uwk4uu0h",
+      "data": "2026-11-11",
+      "cliente": "Humberto Junqueira Galli da Silva",
+      "valorBruto": 2560.09,
+      "valorFrete": 0,
+      "valorLiquido": 2560.09,
+      "comissaoPct": 5,
+      "comissao": 128,
+      "produtos": [
+        {
+          "nome": "Lanterna Camping Fenix CL26R PRO Cinza 650 Lúmens",
+          "qty": 1,
+          "total": 869.08
+        },
+        {
+          "nome": "Lanterna para Camping Fenix CL09 Preto - 200 Lúmens",
+          "qty": 1,
+          "total": 143.23
+        },
+        {
+          "nome": "Lanterna de Cabeça Fenix HM75R 1600 Lúmens",
+          "qty": 1,
+          "total": 1832.24
+        }
+      ],
+      "origem": "woo",
+      "statusWoo": "processing",
+      "cancelada": false,
+      "criadaEm": "2026-11-11T17:38:11.124Z"
     }
   ],
   "pagamentos": [],
@@ -314,25 +352,24 @@
     "modoTeste": true
   },
   "woo": {
-    "ultimaSync": "2026-11-11T17:06:58.978Z",
+    "ultimaSync": "2026-11-11T17:38:11.124Z",
     "porLoja": {
       "fenixstore": {
         "nome": "fenixstore",
-        "pedidos": 370,
+        "pedidos": 10,
         "comCupom": 0,
         "atribuidas": 0,
         "cupons": {}
       },
       "prohunters": {
         "nome": "prohunters",
-        "pedidos": 377,
-        "comCupom": 9,
-        "atribuidas": 7,
+        "pedidos": 13,
+        "comCupom": 2,
+        "atribuidas": 2,
         "cupons": {
-          "M3X": 5,
-          "PRIMEIRACOMPRA": 2,
-          "PHPOINTS": 2,
-          "EDCBRASIL": 2
+          "EDCBRASIL": 1,
+          "PHPOINTS": 1,
+          "M3X": 1
         }
       }
     }
