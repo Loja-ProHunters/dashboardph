@@ -352,6 +352,77 @@
       "statusWoo": "processing",
       "cancelada": false,
       "criadaEm": "2026-11-11T17:38:11.124Z"
+    },
+    {
+      "id": "p_mwdy6zu4pot6ir",
+      "ref": "prohunters#12895",
+      "loja": "prohunters",
+      "lojaNome": "Pro Hunters",
+      "pedidoWoo": 12895,
+      "pedidoTray": "12895",
+      "cupom": "EDCBRASIL",
+      "influenciadorId": "p_mul6y0uwk4uu0h",
+      "data": "2026-11-11",
+      "cliente": "Reinaldo Kireeff Covo",
+      "valorBruto": 2695.1,
+      "valorFrete": 0,
+      "valorLiquido": 2695.1,
+      "comissaoPct": 5,
+      "comissao": 134.76,
+      "produtos": [
+        {
+          "nome": "Faca com Bainha Ruike F815-J",
+          "qty": 1,
+          "total": 529.66
+        },
+        {
+          "nome": "Faca Skinner Andino Hunt com Bainha - Modelo Micarta Preta",
+          "qty": 1,
+          "total": 1104.21
+        },
+        {
+          "nome": "Faca com Bainha Ruike F815-B",
+          "qty": 1,
+          "total": 529.67
+        },
+        {
+          "nome": "Canivete Profissional Ruike P128-SB",
+          "qty": 1,
+          "total": 531.56
+        }
+      ],
+      "origem": "woo",
+      "statusWoo": "processing",
+      "cancelada": false,
+      "criadaEm": "2026-11-12T19:35:37.829Z"
+    },
+    {
+      "id": "p_mwdy6zu5nd5i2v",
+      "ref": "prohunters#12892",
+      "loja": "prohunters",
+      "lojaNome": "Pro Hunters",
+      "pedidoWoo": 12892,
+      "pedidoTray": "12892",
+      "cupom": "M3X",
+      "influenciadorId": "p_mugwfhum61xpac",
+      "data": "2026-11-11",
+      "cliente": "Daniel Coelho de Souza Brito",
+      "valorBruto": 779.45,
+      "valorFrete": 0,
+      "valorLiquido": 779.45,
+      "comissaoPct": 5,
+      "comissao": 38.97,
+      "produtos": [
+        {
+          "nome": "Red Dot Frenzy 1x17x24  - Vector Optics",
+          "qty": 1,
+          "total": 866.06
+        }
+      ],
+      "origem": "woo",
+      "statusWoo": "processing",
+      "cancelada": false,
+      "criadaEm": "2026-11-12T19:35:37.829Z"
     }
   ],
   "pagamentos": [],
@@ -363,25 +434,25 @@
     "modoTeste": true
   },
   "woo": {
-    "ultimaSync": "2026-11-11T17:38:11.124Z",
+    "ultimaSync": "2026-11-12T19:35:38.477Z",
     "porLoja": {
+      "prohunters": {
+        "nome": "Pro Hunters",
+        "pedidos": 20,
+        "comCupom": 4,
+        "atribuidas": 4,
+        "cupons": {
+          "EDCBRASIL": 2,
+          "PHPOINTS": 2,
+          "M3X": 2
+        }
+      },
       "fenixstore": {
-        "nome": "fenixstore",
-        "pedidos": 10,
+        "nome": "Fenix Store",
+        "pedidos": 12,
         "comCupom": 0,
         "atribuidas": 0,
         "cupons": {}
-      },
-      "prohunters": {
-        "nome": "prohunters",
-        "pedidos": 13,
-        "comCupom": 2,
-        "atribuidas": 2,
-        "cupons": {
-          "EDCBRASIL": 1,
-          "PHPOINTS": 1,
-          "M3X": 1
-        }
       }
     }
   }
