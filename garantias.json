@@ -6767,7 +6767,7 @@
       "resolucao_fabricante": null
     },
     "procedimento_interno": {
-      "status": "pendente",
+      "status": "concluido",
       "pedido_substituto": null,
       "pedido_substituto_data": null,
       "baixa_estoque_feita": false,
@@ -6778,12 +6778,12 @@
       "nota": null,
       "atualizado_em": null,
       "atualizado_por": null,
-      "concluido_em": null,
-      "concluido_por": null
+      "concluido_em": "2026-11-13T11:55:42.862Z",
+      "concluido_por": "auxiliar"
     },
     "criado_por": "tally-webhook",
     "criado_em": "2026-10-29T12:16:55.270Z",
-    "atualizado_em": "2026-11-13T11:55:23.157Z",
+    "atualizado_em": "2026-11-13T11:55:42.862Z",
     "tally_meta": {
       "eventId": "sync_QoN5W0p",
       "responseId": "QoN5W0p",
@@ -6855,6 +6855,11 @@
         "por": "auxiliar",
         "resultado": "troca",
         "nota": "Cliente ficou com crédito para proxima compra"
+      },
+      {
+        "ts": "2026-11-13T11:55:42.862Z",
+        "acao": "procedimento_interno_concluido",
+        "por": "auxiliar"
       }
     ],
     "observacao": {
