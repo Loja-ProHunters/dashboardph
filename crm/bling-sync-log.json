@@ -1,5 +1,15 @@
 [
   {
+    "ts": "2026-11-13T13:30:34.639Z",
+    "tipo": "backfill_concluido",
+    "contaId": "prohunters",
+    "pedidos_processados": 2099,
+    "accounts_criadas": 307,
+    "orders_criadas": 843,
+    "ja_existentes": 1251,
+    "rate_limit_perdidos": 8
+  },
+  {
     "ts": "2026-11-13T13:29:46.060Z",
     "tipo": "backfill_concluido",
     "contaId": "prohunters",
