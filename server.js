@@ -9,11 +9,20 @@
 // A porta vem do ambiente (o host decide qual é). Fallback 3000 pra rodar local.
 
 const http = require('http');
+const { URL } = require('url');
 const handler = require('./api/index.js');
 
 const port = process.env.PORT || 3000;
 
 const server = http.createServer(function (req, res) {
+  // A Vercel preenchia req.query automaticamente; no Node puro não existe.
+  // Replicamos aqui pra qualquer rota que leia req.query funcionar igual ao
+  // que funcionava na Vercel (ex.: fallback do callback OAuth do Bling).
+  try {
+    const sp = new URL(req.url || '/', 'http://x').searchParams;
+    req.query = {};
+    for (const [k, v] of sp) { req.query[k] = v; }
+  } catch (e) { req.query = {}; }
   // O handler é async; captura qualquer erro não tratado pra não derrubar o processo.
   Promise.resolve()
     .then(function () { return handler(req, res); })
