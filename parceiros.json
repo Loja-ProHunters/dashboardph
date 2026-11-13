@@ -434,14 +434,15 @@
     "modoTeste": true
   },
   "woo": {
-    "ultimaSync": "2026-11-13T13:26:14.425Z",
+    "ultimaSync": "2026-11-13T19:55:28.863Z",
     "porLoja": {
       "prohunters": {
         "nome": "Pro Hunters",
-        "pedidos": 15,
-        "comCupom": 3,
+        "pedidos": 12,
+        "comCupom": 4,
         "atribuidas": 3,
         "cupons": {
+          "PRIMEIRACOMPRA": 1,
           "EDCBRASIL": 2,
           "PHPOINTS": 2,
           "M3X": 1
@@ -449,7 +450,7 @@
       },
       "fenixstore": {
         "nome": "Fenix Store",
-        "pedidos": 12,
+        "pedidos": 8,
         "comCupom": 0,
         "atribuidas": 0,
         "cupons": {}
