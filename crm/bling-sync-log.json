@@ -1,5 +1,11 @@
 [
   {
+    "ts": "2026-11-13T13:04:17.544Z",
+    "tipo": "incremental_save_abortado",
+    "msg": "canceling statement due to statement timeout",
+    "contaId": "calibre"
+  },
+  {
     "ts": "2026-11-13T13:02:38.201Z",
     "tipo": "sync_incremental",
     "contaId": "prohunters",
