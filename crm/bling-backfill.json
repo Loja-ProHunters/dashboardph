@@ -513,18 +513,18 @@
     "24334457391",
     "24330798109",
     "24330475963",
-    "24326699430",
-    "25470278699"
+    "24326699430"
   ],
   "total_original": 2099,
-  "processados": 1591,
-  "accounts_criadas": 231,
-  "orders_criadas": 712,
+  "processados": 1592,
+  "accounts_criadas": 218,
+  "orders_criadas": 700,
   "orders_atualizadas": 0,
-  "ja_existentes": 874,
-  "rate_limit_perdidos": 9,
+  "ja_existentes": 887,
+  "rate_limit_perdidos": 8,
   "erros_outros": 15280,
   "avisos": [
+    "pedido 24784738655 [prohunters]: Unsupported state or unable to authenticate data",
     "pedido 24782953917 [prohunters]: Unsupported state or unable to authenticate data",
     "pedido 24780446579 [prohunters]: Unsupported state or unable to authenticate data",
     "pedido 24780253441 [prohunters]: Unsupported state or unable to authenticate data",
@@ -723,11 +723,10 @@
     "pedido 24334457391 [prohunters]: Unsupported state or unable to authenticate data",
     "pedido 24330798109 [prohunters]: Unsupported state or unable to authenticate data",
     "pedido 24330475963 [prohunters]: Unsupported state or unable to authenticate data",
-    "pedido 24326699430 [prohunters]: Unsupported state or unable to authenticate data",
-    "pedido 25470278699 [prohunters]: Bling API \"prohunters\" 429 em GET /pedidos/vendas/25470278699: O limite de requisições por segundo foi atingido, tente novamente mais tarde."
+    "pedido 24326699430 [prohunters]: Unsupported state or unable to authenticate data"
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-11-13T11:57:49.842Z",
+  "ultimo_lote_em": "2026-11-13T11:57:54.070Z",
   "ticks_hoje_data": "2026-11-13",
   "ticks_hoje_count": 49
 }
