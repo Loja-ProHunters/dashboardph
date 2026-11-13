@@ -557,10 +557,10 @@
   ],
   "total_original": 2099,
   "processados": 1552,
-  "accounts_criadas": 218,
-  "orders_criadas": 688,
+  "accounts_criadas": 223,
+  "orders_criadas": 695,
   "orders_atualizadas": 0,
-  "ja_existentes": 859,
+  "ja_existentes": 852,
   "rate_limit_perdidos": 8,
   "erros_outros": 15280,
   "avisos": [
@@ -766,7 +766,7 @@
     "pedido 24326699430 [prohunters]: Unsupported state or unable to authenticate data"
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-11-13T11:55:53.633Z",
+  "ultimo_lote_em": "2026-11-13T11:55:53.119Z",
   "ticks_hoje_data": "2026-11-13",
-  "ticks_hoje_count": 48
+  "ticks_hoje_count": 47
 }
