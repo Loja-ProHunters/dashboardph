@@ -7,26 +7,6 @@
   "ate": "2026-11-04",
   "meses": 12,
   "ids_pendentes": [
-    "24683374909",
-    "24682566710",
-    "24682013717",
-    "24681071832",
-    "24680757411",
-    "24680083930",
-    "24679527054",
-    "24679406579",
-    "24676368612",
-    "24671238255",
-    "24670821140",
-    "24662418013",
-    "24657868373",
-    "24656233644",
-    "24637493436",
-    "24636206567",
-    "24635611654",
-    "24635077326",
-    "24632996787",
-    "24627521968",
     "24627025355",
     "24626911796",
     "24624401072",
@@ -176,11 +156,11 @@
     "24326699430"
   ],
   "total_original": 2099,
-  "processados": 1932,
+  "processados": 1952,
   "accounts_criadas": 264,
   "orders_criadas": 784,
   "orders_atualizadas": 0,
-  "ja_existentes": 1143,
+  "ja_existentes": 1163,
   "rate_limit_perdidos": 8,
   "erros_outros": 15280,
   "avisos": [
@@ -386,7 +366,7 @@
     "pedido 24326699430 [prohunters]: Unsupported state or unable to authenticate data"
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-11-13T12:57:15.166Z",
+  "ultimo_lote_em": "2026-11-13T12:57:29.677Z",
   "ticks_hoje_data": "2026-11-13",
-  "ticks_hoje_count": 66
+  "ticks_hoje_count": 65
 }
