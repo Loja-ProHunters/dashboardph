@@ -5388,9 +5388,12 @@ module.exports = async (req, res) => {
       // Vercel/Node podem expor query string em lugares diferentes.
       // Tentamos múltiplas fontes pra ser robusto.
       let code = null, stateRecebido = null, errParam = null, errDesc = null;
-      // (1) via req.url + URL parser
+      // (1) via req.url + URL parser. IMPORTANTE: usar req.url (COM query string),
+      // não o `url` do topo do handler, que já teve o "?..." removido. Na Vercel
+      // o fallback req.query mascarava isso; no Node puro (Hostinger) não existe
+      // req.query nativo, então aqui precisa ser req.url mesmo.
       try {
-        const u = new URL('http://x' + url);
+        const u = new URL('http://x' + (req.url || ''));
         code = u.searchParams.get('code');
         stateRecebido = u.searchParams.get('state');
         errParam = u.searchParams.get('error');
