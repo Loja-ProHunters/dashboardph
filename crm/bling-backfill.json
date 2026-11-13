@@ -1,26 +1,18 @@
 {
   "contaId": "prohunters",
-  "status": "em_andamento",
+  "status": "concluido",
   "iniciado_em": "2026-11-04T12:07:30.924Z",
   "iniciado_por": "auto-recuperar",
   "desde": "2025-11-04",
   "ate": "2026-11-04",
   "meses": 12,
-  "ids_pendentes": [
-    "24357257530",
-    "24339113256",
-    "24337753261",
-    "24334457391",
-    "24330798109",
-    "24330475963",
-    "24326699430"
-  ],
+  "ids_pendentes": [],
   "total_original": 2099,
-  "processados": 2092,
-  "accounts_criadas": 323,
-  "orders_criadas": 863,
+  "processados": 2099,
+  "accounts_criadas": 307,
+  "orders_criadas": 843,
   "orders_atualizadas": 0,
-  "ja_existentes": 1224,
+  "ja_existentes": 1251,
   "rate_limit_perdidos": 8,
   "erros_outros": 15280,
   "avisos": [
@@ -226,7 +218,8 @@
     "pedido 24326699430 [prohunters]: Unsupported state or unable to authenticate data"
   ],
   "truncado_paginacao": false,
-  "ultimo_lote_em": "2026-11-13T13:30:16.603Z",
+  "ultimo_lote_em": "2026-11-13T13:30:32.742Z",
   "ticks_hoje_data": "2026-11-13",
-  "ticks_hoje_count": 79
+  "ticks_hoje_count": 79,
+  "concluido_em": "2026-11-13T13:30:34.207Z"
 }
