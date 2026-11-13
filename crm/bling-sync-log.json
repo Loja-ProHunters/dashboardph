@@ -1,5 +1,17 @@
 [
   {
+    "ts": "2026-11-13T13:32:04.266Z",
+    "tipo": "sync_incremental",
+    "contaId": "prohunters",
+    "dias": 1,
+    "pedidos_vistos": 15,
+    "novos_orders": 15,
+    "novas_accounts": 13,
+    "ja_existentes": 0,
+    "rate_limit_perdidos": 0,
+    "avisos": 0
+  },
+  {
     "ts": "2026-11-13T13:30:40.891Z",
     "tipo": "backfill_concluido",
     "contaId": "prohunters",
