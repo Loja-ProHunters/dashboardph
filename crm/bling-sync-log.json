@@ -1,5 +1,17 @@
 [
   {
+    "ts": "2026-11-14T02:00:32.267Z",
+    "tipo": "sync_incremental",
+    "contaId": "calibre",
+    "dias": 1,
+    "pedidos_vistos": 1,
+    "novos_orders": 0,
+    "novas_accounts": 0,
+    "ja_existentes": 1,
+    "rate_limit_perdidos": 0,
+    "avisos": 0
+  },
+  {
     "ts": "2026-11-14T02:00:27.571Z",
     "tipo": "sync_incremental",
     "contaId": "prohunters",
